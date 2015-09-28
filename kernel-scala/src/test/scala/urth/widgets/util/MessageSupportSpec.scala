@@ -4,7 +4,7 @@ import com.ibm.spark.comm.CommWriter
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, FunSpec}
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.{JsNumber, JsString, Json}
 
 class MessageSupportSpec extends FunSpec with Matchers with MockitoSugar {
 

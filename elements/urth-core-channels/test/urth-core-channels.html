@@ -91,6 +91,7 @@
             channel.clearData('channel1');
             channel.unregister();
             channel.unregister('channel1');
+            channel.unregister('*');
         });
 
         // STEP 5: Define suite(s) and tests.
@@ -160,39 +161,69 @@
             });
         });
 
-        describe('notifySetItem', function(){
-            it('should get called when a setItem call on explictly named default channel', function() {
-                channel.onModelReady();
+        describe('onChannelSetItem', function(){
+            it('should get called when setItem is called with explictly named default channel', function() {
+                channel.register(channel, '*');
+                channel.setItem('foo', 'baz', 'default');
 
-                var notifySpy = sinon.spy(channel, 'notifySetItem');
+                var channelSetSpy = sinon.spy(channel, 'onChannelSetItem');
 
-                Urth.ChannelsBehavior.setItem('foo', 'bar', 'default');
+                channel.setItem('foo', 'bar', 'default');
 
-                assert(notifySpy.calledOnce, "notifySetItem was called " + notifySpy.callCount);
-                assert(notifySpy.calledWith('foo', 'bar', 'default'), "notifySetItem called with wrong arguments")
+                expect(channelSetSpy).to.have.been.calledOnce;
+                expect(channelSetSpy.args[0][0].detail).to.deep.equal({ key: 'foo', oldVal: 'baz', newVal: 'bar', channel: 'default' });
             });
 
-            it('should get called when a setItem called with no channel specified', function() {
-                channel.onModelReady();
+            it('should get called when setItem is called with no channel specified', function() {
+                channel.register(channel, '*');
+                channel.setItem('foo', 'baz');
+                var channelSetSpy = sinon.spy(channel, 'onChannelSetItem');
 
-                var notifySpy = sinon.spy(channel, 'notifySetItem');
+                channel.setItem('foo', 'bar');
 
-                Urth.ChannelsBehavior.setItem('foo', 'bar');
+                expect(channelSetSpy).to.have.been.calledOnce;
+                expect(channelSetSpy.args[0][0].detail).to.deep.equal({ key: 'foo', oldVal: 'baz', newVal: 'bar', channel: 'default' });
+            });
 
-                assert(notifySpy.calledOnce, "notifySetItem was called " + notifySpy.callCount);
-                assert(notifySpy.calledWith('foo', 'bar', 'default'), "notifySetItem called with wrong arguments")
+            it('should send a change message with the correct values', function() {
+                debugger;
+                channel.register(channel, '*');
+                channel.model = {
+                    set: function(){},
+                    callbacks: function(){},
+                    send: function(){}
+                };
+                var expected = {
+                    event: 'change',
+                    data: {
+                        name: 'foo',
+                        old_val: 'bar',
+                        new_val: 'baz',
+                        channel: 'default'
+                    }
+                }
+                channel.setItem('foo', 'bar', 'default');
+                var sendSpy = sinon.spy(channel, 'send');
+
+                channel.setItem('foo', 'baz', 'default');
+
+                expect(sendSpy).to.have.been.calledOnce;
+                expect(sendSpy).to.have.been.calledWith(expected);
             });
 
             it('should set model with right key/value pairs', function() {
+                channel.register(channel, '*')
                 channel.model = {
-                    set: function(){}
-                }
+                    set: function(){},
+                    callbacks: function(){},
+                    send: function(){}
+                };
                 var setSpy = sinon.spy(channel.model, 'set');
 
-                channel.notifySetItem('aKey', 'aValue', 'aChannel')
+                channel.onChannelSetItem({detail:{key: 'aKey', newVal: 'aValue', channel: 'aChannel'}});
 
-                assert(setSpy.calledOnce, "model.set was called " + setSpy.callCount);
-                assert(setSpy.calledWith('aChannel:aKey', 'aValue', {silent: true}), "model.set called with wrong arguments")
+                expect(setSpy).to.have.been.calledOnce;
+                expect(setSpy).to.have.been.calledWith('aChannel:aKey', 'aValue', {silent: true});
             });
         });
 
@@ -260,6 +291,34 @@
 
                 channel.clearData('channel1');
                 channel.unregister('channel1');
+            });
+
+            it('with channel "*" should cause the element to receive channelSetItem event', function(){
+                var notifySpy = sinon.spy();
+                consumer.addEventListener('channelSetItem', notifySpy);
+
+                channel.register(consumer, '*');
+
+                channel.setItem('foo', 'bar', 'default');
+                channel.unregister(consumer, '*');
+
+                expect(notifySpy).to.have.been.calledOnce;
+                expect(notifySpy.args[0][0].detail).to.deep.equal({ key: 'foo', oldVal: undefined, newVal: 'bar', channel: 'default' });
+            });
+
+            it('with channel "*" should not re-subscribe an already subscribed element', function() {
+                channel.setItem('foo', 'baz', 'default');
+                var notifySpy = sinon.spy();
+                consumer.addEventListener('channelSetItem', notifySpy);
+
+                channel.register(consumer, '*');
+                channel.register(consumer, '*');
+
+                channel.setItem('foo', 'bar', 'default');
+
+                // If it was double-subscribed, there would be two calls.
+                expect(notifySpy).to.have.been.calledOnce;
+                expect(notifySpy.args[0][0].detail).to.deep.equal({ key: 'foo', oldVal: 'baz', newVal: 'bar', channel: 'default' });
             });
         });
 
@@ -363,6 +422,21 @@
 
                 expect(consumer.foo).to.equal('initial');
                 expect(consumer.bar).to.equal('initial');
+            });
+
+            it('on channel "*" should cause the element to no longer receive channelSetItem events', function(){
+                channel.setItem('foo', 'baz', 'default');
+                var notifySpy = sinon.spy();
+                consumer.addEventListener('channelSetItem', notifySpy);
+
+                channel.register(consumer, '*');
+                channel.setItem('foo', 'bar', 'default');
+                channel.unregister(consumer, '*');
+                channel.setItem('foo', 'bam', 'default');
+
+                // If it was double-subscribed, there would be two calls.
+                expect(notifySpy).to.have.been.calledOnce;
+                expect(notifySpy.args[0][0].detail).to.deep.equal({ key: 'foo', oldVal: 'baz', newVal: 'bar', channel: 'default' });
             });
         });
 
@@ -484,43 +558,6 @@
 
         });
 
-        describe('subscribe', function(){
-            it('should cause the element to receive setItem notifications', function(){
-                var subscriber = {
-                    notifySetItem: function(){}
-                }
-
-                var notifySpy = sinon.spy(subscriber, 'notifySetItem');
-
-                channel.subscribe(subscriber)
-
-                channel.setItem('foo', 'bar', 'default');
-
-                assert(notifySpy.calledOnce, "notifySetItem was called " + notifySpy.callCount);
-                assert(notifySpy.calledWith('foo', 'bar', 'default'), "notifySetItem was called with wrong arguments");
-            });
-        });
-
-        describe('unsubscribe', function(){
-            it('should cause the element to no longer receive notifications', function(){
-                var subscriber = {
-                    notifySetItem: function(){}
-                }
-
-                var notifySpy = sinon.spy(subscriber, 'notifySetItem');
-
-                channel.subscribe(subscriber)
-
-                channel.setItem('foo', 'bar', 'default');
-
-                channel.unsubscribe(subscriber)
-
-                channel.setItem('foo', 'baz', 'default');
-
-                assert(notifySpy.calledOnce, "notifySetItem was called " + notifySpy.callCount);
-                assert(notifySpy.calledWith('foo', 'bar', 'default'), "notifySetItem was called with wrong arguments");
-            });
-        });
     </script>
 </body>
 </html>

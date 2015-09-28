@@ -10,7 +10,7 @@
 
         // Holds a collection with channel data, and a list of registered
         // listeners for channel changes.
-        var Channel = function() {
+        var initChannel = function() {
             return {
                 'collection': new Polymer.Collection([]),
                 'registered': []
@@ -18,9 +18,10 @@
         }
 
         // Maps channel names to channels. Creates a default channel.
-        var channels = { 'default' : Channel() };
-
-        var subscribers = new Polymer.Collection([])
+        var channels = {
+            'default': initChannel(),
+            '*': initChannel()
+        };
 
         window.Urth = window.Urth || {};
 
@@ -73,6 +74,10 @@
              * The element will have its property set when a key is set
              * on the channel.
              *
+             * Register with the '*' channel to have a `channelSetItem`
+             * event fired on the element when any property changes in any
+             * channel.
+             *
              * @method register
              * @param {HTMLElement} element The DOM element to register.
              * @param {string} channel The name of the channel to register on.
@@ -110,9 +115,17 @@
              */
             setItem: function(key, value, channelName) {
                 var channel = this._getChannel(channelName);
+                var oldVal = channel && key ? this.getItem(key, channelName) : undefined;
 
-                if (key && value && channel) {
-                    channel.collection.setItem(key, value);
+                if (key && channel && oldVal !== value) {
+                    var subscriberChannel = this._getChannel('*');
+
+                    // 'undefined' value results in a delete of the key.
+                    if (typeof value === 'undefined') {
+                        channel.collection.removeKey(key);
+                    } else {
+                        channel.collection.setItem(key, value);
+                    }
 
                     channel.registered.forEach(function(element) {
                         // TODO: Would be good to only set the property
@@ -123,20 +136,18 @@
                         }
                     }.bind(this));
 
-                    subscribers.getItems().forEach(function(elt){
-                        if (elt.notifySetItem){
-                            elt.notifySetItem(key, value, (channelName ? channelName: 'default'));
-                        }
+                    // Fire an event on all the subscribers of the special
+                    // '*' channel.
+                    subscriberChannel.registered.forEach(function(element) {
+                        Polymer.Base.fire('channelSetItem', {
+                                key: key,
+                                oldVal: oldVal,
+                                newVal: value,
+                                channel: channelName || 'default'
+                            }, {node: element}
+                        );
                     });
-
-                } else if (key && channel) {
-                    channel.collection.removeKey(key);
                 }
-            },
-
-            subscribe: function(element) {
-                subscribers.add(element);
-                console.debug("Subscribed element ", element);
             },
 
             /**
@@ -169,7 +180,7 @@
              * @param {string} channel The name of the channel to unregister from.
              */
             unregister: function(element, channel) {
-                var channel = this._getChannel(channel);
+                channel = this._getChannel(channel);
                 if (channel){
                     if (element) {
                         var index = channel.registered.indexOf(element);
@@ -181,11 +192,6 @@
                         channel.registered.splice(0, channel.registered.length);
                     }
                 }
-            },
-
-            unsubscribe: function(element) {
-                subscribers.remove(element);
-                console.debug("Unsubscribed element ", element);
             },
 
             /**
@@ -208,9 +214,9 @@
 
             _createChannel: function(channel) {
                 if (!channels[channel]) {
-                    channels[channel] = Channel();
-                    console.debug("urth-core-channels-behavior _createChannel: " +
-                        "created new channel", channel, "."
+                    channels[channel] = initChannel();
+                    console.debug('urth-core-channels-behavior _createChannel: ' +
+                        'created new channel', channel, '.'
                     );
                 }
                 return channels[channel];
@@ -221,8 +227,8 @@
                     if (channels[channel]) {
                         return channels[channel];
                     } else {
-                        console.warn("urth-core-channels-behavior _getChannel: " +
-                            "channel", channel, "does not exist"
+                        console.warn('urth-core-channels-behavior _getChannel: ' +
+                            'channel', channel, 'does not exist'
                         );
                     }
                 } else {

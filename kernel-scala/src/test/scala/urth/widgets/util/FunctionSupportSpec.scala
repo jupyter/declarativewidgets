@@ -379,6 +379,90 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
       }
     }
 
+    describe("#invokeWatchHandler") {
+      val support = new TestFunctionSupport
+      it ("should execute the given handler with the given arguments converted"){
+
+        val arg1 = JsNumber(1)
+        val arg2 = JsNumber(2)
+        var executed = false
+        val handler = (old: Int, noo: Int) => executed = true
+
+        support.invokeWatchHandler(arg1, arg2, handler) should be (Some(()))
+        executed should be(true)
+      }
+
+      it ("should return None when execution fails"){
+        val arg1 = JsNumber(1)
+        val arg2 = JsNumber(2)
+        val handler = (old: Int, noo: Int) => { 1 / 0; ()}
+
+        support.invokeWatchHandler(arg1, arg2, handler) should be (None)
+      }
+
+      it ("should return None when argument types don't match"){
+        val arg1 = JsNumber(1)
+        val arg2 = JsNumber(2)
+        var executed = false
+        val handler = (old: String, noo: String) => executed = true
+
+        support.invokeWatchHandler(arg1, arg2, handler) should be (None)
+        executed should be(false)
+      }
+    }
+
+    describe("#convertJsValue") {
+      it("should convert an integer JsNumber to Scala Integer"){
+        val x = JsNumber(3)
+        val converted = support.convertJsValue(x)
+        converted should be (3)
+        converted.isInstanceOf[Int] should be (true)
+      }
+      it("should convert a decimal JsNumber to Scala Double"){
+        val x = JsNumber(3.1)
+        val converted = support.convertJsValue(x)
+        converted should be (3.1)
+        println(converted.getClass.getName)
+        converted.isInstanceOf[Double] should be (true)
+      }
+      it("should convert a JsString to Scala String"){
+        val x = JsString("foo")
+        val converted = support.convertJsValue(x)
+        converted should be ("foo")
+        converted.isInstanceOf[String] should be (true)
+      }
+      it("should convert a JsBoolean to Scala Boolean"){
+        val x = JsBoolean(true)
+        val converted = support.convertJsValue(x)
+        converted should equal (true)
+        converted.isInstanceOf[Boolean] should be (true)
+      }
+      it("should convert a JsArray to Scala Seq"){
+        val x = JsArray(Seq(JsNumber(1), JsNumber(2)))
+        val converted = support.convertJsValue(x)
+        val expected = Seq(1, 2)
+        converted should be(expected)
+        converted.isInstanceOf[Seq[_]] should be (true)
+      }
+      it("should convert a JsObject to Scala Map"){
+        val x = JsObject(Seq(("a", JsNumber(1)), ("b", JsString("c"))))
+        val converted = support.convertJsValue(x)
+        val expected = Map("a" -> 1, "b" -> "c")
+        converted should be(expected)
+        converted.isInstanceOf[Map[_, _]] should be (true)
+      }
+      it("should convert JsUndefined to None"){
+        val x = JsUndefined("err")
+        val converted = support.convertJsValue(x)
+        converted should be (None)
+      }
+      it("should convert JsNull to None"){
+        val x = JsNull
+        val converted = support.convertJsValue(x)
+        converted should be (None)
+      }
+    }
+
     describe("#getSymbol") {
       val supportSpy = spy(new TestFunctionSupport)
 

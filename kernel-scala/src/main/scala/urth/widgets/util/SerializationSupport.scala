@@ -7,7 +7,7 @@ package urth.widgets.util
 
 import com.ibm.spark.utils.LogLike
 import org.apache.spark.sql.DataFrame
-import play.api.libs.json.{Json, JsValue, Writes}
+import play.api.libs.json._
 import urth.widgets.Default
 
 /**
@@ -28,6 +28,15 @@ trait SerializationSupport extends LogLike {
     logger.trace(s"Serializing ${x}...")
     x match {
       case d: DataFrame => dataFrameWrites(limit).writes(d)
+      case x: Float      => JsNumber(x.toDouble)
+      case x: Double     => JsNumber(x)
+      case x: Int        => JsNumber(x)
+      case x: BigDecimal => JsNumber(x)
+      case s: Seq[Any]   => JsArray((s map(serialize(_, limit))))
+      case m: Map[_, _] => JsObject(
+        m.map(p => (p._1.toString, serialize(p._2, limit))).toSeq
+      )
+      case j: JsValue => j
       case _ => Json.toJson(x.toString)
     }
   }

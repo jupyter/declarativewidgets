@@ -83,7 +83,7 @@ dist/urth_widgets/elements: ${shell find elements}
 	@cp -R elements/* dist/urth_widgets/elements/.
 	@touch dist/urth_widgets/elements
 
-dist/urth_widgets/bower_components: $(URTH_COMP_LINKS)
+dist/urth_widgets/bower_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
 	@echo 'Moving bower_components'
 	@mkdir -p dist/urth_widgets/bower_components
 	@cp -RL bower_components/* dist/urth_widgets/bower_components/.
@@ -111,7 +111,7 @@ dist/urth_widgets/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
 			sbt package && \
 			cp target/scala-2.10/urth-widgets*.jar /src/dist/urth_widgets/urth-widgets.jar'
 
-dist/docs: bower_components ${shell find elements/**/*.html} bower.json etc/docs/index.html etc/docs/urth-docs.html
+dist/docs: bower_components ${shell find elements/**/*.html} etc/docs/index.html etc/docs/urth-docs.html
 	@echo 'Building docs'
 	@mkdir -p dist/docs
 	@cp elements/**/*.html dist/docs

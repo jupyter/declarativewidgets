@@ -63,10 +63,35 @@ dataChannel.setItem('user', 'Luke');
     Polymer({
         is: 'urth-core-channels',
         behaviors: [Urth.ChannelsBehavior, Urth.JupyterWidgetBehavior, Urth.JupyterKernelObserver],
+        listeners: {
+            'channelSetItem': 'onChannelSetItem' // Fired by Urth.ChannelsBehavior
+        },
+
+        /**
+         * Called when an item property has been changed in any channel.
+         * Pushes changes into the backbone model and sends a message
+         * containing the change to the kernel proxy.
+         */
+        onChannelSetItem: function(event) {
+            if (event && event.detail) {
+                var detail = event.detail;
+                if (this.model){
+                    this.model.set(detail.channel + ':' + detail.key, detail.newVal, {silent : true});
+                }
+                this.send({
+                    event: 'change',
+                    data: {
+                        name: detail.key,
+                        old_val: detail.oldVal,
+                        new_val: detail.newVal,
+                        channel: detail.channel
+                    }
+                });
+            }
+        },
 
         onModelReady: function(){
             console.debug('urth-core-channels onModelReady');
-            this.subscribe(this);
         },
 
         /**
@@ -93,14 +118,6 @@ dataChannel.setItem('user', 'Luke');
             this.createModel('urth.widgets.widget_channels.Channels', maxRetries);
         },
 
-        /**
-         * Called when an item has been set. Pushes changes into the backbone model.
-         */
-        notifySetItem: function(key, value, channel){
-            if (this.model){
-                this.model.set(channel + ':' + key, value, {silent : true});
-            }
-        },
 
         _handleItemChangeMessage: function( path, value ){
             var path = path.split(':');
