@@ -1,0 +1,157 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel='import' href='../polymer/polymer.html'>
+<link rel='import' href='../iron-ajax/iron-ajax.html'>
+<link rel='import' href='../urth-core-behaviors/jupyter-notebook-env.html'>
+
+<!--
+ Adds functionality to `<link>` to provide a mechanism to
+ install web components registered as [bower](http://bower.io/) packages. This
+ element works with a server side REST endpoint to install the specified package
+ and then upon successfull install, injects the appropriate HTML import into the page.
+
+ Example: _Install and import the paper-slider element_
+
+ ```html
+ <link rel='import' href='/urth_components/paper-slider/paper-slider.html'
+        is='urth-core-import' package='PolymerElements/paper-slider'>
+ ```
+
+ @group Urth Core
+ @element urth-core-import
+ -->
+<dom-module id='urth-core-import'>
+    <template>
+        <iron-ajax id='ajaxPost' url='{{_importEndpointURL}}'
+            body='{{requestBody}}'
+            content-type='application/json'
+            handle-as='json'
+            method='POST'></iron-ajax>
+    </template>
+</dom-module>
+
+<script>
+    'use strict';
+    var loadedPackages = {},
+        logTag = 'urth-core-import: ';
+
+    Polymer({
+        is: 'urth-core-import',
+        extends: 'link',
+        /**
+         * fired if the specified package or href fails to load.
+         * @event `importerror`
+         */
+
+        properties: {
+            /**
+             * The project dependency to load. Any endpoints that are
+             * valid for the [`bower install`](http://bower.io/docs/api/#install)
+             * command may be specified.
+             */
+            package: {
+                type: String,
+                observer: '_packageChanged',
+                reflectToAttribute: true
+            },
+            /**
+             * If `true`, console output will be written to indicate the progress of
+             * importing the specified `package`.
+             *
+             * @default false
+             */
+            debug: {
+                type: Boolean,
+                value: false
+            },
+
+            /**
+             * This is the URL to the import endpoint on the notebook
+             */
+            _importEndpointURL: {
+                computed: "_getImportEndpointURL(_baseURL)"
+            }
+
+        },
+
+        behaviors: [Urth.JupyterNotebookEnv],
+
+        listeners: {
+            'load': '_onLinkLoad',
+            'error': '_onLinkError'
+        },
+
+        ready: function() {
+            // Listen to the 'response' event to handle the ajax POST return value.
+            this.$.ajaxPost.addEventListener('response', function(response) {
+                if (response && response.detail.status === 200) {
+                    if (this.debug) {
+                        console.debug(logTag + 'Successfully installed ' + this.package);
+                    }
+
+                    // Add a dummy parameter to the url to force the browser
+                    // to reload.
+                    var url = new URL(this.href);
+                    url.search += '&urthdummy=urth';
+
+                    this.importHref(url.href, function() {
+                        // Save the fact that the link href was loaded successfully.
+                        loadedPackages[this.href] = true;
+                        this.fire('load');
+                        if (this.debug) {
+                            console.debug(logTag + 'Successfully imported ' + this.href);
+                        }
+                    }.bind(this), function(e) {
+                        var msg = 'Failed to import ' + url.href;
+                        console.warn(logTag + msg);
+                        this.fire('importerror', { msg: msg });
+                    }.bind(this));
+                } else {
+                    // Assuming an error has occurred.
+                    var msg = 'Failed to send request to server.';
+                    console.warn(logTag + msg);
+                    this.fire('importerror', { msg: msg });
+                }
+            }.bind(this));
+
+            // `iron-ajax` sets xhr errors on the `error` event.
+            this.$.ajaxPost.addEventListener('error', function(error) {
+                var msg = error && error.detail && error.detail.request &&
+                        error.detail.request.statusText ?
+                        error.detail.request.statusText :
+                        error.detail.error;
+                console.warn(logTag + msg);
+                this.fire('importerror', { msg: msg });
+            }.bind(this));
+        },
+
+        _onLinkError: function(e) {
+            // If a package attribute is specified and the href
+            // has not been loaded successfully then, XHR a request to the
+            // server to load the specified `package` through bower.
+            // Result is sent in `response` event and
+            // errors in `error` event on the ajaxPost element.
+            if (this.package && !loadedPackages[this.href]) {
+                if (this.debug) {
+                    console.debug(logTag + 'Sending server request to install ' + this.package);
+                }
+                this.$.ajaxPost.generateRequest();
+            }
+        },
+
+        _onLinkLoad: function() {
+            // Save the fact that the link href was loaded successfully.
+            loadedPackages[this.href] = true;
+        },
+
+        _packageChanged: function(newVal, oldVal) {
+            this.requestBody = '{"package": ' + '"' + newVal + '"}';
+        },
+
+        _getImportEndpointURL: function( baseURL ){
+            return baseURL + 'urth_import';
+        }
+    });
+</script>

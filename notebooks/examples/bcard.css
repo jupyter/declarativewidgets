@@ -1,0 +1,42 @@
+.bcard {
+    border: 1px solid black;
+    padding: 10px;
+    background-color: #ECF0F1;
+    width: 300px;
+    height: 150px;
+    margin-top: 11px;
+    font-size: 12px;
+    position: relative;
+}
+
+.bcard .info {
+    box-sizing: border-box;
+    width: 65%;
+    margin-left: 35%;
+    margin-top: 5%;
+}
+
+.bcard .line {
+    display: block;
+    line-height: 1.3em;
+}
+
+.bcard .full-name {
+    font-size: 1.4em;
+}
+
+.bcard .title {
+    color: #888;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+.bcard .logo {
+    background-image: url('/static/base/images/logo.png');
+    background-repeat: no-repeat;
+    width: 40px;
+    height: 53px;
+    position: absolute;
+    top: 47px;
+    left: 34px;
+}

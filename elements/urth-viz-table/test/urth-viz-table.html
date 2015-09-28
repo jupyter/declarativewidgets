@@ -1,0 +1,204 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-viz-table tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../urth-viz-table.html'>
+</head>
+
+<body>
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id="basic">
+        <template>
+            <urth-viz-table datarows='[[1,8,5],[2,2,6],[3,5,7]]' columns='["Index","Series 1","Series 2"]'></urth-viz-table>
+        </template>
+    </test-fixture>
+
+    <test-fixture id="colTest1">
+        <template>
+            <urth-viz-table id="table" datarows='[[1,8,5],[2,2,6],[3,5,7]]' columns='["Index","Series 1","Currency"]'>
+                <urth-viz-col index="2" format="$0,0.00" type="numeric"/>
+            </urth-viz-table>
+        </template>
+    </test-fixture>
+    <test-fixture id="colTest2">
+        <template>
+            <urth-viz-table id="table" datarows='[[1,8,5],[2,2,6],[3,5,7]]' columns='["Index","Series 1","Currency"]'>
+                <urth-viz-col format="$0,0.00" type="numeric"/>
+            </urth-viz-table>
+        </template>
+    </test-fixture>
+
+    <script>
+        var fElmt;
+        // STEP 4: Define any globals needed by the test suite.
+        beforeEach(function(done) {
+            var table = fElmt = fixture('basic');
+            fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
+            fElmt.columns = ["Index","Series 1","Series 2"];
+            function listener() {
+                table.removeEventListener('urth-viz-render', listener);
+                done();
+            }
+            fElmt.addEventListener('urth-viz-render', listener);
+        });
+
+        afterEach(function() {
+        });
+
+        // STEP 5: Define suite(s) and tests.
+        describe('urth-viz-table', function() {
+            it('should render a tableContainer', function(done) {
+                setTimeout( function () {
+                    try {
+                        expect(fElmt.querySelectorAll('.handsontable')).to.have.length.above(0);
+                        done();
+                    } catch( e ) {
+                        done( e );
+                    }
+                }, 0);
+            });
+        });
+
+        describe('_isHeightSet', function() {
+            it('should return true if height is 0', function() {
+                fElmt.hot = {
+                    getSettings: function() {
+                        return { height: 0 };
+                    }
+                };
+                var isSet = fElmt._isHeightSet();
+                expect(isSet).to.be.true;
+            });
+
+            it('should return true if height is 10', function() {
+                fElmt.hot = {
+                    getSettings: function() {
+                        return { height: 10 };
+                    }
+                };
+                var isSet = fElmt._isHeightSet();
+                expect(isSet).to.be.true;
+            });
+
+            it('should return false if height is undefined', function() {
+                fElmt.hot = {
+                    getSettings: function() {
+                        return { };
+                    }
+                };
+                var isSet = fElmt._isHeightSet();
+                expect(isSet).to.be.false;
+            });
+        });
+
+        describe('_handleSelection', function() {
+            it('should set the selection property to the right data', function() {
+                fElmt._handleSelection(1);
+                expect(fElmt.selection).to.eql([2,2,6]);
+            });
+        });
+
+        describe('_columnsChanged', function() {
+            beforeEach(function(done) {
+                fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
+                fElmt.columns = ["Index","Series 1","Series 2"];
+                setTimeout(function() {
+                    done();
+                }, 0);
+            });
+
+            it('should not update table if new columns are not defined', function() {
+                fElmt._columnsChanged();
+                expect(fElmt.hot.countCols()).to.equal(3);
+            });
+
+            it('should remove current column headers and replace with default headers (A, B, C) on empty columns []', function() {
+                fElmt._columnsChanged([]);
+                expect(fElmt.hot.countCols()).to.equal(3);
+                expect(fElmt.hot.getColHeader()).to.eql(['A','B','C']);
+            });
+
+            it('should update table with new columns, not exceding # of cols from datarows', function() {
+                fElmt._columnsChanged(["Col1", "Col2", "Col3", "Col4"]);
+                expect(fElmt.hot.countCols()).to.equal(3);
+            });
+        });
+
+        describe('_datarowsChanged', function() {
+            beforeEach(function(done) {
+                fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
+                fElmt.columns = ["Index","Series 1","Series 2"];
+                setTimeout(function() {
+                    done();
+                }, 0);
+            });
+            it('should not update table if new data is not defined', function() {
+                fElmt._datarowsChanged();
+                expect(fElmt.hot.countRows()).to.equal(3);
+            });
+
+            it('should update table with empty datarows', function() {
+                fElmt._datarowsChanged([]);
+                expect(fElmt.hot.countRows()).to.equal(0);
+            });
+
+            it('should update table with new datarows', function() {
+                fElmt._datarowsChanged([[1,8,5],[2,2,6],[3,5,7],[1,2,3]]);
+                expect(fElmt.hot.countRows()).to.equal(4);
+            });
+        });
+
+
+        /* tests for urth-viz-col */
+        var table;
+
+        describe('urth-viz-col', function() {
+            it('should format column to the correct format', function(done) {
+                table = fixture('colTest1');
+                table.datarows = [[1,8,5],[2,2,6],[3,5,7]];
+                setTimeout( function () {
+                    try { //cell should have format of $0,0.00
+                        expect(table.hot.getCell(1,2).innerHTML).to.equal("$6.00");
+                        done();
+                    } catch(e) {
+                        done(e);
+                    }
+                }, 0);
+            });
+
+            it('should not format column if col index was not given', function(done) {
+                table = fixture('colTest2');
+                table.datarows = [[1,8,5],[2,2,6],[3,5,7]];
+                setTimeout( function () {
+                    try { // cell should not have format of $0,0.00
+                        expect(table.hot.getCell(1,2).innerHTML).to.equal("6");
+                        done();
+                    } catch(e) {
+                        done(e);
+                    }
+                }, 0);
+            });
+        });
+
+
+    </script>
+</body>
+</html>

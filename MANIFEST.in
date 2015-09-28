@@ -1,0 +1,2 @@
+recursive-include urth_widgets *.html *.js *.css *.jar *.json
+include VERSION

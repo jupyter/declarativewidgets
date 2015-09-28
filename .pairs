@@ -1,0 +1,13 @@
+# .pairs - configuration for 'git pair'
+pairs:
+  # <initials>: <Firstname> <Lastname>[; <email-id>]
+  # URTH.WIDGETS! Team
+  al: Angel Luu; angel.luu
+  dw: Drew Walters; drewwalt
+  sw: Sean Welleck; swelleck
+  gb: Gino Bustelo; lbustelo
+  zcm: Zack Morris; zmorris
+  ap: Adam Peller; apeller
+email:
+  prefix: pair
+  domain: us.ibm.com

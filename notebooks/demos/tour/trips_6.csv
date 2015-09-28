@@ -1,0 +1,2 @@
+medallion,hack_license,vendor_id,rate_code,store_and_fwd_flag,pickup_datetime,dropoff_datetime,passenger_count,trip_time_in_secs,trip_distance,pickup_longitude,pickup_latitude,dropoff_longitude,dropoff_latitude
+B562ACEF597AA8497E090E41A9F12EEC,0EFFAEB3F3B61D806D70990519375043,VTS,1,,2013-02-05 23:19:00,2013-02-05 23:33:00,1,840,3.46,-73.976097,40.781189,-73.938248,40.804768

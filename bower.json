@@ -1,0 +1,30 @@
+{
+  "name": "urth-widgets",
+  "version": "0.0.1",
+  "authors": [
+    "Jupyter Community"
+  ],
+  "description": "Jupyter web component based widget notebook extension.",
+  "main": "src/nb-extension/main.js",
+  "keywords": [
+    "urth",
+    "polymer",
+    "jupyter"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ],
+  "private": true,
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "webcomponentsjs": "^0.7.2"
+  },
+  "devDependencies": {
+    "web-component-tester": "*",
+    "test-fixture": "PolymerElements/test-fixture#^1.0.0",
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.5"
+  }
+}

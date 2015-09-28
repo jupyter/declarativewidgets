@@ -1,0 +1,112 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-core-bind tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../urth-core-import.html'>
+</head>
+
+<body>
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id='invalidHref'>
+        <template>
+            <link rel='import' href='../../doesnotexist/doesnotexist.html'
+                    is='urth-core-import' package='UrthTest/urthtest'>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='validHref'>
+        <template>
+            <link rel='import' href='../../iron-ajax/iron-ajax.html'
+                    is='urth-core-import' package='PolymerElements/iron-ajax'>
+        </template>
+    </test-fixture>
+
+    <script>
+        // STEP 4: Define any globals needed by the test suite.
+        var server;
+
+        before(function() {
+            server = sinon.fakeServer.create();
+            server.respondImmediately = true;
+        });
+        after(function() {
+            server.restore();
+        });
+
+        // STEP 5: Define suite(s) and tests.
+        describe('package attribute', function() {
+            this.timeout(500);
+            it('should cause POST server request to install the package if href is not found', function(done) {
+                server.respondWith('POST', '/urth_import',
+                    [200, { 'Content-Type': 'application/json' }, '{ "status": 0}']);
+
+                var link = fixture('invalidHref');
+                var importSpy = sinon.spy(link, 'importHref');
+
+                link.addEventListener('load', function() {
+                    expect(importSpy).to.be.calledOnce;
+                    done();
+                });
+                link.addEventListener('importerror', function() {
+                    expect(importSpy).to.be.calledOnce;
+                    done();
+                });
+            });
+
+            it('should not invoke POST server request if href exists', function(done) {
+                var link = fixture('validHref');
+                var importSpy = sinon.spy(link, 'importHref');
+                link.onload = function() {
+                    expect(importSpy).to.not.be.called;
+                    done();
+                };
+            });
+        });
+
+        describe('importerror', function() {
+            this.timeout(500);
+            it('should fire if the server is not responding', function(done) {
+                var link = fixture('invalidHref');
+
+                link.addEventListener('importerror', function(event) {
+                    expect(event.detail.msg).to.not.be.null;
+                    done();
+                });
+            });
+
+            it('should fire if the href can not be loaded', function(done) {
+                server.respondWith('POST', '/urth_import',
+                    [200, { 'Content-Type': 'application/json' }, '{ "status": 0}']);
+
+                var link = fixture('invalidHref');
+                var importSpy = sinon.spy(link, 'importHref');
+
+                link.addEventListener('importerror', function(event) {
+                    expect(event.detail.msg).to.not.be.null;
+                    expect(importSpy).to.be.calledOnce;
+                    done();
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
+<link rel="import" href="../urth-core-dataframe/urth-core-dataframe.html">
+<link rel="import" href="../urth-viz-chart/urth-viz-chart.html">
+<link rel="import" href="../urth-viz-table/urth-viz-table.html">
+
+<!--
+Represents a widget that lets the user choose between a set of visualizations for a given dataframe.
+
+Example:
+
+    <urth-viz-explorer ref="aDataFrame"></urth-viz-explorer>
+
+@group Urth Viz
+@element urth-viz-explorer
+-->
+<dom-module id="urth-viz-explorer">
+    <link rel="import" type="css" href="../fontawesome/css/font-awesome.min.css">
+    <template>
+        <style>
+          .iron-selected { background-color: yellow; }
+        </style>
+        <iron-selector attr-for-selected="name" selected="{{type}}">
+            <span title="Table" name="table" class="fa fa-table fa-2x"></span>
+            <span title="Bar Chart" name="bar" class="fa fa-bar-chart fa-2x"></span>
+            <span title="Area Chart" name="area" class="fa fa-area-chart fa-2x"></span>
+            <span title="Line Chart" name="line" class="fa fa-line-chart fa-2x"></span>
+            <span title="Scatter Chart" name="scatter" class="fa fa-bullseye fa-2x"></span>
+            <span title="Pie Chart" name="pie" class="fa fa-pie-chart fa-2x"></span>
+        </iron-selector>
+        <urth-core-dataframe id="f1" ref$="{{ref}}" value="{{df}}" auto></urth-core-dataframe>
+        <urth-viz-chart id="c1" type$="{{type}}" datarows="{{df.data}}" columns="{{df.columns}}"></urth-viz-chart>
+        <urth-viz-table id="t1" datarows="{{df.data}}" columns="{{df.columns}}"></urth-viz-table>
+        <content></content>
+    </template>
+</dom-module>
+<script>
+
+    'use strict';
+
+    Polymer({
+        is: 'urth-viz-explorer',
+
+        properties: {
+
+            /**
+             * `type` is a reference to a dataframe
+             *
+             * @attribute type
+             * @type string
+             * @default 'bar'
+             */
+            type: {
+                type: String,
+                value: 'bar',
+                notify: true,
+                observer: '_typeChanged'
+            },
+        },
+
+        _typeChanged: function(newValue, oldValue) {
+            if (newValue == 'table') {
+                this.$.c1.style.display = 'none';
+                this.$.t1.style.display = 'inline';
+            } else {
+                this.$.c1.style.display = 'inline';
+                this.$.t1.style.display = 'none';
+            }
+        }
+    });
+
+ </script>

@@ -1,0 +1,27 @@
+{
+  "name": "urth-viz-explorer",
+  "version": "0.0.1",
+  "authors": [
+    "Jupyter Community"
+  ],
+  "description": "A widget that lets the user choose between a set of visualizations for a given dataframe.",
+  "main": "urth-viz-explorer.html",
+  "keywords": [
+    "urth",
+    "dataframe",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "fontawesome": "*",
+    "iron-selector": "PolymerElements/iron-selector#^1.0.2",
+    "polymer": "Polymer/polymer#^1.0.0"
+  },
+  "private": true
+}

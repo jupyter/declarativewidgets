@@ -1,0 +1,143 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../urth-core-behaviors/jupyter-widget-behavior.html">
+<link rel="import" href="execution-complete-behavior.html">
+
+<!--
+Represents a widget that binds to a DataFrame variable. The DataFrame's
+representation is surfaced in the 'value' property.
+
+Example:
+
+    <urth-core-dataframe id="f1" ref="aDataFrame" value="{{x}}" auto></urth-core-dataframe>
+
+@group Urth Core
+@element urth-core-dataframe
+-->
+<script>
+
+(function(){
+    'use strict';
+
+    Polymer({
+        is: 'urth-core-dataframe',
+
+        properties: {
+
+            /**
+             * `ref` is name of the DataFrame variable that this element
+             * will bind to.
+             *
+             * @attribute ref
+             * @type string
+             * @default ''
+             */
+            ref: {
+                type: String,
+                value: ''
+            },
+
+            /**
+             * `value` is the serialized representation of the DataFrame `ref`.
+             *
+             * @attribute value
+             * @type Object
+             */
+            value: {
+                type: Object,
+                readOnly: true,
+                notify: true
+            },
+
+            /**
+             * Toggles automatic updates upon the completion of code execution.
+             *
+             * @attribute auto
+             * @type boolean
+             * @default false
+             */
+            auto: {
+                type: Boolean,
+                value: false
+            },
+
+            /**
+             * Sets the maximun number of rows to bring to the client
+             *
+             * @attribute limit
+             * @type Number
+             * @default 100
+             */
+            limit: {
+              type: Number,
+              value: 100,
+              reflectToAttribute: true,
+              observer: '_onLimitChange'
+            }
+        },
+
+        behaviors: [Urth.JupyterWidgetBehavior, Urth.ExecutionCompleteBehavior],
+
+        created: function(){
+            console.debug('urth-core-datafram created', arguments);
+            this.createModel('urth.widgets.widget_dataframe.DataFrame');
+        },
+
+        ready: function() {
+            console.debug("urth-core-dataframe ready");
+        },
+
+        /*
+         * onModelReady is invoked when have created the model portion of the widget
+         */
+        onModelReady: function(){
+            console.debug('urth-core-dataframe onModelReady');
+
+            var syncData = {
+                variable_name: this.ref,
+                limit: this.limit
+            }
+            console.debug('urth-core-dataframe sending initial sync', syncData);
+            this.sync(syncData);
+
+            this.refresh();
+        },
+
+        /*
+         * onModelValueChange is invoked by JupyterWidgetBehavior when the `value` `property in
+         * the Backbone model changes.
+         */
+        onModelValueChange: function(newVal){
+            console.debug( "urth-core-dataframe onModelValueChange", newVal );
+            this._setValue(newVal || {data:[]});
+        },
+
+        _onExecutionComplete: function(){
+            if (this.auto) {
+                this.refresh();
+            }
+        },
+
+        /**
+         * Update the DataFrame `value` held by this element with
+         * the DataFrame's current state on the kernel.
+         *
+         * @method refresh
+         */
+        refresh: function() {
+            console.debug("urth-core-dataframe sending sync message...");
+            this.send({ "event": "sync" });
+        },
+
+        _onLimitChange: function(){
+            console.debug('urth-core-dataframe sending new limit value', this.limit);
+            this.sync({limit: this.limit});
+            this.refresh();
+        }
+
+    });
+})();
+</script>

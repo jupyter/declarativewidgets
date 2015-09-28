@@ -1,0 +1,29 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+This Behavior represents the completion of a code cell's execution.
+-->
+<script>
+  window.Urth = window.Urth || {};
+
+  Urth.ExecutionCompleteBehavior = {
+
+    ready: function() {
+      // Code execution defined to be complete when an ExecuteReply is received.
+      console.debug("Registering _onExecutionComplete for Execute Reply messages.");
+      IPython.notebook.kernel.widget_manager.notebook.events.on(
+        'shell_reply.Kernel', this._onExecutionComplete.bind(this)
+      );
+    },
+
+    /**
+     * A callback fired when code execution has completed for a cell.
+     */
+    _onExecutionComplete: function() {}
+  }
+
+</script>

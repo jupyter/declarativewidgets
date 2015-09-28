@@ -1,0 +1,102 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-viz-chart tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../urth-viz-chart.html'>
+</head>
+
+<body>
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id='bar'>
+        <template>
+            <urth-viz-chart id='barChart' type='bar' datarows='[[1,8,5],[2,2,6],[3,5,7]]' columns='["Index","Series 1","Series 2"]'></urth-viz-chart>
+        </template>
+    </test-fixture>
+
+
+    <script>
+        // STEP 4: Define any globals needed by the test suite.
+        var chart;
+
+        beforeEach(function(done) {
+            chart = fixture('bar');
+            if (!chart.rendered) {
+                function listener() {
+                    chart.removeEventListener('urth-viz-chart-render', listener);
+                    done();
+                }
+                chart.addEventListener('urth-viz-chart-render', listener);
+            } else {
+                done();
+            }
+        });
+
+        afterEach(function() {
+        });
+
+        // STEP 5: Define suite(s) and tests.
+        describe('render bar chart', function() {
+            it('should contain a top-level <g> element for the bar chart', function() {
+                expect(chart/*.shadowRoot*/.querySelector('g.nv-multiBarWithLegend')).to.exist;
+            });
+
+            it('should contain six bars, each a <rect> element', function() {
+                expect(chart/*.shadowRoot*/.querySelectorAll('rect.nv-bar').length).to.equal(6);
+            });
+        });
+
+        describe('update bar chart data', function() {
+            beforeEach(function(done) {
+                function listener() {
+                    chart.removeEventListener('urth-viz-chart-render', listener);
+                    done();
+                }
+                chart.addEventListener('urth-viz-chart-render', listener);
+                chart.datarows = [[1,8],[2,2],[3,5]];
+            });
+
+            it('should contain same number of bars as indicated by data', function() {
+                expect(chart/*.shadowRoot*/.querySelectorAll('rect.nv-bar').length).to.equal(3);
+            });
+        });
+
+        describe('change chart type to line', function() {
+            beforeEach(function(done) {
+                function listener() {
+                    chart.removeEventListener('urth-viz-chart-render', listener);
+                    done();
+                }
+                chart.addEventListener('urth-viz-chart-render', listener);
+                chart.type = 'line';
+            });
+
+            it('should contain a top-level <g> element for the line chart', function() {
+                expect(chart/*.shadowRoot*/.querySelector('g.nv-lineChart')).to.exist;
+            });
+
+            it('should contain zero bars', function() {
+                expect(chart/*.shadowRoot*/.querySelectorAll('rect.nv-bar').length).to.equal(0);
+            });
+        });
+
+    </script>
+</body>
+</html>

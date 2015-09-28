@@ -53,5 +53,17 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# PyBuilder
+# Project specific
 target/
+.DS_Store
+.idea/
+*.egg-info/
+*.iml
+bower_components
+*.pyc
+*.log
+node_modules/
+npm-debug.*
+.watch
+etc/docs/bower.json
+project/
