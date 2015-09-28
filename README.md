@@ -28,7 +28,7 @@ Note: These are satisfied automatically when you follow the setup instructions b
 
 ## Try It
 
-We're working on a Docker image with the extensions pre-installed. In the meantime, follow the development setup below.
+We're running a tmpnb instance at [http://jupyter.cloudet.xyz](http://jupyter.cloudet.xyz) with a snapshot of this project (and other related incubator projects) pre-installed.
 
 ## Develop
 
