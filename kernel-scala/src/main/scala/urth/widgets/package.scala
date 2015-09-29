@@ -11,6 +11,9 @@ import org.apache.spark.repl.SparkIMain
 
 package object widgets {
 
+  // Types
+  type WatchHandler = (_, _) => Unit
+
   object WidgetClass {
     val Function  = "urth.widgets.widget_function.Function"
     val DataFrame = "urth.widgets.widget_dataframe.DataFrame"
@@ -40,6 +43,7 @@ package object widgets {
     val MethodUpdate     = "update"
 
     // Event types
+    val EventChange      = "change"
     val EventInvoke      = "invoke"
     val EventSync        = "sync"
 
@@ -47,6 +51,13 @@ package object widgets {
     val StateResult      = "result"
     val StateSignature   = "signature"
     val StateValue       = "value"
+
+    // Change types
+    val ChangeData       = "data"
+    val ChangeChannel    = "channel"
+    val ChangeName       = "name"
+    val ChangeOldVal     = "old_val"
+    val ChangeNewVal     = "new_val"
   }
 
   object Default {

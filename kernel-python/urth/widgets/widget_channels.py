@@ -3,6 +3,7 @@
 
 from IPython.html import widgets  # Widget definitions
 
+from collections import defaultdict
 
 # Global variable used to store the current Channels instance
 the_channels = None
@@ -16,11 +17,18 @@ class Channels(widgets.Widget):
         self.serializer = None
         global the_channels
         the_channels = self
+
+        self.on_msg(self._handle_change_msg)
+
+        # maps channel name to a map of variable name to handler function
+        self.watch_handlers = defaultdict(dict)
+
         super(Channels, self).__init__(**kwargs)
 
     def set(self, key, value, chan='default', **kwargs):
 
-        # Need to lazy import Serializers to avoid issue with matplotlib. The Kernel errors if the inline magic runs
+        # Need to lazy import Serializers to avoid issue with matplotlib.
+        # The Kernel errors if the inline magic runs
         # after the modules get imported.
         if self.serializer is None:
             from urth.util.serializer import Serializer
@@ -29,6 +37,24 @@ class Channels(widgets.Widget):
         attr = "{}:{}".format(chan, key)
         serialized = self.serializer.serialize(value, **kwargs)
         self._send_update(attr, serialized)
+
+    def watch(self, key, handler, chan='default'):
+        self.watch_handlers[chan][key] = handler
+
+    def _handle_change_msg(self, _, content):
+        if content.get('event', '') == 'change':
+            data = content.get('data', {})
+            if 'channel' in data and data['channel'] in self.watch_handlers:
+                chan_handlers = self.watch_handlers[data['channel']]
+                if 'name' in data and data['name'] in chan_handlers:
+                    handler = chan_handlers[data['name']]
+                    old = data.get('old_val', None)
+                    new = data.get('new_val', None)
+                    handler(old, new)
+                else:
+                    print("No watch handler for name field in {}".format(data))
+            else:
+                print("No watch handler for channel field in {}".format(data))
 
     def _send_update(self, attribute, value):
         msg = {
@@ -49,6 +75,10 @@ class Channel:
     def set(self, key, value, **kwargs):
         global the_channels
         the_channels.set(key, value, self.chan, **kwargs)
+
+    def watch(self, key, handler):
+        global the_channels
+        the_channels.watch(key, handler, self.chan)
 
 
 def channel(chan='default'):

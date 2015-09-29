@@ -10,7 +10,7 @@ import play.api.libs.json._
 
 import scala.util.{Failure, Success, Try}
 
-import urth.widgets.{Comm, sparkIMain, getKernel}
+import urth.widgets.{WatchHandler, Comm, sparkIMain, getKernel}
 import org.apache.spark.repl.SparkIMain
 
 import com.ibm.spark.utils.LogLike
@@ -37,6 +37,18 @@ trait FunctionSupport {
    *         converted to their inferred types or None if invocation fails.
    */
   def invokeFunction(funcName: String, args: Map[String, String]): Option[Any]
+
+  /**
+   * Invoke the given watch handler with the given arguments. Arguments are
+   * converted from JSON values into their corresponding Scala types prior
+   * to invocation.
+   * @param arg1Json JSON representation of the first handler argument.
+   * @param arg2Json JSON representation of the second handler argument.
+   * @param handler Handler function to invoke.
+   * @return Some(()) if successful, None if an error occurs during invocation.
+   */
+  def invokeWatchHandler(
+    arg1Json: JsValue, arg2Json: JsValue, handler: WatchHandler): Option[Unit]
 
   /**
    * Returns a Signature describing the parameters of the function
@@ -302,6 +314,22 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
     }
 
   /**
+   * Convert the given JSON value to its corresponding Scala runtime type.
+   * @param x The JSON value to convert.
+   * @return Value with converted Scala runtime type.
+   */
+  def convertJsValue(x: JsValue): Any = x match {
+    case JsNumber(v)   => if (v.isValidInt) v.toInt else v.toDouble
+    case JsString(v)   => v
+    case JsBoolean(v)  => v
+    case JsArray(v)    => (v map convertJsValue).toSeq
+    case JsObject(v)   => (v map (t => (t._1, convertJsValue(t._2)))).toMap
+    case JsUndefined() => None
+    case JsNull        => None
+    case _ => None
+  }
+
+  /**
    * Retrieve the class instance for the interpreter code request that
    * contained the declaration of the method with the given name.
    * @param methodName
@@ -410,6 +438,32 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
       argSeq    <- matchArgs(spec, args, Map())
       convArgs  <- convertArgs(argSeq)
     } yield im.reflectMethod(sym)(convArgs: _*)
+  }
+
+  /**
+   * Invoke the given watch handler with the given arguments. Arguments are
+   * converted from JSON values into their corresponding Scala types prior
+   * to invocation.
+   * @param arg1Json JSON representation of the first handler argument.
+   * @param arg2Json JSON representation of the second handler argument.
+   * @param handler Handler function to invoke.
+   * @return Some(()) if successful, None if an error occurs during invocation.
+   */
+  override def invokeWatchHandler(
+    arg1Json: JsValue, arg2Json: JsValue, handler: WatchHandler
+  ): Option[Unit] = {
+    val arg1 = convertJsValue(arg1Json)
+    val arg2 = convertJsValue(arg2Json)
+    logger.trace(s"Invoking handler with arguments " +
+      s"$arg1: ${arg1.getClass.getName}, $arg2: ${arg2.getClass.getName}")
+    applySymbol(handler) flatMap {
+      case (im, sym) => Try(im.reflectMethod(sym)(arg1, arg2)) match {
+        case Success(v) => Some(())
+        case Failure(t) =>
+          logger.error(s"Error invoking watch handler: ${t.getMessage}")
+          None
+      }
+    }
   }
 
   /**

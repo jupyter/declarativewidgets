@@ -20,6 +20,7 @@ define(['require'], function(require) {
                     // Add the global data channel to the document body.
                     var dataChannel = document.createElement('urth-core-channels');
                     dataChannel.setAttribute('id', 'urthChannels');
+                    dataChannel.register(dataChannel, '*');
                     document.body.appendChild(dataChannel);
 
                     // Exposing a global
