@@ -143,6 +143,10 @@ test-js: | $(URTH_COMP_LINKS)
 	@echo 'Running web component tests...'
 	@npm run test
 
+test-js-remote: | $(URTH_COMP_LINKS)
+	@echo 'Running web component tests remotely on Sauce Labs...'
+	@npm run test-sauce --silent -- --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
+
 test-py: REPO?=jupyter/pyspark-notebook:3.2
 test-py: dist/urth
 	@echo 'Running python tests...'
