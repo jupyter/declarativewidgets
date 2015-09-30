@@ -104,6 +104,14 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             staggerlabels: Boolean,
 
             /**
+             * `palette` specifies an optional list of colors to override the default palette
+             *
+             * @attribute palette
+             * @readonly
+             */
+            palette: Array,
+
+            /**
              * `columns` is an array representing column names
              *
              * @attribute columns
@@ -278,6 +286,10 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 
                     if (this.staggerlabels) {
                         chart.staggerLabels(this.staggerlabels)
+                    }
+
+                    if (this.palette) {
+                        chart.color(this.palette);
                     }
 
                     this._fireWhenReady();
