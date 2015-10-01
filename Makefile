@@ -102,6 +102,9 @@ dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/urth_import.py
 
 dist/urth_widgets/urth-widgets.jar: REPO?=cloudet/sbt-sparkkernel-image
 dist/urth_widgets/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
+ifeq ($(NOSCALA), true)
+	@echo 'Skipping scala code'
+else
 	@echo 'Building scala code'
 	@mkdir -p dist
 	@docker run -it --rm \
@@ -110,6 +113,7 @@ dist/urth_widgets/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
 			cd /tmp/src && \
 			sbt package && \
 			cp target/scala-2.10/urth-widgets*.jar /src/dist/urth_widgets/urth-widgets.jar'
+endif
 
 dist/docs: bower_components ${shell find elements/**/*.html} etc/docs/index.html etc/docs/urth-docs.html
 	@echo 'Building docs'
@@ -160,12 +164,16 @@ test-py: dist/urth
 
 test-scala: REPO?=cloudet/sbt-sparkkernel-image
 test-scala:
+ifeq ($(NOSCALA), true)
+	@echo 'Skipping scala tests...'
+else
 	@echo 'Running scala tests...'
 	@docker run -it --rm \
 		-v `pwd`/kernel-scala:/src \
 		$(REPO) bash -c 'cp -r /src /tmp/src && \
 			cd /tmp/src && \
 			sbt test'
+endif
 
 testdev: | $(URTH_COMP_LINKS)
 	@npm run test -- -p
