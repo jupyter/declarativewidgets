@@ -171,7 +171,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             primary = primary || this.primary;
             secondary = secondary || this.secondary;
 
-            var values = datarows[0].map(function (rows, i) {
+            var values = (datarows[0] || []).map(function (rows, i) {
                 return datarows.map(function (d) {
                     return { x: d[primary], y: d[i] };
                 });
@@ -327,7 +327,9 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         },
 
         _resizer: function() { //FIXME: debounce?
-            this.chart.update();
+            if (this.chart) {
+                this.chart.update();
+            }
         },
 
         attached: function() {
