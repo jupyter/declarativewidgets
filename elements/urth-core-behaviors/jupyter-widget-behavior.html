@@ -114,7 +114,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                     console.debug('Urth.JupyterWidgetBehavior sync - sending values', values);
                     var valKeys = Object.keys(values || {});
                     valKeys.forEach(function (value) {
-                        this.model.set(value, values[value]);
+                        this.model.set(value, values[value], {silent: true});
                     }.bind(this));
 
                     if (valKeys.length > 0)
