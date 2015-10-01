@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jupyter-incubator/declarativewidgets.svg)](https://travis-ci.org/jupyter-incubator/declarativewidgets)
+
 # Jupyter Declarative Widget Extension
 
 Extension for Jupyter / IPython Notebook to build interactive areas using 
