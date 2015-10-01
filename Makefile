@@ -144,8 +144,12 @@ test-js: | $(URTH_COMP_LINKS)
 	@npm run test
 
 test-js-remote: | $(URTH_COMP_LINKS)
+ifdef SAUCE_USER_NAME
 	@echo 'Running web component tests remotely on Sauce Labs...'
 	@npm run test-sauce --silent -- --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
+else
+	@echo 'No SAUCE environment variables found, skipping remote web component tests'
+endif
 
 test-py: REPO?=jupyter/pyspark-notebook:3.2
 test-py: dist/urth
