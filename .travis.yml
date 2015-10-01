@@ -1,0 +1,24 @@
+sudo: required
+
+language: c
+
+services:
+  - docker
+
+before_script:
+- curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+- sudo apt-get install -y nodejs
+- docker pull jupyter/pyspark-notebook:3.2
+- docker pull cloudet/pyspark-notebook-bower-sparkkernel
+
+script:
+- make test-js-remote
+- make test-py
+- make test-scala
+- make sdist
+- make install
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always

@@ -53,7 +53,6 @@
 
         // STEP 5: Define suite(s) and tests.
         describe('package attribute', function() {
-            this.timeout(500);
             it('should cause POST server request to install the package if href is not found', function(done) {
                 server.respondWith('POST', '/urth_import',
                     [200, { 'Content-Type': 'application/json' }, '{ "status": 0}']);
@@ -82,7 +81,6 @@
         });
 
         describe('importerror', function() {
-            this.timeout(500);
             it('should fire if the server is not responding', function(done) {
                 var link = fixture('invalidHref');
 

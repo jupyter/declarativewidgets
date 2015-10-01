@@ -13,6 +13,7 @@
   "scripts": {
     "bower": "bower",
     "test": "wct elements/*/test",
+    "test-sauce": "wct --skip-plugin local --plugin sauce elements/*/test",
     "watch": "gulp watch"
   },
   "repository": {
