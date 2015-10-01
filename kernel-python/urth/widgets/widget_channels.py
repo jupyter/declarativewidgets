@@ -1,15 +1,15 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from IPython.html import widgets  # Widget definitions
-
 from collections import defaultdict
+
+from .urth_widget import UrthWidget
 
 # Global variable used to store the current Channels instance
 the_channels = None
 
 
-class Channels(widgets.Widget):
+class Channels(UrthWidget):
     """ A widget that provides an API for setting bound channel variables. """
 
     def __init__(self, value=None, **kwargs):

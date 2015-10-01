@@ -3,15 +3,15 @@
 
 import inspect
 
-from IPython.html import widgets # Widget definitions
 from IPython.utils.traitlets import Integer, Unicode # Used to declare attributes of our widget
 from IPython.core.getipython import get_ipython
 
 from urth.util.serializer import Serializer
 from urth.util.functions import apply_with_conversion, signature_spec
+from .urth_widget import UrthWidget
 
 
-class Function(widgets.Widget):
+class Function(UrthWidget):
     """
     A Widget for invoking a function on the kernel.
     """

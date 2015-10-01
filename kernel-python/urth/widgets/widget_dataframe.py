@@ -1,14 +1,14 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from IPython.html import widgets # Widget definitions
 from IPython.utils.traitlets import * # Used to declare attributes of our widget
 from IPython.core.getipython import get_ipython
 
 from urth.util.serializer import Serializer
+from .urth_widget import UrthWidget
 
 
-class DataFrame(widgets.Widget):
+class DataFrame(UrthWidget):
     """
     A widget for retrieving the value of a DataFrame in the kernel.
     """
