@@ -88,6 +88,30 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             },
 
             /**
+             * `rotatelabels` is an optional angle in degrees to rotate labels on the X axis
+             *
+             * @attribute rotatelabels
+             * @readonly
+             */
+            rotatelabels: Number,
+
+            /**
+             * `staggerlabels` will stagger the layout of labels on the X axis
+             *
+             * @attribute staggerlabels
+             * @readonly
+             */
+            staggerlabels: Boolean,
+
+            /**
+             * `palette` specifies an optional list of colors to override the default palette
+             *
+             * @attribute palette
+             * @readonly
+             */
+            palette: Array,
+
+            /**
              * `columns` is an array representing column names
              *
              * @attribute columns
@@ -210,8 +234,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                         model = nv.models.multiBarChart;
                         config = function(chart) {
                             chart
-                                .reduceXTicks(true)   //If 'false', every single x-axis tick label will be rendered.
-                                .rotateLabels(0)      //Angle to rotate x-axis labels.
+                                .reduceXTicks(false)   //If 'false', every single x-axis tick label will be rendered.
                                 .showControls(true)   //Allow user to switch between 'Grouped' and 'Stacked' mode.
                                 .groupSpacing(0.1);    //Distance between each group of bars.
                         };
@@ -255,6 +278,18 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                     var chart = this.chart = model();
                     if (config) {
                         config(chart);
+                    }
+
+                    if (this.rotatelabels) {
+                        chart.rotateLabels(this.rotatelabels)      //Angle to rotate x-axis labels.
+                    }
+
+                    if (this.staggerlabels) {
+                        chart.staggerLabels(this.staggerlabels)
+                    }
+
+                    if (this.palette) {
+                        chart.color(this.palette);
                     }
 
                     this._fireWhenReady();
