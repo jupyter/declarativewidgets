@@ -21,14 +21,14 @@ class WidgetFunctionSpec extends FunSpec with Matchers with MockitoSugar {
     override def handleInvoke(msg: MsgData, name: String, limit: Int) = ()
   }
 
-  class TestWidgetNoArgSpec(comm: CommWriter) extends WidgetFunction(comm) {
+  class TestWidgetNoSignature(comm: CommWriter) extends WidgetFunction(comm) {
     override def sendSignature(name: String) = ()
   }
 
   describe("WidgetFunction"){
     describe("#handleBackbone") {
       it("should register a function name and send the signature") {
-        val test = spy(new TestWidgetNoArgSpec(mock[CommWriter]))
+        val test = spy(new TestWidgetNoSignature(mock[CommWriter]))
         val msg = Json.obj(Comm.KeySyncData -> Map(Comm.KeyFunctionName -> "f"))
         test.handleBackbone(msg)
         verify(test).registerFunction("f")
@@ -67,6 +67,16 @@ class WidgetFunctionSpec extends FunSpec with Matchers with MockitoSugar {
         val msg = Json.obj(Comm.KeyEvent -> Comm.EventInvoke)
         test.handleCustom(msg)
         verify(test).handleInvoke(msg, "f", 100)
+      }
+
+      it("should send the current signature on a sync event") {
+        val test = spy(new TestWidgetNoSignature(mock[CommWriter]))
+
+        test.registerFunction("f")
+
+        val msg = Json.obj(Comm.KeyEvent -> Comm.EventSync)
+        test.handleCustom(msg)
+        verify(test).sendSignature("f")
       }
 
       it("should not handle an invalid event") {

@@ -4,6 +4,7 @@
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-core-behaviors/jupyter-widget-behavior.html">
+<link rel='import' href='../urth-core-behaviors/dynamic-properties-behavior.html'>
 
 <!--
 Creates a client side proxy to a function defined in the kernel. This function is specified by
@@ -126,10 +127,15 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                     readOnly: true,
                     computed: '_computeReady(args.*, signature)',
                     notify: true
-                }
+                },
+
             },
 
-            behaviors: [Urth.JupyterWidgetBehavior],
+            behaviors: [
+                Urth.JupyterWidgetBehavior,
+                Urth.ExecutionCompleteBehavior,
+                Urth.DynamicPropertiesBehavior
+            ],
 
             observers: [
                 '_onArgsPropertyChanged(args.*)'
@@ -203,6 +209,10 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
 
                     }
                 }
+            },
+
+            _onExecutionComplete: function(){
+                this.refresh();
             },
 
             _syncParamAttributes: function( params ){
@@ -343,11 +353,12 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
              * This method handles changes to the signature of the method. It will create a new property based on
              * the name of the parameter. These new properties will allow data binding and will be kept in sync with
              * the contents of the `args` property.
+             *
              */
             _onSignatureChange: function(sig){
                 console.debug('urth-core-function _onSignatureChange got new signature', sig);
 
-                this._resetProperties();
+                this.resetDynamicProperties();
 
                 var paramNames = Object.keys(sig);
                 if( paramNames.length > 0 ){
@@ -369,7 +380,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
 
                     }.bind(this));
 
-                    this._addProperties(paramProperties);
+                    this.addDynamicProperties(paramProperties);
 
                     //set the defaults values and sync if necessary
                     var paramsToSync = {};
@@ -397,15 +408,15 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                 }
             },
 
-            _resetProperties: function(){
-                //need to copy the properties from the prototype
-                this._propertyEffects = {};
-                this.mixin(this._propertyEffects, this.constructor.prototype._propertyEffects);
-            },
-
-            _addProperties: function(properties){
-                this._addPropertyEffects(properties);
-                Polymer.Bind.createBindings(this);
+            /**
+             * Update the `signature` held by this element with
+             * the function signature's current state on the kernel.
+             *
+             * @method refresh
+             */
+            refresh: function() {
+                console.debug("urth-core-function sending sync message...");
+                this.send({ "event": "sync" });
             },
 
             _createArgChangeHandler: function(param){
