@@ -74,7 +74,8 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
 
                 /**
                  * Controls if the function is invoked automatically on any change to
-                 * its parameters.
+                 * its parameters, and whether the `signature` is refreshed
+                 * after each code execution.
                  *
                  * @attribute auto
                  * @type Boolean
@@ -212,7 +213,9 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
             },
 
             _onExecutionComplete: function(){
-                this.refresh();
+                if (this.auto) {
+                    this.refresh();
+                }
             },
 
             _syncParamAttributes: function( params ){
