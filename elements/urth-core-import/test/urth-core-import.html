@@ -12,6 +12,11 @@
 
     <!-- Need the web component polyfill for browsers without native support. -->
     <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+    <script>
+        window.Urth = {
+            BASE_URL: '/'
+        };
+    </script>
 
     <!-- Load test framework and helpers. -->
     <script src='../../web-component-tester/browser.js'></script>
@@ -34,7 +39,7 @@
 
     <test-fixture id='validHref'>
         <template>
-            <link rel='import' href='../../iron-ajax/iron-ajax.html'
+            <link rel='import' href='/elements/iron-ajax/iron-ajax.html'
                     is='urth-core-import' package='PolymerElements/iron-ajax'>
         </template>
     </test-fixture>
@@ -75,6 +80,10 @@
                 var importSpy = sinon.spy(link, 'importHref');
                 link.onload = function() {
                     expect(importSpy).to.not.be.called;
+                    done();
+                };
+                link.onerror = function() {
+                    expect.fail();
                     done();
                 };
             });

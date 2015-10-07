@@ -80,7 +80,7 @@ class UrthImportHandler(RequestHandler):
             msg = 'Failed to open bower.json for {0}.'.format(package_name)
             raise tornado.web.HTTPError(404, msg, reason=msg)
 
-class ComponentsRedirectHandler(RequestHandler): 
+class ComponentsRedirectHandler(RequestHandler):
     def get(self, path):
         '''
         Redirect relative requests for components to the global store. Makes
@@ -100,12 +100,13 @@ def load_jupyter_server_extension(nb_app):
         if ipython_dir in path:
             nbext = path
     import_route_pattern = url_path_join(web_app.settings['base_url'], '/urth_import')
+
+    # Any requests containing /urth_components/ will get served from the bower_components
+    # directory.
     components_route_pattern = url_path_join(web_app.settings['base_url'], '/urth_components/(.*)')
-    components_redirect_route_pattern = url_path_join(web_app.settings['base_url'], '/notebooks/.*/urth_components/(.*)')
     path = os.path.join(nbext, 'urth_widgets/bower_components/')
+
     web_app.add_handlers(host_pattern, [
         (import_route_pattern, UrthImportHandler),
-        (components_route_pattern, FileFindHandler, {'path': [path]}),
-        (components_redirect_route_pattern, ComponentsRedirectHandler)
+        (components_route_pattern, FileFindHandler, {'path': [path]})
     ])
-
