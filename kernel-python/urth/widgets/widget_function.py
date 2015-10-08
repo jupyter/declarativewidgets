@@ -18,22 +18,24 @@ class Function(UrthWidget):
     function_name = Unicode('', sync=True)
     limit = Integer(100, sync=True)
 
-    def __init__(self, value=None, **kwargs):
+    def __init__(self, **kwargs):
         self.log.info("Created a new Function widget.")
 
-        self.on_msg(self._handle_invoke_msg)
+        self.on_msg(self._handle_custom_event_msg)
         self.shell = get_ipython()
         self.serializer = Serializer()
         super(Function, self).__init__(**kwargs)
 
     def _function_name_changed(self, old, new):
         self.log.info("Binding to function name {}...".format(new))
-        signature = signature_spec(self._the_function())
-        self._send_update("signature", signature)
+        self._sync_state()
 
-    def _handle_invoke_msg(self, _, content):
-        if content.get('event', '') == 'invoke':
+    def _handle_custom_event_msg(self, _, content):
+        event = content.get('event', '')
+        if event == 'invoke':
             self._invoke(content.get('args', {}))
+        elif event == 'sync':
+            self._sync_state()
 
     def _the_function(self):
         return self.shell.user_ns[self.function_name]
@@ -53,3 +55,7 @@ class Function(UrthWidget):
             }
         }
         self._send(msg)
+
+    def _sync_state(self):
+        signature = signature_spec(self._the_function())
+        self._send_update("signature", signature)

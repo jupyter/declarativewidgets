@@ -20,6 +20,7 @@
 
     <!-- STEP 2: Import the element to test. -->
     <link rel='import' href='../../urth-core-behaviors/jupyter-widget-behavior.html'>
+
     <script>
         //mock Urth.JupyterWidgetBehavior
         sinon.stub(Urth.JupyterWidgetBehavior, "createModel");
@@ -514,6 +515,54 @@
 
                 expect(_tryInvoke.callCount).to.equal(0);
             });
+
+            it('should handle multiple signature changes', function() {
+                var fElmt = fixture('basic');
+
+                fElmt._onSignatureChange({
+                    x: {}
+                });
+
+                fElmt._onSignatureChange({
+                    x: {'value': 3}
+                });
+
+                expect(fElmt.hasOwnProperty('argX')).to.be.true;
+                expect(fElmt.argX).to.equal(3);
+            });
+
+            it('should add new argument properties in the new signature', function() {
+                var fElmt = fixture('basic');
+
+                fElmt._onSignatureChange({
+                    x: {}
+                });
+
+                fElmt._onSignatureChange({
+                    x: {},
+                    y: {}
+                });
+
+                expect(fElmt.hasOwnProperty('argX')).to.be.true;
+                expect(fElmt.hasOwnProperty('argY')).to.be.true;
+            });
+
+            it('should remove an argument property if it is not in the new signature', function(){
+                var fElmt = fixture('basic');
+
+                fElmt._onSignatureChange({
+                    x: {},
+                    y: {}
+                });
+
+                fElmt._onSignatureChange({
+                    x: {}
+                });
+
+                expect(fElmt.hasOwnProperty('argX')).to.be.true;
+                expect(fElmt.hasOwnProperty('argY')).to.be.false;
+            });
+
         });
 
         describe('invoke', function() {

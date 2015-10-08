@@ -55,6 +55,8 @@ class WidgetFunction(comm: CommWriter)
     (msgContent \ Comm.KeyEvent).asOpt[String] match {
       case Some(Comm.EventInvoke) =>
         handleInvoke(msgContent, this.theFunctionName, this.limit)
+      case Some(Comm.EventSync) =>
+        sendSignature(this.theFunctionName)
       case Some(evt) =>
         logger.warn(s"Unhandled custom event ${evt}.")
       case None =>
