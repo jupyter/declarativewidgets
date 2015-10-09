@@ -172,6 +172,14 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             }
         },
 
+        behaviors: [
+            Polymer.IronResizableBehavior
+        ],
+
+        listeners: {
+            'iron-resize': '_resizer'
+        },
+
         _svgSelection: function(d3) {
             return d3.select(this.$.chart1).select('svg');
         },
@@ -361,19 +369,10 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             });
         },
 
-        _resizer: function() { //FIXME: debounce?
+        _resizer: function() {
             if (this.chart) {
                 this.chart.update();
             }
-        },
-
-        attached: function() {
-            this._resizer = this._resizer.bind(this);
-            window.addEventListener('resize', this._resizer);
-        },
-
-        detached: function() {
-            window.removeEventListener('resize', this._resizer);
         }
     });
 
