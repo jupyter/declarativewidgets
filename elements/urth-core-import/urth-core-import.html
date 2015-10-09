@@ -4,7 +4,7 @@
 -->
 <link rel='import' href='../polymer/polymer.html'>
 <link rel='import' href='../iron-ajax/iron-ajax.html'>
-<link rel='import' href='../urth-core-behaviors/jupyter-notebook-env.html'>
+<link rel="import" href="./urth-core-import-behavior.html">
 
 <!--
  Adds functionality to `<link>` to provide a mechanism to
@@ -24,7 +24,7 @@
  -->
 <dom-module id='urth-core-import'>
     <template>
-        <iron-ajax id='ajaxPost' url='{{_importEndpointURL}}'
+        <iron-ajax id='ajaxPost' url='/urth_import'
             body='{{requestBody}}'
             content-type='application/json'
             handle-as='json'
@@ -40,10 +40,7 @@
     Polymer({
         is: 'urth-core-import',
         extends: 'link',
-        /**
-         * fired if the specified package or href fails to load.
-         * @event `importerror`
-         */
+        behaviors: [Urth.ImportBehavior],
 
         properties: {
             /**
@@ -65,19 +62,8 @@
             debug: {
                 type: Boolean,
                 value: false
-            },
-
-            /**
-             * This is the URL to the import endpoint on the notebook
-             */
-            _importEndpointURL: {
-                computed: "_getImportEndpointURL(_baseURL)"
             }
-
         },
-
-        behaviors: [Urth.JupyterNotebookEnv],
-
         listeners: {
             'load': '_onLinkLoad',
             'error': '_onLinkError'
@@ -99,13 +85,19 @@
                     this.importHref(url.href, function() {
                         // Save the fact that the link href was loaded successfully.
                         loadedPackages[this.href] = true;
+                        if (this.package !== undefined) {
+                            this.setNotification(this.package, false);
+                        }
                         this.fire('load');
                         if (this.debug) {
                             console.debug(logTag + 'Successfully imported ' + this.href);
                         }
                     }.bind(this), function(e) {
-                        var msg = 'Failed to import ' + url.href;
+                        var msg = 'Failed to import ' + this.href;
                         console.warn(logTag + msg);
+                        if (this.package !== undefined) {
+                            this.setNotification(this.package, true);
+                        }
                         this.fire('importerror', { msg: msg });
                     }.bind(this));
                 } else {
@@ -123,6 +115,7 @@
                         error.detail.request.statusText :
                         error.detail.error;
                 console.warn(logTag + msg);
+                this.setNotification(this.package, true);
                 this.fire('importerror', { msg: msg });
             }.bind(this));
         },
@@ -134,24 +127,28 @@
             // Result is sent in `response` event and
             // errors in `error` event on the ajaxPost element.
             if (this.package && !loadedPackages[this.href]) {
+                // The current package is not installed.
+                if (this.package !== undefined) {
+                    installMap.push(this.package);
+                    this.setNotification(this.package)
+                }
                 if (this.debug) {
                     console.debug(logTag + 'Sending server request to install ' + this.package);
                 }
-                this.$.ajaxPost.generateRequest();
+                this.async(this.$.ajaxPost.generateRequest.bind(this.$.ajaxPost), 100);
             }
         },
 
         _onLinkLoad: function() {
             // Save the fact that the link href was loaded successfully.
             loadedPackages[this.href] = true;
+            if (installMap.length === 0) {
+                failedPackages = [];
+            }
         },
 
         _packageChanged: function(newVal, oldVal) {
             this.requestBody = '{"package": ' + '"' + newVal + '"}';
-        },
-
-        _getImportEndpointURL: function( baseURL ){
-            return baseURL + 'urth_import';
         }
     });
 </script>
