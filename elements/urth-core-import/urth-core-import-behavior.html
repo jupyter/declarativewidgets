@@ -1,0 +1,76 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+
+<script>
+    'use strict';
+
+    var installMap = [];
+    var failedPackages = [];
+    var multiplePackages = false;
+
+    window.Urth = window.Urth || {};
+
+    /**
+     * `Urth.ImportBehavior` provides an interface for
+     * managing notifications defined in the notebook
+     * frontend.
+     *
+     * @group Urth Core
+     * @polymerBehavior Urth.ImportBehavior
+     */
+    Urth.ImportBehavior = {
+
+        /**
+         * Sets channel data as properties on the given element.
+         *
+         * @param {String} pkg The current package being installed.
+         * @param {Boolean} isFailure True if package installation failed,
+         *                            false if package installation succeeded.
+         */
+        setNotification: function(pkg, isFailure) {
+            var msg, timeout = 5000;
+
+            // The isFailure flag indicates completion of the request. Either
+            // success (false) or failure (true).
+            if (typeof isFailure !== 'undefined') {
+                var idx = installMap.indexOf(pkg);
+                installMap.splice(idx, 1);
+                if (isFailure) {
+                    failedPackages.push(pkg);
+                }
+                if (installMap.length === 0) {
+                    if (failedPackages.length > 0) {
+                        msg = failedPackages.length > 1 ? 'Failed to install ' + failedPackages.length + ' packages.' : 'Failed to install ' + pkg;
+                    } else {
+                        msg = multiplePackages ? 'Successfully installed packages.' : 'Successfully installed ' + pkg;
+                    }
+                    failedPackages = [];
+                    multiplePackages = false;
+                } else {
+                    multiplePackages = true;
+                    msg = 'Installing ' + installMap.length + ' packages.';
+                }
+            } else {
+                timeout = 10000;
+                multiplePackages = installMap.length > 1;
+                if (multiplePackages) {
+                    msg = 'Installing ' + installMap.length + ' packages.';
+                } else {
+                    msg = 'Installing ' + pkg;
+                }
+            }
+
+            // Use the notebook notification area if it is defined or else just
+            // log to the console.
+            if (typeof IPython !== 'undefined' && IPython.notification_area) {
+                var w = IPython.notification_area.get_widget('notebook');
+                w.set_message(msg, timeout);
+            } else {
+                console.log(msg);
+            }
+        }
+    };
+</script>
