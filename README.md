@@ -80,27 +80,20 @@ To see the Jupyter instance with extensions working:
 1. Run `docker-machine ls` and note the IP of the dev machine.
 2. Visit http://THAT_IP:8888 in your browser
 
-## Build
+## Build & Package
 
-On a Mac, `make sdist` will build a `pip` installable archive file in the `dist` directory. Running 'make server' will run a docker container and pip install the package. This command is usefull to validate the packaing and installation.
+Run `make sdist` to create a `pip` installable archive file in the `dist` directory. To test the package, run 'make server'. This command will run a docker container and pip install the package. It is usefull to validate the packaing and installation.
 
 ## Install
 
 Ensure you have the following prerequisites met:
-* IPython Notebook 3.2.x (not Jupyter Notebook 4.x-pre yet)
+* IPython Notebook 3.2.x (no Jupyter Notebook 4.x-pre yet)
 * Notebook instance running out of `profile_default`
 
-On a IPython / Jupyter Notebook host:
+> Note: <br>
+> You should be able to install that tarball using pip anywhere you please with one caveat: the setup.py assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at pip install time.
 
-```
-pip install --index=https://cloudet:pypi4cloudet!@pypi.cloudet.xyz/simple urth-widgets-nbexts -U
-```
 
-Or, on a Notebook cell run:
-
-```
-!pip install --index=https://cloudet:pypi4cloudet!@pypi.cloudet.xyz/simple urth-widgets-nbexts -U
-```
 ## Test
 
 On a Mac, `make test` will execute the browser, python and scala tests.
