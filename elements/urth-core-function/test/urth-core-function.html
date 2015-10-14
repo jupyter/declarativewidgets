@@ -19,15 +19,6 @@
     <link rel='import' href='../../test-fixture/test-fixture.html'>
 
     <!-- STEP 2: Import the element to test. -->
-    <link rel='import' href='../../urth-core-behaviors/jupyter-widget-behavior.html'>
-    <link rel='import' href='../../urth-core-behaviors/execution-complete-behavior.html'>
-
-    <script>
-        //mock Urth.JupyterWidgetBehavior
-        sinon.stub(Urth.JupyterWidgetBehavior, "createModel");
-        sinon.stub(Urth.ExecutionCompleteBehavior, "ready");
-        sinon.stub(Urth.ExecutionCompleteBehavior, "detached");
-    </script>
     <link rel='import' href='../urth-core-function.html'>
 
 </head>
@@ -62,11 +53,15 @@
 
     <script>
         // STEP 4: Define any globals needed by the test suite.
-
-        beforeEach(function() {
-        });
-
-        afterEach(function() {
+        before(function() {
+            /*
+             * Non-lifecycle methods must be mocked on the prototype.
+             * Lifecycle methods(e.g. detached, ready) remain in the behavior, so they
+             * must be mocked there.
+             */
+            sinon.stub(Urth["urth-core-function"].prototype, "createModel");
+            sinon.stub(Urth.ExecutionCompleteBehavior, "ready");
+            sinon.stub(Urth.ExecutionCompleteBehavior, "detached");
         });
 
         // STEP 5: Define suite(s) and tests.

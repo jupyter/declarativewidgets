@@ -33,7 +33,9 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
         var ParamAttrPattern = /^arg-(.+)/;
         var ParamPropPathPattern = /^args.(.+)/;
 
-        Polymer({
+        window.Urth = window.Urth || {};
+
+        window.Urth['urth-core-function'] = Polymer({
             is: 'urth-core-function',
             properties: {
 

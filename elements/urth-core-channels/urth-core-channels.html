@@ -60,7 +60,10 @@ dataChannel.setItem('user', 'Luke');
 
 <script>
     'use strict';
-    Polymer({
+
+    window.Urth = window.Urth || {};
+
+    window.Urth['urth-core-channels'] = Polymer({
         is: 'urth-core-channels',
         behaviors: [Urth.ChannelsBehavior, Urth.JupyterWidgetBehavior, Urth.JupyterKernelObserver],
         listeners: {

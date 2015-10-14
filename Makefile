@@ -152,7 +152,7 @@ ifdef SAUCE_USER_NAME
 	@echo 'Running web component tests remotely on Sauce Labs...'
 	@npm run test-sauce --silent -- --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
 else
-	@echo 'No SAUCE environment variables found, skipping remote web component tests'
+	@npm run test -- --local firefox
 endif
 
 test-py: REPO?=cloudet/pyspark-notebook-bower-sparkkernel

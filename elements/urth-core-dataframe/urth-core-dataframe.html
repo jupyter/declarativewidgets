@@ -22,7 +22,9 @@ Example:
 (function(){
     'use strict';
 
-    Polymer({
+    window.Urth = window.Urth || {};
+
+    window.Urth['urth-core-dataframe'] = Polymer({
         is: 'urth-core-dataframe',
 
         properties: {

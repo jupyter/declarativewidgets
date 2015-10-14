@@ -79,32 +79,59 @@
         // Step 4: Define any globals needed by the test suite.
 
         // Step 5: Define suite(s) and tests.
-        describe('attached', function() {
-            it('should register the element with the default data channel', function() {
+        describe('attached', function(done) {
+            var registerSpy;
+
+            afterEach(function() {
+                registerSpy.restore();
+            });
+
+            it('should register the element with the default data channel', function(done) {
                 var domBind = document.createElement('template', 'urth-core-bind');
-                var registerSpy = sinon.spy(domBind, 'register');
+                registerSpy = sinon.spy(domBind, 'register');
                 var doc = domBind.content.ownerDocument;
                 var elem = doc.createElement('test-bind');
                 domBind.content.appendChild(elem);
                 document.body.appendChild(domBind);
-
-                registerSpy.restore();
-                expect(registerSpy).to.have.been.calledWith(domBind, 'default');
+                // This is a workaround for a polyfill timing issue in Firefox.
+                // We explicitly wait for Polymer to register the domBind element
+                // prior to checking the whether the registerSpy has been called.
+                // Otherwise, the test will fail because the domBind element will
+                // not be initialized by the time the assertion is checked.
+                document.addEventListener("dom-change", function() {
+                    expect(registerSpy).to.have.been.calledWith(domBind, 'default');
+                }, false);
+                done();
             });
         });
 
-        describe('detached', function() {
-            it('should unregister the element with the data channel', function() {
+        describe('detached', function(done) {
+            var unregisterSpy;
+
+            afterEach(function() {
+                unregisterSpy.restore();
+            });
+
+            it('should unregister the element with the data channel', function(done) {
                 var domBind = document.createElement('template', 'urth-core-bind');
-                var unregisterSpy = sinon.spy(domBind, 'unregister');
+                unregisterSpy = sinon.spy(domBind, 'unregister');
                 var doc = domBind.content.ownerDocument;
                 var elem = doc.createElement('test-bind');
                 domBind.content.appendChild(elem);
                 document.body.appendChild(domBind);
-                domBind.remove();
-
-                unregisterSpy.restore();
-                expect(unregisterSpy).to.have.been.calledOnce;
+                // This is a workaround for a polyfill timing issue in Firefox.
+                // We explicitly wait for Polymer to remove the domBind element,
+                // then wait again prior to checking whether the unregisterSpy
+                // has been called. Otherwise, the test will fail because the
+                // domBind element will not be removed by the time the
+                // assertion is checked.
+                document.addEventListener("dom-change", function() {
+                    document.addEventListener("DOMNodeRemoved", function() {
+                        expect(unregisterSpy).to.have.been.calledOnce;
+                    }, false);
+                    domBind.remove();
+                }, false);
+                done();
             });
         });
 

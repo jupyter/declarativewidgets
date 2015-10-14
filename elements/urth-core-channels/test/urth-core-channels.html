@@ -18,18 +18,6 @@
     <script src='../../test-fixture/test-fixture-mocha.js'></script>
     <link rel='import' href='../../test-fixture/test-fixture.html'>
 
-    <!-- Import and define dependencies -->
-    <link rel='import' href='../../urth-core-behaviors/jupyter-widget-behavior.html'>
-    <link rel='import' href='../../urth-core-behaviors/jupyter-kernel-observer.html'>
-    <script>
-        //mock Urth.JupyterWidgetBehavior
-        sinon.stub(Urth.JupyterWidgetBehavior, "createModel");
-        sinon.stub(Urth.JupyterWidgetBehavior, "detached");
-            
-        //mock Urth.JupyterKernelObserver
-        sinon.stub(Urth.JupyterKernelObserver, "created");
-    </script>
-
     <!-- STEP 2: Import the element to test. -->
     <link rel='import' href='../urth-core-channels.html'>
 </head>
@@ -82,6 +70,17 @@
     <script>
         // STEP 4: Define any globals needed by the test suite.
         var channel;
+
+        before(function () {
+            /*
+             * Non-lifecycle methods must be mocked on the prototype.
+             * Lifecycle methods(e.g. detached, ready) remain in the behavior, so they
+             * must be mocked there.
+             */
+            sinon.stub(Urth["urth-core-channels"].prototype, "createModel");
+            sinon.stub(Urth.JupyterKernelObserver, "created");
+            sinon.stub(Urth.JupyterWidgetBehavior, "detached");
+        });
 
         beforeEach(function() {
             channel = fixture('basic');
