@@ -12,10 +12,14 @@
  element works with a server side REST endpoint to install the specified package
  and then upon successfull install, injects the appropriate HTML import into the page.
 
+ The `href` attribute should be specified as a relative path as the appropriate
+ base URL for the environment will be prefixed automatically. In the notebook
+ all `href` values should be of the form `urth_components/<package_name>/<file>`.
+
  Example: _Install and import the paper-slider element_
 
  ```html
- <link rel='import' href='/urth_components/paper-slider/paper-slider.html'
+ <link rel='import' href='urth_components/paper-slider/paper-slider.html'
         is='urth-core-import' package='PolymerElements/paper-slider'>
  ```
 
@@ -73,17 +77,29 @@
             _importEndpointURL: {
                 computed: "_getImportEndpointURL(_baseURL)"
             }
-
         },
 
         behaviors: [Urth.JupyterNotebookEnv],
 
         listeners: {
-            'load': '_onLinkLoad',
-            'error': '_onLinkError'
+            'load': '_onLinkLoad'
+        },
+
+        attributeChanged: function(name, type) {
+            if (name === 'href') {
+                this._onHrefAttrChange(this.getAttribute('href'));
+            }
         },
 
         ready: function() {
+            this._onHrefAttrChange(this.getAttribute('href'));
+        },
+
+        _downloadPackage: function() {
+            if (this.debug) {
+                console.debug(logTag + 'Sending server request to install ' + this.package);
+            }
+
             // Listen to the 'response' event to handle the ajax POST return value.
             this.$.ajaxPost.addEventListener('response', function(response) {
                 if (response && response.detail.status === 200) {
@@ -101,7 +117,7 @@
                         loadedPackages[this.href] = true;
                         this.fire('load');
                         if (this.debug) {
-                            console.debug(logTag + 'Successfully imported ' + this.href);
+                            console.debug(logTag + 'Successfully imported ' + url.href);
                         }
                     }.bind(this), function(e) {
                         var msg = 'Failed to import ' + url.href;
@@ -125,32 +141,63 @@
                 console.warn(logTag + msg);
                 this.fire('importerror', { msg: msg });
             }.bind(this));
+
+            this.$.ajaxPost.generateRequest();
         },
 
-        _onLinkError: function(e) {
-            // If a package attribute is specified and the href
-            // has not been loaded successfully then, XHR a request to the
-            // server to load the specified `package` through bower.
-            // Result is sent in `response` event and
-            // errors in `error` event on the ajaxPost element.
-            if (this.package && !loadedPackages[this.href]) {
-                if (this.debug) {
-                    console.debug(logTag + 'Sending server request to install ' + this.package);
+        _onHrefAttrChange: function(newHref) {
+            // When the href changes, need to inject a new link tag
+            // to force the resource to be retrieved. Changing the
+            // href dynamically works on Chrome but other browsers
+            // require a new link tag so this always injects a new
+            // link tag to ensure the new href is retrieved.
+            if (newHref && this.rel === 'import') {
+                var prefixedHref = this._prefixHref(newHref);
+                if (prefixedHref !== newHref) {
+                    this.setAttribute('href', prefixedHref);
+
+                    this.importHref(this.href, function() {
+                        this.fire('load');
+                    }.bind(this), function(e) {
+                        // If the href doesn't load, try to download
+                        // the package if it is specified.
+                        if (this.package && !loadedPackages[this.href]) {
+                            this._downloadPackage();
+                        } else {
+                            var msg = 'Failed to import ' + this.href;
+                            console.warn(logTag + msg);
+                            this.fire('importerror', { msg: msg });
+                        }
+                    }.bind(this));
                 }
-                this.$.ajaxPost.generateRequest();
             }
         },
 
         _onLinkLoad: function() {
             // Save the fact that the link href was loaded successfully.
             loadedPackages[this.href] = true;
+            if (this.debug) {
+                console.debug(logTag + 'Successfully imported ' + this.href);
+            }
         },
 
         _packageChanged: function(newVal, oldVal) {
             this.requestBody = '{"package": ' + '"' + newVal + '"}';
         },
 
-        _getImportEndpointURL: function( baseURL ){
+        // Imports need to have their href prefixed with the configured
+        // import base URL in order to prevent duplication of resources between
+        // the notebook initialization and cell imports.
+        _prefixHref: function(newHref) {
+            if (newHref && this._importBaseURL && newHref.indexOf(this._importBaseURL) !== 0) {
+                var prefixed = this._importBaseURL + newHref;
+                newHref = this._prefixedHref = prefixed.replace(/((?!:).|^)\/\//g, '$1/');
+            }
+
+            return newHref;
+        },
+
+        _getImportEndpointURL: function(baseURL) {
             return baseURL + 'urth_import';
         }
     });

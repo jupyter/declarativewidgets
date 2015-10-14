@@ -22,7 +22,18 @@ This behavior is used to encapsulate Notebook specific properties
             properties: {
                 _baseURL: {
                     value: function(){
-                        return window['IPython'] ? IPython.notebook.base_url : '/'
+                        return window['IPython'] ? IPython.notebook.base_url : '/';
+                    }
+                },
+
+                _importBaseURL: {
+                    value: function() {
+                        var url = window.Urth.BASE_URL;
+                        // Ensure url is '/' terminated.
+                        if (url && url[url.length - 1] !== '/') {
+                            url = url + '/';
+                        }
+                        return url;
                     }
                 }
             }

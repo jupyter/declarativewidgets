@@ -6,6 +6,6 @@ define([
     './init/init'
 ], function(init) {
     'use strict';
-    init(IPython.notebook.base_url + 'urth_components');
+    init(IPython ? IPython.notebook.base_url : '/');
     console.debug('Custom JS loaded');
 });

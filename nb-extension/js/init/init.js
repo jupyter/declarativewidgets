@@ -63,10 +63,16 @@ define(['require'], function(require) {
         document.head.appendChild(script);
     }
 
-    return function(bower_root, links) {
+    return function(baseURL, links) {
         // Enable shadow dom if it is there for polymer elements.
         window.Polymer = window.Polymer || {};
         window.Polymer.dom = 'shadow';
+
+        // Expose the base URL being used.
+        window.Urth = window.Urth || {};
+        window.Urth.BASE_URL = baseURL;
+
+        var bower_root = baseURL + 'urth_components';
 
         // Load the web components polyfill if it is necessary then
         // load the web components.
