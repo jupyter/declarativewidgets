@@ -28,10 +28,27 @@ trait MessageSupport extends LogLike {
   }
 
   /**
+   * Send a status update with the given status and message.
+   * @param comm CommWriter to use for communication.
+   * @param status "ok" or "error"
+   * @param msg Optional status message, e.g. an error message.
+   */
+  def sendStatus(comm: CommWriter, status: String, msg: String = ""): Unit = {
+    val statusJson = Json.obj(
+      Comm.KeyStatus -> status,
+      Comm.KeyMessage -> msg,
+      Comm.KeyTimestamp -> timestamp
+    )
+    sendState(comm, Comm.KeyStatus, statusJson)
+  }
+
+  /**
    * Send a JSON message using the given comm writer.
    * @param comm CommWriter to use for communication.
    * @param msg Message to send.
    */
   def send(comm: CommWriter, msg: JsValue): Unit = comm.writeMsg(msg)
+
+  private[util] def timestamp: Long = System.currentTimeMillis()
 
 }

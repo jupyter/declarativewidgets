@@ -25,15 +25,11 @@ class WidgetChannels(val comm: CommWriter)
     logger.debug(s"Handling custom message ${msgContent}...")
     (msgContent \ Comm.KeyEvent).asOpt[String] match {
       case Some(Comm.EventChange) => handleChange(msgContent) match {
-        case Some(u) => ()
-        case None => logger.trace(s"Failed to execute watch handler for " +
-          s"${msgContent} with handlers ${WidgetChannels.chanHandlers}"
-        )
+        case Right(u)  => sendOk()
+        case Left(msg) => sendError(msg)
       }
-      case Some(evt) =>
-        logger.warn(s"Unhandled custom event ${evt}.")
-      case None =>
-        logger.warn("No event value in custom comm message.")
+      case Some(evt) => logger.warn(s"Unhandled custom event ${evt}.")
+      case None => logger.warn("No event value in custom comm message.")
     }
   }
 
@@ -41,18 +37,51 @@ class WidgetChannels(val comm: CommWriter)
    * Execute the handler corresponding to the channel and variable found in
    * the message using the old and new values found in the message.
    * @param msgContent Message contents.
-   * @return Some(Unit) or None if an error occurred.
+   * @return Right(Unit) or Left(error_message) if an error occurred.
    */
-  private[widgets] def handleChange(msgContent: MsgData): Option[Unit] = for {
-    chan <- (msgContent \ Comm.ChangeData \ Comm.ChangeChannel).asOpt[String]
-    name <- (msgContent \ Comm.ChangeData \ Comm.ChangeName).asOpt[String]
-    oldVal   <- (msgContent \ Comm.ChangeData \ Comm.ChangeOldVal).asOpt[JsValue]
-    newVal   <- (msgContent \ Comm.ChangeData \ Comm.ChangeNewVal).asOpt[JsValue]
-    handlers <- WidgetChannels.chanHandlers.get(chan)
-    handler  <- handlers.get(name)
-    res      <- invokeWatchHandler(oldVal, newVal, handler)
-  } yield res
+  private[widgets] def handleChange(msgContent: MsgData): Either[String, Unit] =
+    parseMessage(msgContent) match {
+      case Some((chan, name, oldVal, newVal)) =>
+        getHandler(chan, name) match {
+          case Some(handler) =>
+            invokeWatchHandler(oldVal, newVal, handler).toRight(s"Error " +
+              s"invoking watch handler for variable $name on channel $chan"
+            )
+          case None =>
+            logger.warn(s"No watch handler for variable $name on channel $chan")
+            Right(())
+        }
+      case None =>
+        logger.warn(s"Could not parse change message $msgContent")
+        Left(s"Could not parse change message $msgContent")
+    }
 
+  /**
+   * Parses the fields necessary to invoke a watch handler from the message.
+   * @param msgContent Message to parse.
+   * @return Tuple of field values, or None if parsing fails.
+   */
+  private[widgets] def parseMessage(
+    msgContent: MsgData
+  ): Option[(String, String, JsValue, JsValue)] = for {
+      chan <- (msgContent \ Comm.ChangeData \ Comm.ChangeChannel).asOpt[String]
+      name <- (msgContent \ Comm.ChangeData \ Comm.ChangeName).asOpt[String]
+      oldVal <- (msgContent \ Comm.ChangeData \ Comm.ChangeOldVal).asOpt[JsValue]
+      newVal <- (msgContent \ Comm.ChangeData \ Comm.ChangeNewVal).asOpt[JsValue]
+    } yield (chan, name, oldVal, newVal)
+
+  /**
+   * Retrieves the registered WatchHandler for the given channel and name.
+   * @param chan channel
+   * @param name variable name
+   * @return WatchHandler or None if no handler is found.
+   */
+  private[widgets] def getHandler(
+    chan: String, name: String
+  ): Option[WatchHandler] = for {
+      handlers <- WidgetChannels.chanHandlers.get(chan)
+      handler  <- handlers.get(name)
+  } yield handler
 }
 
 /**

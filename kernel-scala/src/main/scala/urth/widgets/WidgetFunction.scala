@@ -35,7 +35,6 @@ class WidgetFunction(comm: CommWriter)
         logger.trace(s"Sync data ${Comm.KeyFunctionName}: $name")
         val funcName = name.toString
         registerFunction(funcName)
-        sendSignature(funcName)
       case _ => logger.error(s"No ${Comm.KeyFunctionName} value provided!")
     }
 
@@ -69,10 +68,16 @@ class WidgetFunction(comm: CommWriter)
     (msg \ Comm.KeyArgs).asOpt[JsValue] match {
       case Some(args) =>
         invokeFunc(name, args).map(serialize(_, limit)) match {
-          case Some(result) => sendResult(result)
-          case None => logger.error(s"No result for ${theFunctionName} invoke.")
+          case Some(result) =>
+            sendResult(result)
+            sendOk()
+          case None =>
+            sendError(s"No result for ${theFunctionName} invoke.")
+            logger.error(s"No result for ${theFunctionName} invoke.")
         }
-      case None => logger.warn(s"No arguments were provided for invocation!")
+      case None =>
+        sendError(s"No arguments were provided in message $msg for invocation!")
+        logger.warn(s"No arguments were provided for invocation!")
     }
   }
 
@@ -100,6 +105,10 @@ class WidgetFunction(comm: CommWriter)
   private[widgets] def registerFunction(funcName: String): Unit = {
     this.theFunctionName = funcName
     logger.debug(s"Registered function ${funcName}.")
+    sendSignature(funcName) match {
+      case Right(_)  => sendOk()
+      case Left(msg) => sendError(msg)
+    }
   }
 
   private[widgets] def registerLimit(limit: Int): Unit = {
@@ -107,13 +116,15 @@ class WidgetFunction(comm: CommWriter)
     logger.debug(s"Registered limit ${limit}.")
   }
 
-  private[widgets] def sendSignature(funcName: String): Unit = {
+  private[widgets] def sendSignature(funcName: String): Either[String, Unit] = {
     signature(funcName) match {
       case Some(sig) =>
         val sigJSON = Json.toJson(sig)
         logger.trace(s"Signature for ${funcName}: ${sigJSON}")
-        sendState(Comm.StateSignature, sigJSON)
-      case None => logger.warn(s"Could not determine signature for ${funcName}")
+        Right(sendState(Comm.StateSignature, sigJSON))
+      case None =>
+        logger.trace(s"Could not determine signature for function $funcName.")
+        Left(s"Invalid function name $funcName. Could not determine signature.")
     }
   }
 

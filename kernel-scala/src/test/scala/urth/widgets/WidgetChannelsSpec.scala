@@ -13,7 +13,7 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
   class TestWidget(comm: CommWriter) extends WidgetChannels(comm)
 
   class TestWidgetNoChange(comm: CommWriter) extends WidgetChannels(comm) {
-    override def handleChange(msgContent: MsgData) = Some(Unit)
+    override def handleChange(msgContent: MsgData) = Right(Unit)
   }
 
   describe("WidgetChannels") {
@@ -66,6 +66,22 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         test.handleCustom(msg)
         verify(test, times(0)).handleChange(any())
       }
+
+      it("should send a status ok message if handling the change succeeded"){
+        val test = spy(new TestWidget(mock[CommWriter]))
+        doReturn(Right(())).when(test).handleChange(any())
+        val msg = Json.obj(Comm.KeyEvent -> Comm.EventChange)
+        test.handleCustom(msg)
+        verify(test).sendOk()
+      }
+
+      it("should send a status error message if handling the change fails"){
+        val test = spy(new TestWidget(mock[CommWriter]))
+        doReturn(Left("uh oh")).when(test).handleChange(any())
+        val msg = Json.obj(Comm.KeyEvent -> Comm.EventChange)
+        test.handleCustom(msg)
+        verify(test).sendError("uh oh")
+      }
     }
 
     describe("#handleChange") {
@@ -115,7 +131,7 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         executed should be(true)
       }
 
-      it ("should return None when the channel is not registered") {
+      it ("should return Right when the channel is not registered") {
         val old = 1
         val noo = 2
         val msg = Json.obj(
@@ -128,10 +144,10 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         )
 
         val wid = spy(new TestWidget(mock[CommWriter]))
-        wid.handleChange(msg) should be(None)
+        wid.handleChange(msg).isRight should be(true)
       }
 
-      it ("should return None when the name is not registered") {
+      it ("should return Right when the name is not registered") {
         val old = 1
         val noo = 2
         val msg = Json.obj(
@@ -147,12 +163,12 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         val handler = (x: Int, y: Int) => executed = true; ()
         WidgetChannels.watch(chan, "DNE", handler)
         val wid = spy(new TestWidget(mock[CommWriter]))
-        wid.handleChange(msg) should be(None)
+        wid.handleChange(msg).isRight should be(true)
 
         executed should be(false)
       }
 
-      it ("should fail (return None) if oldVal is undefined") {
+      it ("should fail (return Left) if oldVal is undefined") {
         val noo = 2
         val msg = Json.obj(
           Comm.ChangeData -> Map(
@@ -167,11 +183,11 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         val handler = (x: Int, y: Int) => executed = true; ()
         WidgetChannels.watch(chan, name, handler)
         val wid = spy(new TestWidget(mock[CommWriter]))
-        wid.handleChange(msg) should be(None)
+        wid.handleChange(msg).isLeft should be(true)
 
       }
 
-      it ("should return None when invocation fails") {
+      it ("should return Left when invocation fails") {
         val old = 1
         val noo = 2
         val msg = Json.obj(
@@ -186,10 +202,10 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         val handler = (x: Int, y: Int) => {val explosion = 1 / 0; ()}
         WidgetChannels.watch(chan, name, handler)
         val wid = spy(new TestWidget(mock[CommWriter]))
-        wid.handleChange(msg) should be(None)
+        wid.handleChange(msg).isLeft should be(true)
       }
 
-      it ("should return None if argument types don't match handler types") {
+      it ("should return Left if argument types don't match handler types") {
         val old = 1
         val noo = 2
         val msg = Json.obj(
@@ -204,15 +220,15 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         val handler = (x: String, y: String) => ()
         WidgetChannels.watch(chan, name, handler)
         val wid = spy(new TestWidget(mock[CommWriter]))
-        wid.handleChange(msg) should be(None)
+        wid.handleChange(msg).isLeft should be(true)
       }
 
-      it ("should return None if the message format is invalid") {
+      it ("should return Left if the message format is invalid") {
         val msg = Json.obj()
         val handler = (x: Int, y: Int) => ()
         WidgetChannels.watch(chan, name, handler)
         val wid = spy(new TestWidget(mock[CommWriter]))
-        wid.handleChange(msg) should be(None)
+        wid.handleChange(msg).isLeft should be(true)
       }
     }
 
@@ -263,6 +279,82 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         val comm = mock[CommWriter]
         val widget = new WidgetChannels(comm)
         WidgetChannels.theChannels should be (widget)
+      }
+    }
+
+    describe("#parseMessage") {
+      val chan = "c"
+      val name = "x"
+
+      it ("should give channel, name, oldVal, newVal for a valid message"){
+        val old = 0
+        val noo = 1
+
+        val msg = Json.obj(
+          Comm.ChangeData -> Map(
+            Comm.ChangeChannel -> JsString(chan),
+            Comm.ChangeName -> JsString(name),
+            Comm.ChangeOldVal -> JsNumber(old),
+            Comm.ChangeNewVal -> JsNumber(noo)
+          )
+        )
+
+        val expected = Some((chan, name, JsNumber(old), JsNumber(noo)))
+
+        val test = new TestWidget(mock[CommWriter])
+        test.parseMessage(msg) should be (expected)
+      }
+
+      it ("should give return None given an incomplete message"){
+        val noo = 1
+
+        val msg = Json.obj(
+          Comm.ChangeData -> Map(
+            Comm.ChangeChannel -> JsString(chan),
+            Comm.ChangeNewVal -> JsNumber(noo)
+          )
+        )
+
+        val expected = None
+
+        val test = new TestWidget(mock[CommWriter])
+        test.parseMessage(msg) should be (expected)
+      }
+
+      it ("should give return None if channel or name are not strings"){
+        val old = 0
+        val noo = 1
+
+        val msg = Json.obj(
+          Comm.ChangeData -> Map(
+            Comm.ChangeChannel -> JsNumber(0),
+            Comm.ChangeName -> JsNumber(1),
+            Comm.ChangeOldVal -> JsNumber(old),
+            Comm.ChangeNewVal -> JsNumber(noo)
+          )
+        )
+
+        val expected = None
+
+        val test = new TestWidget(mock[CommWriter])
+        test.parseMessage(msg) should be (expected)
+      }
+    }
+
+    describe("#getHandler") {
+      it("should retrieve a registered handler"){
+        val chan = "c"
+        val name = "n"
+        val handler = (x: Int, y: Int) => ()
+        Channel(mock[CommWriter], chan).watch(name, handler)
+
+        val test = new TestWidget(mock[CommWriter])
+        test.getHandler(chan, name) should be (Some(handler))
+      }
+
+      it("should return none if the requested handler does not exist") {
+        val test = new TestWidget(mock[CommWriter])
+        test.getHandler("", "") should be (None)
       }
     }
   }
