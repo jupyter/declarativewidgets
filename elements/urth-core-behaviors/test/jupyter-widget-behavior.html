@@ -56,6 +56,41 @@
 
         });
 
+        describe('_onModelStatusChange', function() {
+            it('should call _clearErrorMessages on status ok', function() {
+                var optionFixture = {
+                    status: "ok"
+                }
+
+                var testObject = Polymer.Base.mixin({
+                    _clearErrorMessages: function(){}
+                }, Urth.JupyterWidgetBehavior);
+
+                var clearFunc = sinon.stub(testObject, "_clearErrorMessages");
+
+                testObject.onModelStatusChange(optionFixture);
+
+                assert(clearFunc.calledOnce, "_clearErrorMessages was called " + clearFunc.callCount);
+            });
+
+            it('should call displayErrorMessage on status error', function() {
+                var optionFixture = {
+                    status: "error"
+                }
+
+                var testObject = Polymer.Base.mixin({
+                    displayErrorMessage:function(){}
+                }, Urth.JupyterWidgetBehavior);
+
+                var displayFunc = sinon.stub(testObject, "displayErrorMessage");
+
+                testObject.onModelStatusChange(optionFixture);
+
+                assert(displayFunc.calledOnce, "displayErrorMessage was called " + displayFunc.callCount);
+            });
+
+        });
+
         describe('sync', function() {
             it('should call set on the model on each property and save changes', function() {
 

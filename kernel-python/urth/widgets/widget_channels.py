@@ -50,20 +50,19 @@ class Channels(UrthWidget):
                     handler = chan_handlers[data['name']]
                     old = data.get('old_val', None)
                     new = data.get('new_val', None)
-                    handler(old, new)
+                    try:
+                        handler(old, new)
+                        self.ok()
+                    except Exception as e:
+                        self.error("Error executing watch handler for {} on "
+                                   "channel {}: {}".format(
+                                    data['name'], data['channel'], str(e)))
                 else:
-                    print("No watch handler for name field in {}".format(data))
+                    print("No watch handler for name field in {}".format(
+                        data))
             else:
-                print("No watch handler for channel field in {}".format(data))
-
-    def _send_update(self, attribute, value):
-        msg = {
-            "method": "update",
-            "state": {
-                attribute: value
-            }
-        }
-        self._send(msg)
+                print("No watch handler for channel field in {}".format(
+                    data))
 
 
 class Channel:

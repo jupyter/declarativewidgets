@@ -105,9 +105,11 @@ dataChannel.setItem('user', 'Luke');
             console.debug('urth-core-channels onModelChange', options);
 
             var changes = options.changed;
-            Object.keys(changes).forEach(function(change){
+            Object.keys(changes).filter(function(change){
+                return !(change === "status");
+            }).forEach(function(change){
                 console.debug('urth-core-channels onModelChange changed ', change, changes[change]);
-                this._handleItemChangeMessage(change, changes[change])
+                this._handleItemChangeMessage(change, changes[change]);
             }.bind(this));
         },
 
@@ -127,7 +129,11 @@ dataChannel.setItem('user', 'Luke');
          */
         _handleItemChangeMessage: function( path, value ){
             var path = path.split(':');
-            this.setItem(path[1], value, path[0]);
+            if (!this._getChannel(path[0])){
+                this.displayErrorMessage("Channel " + path[0] + " does not exist.");
+            } else {
+                this.setItem(path[1], value, path[0]);
+            }
         }
     });
 </script>

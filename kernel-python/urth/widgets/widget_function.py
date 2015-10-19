@@ -9,6 +9,7 @@ from IPython.core.getipython import get_ipython
 from urth.util.serializer import Serializer
 from urth.util.functions import apply_with_conversion, signature_spec
 from .urth_widget import UrthWidget
+from .urth_exception import UrthException
 
 
 class Function(UrthWidget):
@@ -27,8 +28,12 @@ class Function(UrthWidget):
         super(Function, self).__init__(**kwargs)
 
     def _function_name_changed(self, old, new):
-        self.log.info("Binding to function name {}...".format(new))
-        self._sync_state()
+        try:
+            self.log.info("Binding to function name {}...".format(new))
+            self._sync_state()
+            self.ok()
+        except Exception as e:
+            self.error(str(e))
 
     def _handle_custom_event_msg(self, _, content):
         event = content.get('event', '')
@@ -38,23 +43,23 @@ class Function(UrthWidget):
             self._sync_state()
 
     def _the_function(self):
-        return self.shell.user_ns[self.function_name]
+        if self.function_name in self.shell.user_ns:
+            return self.shell.user_ns[self.function_name]
+        else:
+            raise UrthException("Invalid function name {}".format(
+                self.function_name))
 
     def _invoke(self, args):
         self.log.info("Invoking function {} with args {}...".format(
             self.function_name, args))
-        result = apply_with_conversion(self._the_function(), args)
-        serialized_result = self.serializer.serialize(result, limit=self.limit)
-        self._send_update("result", serialized_result)
-
-    def _send_update(self, attribute, value):
-        msg = {
-            "method": "update",
-            "state": {
-                attribute: value
-            }
-        }
-        self._send(msg)
+        try:
+            result = apply_with_conversion(self._the_function(), args)
+            serialized_result = self.serializer.serialize(
+                result, limit=self.limit)
+            self._send_update("result", serialized_result)
+            self.ok()
+        except Exception as e:
+            self.error("Error while invoking function: {}".format(str(e)))
 
     def _sync_state(self):
         signature = signature_spec(self._the_function())
