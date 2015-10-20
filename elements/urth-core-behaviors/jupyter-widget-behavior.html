@@ -20,6 +20,11 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
          */
         Urth.JupyterWidgetBehavior = {
 
+            detached: function() {
+                this._unRegisterModelCallbacks();
+                this._unRegisterNotebookCallbacks();
+            },
+
             /**
              * Creates a backbone model and a comm connection with an instance
              * of the specified kernelClass on the kernel.
@@ -46,9 +51,12 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                     }
                 ).then(function(model) {
                         console.log('Model creation successful!', model);
+                        this.__modelChangeCallback = this._onModelChange.bind(this);
+                        this.__commCloseCallback = this._handleCommDisconnect.bind(this);
 
-                        model.on('change', this._onModelChange, this);
-                        model.once('comm:close', this._handleCommDisconnect, this);
+                        model.on('change', this.__modelChangeCallback);
+                        model.once('comm:close', this.__commCloseCallback);
+
                         this.model = model;
                         this.onModelReady();
                     }.bind(this),
@@ -60,10 +68,13 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
 
             _retryCreateModel: function(){
                 console.debug('Urth.JupyterWidgetBehavior _retryCreateModel - Waiting for another code exec...');
-                IPython.notebook.events.one('shell_reply.Kernel', function(){
-                        console.debug('Urth.JupyterWidgetBehavior createModel - retrying...');
-                        this._doCreateModel();
-                    }.bind(this)
+                this.__shellReplyCallback = function(){
+                    console.debug('Urth.JupyterWidgetBehavior createModel - retrying...');
+                    this._doCreateModel();
+                }.bind(this);
+
+                IPython.notebook.events.one(
+                    'shell_reply.Kernel', this.__shellReplyCallback
                 );
             },
 
@@ -78,6 +89,27 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                     }
                 } else {
                     console.error('Urth.JupyterWidgetBehavior no longer retrying createModel!');
+                }
+            },
+
+            /**
+             * Unregister event callbacks associated with the model.
+             */
+            _unRegisterModelCallbacks: function() {
+                if (this.model){
+                    this.model.off('change', this.__modelChangeCallback);
+                    this.model.off('comm:close', this.__commCloseCallback);
+                }
+            },
+
+            /**
+             * Unregister event callbacks associated with the notebook.
+             */
+            _unRegisterNotebookCallbacks: function() {
+                if (this.__shellReplyCallback){
+                    IPython.notebook.events.off(
+                        'shell_reply.Kernel', this.__shellReplyCallback
+                    );
                 }
             },
 

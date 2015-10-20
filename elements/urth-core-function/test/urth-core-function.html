@@ -20,10 +20,13 @@
 
     <!-- STEP 2: Import the element to test. -->
     <link rel='import' href='../../urth-core-behaviors/jupyter-widget-behavior.html'>
+    <link rel='import' href='../../urth-core-behaviors/execution-complete-behavior.html'>
 
     <script>
         //mock Urth.JupyterWidgetBehavior
         sinon.stub(Urth.JupyterWidgetBehavior, "createModel");
+        sinon.stub(Urth.ExecutionCompleteBehavior, "ready");
+        sinon.stub(Urth.ExecutionCompleteBehavior, "detached");
     </script>
     <link rel='import' href='../urth-core-function.html'>
 
