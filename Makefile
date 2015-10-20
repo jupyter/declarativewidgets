@@ -125,7 +125,7 @@ dist/docs: bower_components ${shell find elements/**/*.html} etc/docs/index.html
 
 dist: dist/urth_widgets dist/urth dist/urth_widgets/urth-widgets.jar dist/docs
 
-sdist: REPO?=jupyter/pyspark-notebook:3.2
+sdist: REPO?=cloudet/pyspark-notebook-bower-sparkkernel
 sdist: RELEASE?=
 sdist: GIT_COMMIT?=HEAD
 sdist: BUILD_NUMBER?=0
@@ -140,7 +140,7 @@ sdist: dist
 			python setup.py sdist && \
 			cp -r dist/*.tar.gz /src/.'
 
-test: REPO?=jupyter/pyspark-notebook:3.2
+test: REPO?=cloudet/pyspark-notebook-bower-sparkkernel
 test: test-js test-py test-scala
 
 test-js: | $(URTH_COMP_LINKS)
@@ -155,7 +155,7 @@ else
 	@echo 'No SAUCE environment variables found, skipping remote web component tests'
 endif
 
-test-py: REPO?=jupyter/pyspark-notebook:3.2
+test-py: REPO?=cloudet/pyspark-notebook-bower-sparkkernel
 test-py: dist/urth
 	@echo 'Running python tests...'
 	@docker run -it --rm \
