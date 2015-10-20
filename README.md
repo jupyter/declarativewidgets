@@ -90,6 +90,7 @@ Ensure you have the following prerequisites met:
 * IPython Notebook 3.2.x (no Jupyter Notebook 4.x-pre yet)
 * Notebook instance running out of `profile_default`
 * Make sure you installing and running on a Python3 environment. (i.e. python, ipython, and pip)
+* Bower
 
 > Note: <br>
 > You should be able to install that tarball using pip anywhere you please with one caveat: the setup.py assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at pip install time.
