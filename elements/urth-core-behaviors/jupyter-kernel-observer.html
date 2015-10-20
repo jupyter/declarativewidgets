@@ -20,9 +20,24 @@ This behavior is used to implement handlers to kernel events
         Urth.JupyterKernelObserver = {
 
             created: function(){
-                IPython.notebook.events.on('kernel_ready.Kernel', this.onKernelReady.bind(this));
+                console.debug("Registering onKernelReady for Kernel Ready messages.")
+
+                this.__kernelReadyCallback = this.onKernelReady.bind(this);
+                IPython.notebook.events.on(
+                    'kernel_ready.Kernel', this.__kernelReadyCallback
+                );
+
                 if( IPython.notebook.kernel.is_connected() ){
                   this.onKernelReady();
+                }
+            },
+
+            detached: function(){
+                if (this.__kernelReadyCallback) {
+                    console.debug("Unregistering onKernelReady for Kernel Ready messages.")
+                    IPython.notebook.events.off(
+                        'kernel_ready.Kernel', this.__kernelReadyCallback
+                    );
                 }
             },
 

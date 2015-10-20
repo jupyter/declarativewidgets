@@ -24,7 +24,8 @@
     <script>
         //mock Urth.JupyterWidgetBehavior
         sinon.stub(Urth.JupyterWidgetBehavior, "createModel");
-
+        sinon.stub(Urth.JupyterWidgetBehavior, "detached");
+            
         //mock Urth.JupyterKernelObserver
         sinon.stub(Urth.JupyterKernelObserver, "created");
     </script>
