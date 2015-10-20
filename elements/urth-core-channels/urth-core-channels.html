@@ -118,7 +118,10 @@ dataChannel.setItem('user', 'Luke');
             this.createModel('urth.widgets.widget_channels.Channels', maxRetries);
         },
 
-
+        /**
+         * Handle an item change represented by the given path and value.
+         * The path is of the form <CHANNEL_NAME>:<ITEM_NAME>, e.g. "c:user".
+         */
         _handleItemChangeMessage: function( path, value ){
             var path = path.split(':');
             this.setItem(path[1], value, path[0]);

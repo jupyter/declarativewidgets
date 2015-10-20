@@ -357,6 +357,16 @@
 
                 expect(channel.getItem('foo')).to.equal(channel.getItem('foo', 'default'));
             });
+
+            it('should create the given channel if it does not exist', function() {
+                var createChannel = sinon.spy(channel, '_createChannel');
+                var chan = 'DNE';
+                channel.setItem('foo', 'bar', chan);
+
+                assert(createChannel.calledOnce, "_createChannel was called " + createChannel.callCount + " expected 1");
+                expect(createChannel.getCall(0).args[0]).to.equal(chan);
+
+            });
         });
 
         describe('unregister', function() {

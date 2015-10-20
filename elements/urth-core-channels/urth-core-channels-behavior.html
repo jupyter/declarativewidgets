@@ -106,7 +106,8 @@
 
             /**
              * Sets the value of a key on the channel. Setting a value
-             * will set the property value on all registered elements.
+             * will set the property value on all registered elements. Creates
+             * the channel if it does not exist.
              *
              * @method setItem
              * @param {string} key The key to be associated with the value.
@@ -114,7 +115,7 @@
              * @param {string} channelName The name of the channel to set the value on.
              */
             setItem: function(key, value, channelName) {
-                var channel = this._getChannel(channelName);
+                var channel = this._getOrCreateChannel(channelName);
                 var oldVal = channel && key ? this.getItem(key, channelName) : undefined;
 
                 if (key && channel && oldVal !== value) {
@@ -234,6 +235,11 @@
                 } else {
                     return channels['default'];
                 }
+            },
+
+            _getOrCreateChannel: function(channelName) {
+                var channel = this._getChannel(channelName);
+                return channel ? channel : this._createChannel(channelName);
             },
 
             /**
