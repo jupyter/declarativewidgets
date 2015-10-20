@@ -312,7 +312,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 
                     this.chart[modelProp].dispatch.on('elementClick', function(e) {
                           this.$$('.hover').classList.toggle('selected');
-                          this._setSelection(d3.select(this.shadowRoot).selectAll('.nvd3 .selected').data());
+                          this._setSelection(this._svgSelection(d3).selectAll('.nvd3 .selected').data());
                     }.bind(this));
 
                     return chart;
