@@ -2,11 +2,12 @@
  * Copyright (c) Jupyter Development Team.
  * Distributed under the terms of the Modified BSD License.
  */
+/* globals console:false */
 /**
  * Loads the web component polyfill and all web components specified in
  * elements.html.
  */
-define(['require'], function(require) {
+define(['require', 'jquery'], function(require, $) {
     'use strict';
 
     function loadComponents(bower_root, links) {
@@ -14,25 +15,53 @@ define(['require'], function(require) {
 
         var defaultLinks = [
             { href: bower_root + '/urth-core-bind/urth-core-bind.html' },
-            {
-                href: bower_root + '/urth-core-channels/urth-core-channels.html',
-                onload: function(e) {
-                    // Add the global data channel to the document body.
-                    var dataChannel = document.createElement('urth-core-channels');
-                    dataChannel.setAttribute('id', 'urthChannels');
-                    dataChannel.register(dataChannel, '*');
-                    document.body.appendChild(dataChannel);
+            (function() {
+                var deferred = $.Deferred();
 
-                    // Exposing a global
-                    window.UrthData = dataChannel;
-                }
-            },
+                return {
+                    href: bower_root + '/urth-core-channels/urth-core-channels.html',
+                    onload: function() {
+                        // Add the global data channel to the document body.
+                        var dataChannel = document.createElement('urth-core-channels');
+                        dataChannel.setAttribute('id', 'urthChannels');
+                        dataChannel.register(dataChannel, '*');
+                        dataChannel.addEventListener('connected', function() {
+                            deferred.resolve();
+                        });
+                        document.body.appendChild(dataChannel);
+
+                        // Exposing a global
+                        window.UrthData = dataChannel;
+                    },
+                    promise: deferred.promise()
+                };
+            })(),
             { href: bower_root + '/urth-core-import/urth-core-import.html' },
             { href: bower_root + '/urth-core-dataframe/urth-core-dataframe.html' },
             { href: bower_root + '/urth-core-function/urth-core-function.html' }
         ];
 
         links = defaultLinks.concat( links || [] );
+        var linksLoaded = 0;
+
+        function updateLinksCompleted() {
+            linksLoaded++;
+            if (linksLoaded === links.length) {
+                // all links loaded; resolve promise
+                window.Urth.widgets.whenReady.resolve();
+            }
+        }
+
+        function linkLoaded(elem, link) {
+            if (link.onload) {
+                link.onload();
+            }
+            if (link.promise) {
+                link.promise.then(updateLinksCompleted);
+            } else {
+                updateLinksCompleted();
+            }
+        }
 
         // Dynamically add HTML link tags for specified dependencies.
         links.forEach(function(link) {
@@ -42,12 +71,14 @@ define(['require'], function(require) {
                 var elem = document.createElement('link');
                 elem.setAttribute('rel', rel);
                 elem.setAttribute('href', link.href);
-                if (link.onload) {
-                    elem.onload = link.onload;
-                }
+                elem.onload = function() {
+                    linkLoaded(elem, link);
+                };
 
                 elem.onerror = function(e) {
-                    console.error('Failed to load link: ' + link.href, e);
+                    var msg = 'Failed to load link: ' + link.href;
+                    console.error(msg, e);
+                    window.Urth.widgets.whenReady.reject(msg);
                 };
                 document.head.appendChild(elem);
             }
@@ -72,6 +103,10 @@ define(['require'], function(require) {
         window.Urth = window.Urth || {};
         window.Urth.BASE_URL = baseURL;
 
+        // Global promise which is resolved when widgets are fully initialized
+        window.Urth.widgets = window.Urth.widgets || {};
+        window.Urth.widgets.whenReady = $.Deferred();
+
         var bower_root = baseURL + 'urth_components';
 
         // Load the web components polyfill if it is necessary then
@@ -90,5 +125,7 @@ define(['require'], function(require) {
                 console.error('Failed to load web components polyfill: ' + e);
             });
         }
+
+        return window.Urth.widgets.whenReady;
     };
 });
