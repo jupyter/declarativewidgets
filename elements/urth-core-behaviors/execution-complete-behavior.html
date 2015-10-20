@@ -15,9 +15,20 @@ This Behavior represents the completion of a code cell's execution.
     ready: function() {
       // Code execution defined to be complete when an ExecuteReply is received.
       console.debug("Registering _onExecutionComplete for Execute Reply messages.");
+      this.__replyCallback = this._onExecutionComplete.bind(this);
+
       IPython.notebook.kernel.widget_manager.notebook.events.on(
-        'shell_reply.Kernel', this._onExecutionComplete.bind(this)
+        'shell_reply.Kernel', this.__replyCallback
       );
+    },
+
+    detached: function() {
+        console.debug("Unregistering _onExecutionComplete for Execute Reply messages.");
+        if (this.__replyCallback){
+            IPython.notebook.kernel.widget_manager.notebook.events.off(
+                'shell_reply.Kernel', this.__replyCallback
+            );
+        }
     },
 
     /**
