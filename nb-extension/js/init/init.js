@@ -109,22 +109,11 @@ define(['require', 'jquery'], function(require, $) {
 
         var bower_root = baseURL + 'urth_components';
 
-        // Load the web components polyfill if it is necessary then
-        // load the web components.
-        if ('registerElement' in document &&
-            'createShadowRoot' in HTMLElement.prototype &&
-            'import' in document.createElement('link') &&
-            'content' in document.createElement('template')) {
-            // Web components fully supported so load the components
+        loadPolyfill(bower_root, function() {
             loadComponents(bower_root, links);
-        } else {
-            // Need to load web components polyfill first.
-            loadPolyfill(bower_root, function() {
-                loadComponents(bower_root, links);
-            }, function (e) {
-                console.error('Failed to load web components polyfill: ' + e);
-            });
-        }
+        }, function (e) {
+            console.error('Failed to load web components polyfill: ' + e);
+        });
 
         return window.Urth.widgets.whenReady;
     };
