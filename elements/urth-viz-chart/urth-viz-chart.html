@@ -8,6 +8,7 @@
 <link rel="import" href="../paper-menu/paper-menu.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../urth-viz-col/urth-viz-col.html">
 
 <!-- import the nvd3 stylesheet into the main page as well as the shadow dom
      because the nvtooltip is a child of BODY -->
@@ -203,9 +204,26 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             primary = primary || this.primary;
             secondary = secondary || this.secondary;
 
+            var columnSettings = this.columnSettings;
             var values = (datarows[0] || []).map(function (rows, i) {
+                var t = function (d, i) {
+                    var result = d[i];
+
+                    switch (columnSettings && columnSettings[i] && columnSettings[i].type) {
+                        case 'numeric':
+                            result = +result;
+                            break;
+                        case 'date':
+                            result = new Date(result);
+                            break;
+                        default:
+                    }
+
+                    return result;
+                };
+
                 return datarows.map(function (d) {
-                    return { x: d[primary], y: d[i] };
+                    return { x: t(d, primary), y: t(d, i) };
                 });
             });
 
@@ -221,6 +239,19 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                 };
             }).filter(function (values, i) {
                 return i != primary;
+            });
+        },
+
+        _parseColumns: function() {
+            var columnSettings = this.columnSettings = [];
+            Array.prototype.forEach.call(this.querySelectorAll(':scope > urth-viz-col'), function (col) {
+                if (col.hasAttribute('index')) {
+                    var index = col.getAttribute('index');
+                    var set = columnSettings[index] = {};
+                    ["type", "format"].forEach(function(prop) {
+                        set[prop] = col.getAttribute(prop);
+                    });
+                }
             });
         },
 
@@ -288,6 +319,30 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                         config(chart);
                     }
 
+                    // Format axis tick marks according to type and format,
+                    // if supplied by urth-viz-col
+                    var formatTicks = function(axis, dataIndex) {
+                        if (axis) {
+                            var axisSettings = this.columnSettings[dataIndex] || [];
+                            switch (axisSettings.type) {
+                                case 'numeric':
+                                    if (axisSettings.format) {
+                                        axis.tickFormat(d3.format(axisSettings.format));
+                                    }
+                                    break;
+                                case 'date':
+//                                  Cannot use time scale for discrete values (e.g. bar)  Need to explicitly convert to Date
+//                                    chart[dataIndex == this.primary ? 'xScale' : 'yScale'](d3.time.scale());
+                                    axis.tickFormat(axisSettings.format ?
+                                        function(d) { return d3.time.format(axisSettings.format)(new Date(d)); }
+                                        : function(d) { return new Date(d).toLocaleDateString(); });
+                            }
+                        }
+                    }.bind(this);
+
+                    formatTicks(chart.xAxis, this.primary);
+                    formatTicks(chart.yAxis, this.secondary);
+
                     if (this.rotatelabels) {
                         chart.rotateLabels(this.rotatelabels)      //Angle to rotate x-axis labels.
                     }
@@ -330,6 +385,8 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         },
 
         created: function() {
+            this._parseColumns();
+
             // Need the relative paths for d3 and nvd3 based on the
             // location of this Polymer element. This has to be done
             // inside the element to get the proper path. Calling
