@@ -59,6 +59,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
 
                         this.model = model;
                         this.onModelReady();
+                        this.fire('connected');
                     }.bind(this),
                     function(error){
                         console.error(error);
