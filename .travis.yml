@@ -8,14 +8,16 @@ services:
 before_script:
 - curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
 - sudo apt-get install -y nodejs
-- docker pull cloudet/pyspark-notebook-bower-sparkkernel
+- export DISPLAY=:99.0
+- sh -e /etc/init.d/xvfb start
+# - docker pull cloudet/pyspark-notebook-bower-sparkkernel
 
 script:
 - make test-js-remote
-- make test-py
-- make test-scala
-- make sdist
-- make install
+#- make test-py
+# - make test-scala
+# - make sdist
+# - make install
 
 notifications:
   slack: cloudet:rMfRKhvsbZuCIRZpTct3kBI4#urth-widgets
