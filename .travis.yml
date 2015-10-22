@@ -13,7 +13,6 @@ before_script:
   - sudo apt-get install -y nodejs
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - docker pull cloudet/pyspark-notebook-bower-sparkkernel
 
 script:
   - make test-js-remote
