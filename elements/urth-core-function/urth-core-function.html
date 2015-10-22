@@ -133,6 +133,19 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                     notify: true
                 },
 
+                /**
+                 * Sets a delay time, in milliseconds, for debouncing the invocation of the function.
+                 * This time will debounce for every argument change as well as every call to invoke.
+                 *
+                 * @attribute delay
+                 * @type number
+                 */
+                delay: {
+                  type: Number,
+                  notify: true,
+                  value: 0
+                }
+
             },
 
             behaviors: [
@@ -270,7 +283,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                         event: 'invoke',
                         args: serArgs
                     });
-                }.bind(this))
+                }.bind(this), this.delay)
             },
 
             /**
