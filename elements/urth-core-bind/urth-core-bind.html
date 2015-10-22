@@ -29,7 +29,9 @@
      * @group Urth Core
      * @element urth-core-bind
      */
-    Polymer({
+    window.Urth = window.Urth || {};
+
+    window.Urth['urth-core-bind'] = Polymer({
         /**
          * Fired when DOM is stamped by this template.
          *
