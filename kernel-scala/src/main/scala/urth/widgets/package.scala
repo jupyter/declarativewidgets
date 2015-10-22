@@ -5,7 +5,6 @@
 
 package urth
 
-import com.ibm.spark.interpreter.ScalaInterpreter
 import com.ibm.spark.kernel.api.Kernel
 import org.apache.spark.repl.SparkIMain
 
@@ -78,7 +77,9 @@ package object widgets {
     _the_kernel
   }
 
-  def sparkIMain: SparkIMain =
-    getKernel.interpreter.asInstanceOf[ScalaInterpreter].sparkIMain
-
+  def sparkIMain: SparkIMain = {
+    val sparkIMainMethod = getKernel.interpreter.getClass.getMethod("sparkIMain")
+    val sparkIMain = sparkIMainMethod.invoke(getKernel.interpreter).asInstanceOf[org.apache.spark.repl.SparkIMain]
+    sparkIMain
+  }
 }
