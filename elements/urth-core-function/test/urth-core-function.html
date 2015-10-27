@@ -475,6 +475,33 @@
                 expect(fElmt.argZ).to.equal('5');
             });
 
+            it('should set values already present on the element\'s proto to args property', function() {
+                var fElmt = fixture('basic');
+                sinon.stub(fElmt, "_tryInvoke");
+
+                fElmt.argX = "pre existing value";
+
+                fElmt._onSignatureChange({
+                    x: {'required': true},
+                    y: {'value': 5},
+                    z: {'value': 'some val'}
+                });
+
+                expect(fElmt.args).to.eql({
+                    x: "pre existing value",
+                    y: 5,
+                    z: 'some val'
+                })
+
+                expect(fElmt.hasOwnProperty('argX')).to.be.true;
+                expect(fElmt.hasOwnProperty('argY')).to.be.true;
+                expect(fElmt.hasOwnProperty('argZ')).to.be.true;
+
+                expect(fElmt.argX).to.equal("pre existing value")
+                expect(fElmt.argY).to.equal(5);
+                expect(fElmt.argZ).to.equal('some val');
+            });
+
             it('should set default values to args property if it is set to NaN', function() {
                 var fElmt = fixture('basic');
                 sinon.stub(fElmt, "_tryInvoke");
