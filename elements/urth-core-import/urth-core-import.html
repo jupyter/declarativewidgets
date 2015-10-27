@@ -158,6 +158,9 @@
 
                     this.importHref(this.href, function() {
                         this.fire('load');
+                        if (this.debug) {
+                            console.debug(logTag + 'Successfully imported ' + this.href);
+                        }
                     }.bind(this), function(e) {
                         // If the href doesn't load, try to download
                         // the package if it is specified.
@@ -176,9 +179,6 @@
         _onLinkLoad: function() {
             // Save the fact that the link href was loaded successfully.
             loadedPackages[this.href] = true;
-            if (this.debug) {
-                console.debug(logTag + 'Successfully imported ' + this.href);
-            }
         },
 
         _packageChanged: function(newVal, oldVal) {

@@ -1,27 +1,29 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import codecs
 import os
 import json
+import tornado
 import subprocess
-import tornado.web
 
 from IPython.html.utils import url_path_join
 from IPython.utils.path import get_ipython_dir
 from IPython.html.base.handlers import FileFindHandler
 from tornado.web import HTTPError, RequestHandler
-from contextlib import redirect_stdout
+from concurrent.futures import ThreadPoolExecutor
+
+widgets_dir = ''
+logger = None
 
 class UrthImportHandler(RequestHandler):
 
-    ipython_dir = get_ipython_dir()
-    nbext = os.path.join(ipython_dir, 'nbextensions/urth_widgets/')
+    def initialize(self, executor):
+        self.executor = executor
 
     # This API can be used to retrieve the list of installed bower packages.
     # It is not currently being used by the client.
     def get(self):
-        os.chdir(self.nbext)
+        os.chdir(widgets_dir)
         try:
             proc = subprocess.check_output(['bower', 'list', '--allow-root', '--config.interactive=false', '-o', '-p', '-j'])
             d = json.loads(proc.decode('utf-8'))
@@ -40,73 +42,71 @@ class UrthImportHandler(RequestHandler):
             msg = 'Failed to list bower packages'
             raise tornado.web.HTTPError(400, msg, reason=msg)
 
+    @tornado.gen.coroutine
     def post(self):
-        if '.bowerrc' not in os.listdir():
-            print("writing .bowerrc in", os.getcwd())
-            with open('.bowerrc', 'a') as f:
-                f.write("""{
-                "analytics": false,
-                "interactive": false
-                }""")
-
         package_name = json.loads(self.request.body.decode())['package']
 
-        os.chdir(self.nbext)
-
-        try:
-            subprocess.check_call(['bower', 'install', '--allow-root', '--config.interactive=false', package_name])
-        except subprocess.CalledProcessError as e:
+        # Use the ThreadPoolExecutor to perform the bower install. Since
+        # the ThreadPoolExecutor has a max_workers of 1, this allows the
+        # installs to happen asynchronously but in the requested order
+        # to prevent simultaneous install issues.
+        code = yield self.executor.submit(do_install, package_name=package_name)
+        if code == 0:
+            self.set_status(200)
+            self.finish()
+        else:
             msg = 'Failed to install {0}.'.format(package_name)
-            raise tornado.web.HTTPError(400, msg, reason=msg)
+            self.send_error(status_code=400, reason=msg)
 
-        try:
-            proc = subprocess.Popen(['bower', 'info', '--allow-root', '-o'
-                '--config.interactive=false', package_name, 'name'], stdout=subprocess.PIPE)
-        except Exception as e:
-            msg = 'Failed to get info about {0}.'.format(package_name)
-            raise tornado.web.HTTPError(500, msg, reason=msg)
+# Executes bower install requests in a subprocess and returns 0 for success
+# and non-zero for an error.
+def do_install(package_name):
+    logger.info('Installing {0}'.format(package_name))
+    try:
+        subprocess.check_call(['bower', 'install', '--allow-root',
+                '--config.interactive=false', '--production', package_name],
+                cwd=widgets_dir)
+    except subprocess.CalledProcessError as e:
+        return -1
 
-        output = proc.communicate()
-        output_str = str(output[0])
-        directory_name = output_str.split("'")[1]
-        path = os.path.join('bower_components', directory_name, 'bower.json')
-
-        try:
-            with open(path) as f:
-                content = f.read()
-                self.set_status(200)
-                self.finish(json.dumps(content))
-        except Exception as e:
-            msg = 'Failed to open bower.json for {0}.'.format(package_name)
-            raise tornado.web.HTTPError(404, msg, reason=msg)
-
-class ComponentsRedirectHandler(RequestHandler):
-    def get(self, path):
-        '''
-        Redirect relative requests for components to the global store. Makes
-        components easier to relocate later.
-        '''
-        url = url_path_join(self.settings['base_url'], 'urth_components', path)
-        self.redirect(url, permanent=True)
+    return 0
 
 def load_jupyter_server_extension(nb_app):
-    '''
-    Register a Urth import handler.
-    '''
-    web_app = nb_app.web_app
-    host_pattern = '.*$'
+    global logger
+    global widgets_dir
+
+    logger = nb_app.log
+    logger.info('Loading urth_import server extension.')
+
+    # Determine the nbextensions directory and urth_widgets path
     ipython_dir = get_ipython_dir()
+    web_app = nb_app.web_app
     for path in web_app.settings['nbextensions_path']:
         if ipython_dir in path:
             nbext = path
-    import_route_pattern = url_path_join(web_app.settings['base_url'], '/urth_import')
+    widgets_dir = os.path.join(nbext, 'urth_widgets/')
 
-    # Any requests containing /urth_components/ will get served from the bower_components
+    # Write out a .bowerrc file to configure bower installs to
+    # not be interactive and not to prompt for analytics
+    bowerrc = os.path.join(widgets_dir, '.bowerrc')
+    if os.access(bowerrc, os.F_OK) is not True:
+        logger.debug('Writing .bowerrc at {0}'.format(bowerrc))
+        with open(bowerrc, 'a') as f:
+            f.write("""{
+            "analytics": false,
+            "interactive": false
+            }""")
+
+    # The import handler serves from /urth_import and any requests
+    # containing /urth_components/ will get served from the bower_components
     # directory.
+    import_route_pattern = url_path_join(web_app.settings['base_url'], '/urth_import')
     components_route_pattern = url_path_join(web_app.settings['base_url'], '/urth_components/(.*)')
-    path = os.path.join(nbext, 'urth_widgets/bower_components/')
+    bower_path = os.path.join(widgets_dir, 'bower_components/')
 
-    web_app.add_handlers(host_pattern, [
-        (import_route_pattern, UrthImportHandler),
-        (components_route_pattern, FileFindHandler, {'path': [path]})
+    # Register the Urth import handler and static file handler.
+    logger.debug('Adding handlers for {0} and {1}'.format(import_route_pattern, components_route_pattern))
+    web_app.add_handlers('.*$', [
+        (import_route_pattern, UrthImportHandler, dict(executor=ThreadPoolExecutor(max_workers=1))),
+        (components_route_pattern, FileFindHandler, {'path': [bower_path]})
     ])
