@@ -10,8 +10,33 @@ import tornado.web
 from IPython.html.utils import url_path_join
 from IPython.utils.path import get_ipython_dir
 from IPython.html.base.handlers import FileFindHandler
+from tornado.gen import coroutine, Return, Task
+from tornado.process import Subprocess
 from tornado.web import HTTPError, RequestHandler
 from contextlib import redirect_stdout
+
+@coroutine
+def call_subprocess(cmd):
+    '''
+    Spawns a subprocess and streams its stdout and stderr asynchronously.
+    Sets the optional environment variables and feeds optional data on stdin.
+    :param cmd:
+    :param env:
+    :param stdin_data:
+    '''
+    sub_process = Subprocess(
+        cmd,
+        stdin=subprocess.PIPE,
+        stdout=Subprocess.STREAM,
+        stderr=Subprocess.STREAM
+    )
+
+    result, error = yield [
+        Task(sub_process.stdout.read_until_close),
+        Task(sub_process.stderr.read_until_close)
+    ]
+
+    raise Return((result, error))
 
 class UrthImportHandler(RequestHandler):
 
@@ -40,6 +65,7 @@ class UrthImportHandler(RequestHandler):
             msg = 'Failed to list bower packages'
             raise tornado.web.HTTPError(400, msg, reason=msg)
 
+    @coroutine
     def post(self):
         if '.bowerrc' not in os.listdir():
             print("writing .bowerrc in", os.getcwd())
@@ -50,25 +76,25 @@ class UrthImportHandler(RequestHandler):
                 }""")
 
         package_name = json.loads(self.request.body.decode())['package']
-
         os.chdir(self.nbext)
+        install_cmd = ['bower', 'install', '--allow-root', '--config.interactive=false', package_name]
 
         try:
-            subprocess.check_call(['bower', 'install', '--allow-root', '--config.interactive=false', package_name])
+            install_result, install_error = yield call_subprocess(install_cmd)
         except subprocess.CalledProcessError as e:
             msg = 'Failed to install {0}.'.format(package_name)
             raise tornado.web.HTTPError(400, msg, reason=msg)
 
+        info_cmd = ['bower', 'info', '--allow-root', '-o',
+            '--config.interactive=false', package_name, 'name']
+
         try:
-            proc = subprocess.Popen(['bower', 'info', '--allow-root', '-o'
-                '--config.interactive=false', package_name, 'name'], stdout=subprocess.PIPE)
+            info_result, info_error = yield call_subprocess(info_cmd)
         except Exception as e:
             msg = 'Failed to get info about {0}.'.format(package_name)
             raise tornado.web.HTTPError(500, msg, reason=msg)
 
-        output = proc.communicate()
-        output_str = str(output[0])
-        directory_name = output_str.split("'")[1]
+        directory_name = str(info_result).split("'")[1]
         path = os.path.join('bower_components', directory_name, 'bower.json')
 
         try:
