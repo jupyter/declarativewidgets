@@ -21,18 +21,16 @@ The table accepts data via attribute `datarows` and column headers via attribute
 -->
 <dom-module id="urth-viz-table">
     <link rel="import" type="css" href="../handsontable/dist/handsontable.full.css">
+    <link rel="import" type="css" href="urth-viz-table.css">
+
     <template>
-        <style>
-            .handsontable td {
-                white-space: normal;
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="../handsontable/dist/handsontable.full.css">
+        <link rel="stylesheet" type="text/css" href="urth-viz-table.css">
+
         <table id="tableContainer" style="border-spacing: 0; display: block;"></table>
         <content></content>
     </template>
-</dom-module>
-
-<script>
+    <script>
     (function () {
         'use strict';
         var requireConfigured;
@@ -258,4 +256,5 @@ The table accepts data via attribute `datarows` and column headers via attribute
             }
         });
     })();
-</script>
+    </script>
+</dom-module>

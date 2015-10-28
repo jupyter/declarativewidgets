@@ -12,7 +12,7 @@
 
 <!-- import the nvd3 stylesheet into the main page as well as the shadow dom
      because the nvtooltip is a child of BODY -->
-<link rel="stylesheet" type="css" href="../nvd3/build/nv.d3.css">
+<link rel="stylesheet" type="text/css" href="../nvd3/build/nv.d3.css">
 
 <!--
 Represents a widget that draws a chart.
@@ -27,10 +27,12 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 -->
 <dom-module id="urth-viz-chart">
     <link rel="import" type="css" href="../nvd3/build/nv.d3.css">
+    <link rel="import" type="css" href="urth-viz-chart.css">
+
     <template>
-        <style>
-            .selected { fill: yellow !important; }
-        </style>
+        <link rel="stylesheet" type="text/css" href="../nvd3/build/nv.d3.css">
+        <link rel="stylesheet" type="text/css" href="urth-viz-chart.css">
+
         <div id="settings-section">
           <paper-dropdown-menu label="Category" noink no-animations>
             <paper-menu class="dropdown-content" selected="{{primary}}">
@@ -52,8 +54,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         </div>
         <content></content>
     </template>
-</dom-module>
-<script>
+    <script>
 
     'use strict';
     var requireConfigured;
@@ -433,4 +434,5 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         }
     });
 
- </script>
+    </script>
+</dom-module>
