@@ -37,11 +37,14 @@ describe('system-test (' + desired.browserName + ')', function() {
 
     var tableExistAssert = new Asserter (
         function (target) {
-            if (desired.browserName === "chrome") {
-                return target.waitForElementByCssSelector('urth-viz-table::shadow .handsontable', wd.asserters.isDisplayed, 5000);
-            } else {
-                return target.waitForElementByCssSelector('urth-viz-table .handsontable', wd.asserters.isDisplayed, 5000);
-            }
+            //if we could create shadow root, the browser we're on supports shadow dom
+            return browser.eval("document.body.createShadowRoot", function(err, value) {
+                if (value) {
+                    return target.waitForElementByCssSelector('urth-viz-table::shadow .handsontable', wd.asserters.isDisplayed, 5000);
+                } else {
+                    return target.waitForElementByCssSelector('urth-viz-table .handsontable', wd.asserters.isDisplayed, 5000);
+                }
+            }); 
             
         }
     );
