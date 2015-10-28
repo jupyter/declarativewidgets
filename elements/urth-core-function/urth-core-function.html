@@ -392,7 +392,8 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                         paramProperties[argPropName] = {
                             notify: true,
                             reflectToAttribute: true,
-                            observer: argPropObserverName
+                            observer: argPropObserverName,
+                            value: this[argPropName] || sig[param].value
                         }
 
                     }.bind(this));
@@ -403,13 +404,10 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                     var paramsToSync = {};
 
                     paramNames.forEach(function(param){
-                        /*
-                         * The args property holds a
-                         */
                         if(this._isParameterUnset(this.args[param])){
-
-                            if( sig[param].value !== undefined ) {
-                                this.set('args.' + param, sig[param].value);
+                            var propValue = paramProperties[this._toParamPropertyName(param)].value
+                            if( propValue !== undefined ) {
+                                this.set('args.' + param, propValue);
                             }
                         }
                         else{
