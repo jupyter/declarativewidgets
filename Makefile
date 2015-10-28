@@ -100,7 +100,7 @@ dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/urth_import.py
 	@mkdir -p dist/urth
 	@cp -R kernel-python/urth/* dist/urth/.
 
-dist/urth_widgets/urth-widgets.jar: REPO?=cloudet/sbt-sparkkernel-image
+dist/urth_widgets/urth-widgets.jar: REPO?=cloudet/sbt-sparkkernel-image:1.4.0
 dist/urth_widgets/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala code'
@@ -162,7 +162,7 @@ test-py: dist/urth
 			-v `pwd`/dist/urth:/usr/local/lib/python3.4/dist-packages/urth \
 			$(REPO) bash -c 'python3 -m unittest discover /usr/local/lib/python3.4/dist-packages/urth'
 
-test-scala: REPO?=cloudet/sbt-sparkkernel-image
+test-scala: REPO?=cloudet/sbt-sparkkernel-image:1.4.0
 test-scala:
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala tests...'
