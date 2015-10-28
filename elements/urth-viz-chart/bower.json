@@ -23,8 +23,10 @@
     "polymer": "Polymer/polymer#^1.0.0",
     "paper-item": "PolymerElements/paper-item#^1.0.0",
     "paper-menu": "PolymerElements/paper-menu#^1.0.0",
-    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.0.0",
-    "requirejs": "^2.1.0"
+    "requirejs": "^2.1.0",
+
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#1.0.5",
+    "paper-input": "PolymerElements/paper-input#1.0.16"
   },
   "private": true
 }
