@@ -8,14 +8,14 @@
     'use strict';
     (function() {
 
-        // Holds a collection with channel data, and a list of registered
+        // A channel is a set of channel data, and a list of registered
         // listeners for channel changes.
         var initChannel = function() {
             return {
-                'collection': new Polymer.Collection([]),
+                'data': {},
                 'registered': []
-            }
-        }
+            };
+        };
 
         // Maps channel names to channels. Creates a default channel.
         var channels = {
@@ -46,10 +46,7 @@
             clearData: function(channel) {
                 var channel = this._getChannel(channel);
                 if (channel){
-                    var keys = channel.collection.getKeys();
-                    keys.forEach(function(key) {
-                        channel.collection.removeKey(key);
-                    });
+                    channel.data = {};
                 }
             },
 
@@ -65,7 +62,7 @@
             getItem: function(key, channel) {
                 var channel = this._getChannel(channel);
                 if (channel){
-                    return channel.collection.getItem(key);
+                    return channel.data[key];
                 }
             },
 
@@ -123,9 +120,9 @@
 
                     // 'undefined' value results in a delete of the key.
                     if (typeof value === 'undefined') {
-                        channel.collection.removeKey(key);
+                        delete channel.data[key];
                     } else {
-                        channel.collection.setItem(key, value);
+                        channel.data[key] = value;
                     }
 
                     channel.registered.forEach(function(element) {
@@ -204,9 +201,9 @@
              * @param {object} oldChannelObj The old Channel.
              */
             _clearElementData: function(element, newChannelObj, oldChannelObj) {
-                if (newChannelObj && oldChannelObj){
-                    oldChannelObj.collection.getKeys().forEach(function (key) {
-                        if (!newChannelObj.collection.getItem(key)){
+                if (newChannelObj && oldChannelObj) {
+                    Object.keys(oldChannelObj.data).forEach(function(key) {
+                        if (!newChannelObj.data[key]) {
                             element[key] = undefined;
                         }
                     });
@@ -250,8 +247,8 @@
              */
             _setElementData: function(element, channelObj) {
                 if (channelObj){
-                    channelObj.collection.getKeys().forEach(function(key) {
-                        element[key] = channelObj.collection.getItem(key);
+                    Object.keys(channelObj.data).forEach(function(key) {
+                        element[key] = channelObj.data[key];
                     });
                 }
             },
