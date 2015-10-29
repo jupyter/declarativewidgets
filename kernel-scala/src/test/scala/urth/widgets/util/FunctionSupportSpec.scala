@@ -16,12 +16,15 @@ import org.mockito.Mockito._
 import play.api.libs.json._
 import scala.reflect.runtime.universe._
 import scala.runtime.BoxedUnit
+import com.ibm.spark.kernel.interpreter.scala._
 
 class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
 
   class TestFunctionSupport extends StandardFunctionSupport {
-    override lazy val iMain = interpreter.asInstanceOf[ScalaInterpreter].sparkIMain
-
+    override lazy val iMain = {
+      val sparkIMainMethod = interpreter.getClass.getMethod("sparkIMain")
+      sparkIMainMethod.invoke(interpreter).asInstanceOf[org.apache.spark.repl.SparkIMain]
+    }
   }
 
   private var interpreter: Interpreter = _

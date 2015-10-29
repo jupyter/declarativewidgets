@@ -52,7 +52,7 @@ clean:
 	-@rm .watch
 	-@kill -9 `pgrep gulp`
 
-dev: REPO?=cloudet/pyspark-notebook-bower-sparkkernel
+dev: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 dev: NB_HOME?=/home/jovyan/.ipython
 dev: NB_PORT=8888
 dev: DEV_NAME?=urth_widgets_dev
@@ -100,7 +100,7 @@ dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/urth_import.py
 	@mkdir -p dist/urth
 	@cp -R kernel-python/urth/* dist/urth/.
 
-dist/urth_widgets/urth-widgets.jar: REPO?=cloudet/sbt-sparkkernel-image:1.4.0
+dist/urth_widgets/urth-widgets.jar: REPO?=cloudet/sbt-sparkkernel-image:1.5.1
 dist/urth_widgets/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala code'
@@ -125,7 +125,7 @@ dist/docs: bower_components ${shell find elements/**/*.html} etc/docs/index.html
 
 dist: dist/urth_widgets dist/urth dist/urth_widgets/urth-widgets.jar dist/docs
 
-sdist: REPO?=cloudet/pyspark-notebook-bower-sparkkernel
+sdist: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 sdist: RELEASE?=
 sdist: GIT_COMMIT?=HEAD
 sdist: BUILD_NUMBER?=0
@@ -140,7 +140,7 @@ sdist: dist
 			python setup.py sdist && \
 			cp -r dist/*.tar.gz /src/.'
 
-test: REPO?=cloudet/pyspark-notebook-bower-sparkkernel
+test: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 test: test-js test-py test-scala
 
 test-js: | $(URTH_COMP_LINKS)
@@ -155,14 +155,14 @@ else
 	@npm run test -- --local firefox
 endif
 
-test-py: REPO?=cloudet/pyspark-notebook-bower-sparkkernel
+test-py: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 test-py: dist/urth
 	@echo 'Running python tests...'
 	@docker run -it --rm \
 			-v `pwd`/dist/urth:/usr/local/lib/python3.4/dist-packages/urth \
 			$(REPO) bash -c 'python3 -m unittest discover /usr/local/lib/python3.4/dist-packages/urth'
 
-test-scala: REPO?=cloudet/sbt-sparkkernel-image:1.4.0
+test-scala: REPO?=cloudet/sbt-sparkkernel-image:1.5.1
 test-scala:
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala tests...'
@@ -178,16 +178,16 @@ endif
 testdev: | $(URTH_COMP_LINKS)
 	@npm run test -- -p
 
-install: REPO?=cloudet/pyspark-notebook-bower-sparkkernel
+install: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 install: CMD?=exit
 install:
 	@docker run -it --rm \
 		-v `pwd`:/src \
 		$(REPO) bash -c 'cd /src/dist && \
-			pip install $$(ls -1 *.tar.gz | tail -n 1) && \
+			pip install --no-binary :all: $$(ls -1 *.tar.gz | tail -n 1) && \
 			$(CMD)'
 
-server: REPO?=cloudet/pyspark-notebook-bower-sparkkernel
+server: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 server: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
 server: SERVER_NAME?=urth_widgets_server
 server:
@@ -198,7 +198,7 @@ server:
 		-v `pwd`:/widgets-nbexts \
 		-v `pwd`/notebooks:/home/jovyan/work \
 		$(REPO) bash -c 'git config --global core.askpass true && \
-			pip install $$(ls -1 /widgets-nbexts/dist/*.tar.gz | tail -n 1) && \
+			pip install --no-binary ::all: $$(ls -1 /widgets-nbexts/dist/*.tar.gz | tail -n 1) && \
 			$(CMD)'
 
 docs: DOC_PORT?=4001
