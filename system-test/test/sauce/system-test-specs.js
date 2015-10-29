@@ -34,20 +34,23 @@ var Asserter = wd.Asserter;
 describe('system-test (' + desired.browserName + ')', function() {
     var browser;
     var allPassed = true;
+    var browserSupportsShadowDOM;
 
-    var tableExistAssert = new Asserter (
-        function (target) {
-            //if we could create shadow root, the browser we're on supports shadow dom
-            return browser.eval("document.body.createShadowRoot", function(err, value) {
-                if (value) {
-                    return target.waitForElementByCssSelector('urth-viz-table::shadow .handsontable', wd.asserters.isDisplayed, 5000);
-                } else {
-                    return target.waitForElementByCssSelector('urth-viz-table .handsontable', wd.asserters.isDisplayed, 5000);
-                }
-            }); 
-            
+    var tagChaiAssertionError = function(err) {
+        // throw error and tag as retriable to poll again
+        err.retriable = err instanceof chai.AssertionError;
+        throw err;
+    };
+
+    wd.PromiseChainWebdriver.prototype.waitForWidgetElement = function(selector, browserSupportsShadowDOM, timeout, pollFreq) {
+        if (browserSupportsShadowDOM) {
+            return this.waitForElementByCssSelector('urth-viz-table::shadow .handsontable', wd.asserters.isDisplayed, 5000)
+                    .catch(tagChaiAssertionError);
+        } else {
+            return this.waitForElementByCssSelector('urth-viz-table .handsontable', wd.asserters.isDisplayed, 5000)
+                    .catch(tagChaiAssertionError);
         }
-    );
+    };
 
     before(function(done) {
         var username = process.env.SAUCE_USERNAME;
@@ -62,15 +65,20 @@ describe('system-test (' + desired.browserName + ')', function() {
                 console.log(' > ' + meth.yellow, path.grey, data || '');
             });
         }
+        console.log("before Hook");
         browser
             .init(desired)
-            .get('http://jupyter.cloudet.xyz/user/r4TF1CcUxpDR/notebooks/widgets/examples/urth-viz-table.ipynb')
+            .get('http://jupyter.cloudet.xyz/user/r4TF1CcUxpDR/notebooks/widgets/examples/urth-viz-chart.ipynb')
             .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, 10000)
             .elementByLinkText("Cell")
             .click()
+            .waitForElementByLinkText("Run All", wd.asserters.isDisplayed, 10000)
             .elementByLinkText("Run All")
             .click()
-            .nodeify(done);
+            .eval("!!document.body.createShadowRoot", function(err, value) {
+                browserSupportsShadowDOM = value;
+                done();
+            });
     });
 
     afterEach(function(done) {
@@ -79,6 +87,7 @@ describe('system-test (' + desired.browserName + ')', function() {
     });
 
     after(function(done) {
+        console.log("after Hook");
         browser
             .quit()
             // .sauceJobStatus(allPassed)
@@ -88,7 +97,7 @@ describe('system-test (' + desired.browserName + ')', function() {
     it('should run all cells and find a handsontable in the 3rd output area', function(done) {
         browser
             .waitForElementsByCssSelector('div.output_area').nth(3)
-            .waitFor(tableExistAssert, 5000)
+            .waitForWidgetElement("urth-viz-table", browserSupportsShadowDOM, 10000)
             .nodeify(done);
 
     });
