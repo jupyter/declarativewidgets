@@ -1,32 +1,33 @@
+//options:
+// baseurl - base url for notebook server to test
+// server - the selenium server, defaults to ondemand.saucelabs.com
+// platform - defaults to 'OS X 10.10'
+// browser - defaults to 'chrome'
+// verbose
+
 var wd = require('wd');
 require('colors');
-var _ = require('lodash');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
+var parseArgs = require('minimist');
+var args = parseArgs(process.argv);
 
 chai.use(chaiAsPromised);
 chai.should();
 chaiAsPromised.transferPromiseness = wd.transferPromiseness;
 
-// checking sauce credential
-if (!process.env.SAUCE_USERNAME || !process.env.SAUCE_ACCESS_KEY) {
-    console.warn(
-        '\nPlease configure your sauce credential:\n\n' +
-        'export SAUCE_USERNAME=<SAUCE_USERNAME>\n' +
-        'export SAUCE_ACCESS_KEY=<SAUCE_ACCESS_KEY>\n\n'
-    );
-    throw new Error('Missing sauce credentials');
-}
-
 // http configuration, not needed for simple runs
 wd.configureHttp({
     timeout: 60000,
     retryDelay: 15000,
-    retries: 5
+    retries: 5,
+    baseUrl: args.baseurl
 });
 
-var desired = JSON.parse(process.env.DESIRED || '{"browserName": "chrome"}');
-desired.name = 'example with ' + desired.browserName;
+var desired = {browserName: 'chrome', platform: 'OS X 10.10'};
+desired.platform = args.platform || desired.platform;
+desired.browserName = args.browser || desired.browserName;
+desired.name = 'Urth System Test with ' + desired.browserName;
 desired.tags = ['tutorial'];
 
 var Asserter = wd.Asserter;
@@ -43,20 +44,20 @@ describe('system-test (' + desired.browserName + ')', function() {
     };
 
     wd.PromiseChainWebdriver.prototype.waitForWidgetElement = function(selector, browserSupportsShadowDOM, timeout, pollFreq) {
-        if (browserSupportsShadowDOM) {
-            return this.waitForElementByCssSelector('urth-viz-table::shadow .handsontable', wd.asserters.isDisplayed, 5000)
-                    .catch(tagChaiAssertionError);
-        } else {
-            return this.waitForElementByCssSelector('urth-viz-table .handsontable', wd.asserters.isDisplayed, 5000)
-                    .catch(tagChaiAssertionError);
-        }
+        return this.waitForElementByCssSelector(
+            browserSupportsShadowDOM ? 'urth-viz-table::shadow .handsontable' : 'urth-viz-table .handsontable',
+            wd.asserters.isDisplayed,
+            timeout)
+        .catch(tagChaiAssertionError);
     };
 
-    before(function(done) {
-        var username = process.env.SAUCE_USERNAME;
-        var accessKey = process.env.SAUCE_ACCESS_KEY;
-        browser = wd.promiseChainRemote();//'ondemand.saucelabs.com', 80, username, accessKey);
-        if (process.env.VERBOSE) {
+    before(function(done) { 
+            // http://user:apiKey@ondemand.saucelabs.com/wd/hub
+        var auth = args['sauce-username'] && args['sauce-access-key'] ?
+            args['sauce-username'] + ':' + args['sauce-access-key'] + '@' : '';
+        browser = wd.promiseChainRemote('http://' + auth + (args.server || 'ondemand.saucelabs.com') + '/wd/hub');
+
+        if (args.verbose) {
             // optional logging
             browser.on('status', function(info) {
                 console.log(info.cyan);
@@ -65,10 +66,10 @@ describe('system-test (' + desired.browserName + ')', function() {
                 console.log(' > ' + meth.yellow, path.grey, data || '');
             });
         }
-        console.log("before Hook");
+
         browser
             .init(desired)
-            .get('http://jupyter.cloudet.xyz/user/r4TF1CcUxpDR/notebooks/widgets/examples/urth-viz-chart.ipynb')
+            .get('/notebooks/examples/urth-viz-table.ipynb')
             .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, 10000)
             .elementByLinkText("Cell")
             .click()
@@ -87,11 +88,12 @@ describe('system-test (' + desired.browserName + ')', function() {
     });
 
     after(function(done) {
-        console.log("after Hook");
-        browser
-            .quit()
-            // .sauceJobStatus(allPassed)
-            .nodeify(done);
+        var result = browser
+            .quit();
+        if (result.sauceJobStatus) {
+            result = result.sauceJobStatus(allPassed);
+        }
+        result.nodeify(done);
     });
 
     it('should run all cells and find a handsontable in the 3rd output area', function(done) {
@@ -99,7 +101,6 @@ describe('system-test (' + desired.browserName + ')', function() {
             .waitForElementsByCssSelector('div.output_area').nth(3)
             .waitForWidgetElement("urth-viz-table", browserSupportsShadowDOM, 10000)
             .nodeify(done);
-
     });
 
 });
