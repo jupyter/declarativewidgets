@@ -1,0 +1,19 @@
+# .pairs - configuration for 'git pair'
+pairs:
+  # <initials>: <Firstname> <Lastname>[; <email-id>]
+  # URTH.WIDGETS! Team
+  al: Angel Luu; angel.luu
+  dl: Drew Logsdon; dalogsdo
+  dw: Drew Walters; drewwalt
+  jp: Javier Pedemonte; pedemont
+  sw: Sean Welleck; swelleck
+  gb: Gino Bustelo; lbustelo
+  zcm: Zack Morris; zmorris
+  ap: Adam Peller; apeller
+email:
+  prefix: pair
+  domain: us.ibm.com
+  no_solo_prefix: true
+email_addresses:
+  dl: dalogsdon@gmail.com
+  jp: javier@pedemonte.us
