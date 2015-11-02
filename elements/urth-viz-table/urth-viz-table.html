@@ -45,8 +45,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                  * @type Array
                  */
                 datarows: {
-                    type: Array,
-                    observer: '_datarowsChanged'
+                    type: Array
                 },
 
                 /**
@@ -56,8 +55,12 @@ The table accepts data via attribute `datarows` and column headers via attribute
                  * @type Array
                  */
                 columns: {
-                    type: Array,
-                    observer: '_columnsChanged'
+                    type: Array
+                },
+
+                tableView: {
+                    type: Object,
+                    computed: 'computeTableView(datarows, columns)'
                 },
 
                 /**
@@ -91,41 +94,47 @@ The table accepts data via attribute `datarows` and column headers via attribute
             ROW_HEIGHT: 25,
             COL_OPTIONS: ["type", "format"],
 
-            _columnsChanged: function (newColumns) {
+            _updateColumns: function (newColumns) {
                 if(!newColumns) { return; }
 
-                if (this.hot) {
-                    var columnSettings = this._parseColumns();
+                var columnSettings = this._parseColumns();
+                this.hot.updateSettings({
+                  colHeaders: newColumns,
+                  columns: columnSettings
+                });
+            },
+
+            _updateDatarows: function (newDataRows) {
+                if(!newDataRows) { return; }
+
+                // if data will not fit, we need to add a height to table to add scrollbar
+                if(!this._willDataFit(newDataRows)) {
+                    this.hot.loadData(newDataRows);
+
                     this.hot.updateSettings({
-                      colHeaders: newColumns,
-                      columns: columnSettings
+                        height: this._calcTableHeight(),
+                        rowHeights: this.ROW_HEIGHT
                     });
+                } else /* data will fit */ {
+                    // if height was previously set, we need to create new table with no height defined
+                    if (this._isHeightSet()) {
+                        this._createTable(newDataRows);
+                    } else /* height wasn't set before, so we don't have to mess with height, just update data */ {
+                        this.hot.loadData(newDataRows);
+                    }
                 }
             },
 
-            _datarowsChanged: function (newDataRows) {
-                if(!newDataRows) { return; }
-
-                if (this.hot) {
-                    // if data will not fit, we need to add a height to table to add scrollbar
-                    if(!this._willDataFit(newDataRows)) {
-                        this.hot.loadData(newDataRows);
-
-                        this.hot.updateSettings({
-                            height: this._calcTableHeight(),
-                            rowHeights: this.ROW_HEIGHT
-                        });
-                    } else /* data will fit */ {
-                        // if height was previously set, we need to create new table with no height defined
-                        if (this._isHeightSet()) {
-                            this._createTable(newDataRows);
-                        } else /* height wasn't set before, so we don't have to mess with height, just update data */ {
-                            this.hot.loadData(newDataRows);
-                        }
+            computeTableView: function(datarows, columns) {
+                this.debounce('computeTableView', function () {
+                    if (!datarows || !columns) { return; }
+                    if (this.hot) {
+                        this._updateColumns(columns);
+                        this._updateDatarows(datarows);
+                    } else {
+                        this._createTable(datarows);
                     }
-                } else {
-                    this._createTable(newDataRows);
-                }
+                });
             },
 
             /*
@@ -156,6 +165,8 @@ The table accepts data via attribute `datarows` and column headers via attribute
             },
 
             _parseColumns: function() {
+                // parse columns using data's first row
+                // in case user provides missing column headers
                 console.assert(this.datarows);
                 var firstRow = this.datarows[0];
 
