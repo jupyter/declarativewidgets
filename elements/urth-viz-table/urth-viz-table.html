@@ -126,7 +126,11 @@ The table accepts data via attribute `datarows` and column headers via attribute
             },
 
             computeTableView: function(datarows, columns) {
-                this.debounce('computeTableView', function () {
+                var jName = "computeTableView";
+                if( this.isDebouncerActive(jName) ) {
+                    this.cancelDebouncer(jName);
+                }
+                this.debounce(jName, function () {
                     if (!datarows || !columns) { return; }
                     if (this.hot) {
                         this._updateColumns(columns);
