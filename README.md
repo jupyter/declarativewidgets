@@ -2,11 +2,11 @@
 
 # Jupyter Declarative Widget Extension
 
-Extension for Jupyter / IPython Notebook to build interactive areas using 
+Extension for Jupyter / IPython Notebook to build interactive areas using
 declarative widgets.
 
 ## What It Gives You
-Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording](https://www.youtube.com/watch?v=SJiezXPhVv8). 
+Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording](https://www.youtube.com/watch?v=SJiezXPhVv8).
 
 * A base extension that enable the use of [Web Components](http://webcomponents.org) and [Polymer](https://www.polymer-project.org/1.0/) elements
 * A set of core elements facilitate interacting with code running on the kernel
@@ -158,15 +158,14 @@ Documentation can be run locally with the `make docs` target:
 
 ```
 $ make docs
-urth_widgets_docs
-Sending build context to Docker daemon  7.68 kB
-Sending build context to Docker daemon
+Moving static doc site content
+Running hydrolysis to generate doc json
+Running polybuild on docs.html
 ...
-Documentation available at <ip_address>:4001/components/urth-widgets/
+Serving docs at http://127.0.0.1:4001
 ```
 
-Documentation is run inside of a docker container. Load the specified url in your
-browser (substitute &lt;ip_address&gt; with your docker host ip) to explore the documentation.
+Load the specified url in your browser to explore the documentation.
 
 ### Including a Web Component in a Notebook
 

@@ -8,6 +8,7 @@ var gulp = require('gulp'),
 
 gulp.task('watch', function () {
     watch(['elements/**/*',
+           'etc/docs/**/*',
            'kernel-python/**/*',
            'kernel-scala/**/*',
            'nb-extension/**/*'], function(){

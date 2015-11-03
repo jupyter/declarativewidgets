@@ -65,5 +65,4 @@ bower_components
 node_modules/
 npm-debug.*
 .watch
-etc/docs/bower.json
 project/

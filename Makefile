@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: help clean sdist dist dev docs test test-js test-py test-scala init server install dev-build
+.PHONY: help clean sdist dist dev docs test test-js test-py test-scala init server install dev-build .killwatch
 .SUFFIXES:
 MAKEFLAGS=-r
 
@@ -115,13 +115,25 @@ else
 			cp target/scala-2.10/urth-widgets*.jar /src/dist/urth_widgets/urth-widgets.jar'
 endif
 
-dist/docs: bower_components ${shell find elements/**/*.html} etc/docs/index.html etc/docs/urth-docs.html
-	@echo 'Building docs'
+dist/docs: dist/docs/bower_components dist/docs/site dist/docs/site/generated_docs.json
+
+dist/docs/bower_components: node_modules etc/docs/bower.json
+	@echo 'Installing documentation dependencies'
 	@mkdir -p dist/docs
-	@cp elements/**/*.html dist/docs
-	@cp -R etc/docs/*.html dist/docs
-	@cp bower.json dist/docs
-	@cp -RLf bower_components dist/docs
+	@cp etc/docs/bower.json dist/docs/bower.json
+	@npm run docsbower -- install
+
+dist/docs/site: node_modules ${shell find etc/docs/site}
+	@echo 'Moving static doc site content'
+	@mkdir -p dist/docs/site
+	@cp -R etc/docs/site/* dist/docs/site
+	@echo 'Running polybuild on docs.html'
+	@npm run polybuild -- --maximum-crush dist/docs/site/docs.html
+	@mv dist/docs/site/docs.build.html dist/docs/site/docs.html
+
+dist/docs/site/generated_docs.json: dist/docs/site bower_components ${shell find elements/**/*.html} etc/docs/hydrolyze_elements.js etc/docs/urth-elements.html | $(URTH_COMP_LINKS)
+	@echo 'Running hydrolysis to generate doc json'
+	@node etc/docs/hydrolyze_elements.js 'etc/docs/urth-elements.html' 'dist/docs/site/generated_docs.json'
 
 dist: dist/urth_widgets dist/urth dist/urth_widgets/urth-widgets.jar dist/docs
 
@@ -202,17 +214,6 @@ server:
 			$(CMD)'
 
 docs: DOC_PORT?=4001
-docs: DOC_NAME?=urth_widgets_docs
-docs: DOC_IMAGE?=urth_polyserve
-docs: DOC_DIR?=/src/urth-widgets
-docs: DOC_PARAMS?=-it --rm
 docs: .watch dist/docs
-	-@docker rm -f $(DOC_NAME)
-	@docker build -t $(DOC_IMAGE) etc/docs
-	-@docker run $(DOC_PARAMS) --name $(DOC_NAME) \
-		-p $(DOC_PORT):8080 \
-		-v `pwd`/dist/docs:$(DOC_DIR):ro \
-		$(DOC_IMAGE) bash -c 'cd $(DOC_DIR) && \
-			echo "Documentation available at <ip_address>:$(DOC_PORT)/components/urth-widgets/" && \
-			polyserve >> /dev/null'
-	@make .killwatch
+	@echo "Serving docs at http://127.0.0.1:$(DOC_PORT)"
+	@bash -c "trap 'make .killwatch' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
