@@ -7,11 +7,17 @@
     "gulp": "^3.9.0",
     "gulp-run": "^1.6.10",
     "gulp-watch": "^4.3.4",
+    "http-server": "^0.8.5",
+    "hydrolysis": "^1.19.1",
+    "polybuild": "^1.0.5",
     "web-component-tester": "^3.3.10"
   },
   "config": {},
   "scripts": {
     "bower": "bower",
+    "docsbower": "cd dist/docs && bower",
+    "http-server": "http-server",
+    "polybuild": "polybuild",
     "test": "wct elements/*/test",
     "test-sauce": "wct --skip-plugin local --plugin sauce elements/*/test",
     "watch": "gulp watch"
