@@ -77,6 +77,24 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
         support.serialize(d) should be (Json.toJson(d.toString))
 
       }
+
+      it("should serialize true as a JSBoolean") {
+        val d: Boolean = true
+
+        val support = spy(new TestSupport)
+
+        support.serialize(d) should be (JsBoolean(true))
+
+      }
+
+      it("should serialize false as a JSBoolean") {
+        val d: Boolean = false
+
+        val support = spy(new TestSupport)
+
+        support.serialize(d) should be (JsBoolean(false))
+
+      }
     }
 
   }
