@@ -205,7 +205,7 @@ server: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
 server: SERVER_NAME?=urth_widgets_server
 server: OPTIONS?=-it --rm
 server:
-	@echo 'Starting server...'
+	@echo 'Starting server... $(SERVER_NAME)'
 	@docker run --name $(SERVER_NAME) $(OPTIONS) \
 		-p 9500:8888 \
 		-e USE_HTTP=1 \
@@ -219,9 +219,11 @@ system-test: BASEURL?=http://192.168.99.100:9500
 system-test: TEST_SERVER?=ondemand.saucelabs.com
 system-test: sdist
 system-test:
+	@OPTIONS=-d SERVER_NAME=urth_widgets_integration_server make server
+	@echo 'Waiting 20 seconds for server to start...'
+	@sleep 20
 	@echo 'Running system integration tests...'
-	@make server OPTIONS=-d SERVER_NAME=urth_widgets_integration_server
-	@sleep 20 && npm run system-test -- --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY) --baseurl $(BASEURL) --server $(TEST_SERVER)
+	@npm run system-test -- --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY) --baseurl $(BASEURL) --server $(TEST_SERVER)
 	@docker kill urth_widgets_integration_server
 	@docker rm urth_widgets_integration_server
 
