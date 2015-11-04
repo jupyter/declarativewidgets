@@ -5,13 +5,12 @@
 <link rel="import" href="../../../bower_components/paper-drawer-panel/paper-drawer-panel.html">
 <link rel="import" href="../../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
 
 <dom-module id='urth-docs-panel'>
     <template>
         <style>
-            .iron-selected {
+            .iron-selected.selectable {
                 background: #fafafa;
                 color: #000000;
             }
@@ -22,6 +21,16 @@
                 letter-spacing: 0.05rem;
                 text-decoration: none;
                 color: #ffffff;
+            }
+
+            .selectable {
+                color: #D0D0D0;
+                font-size: 14px;
+                font-family: "Helvetica Neue",Arial,sans-serif;
+                height: 28px;
+                line-height: 28px;
+                padding-left: 20px;
+                -webkit-font-smoothing: antialiased;
             }
 
             .selectable:hover:not(.iron-selected) {
@@ -84,19 +93,6 @@
                 --paper-toolbar-background: #fafafa;
                 --paper-toolbar-color: #000000;
             }
-
-            paper-item {
-                --paper-item-min-height: 28px;
-                --paper-item: {
-                    font-size: 14px;
-                    font-family: "Helvetica Neue",Arial,sans-serif;
-                    color: #D0D0D0;
-                };
-            }
-
-            paper-item:focus:before {
-                background-color: #fafafa;
-            }
         </style>
         <paper-drawer-panel id="drawerPanel">
             <paper-header-panel drawer mode="waterfall">
@@ -106,11 +102,11 @@
                 <iron-selector id="selector" attr-for-selected="name" selectable=".selectable" selected="{{activeDescriptor}}">
                     <div class="selector-header">Elements</div>
                     <template is="dom-repeat" items="[[elementDescriptors]]">
-                        <paper-item class="selectable" name="[[item.is]]">[[item.is]]</paper-item>
+                        <div class="selectable" name="[[item.is]]">[[item.is]]</div>
                     </template>
                     <div class="selector-header">Behaviors</div>
                     <template is="dom-repeat" items="[[behaviorDescriptors]]">
-                        <paper-item class="selectable" name="[[item.is]]">[[item.is]]</paper-item>
+                        <div class="selectable" name="[[item.is]]">[[item.is]]</div>
                     </template>
                 <iron-selector>
             </paper-header-panel>
