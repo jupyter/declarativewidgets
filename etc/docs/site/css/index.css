@@ -82,6 +82,7 @@ nav a {
 }
 .feature-description {
     color: #4E4E4E;
+    max-width: 310px;
 }
 .feature-title {
     color: #4E4E4E;
@@ -89,9 +90,7 @@ nav a {
     font-size: 1.25rem;
     font-weight: 400;
     margin: 10px 0;
-}
-.first-nav-link {
-    margin-left: auto;
+    max-width: 310px;
 }
 .hero {
     display: -webkit-box;
@@ -112,15 +111,25 @@ nav a {
     height: 300px;
 }
 .hero-subtitle {
+    box-sizing: border-box;
     color: #fafafa;
+    -webkit-flex: 0 1 auto;
+    -ms-flex: 0 1 auto;
+    flex: 0 1 auto;
     font-weight: 100;
     letter-spacing: 1px;
     letter-spacing: 0.1rem;
-    margin: 0 40px 40px 40px;
+    padding: 0 40px 40px 40px;
+    max-width: 100%;
 }
 .hero-title {
+    box-sizing: border-box;
+    -webkit-flex: 0 1 auto;
+    -ms-flex: 0 1 auto;
+    flex: 0 1 auto;
     font-weight: 200;
     letter-spacing: 1px;
     letter-spacing: 0.1rem;
-    margin: 0 40px 10px 40px;
+    padding: 0 40px 10px 40px;
+    max-width: 100%;
 }
