@@ -10,7 +10,7 @@ import play.api.libs.json._
 
 import scala.util.{Failure, Success, Try}
 
-import urth.widgets.{WatchHandler, Comm, sparkIMain, getKernel}
+import urth.widgets._
 import org.apache.spark.repl.SparkIMain
 
 import com.ibm.spark.utils.LogLike
@@ -34,9 +34,9 @@ trait FunctionSupport {
    * @param funcName Name of the function to invoke.
    * @param args Map[ArgumentName, ArgumentValue]
    * @return Result of invoking the given function with the given arguments
-   *         converted to their inferred types or None if invocation fails.
+   *         converted to their inferred types or Failure if invocation fails.
    */
-  def invokeFunction(funcName: String, args: Map[String, String]): Option[Any]
+  def invokeFunction(funcName: String, args: Map[String, String]): Try[Any]
 
   /**
    * Invoke the given watch handler with the given arguments. Arguments are
@@ -82,16 +82,17 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
    * @param funcName Name of the function to invoke.
    * @param args Map[ArgumentName, ArgumentValue]
    * @return Result of invoking the given function with the given arguments
-   *         converted to their inferred types or None if invocation fails.
+   *         converted to their inferred types or Failure if invocation fails.
    */
   override def invokeFunction(
     funcName: String, args: Map[String, String]
-  ): Option[Any] =
-    getSymbol(funcName) flatMap { case symbol =>
+  ): Try[Any] = tryGetSymbol(funcName) flatMap { case symbol =>
       symbol.kindString match {
-        case "method" => invokeMethod(funcName, args)
-        case "value"  => invokeVal(funcName, args)
-        case _ => None
+        case SymbolKind.Method => invokeMethod(funcName, args)
+        case SymbolKind.Value  => invokeVal(funcName, args)
+        case s => throw new RuntimeException(
+          s"Unsupported symbol kind $s for function $funcName"
+        )
       }
     }
 
@@ -403,20 +404,20 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
    *
    * @param methodName name of the method to invoke
    * @param args mapping of argument name to argument value as a string
-   * @return Result of method invocation, or None if invocation fails
+   * @return Result of method invocation, or Failure if invocation fails
    */
   private[util] def invokeMethod(
     methodName: String, args: Map[String, String]
-  ): Option[Any] = {
+  ): Try[Any] = {
     logger.trace(s"invokeMethod with function $methodName and args $args")
-    for {
+    tryOptionFunction(() => for {
       spec     <- argTypes(methodName)
       symb     <- getSymbol(methodName)
       defaults <- defArgDefaults(symb, methodName)
       argSeq   <- matchArgs(spec, args, defaults)
       convArgs <- convertArgs(argSeq)
       result   <- _invokeMethod(methodName, convArgs: _*)
-    } yield result
+    } yield result, methodName)
   }
 
   /**
@@ -425,20 +426,33 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
    *
    * @param funcName name of the variable containing the function to invoke
    * @param args mapping of argument name to argument value as a string
-   * @return Result of function invocation, or None if invocation fails
+   * @return Result of function invocation, or Failure if invocation fails
    */
   private[util] def invokeVal(
   funcName: String, args: Map[String, String]
-  ): Option[Any] = {
+  ): Try[Any] = {
     logger.trace(s"invokeVal with function $funcName and args $args")
-    for {
-      func      <- kernelInterpreter.read(funcName)
-      (im, sym) <- applySymbol(func)
-      spec      <- argTypes(funcName)
-      argSeq    <- matchArgs(spec, args, Map())
-      convArgs  <- convertArgs(argSeq)
-    } yield im.reflectMethod(sym)(convArgs: _*)
+    tryOptionFunction(() => for {
+        func      <- kernelInterpreter.read(funcName)
+        (im, sym) <- applySymbol(func)
+        spec      <- argTypes(funcName)
+        argSeq    <- matchArgs(spec, args, Map())
+        convArgs  <- convertArgs(argSeq)
+      } yield im.reflectMethod(sym)(convArgs: _*), funcName)
   }
+
+  /**
+   * Execute the given function that returns an Option type, catching execution
+   * errors.
+   * @param f The function to execute.
+   * @param funcName The name of the function to execute.
+   * @tparam T Type of underlying data that the function `f` returns.
+   * @return Success(function result data) or Failure if execution fails.
+   */
+  private[util] def tryOptionFunction[T](f: () => Option[T], funcName: String): Try[T] =
+    Try(f() getOrElse {
+      throw new RuntimeException(s"Error invoking function $funcName")}
+    )
 
   /**
    * Invoke the given watch handler with the given arguments. Arguments are
@@ -486,6 +500,12 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
         Some(sym)
     }
   }
+
+  private[util] def tryGetSymbol(name: String): Try[iMain.global.Symbol] =
+    getSymbol(name) match {
+      case Some(sym) => Success(sym)
+      case None => throw new RuntimeException(s"Symbol $name not found!")
+    }
 
   /** Get the interpreter Request object for the line of code that
     * contained the given name.

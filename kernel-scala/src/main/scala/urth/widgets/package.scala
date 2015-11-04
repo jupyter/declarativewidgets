@@ -36,6 +36,7 @@ package object widgets {
     val KeyRequired      = "required"
     val KeyDefaultValue  = "value"
     val KeyStatus        = "status"
+    val KeyStatusMsg     = "__status__"
     val KeyMessage       = "msg"
     val KeyTimestamp     = "timestamp"
 
@@ -64,6 +65,11 @@ package object widgets {
     // Status types
     val StatusError      = "error"
     val StatusOk         = "ok"
+  }
+
+  object SymbolKind {
+    val Method = "method"
+    val Value = "value"
   }
 
   object Default {

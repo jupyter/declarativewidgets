@@ -214,7 +214,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
              * sent from the kernel. The status is "ok" when execution was
              * successful, and "error" when an error occurred.
              */
-            onModelStatusChange: function(newVal){
+            onModel__status__Change: function(newVal){
                 if (newVal.status === "ok"){
                     this._clearErrorMessages();
                 } else {

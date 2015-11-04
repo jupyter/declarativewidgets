@@ -43,7 +43,7 @@ class UrthWidget(widgets.Widget):
         self._send({
             "method": "update",
             "state": {
-                "status": {
+                "__status__": {
                     "status": status,
                     "msg": msg,
                     "timestamp": round(time.time() * 1000)

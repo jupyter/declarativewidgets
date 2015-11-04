@@ -537,19 +537,34 @@
 
                 channel.onModelChange({
                     changed: {
-                        "one": 1,
-                        "two": 2
+                        "one:one": 1,
+                        "two:two": 2
                     }
                 });
 
                 assert(_handleItemChangeMessage.calledTwice, "Method was called " + _handleItemChangeMessage.callCount + " expected 2");
-                expect(_handleItemChangeMessage.getCall(0).args[0]).to.equal('one');
+                expect(_handleItemChangeMessage.getCall(0).args[0]).to.equal('one:one');
                 expect(_handleItemChangeMessage.getCall(0).args[1]).to.equal(1);
 
-                expect(_handleItemChangeMessage.getCall(1).args[0]).to.equal('two');
+                expect(_handleItemChangeMessage.getCall(1).args[0]).to.equal('two:two');
                 expect(_handleItemChangeMessage.getCall(1).args[1]).to.equal(2);
             });
 
+            it('should not call _handleItemChangeMessage with invalid paths', function() {
+                var _handleItemChangeMessage = sinon.stub(channel, '_handleItemChangeMessage');
+
+                channel.onModelChange({
+                    changed: {
+                        "one:one": 1,
+                        "foo": 2
+                    }
+                });
+
+                assert(_handleItemChangeMessage.calledOnce, "Method was called " + _handleItemChangeMessage.callCount + " expected 1");
+                expect(_handleItemChangeMessage.getCall(0).args[0]).to.equal("one:one");
+                expect(_handleItemChangeMessage.getCall(0).args[1]).to.equal(1);
+
+            });
         });
 
         describe('_handleItemChangeMessage', function(){

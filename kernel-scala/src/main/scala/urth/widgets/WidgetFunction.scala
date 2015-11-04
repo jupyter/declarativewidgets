@@ -10,6 +10,8 @@ import com.ibm.spark.kernel.protocol.v5.MsgData
 import play.api.libs.json.{JsString, JsValue, Json}
 import urth.widgets.util.{SerializationSupport, StandardFunctionSupport}
 
+import scala.util.{Failure, Success, Try}
+
 /**
  * A widget for invoking a function in the kernel.
  *
@@ -67,13 +69,13 @@ class WidgetFunction(comm: CommWriter)
     logger.debug(s"Handling invoke message ${msg}...")
     (msg \ Comm.KeyArgs).asOpt[JsValue] match {
       case Some(args) =>
-        invokeFunc(name, args).map(serialize(_, limit)) match {
-          case Some(result) =>
+        invokeFunc(name, args, limit) match {
+          case Success(result) =>
             sendResult(result)
             sendOk()
-          case None =>
-            sendError(s"No result for ${theFunctionName} invoke.")
-            logger.error(s"No result for ${theFunctionName} invoke.")
+          case Failure(t) =>
+            sendError(s"Error invoking ${theFunctionName}: ${t.getCause}")
+            logger.error(s"Error invoking ${theFunctionName}: ${t.getCause}")
         }
       case None =>
         sendError(s"No arguments were provided in message $msg for invocation!")
@@ -81,14 +83,14 @@ class WidgetFunction(comm: CommWriter)
     }
   }
 
-  private[widgets] def invokeFunc(funcName: String, args: JsValue): Option[Any] = {
+  private[widgets] def invokeFunc(funcName: String, args: JsValue, limit: Int = limit): Try[JsValue] = {
     logger.debug(s"Invoking registered function with args ${args}")
-    val result = for {
-      map <- argMap(args)
-      res <- invokeFunction(funcName, map)
-    } yield res
-    logger.debug(s"Function invocation result: ${result}")
-    result
+    argMap(args) match {
+      case Some(map) => invokeFunction(funcName, map) map (serialize(_, limit))
+      case None => throw new RuntimeException(
+          s"Invalid arguments $args for function $funcName"
+      )
+    }
   }
 
   private def argMap(args: JsValue): Option[Map[String, String]] =

@@ -106,8 +106,8 @@ dataChannel.setItem('user', 'Luke');
 
             var changes = options.changed;
             Object.keys(changes).filter(function(change){
-                return !(change === "status");
-            }).forEach(function(change){
+                return this.__validPath(change);
+            }.bind(this)).forEach(function(change){
                 console.debug('urth-core-channels onModelChange changed ', change, changes[change]);
                 this._handleItemChangeMessage(change, changes[change]);
             }.bind(this));
@@ -124,16 +124,20 @@ dataChannel.setItem('user', 'Luke');
         },
 
         /**
+         * Decides whether the given string is valid for use in _handleItemChangeMessage
+         **/
+        __validPath: function(path){
+            var pathRegex = RegExp("[a-zA-Z_0-9]+:[a-zA-Z_0-9]+");
+            return pathRegex.exec(path);
+        },
+
+        /**
          * Handle an item change represented by the given path and value.
          * The path is of the form <CHANNEL_NAME>:<ITEM_NAME>, e.g. "c:user".
          */
         _handleItemChangeMessage: function( path, value ){
             var path = path.split(':');
-            if (!this._getChannel(path[0])){
-                this.displayErrorMessage("Channel " + path[0] + " does not exist.");
-            } else {
-                this.setItem(path[1], value, path[0]);
-            }
+            this.setItem(path[1], value, path[0]);
         }
     });
 </script>

@@ -39,7 +39,7 @@ trait MessageSupport extends LogLike {
       Comm.KeyMessage -> msg,
       Comm.KeyTimestamp -> timestamp
     )
-    sendState(comm, Comm.KeyStatus, statusJson)
+    sendState(comm, Comm.KeyStatusMsg, statusJson)
   }
 
   /**

@@ -8,7 +8,8 @@ package urth.widgets.util
 import java.io.{OutputStream, ByteArrayOutputStream}
 
 import com.ibm.spark.global.StreamState
-import com.ibm.spark.interpreter._
+import com.ibm.spark.interpreter.Interpreter
+import com.ibm.spark.kernel.interpreter.scala._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, FunSpec}
 import org.mockito.Matchers._
@@ -16,7 +17,7 @@ import org.mockito.Mockito._
 import play.api.libs.json._
 import scala.reflect.runtime.universe._
 import scala.runtime.BoxedUnit
-import com.ibm.spark.kernel.interpreter.scala._
+import scala.util.Success
 
 class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
 
@@ -55,26 +56,42 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
   interpreter.interpret(s"""def fdv(a: Int, b: Double=d): Int = a""")
   val TestDefaultVariableMethodName = "fdv"
 
+  // method that causes an exception
+  interpreter.interpret("def fme(a: Int): Int = throw new Exception")
+  val TestMethodWithException = "fme"
+
+  // val that causes an exception
+  interpreter.interpret("val fve = (a: Int) => 1/0")
+  val TestValWithException = "fve"
+
   describe("FunctionSupport") {
     val support = spy(new TestFunctionSupport)
     doReturn(interpreter).when(support).kernelInterpreter
 
     describe("invokeFunction") {
       it("should invoke a method defined with def") {
-        support.invokeFunction(TestMethodName, Map("a" -> "1")) should be (Some(1))
+        support.invokeFunction(TestMethodName, Map("a" -> "1")) should be (Success(1))
       }
 
       it("should invoke a method defined with def using default arguments") {
-        support.invokeFunction(TestDefaultMethodName, Map("a" -> "1")) should be (Some(1))
+        support.invokeFunction(TestDefaultMethodName, Map("a" -> "1")) should be (Success(1))
       }
 
       it("should invoke a function defined with val") {
-        support.invokeFunction(TestValName, Map("a" -> "1")) should be (Some(1))
+        support.invokeFunction(TestValName, Map("a" -> "1")) should be (Success(1))
       }
       
-      it("should return None if an error occurs") {
+      it("should return Failure if an error occurs") {
         // empty args
-        support.invokeFunction(TestValName, Map()) should be (None)
+        support.invokeFunction(TestValName, Map()).isFailure should be (true)
+      }
+
+      it("should return Failure if an exception occurs during method invocation") {
+        support.invokeFunction(TestMethodWithException, Map("a" -> "1")).isFailure should be (true)
+      }
+
+      it("should return Failure if an exception occurs during val invocation") {
+        support.invokeFunction(TestValWithException, Map("a" -> "1")).isFailure should be (true)
       }
     }
 
@@ -314,16 +331,16 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
       it("integration: should return the result of method invocation") {
         val supportSpy = spy(new TestFunctionSupport)
 
-        supportSpy.invokeMethod(TestMethodName, Map("a" -> "1")) should be(Some(1))
+        supportSpy.invokeMethod(TestMethodName, Map("a" -> "1")) should be(Success(1))
       }
 
       it("integration: should work with a default value") {
         val supportSpy = spy(new TestFunctionSupport)
 
-        supportSpy.invokeMethod(TestDefaultMethodName, Map("a" -> "1")) should be (Some(1))
+        supportSpy.invokeMethod(TestDefaultMethodName, Map("a" -> "1")) should be (Success(1))
       }
 
-      it("should return none if any intermediate stage fails") {
+      it("should return Failure if any intermediate stage fails") {
         val supportSpy = spy(new TestFunctionSupport)
 
         doReturn(Some(Seq(("a", typeOf[String])))).when(supportSpy).argTypes("foo")
@@ -332,7 +349,11 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
         doReturn(None).when(supportSpy).convertArgs(any())
 
         val args = Map("a" -> "asdf")
-        supportSpy.invokeMethod("foo", args) should be (None)
+        supportSpy.invokeMethod("foo", args).isFailure should be (true)
+      }
+
+      it("should return Failure if the method invocation fails") {
+        support.invokeMethod(TestMethodWithException, Map("a" -> "1")).isFailure should be (true)
       }
     }
 
@@ -373,12 +394,16 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
       it("should return the result of invoking a val function") {
 
         val args = Map("a" -> "1")
-        supportSpy.invokeVal(TestValName, args) should be(Some(1))
+        supportSpy.invokeVal(TestValName, args) should be(Success(1))
       }
 
-      it("should return None if an intermediate stage fails") {
+      it("should return Failure if an intermediate stage fails") {
         val badArgs = Map("a" -> "asdf")
-        supportSpy.invokeVal(TestValName, badArgs) should be(None)
+        supportSpy.invokeVal(TestValName, badArgs).isFailure should be(true)
+      }
+
+      it("should return Failure if an exception occurs during val invocation") {
+        support.invokeVal(TestValWithException, Map("a" -> "1")).isFailure should be (true)
       }
     }
 
@@ -425,7 +450,6 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
         val x = JsNumber(3.1)
         val converted = support.convertJsValue(x)
         converted should be (3.1)
-        println(converted.getClass.getName)
         converted.isInstanceOf[Double] should be (true)
       }
       it("should convert a JsString to Scala String"){
@@ -601,6 +625,26 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
         val supportSpy = spy(new TestFunctionSupport)
         supportSpy.jsType(typeOf[JsArray]) should be("Array")
         supportSpy.jsType(supportSpy.iMain.global.typeOf[JsArray].asInstanceOf[Type]) should be("Array")
+      }
+    }
+
+    describe("#tryOptionFunction") {
+      it("should return the underlying option data when execution returns Some") {
+        val support = new TestFunctionSupport
+        val f = () => Some(1)
+        support.tryOptionFunction(f, "") should be (Success(1))
+      }
+
+      it("should return failure when the function returns None") {
+        val support = new TestFunctionSupport
+        val f = () => None
+        support.tryOptionFunction(f, "").isFailure should be(true)
+      }
+
+      it("should return failure when the execution fails") {
+        val support = new TestFunctionSupport
+        val f = () => throw new Exception
+        support.tryOptionFunction(f, "").isFailure should be(true)
       }
     }
   }

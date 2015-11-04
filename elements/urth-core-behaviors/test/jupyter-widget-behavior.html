@@ -56,7 +56,7 @@
 
         });
 
-        describe('_onModelStatusChange', function() {
+        describe('onModel__status__Change', function() {
             it('should call _clearErrorMessages on status ok', function() {
                 var optionFixture = {
                     status: "ok"
@@ -68,7 +68,7 @@
 
                 var clearFunc = sinon.stub(testObject, "_clearErrorMessages");
 
-                testObject.onModelStatusChange(optionFixture);
+                testObject.onModel__status__Change(optionFixture);
 
                 assert(clearFunc.calledOnce, "_clearErrorMessages was called " + clearFunc.callCount);
             });
@@ -84,7 +84,7 @@
 
                 var displayFunc = sinon.stub(testObject, "displayErrorMessage");
 
-                testObject.onModelStatusChange(optionFixture);
+                testObject.onModel__status__Change(optionFixture);
 
                 assert(displayFunc.calledOnce, "displayErrorMessage was called " + displayFunc.callCount);
             });

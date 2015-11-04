@@ -34,7 +34,7 @@ class MessageSupportSpec extends FunSpec with Matchers with MockitoSugar {
       val test = spy(new TestSupport)
       test.sendStatus(comm, "status", "message")
 
-      verify(test).sendState(comm, Comm.KeyStatus, expectedData);
+      verify(test).sendState(comm, Comm.KeyStatusMsg, expectedData);
     }
   }
 }
