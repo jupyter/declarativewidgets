@@ -105,9 +105,11 @@ dataChannel.setItem('user', 'Luke');
             console.debug('urth-core-channels onModelChange', options);
 
             var changes = options.changed;
-            Object.keys(changes).forEach(function(change){
+            Object.keys(changes).filter(function(change){
+                return this.__validPath(change);
+            }.bind(this)).forEach(function(change){
                 console.debug('urth-core-channels onModelChange changed ', change, changes[change]);
-                this._handleItemChangeMessage(change, changes[change])
+                this._handleItemChangeMessage(change, changes[change]);
             }.bind(this));
         },
 
@@ -119,6 +121,14 @@ dataChannel.setItem('user', 'Luke');
             console.debug('urth-core-channels onKernelReady, creating model...');
             var maxRetries = 10;
             this.createModel('urth.widgets.widget_channels.Channels', maxRetries);
+        },
+
+        /**
+         * Decides whether the given string is valid for use in _handleItemChangeMessage
+         **/
+        __validPath: function(path){
+            var pathRegex = RegExp("[a-zA-Z_0-9]+:[a-zA-Z_0-9]+");
+            return pathRegex.exec(path);
         },
 
         /**

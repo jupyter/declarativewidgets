@@ -35,6 +35,10 @@ package object widgets {
     val KeyType          = "type"
     val KeyRequired      = "required"
     val KeyDefaultValue  = "value"
+    val KeyStatus        = "status"
+    val KeyStatusMsg     = "__status__"
+    val KeyMessage       = "msg"
+    val KeyTimestamp     = "timestamp"
 
     // Method types
     val MethodBackbone   = "backbone"
@@ -57,6 +61,15 @@ package object widgets {
     val ChangeName       = "name"
     val ChangeOldVal     = "old_val"
     val ChangeNewVal     = "new_val"
+
+    // Status types
+    val StatusError      = "error"
+    val StatusOk         = "ok"
+  }
+
+  object SymbolKind {
+    val Method = "method"
+    val Value = "value"
   }
 
   object Default {

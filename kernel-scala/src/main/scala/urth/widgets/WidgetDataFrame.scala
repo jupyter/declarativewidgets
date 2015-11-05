@@ -51,9 +51,12 @@ class WidgetDataFrame(comm: CommWriter)
   def handleCustom(msgContent: MsgData): Unit = {
     logger.debug(s"Handling custom message ${msgContent}...")
     (msgContent \ Comm.KeyEvent).asOpt[String] match {
-      case Some(Comm.EventSync) => handleSync(this.variableName, this.limit)
-      case Some(evt) => logger.warn(s"Unhandled custom event ${evt}.")
-      case None => logger.warn("No event value in custom comm message.")
+      case Some(Comm.EventSync) =>
+        serializeAndSend(this.variableName, this.limit)
+      case Some(evt) =>
+        logger.warn(s"Unhandled custom event ${evt}.")
+      case None =>
+        logger.warn("No event value in custom comm message.")
     }
   }
 
@@ -65,16 +68,24 @@ class WidgetDataFrame(comm: CommWriter)
   private[widgets] def registerName(name: String): Unit = {
     this.variableName = name
     logger.debug(s"Registered DataFrame variable name ${name}.")
+    serializeAndSend(name, this.limit) match {
+      case Right(_)  => sendOk()
+      case Left(msg) => sendError(msg)
+    }
   }
 
-  private[widgets] def handleSync(name: String, limit: Int): Unit = {
-    logger.debug(s"Handling ${Comm.KeySyncData} message...")
+  private[widgets] def serializeAndSend(
+    name: String, limit: Int
+  ): Either[String, Unit] = {
     kernelInterpreter.read(name) match {
       case Some(df) =>
         val serialized = serialize(df, limit)
         sendSyncData(serialized)
+        logger.trace(s"Sent sync message for DataFrame $name")
+        Right()
       case None =>
-        logger.error(s"DataFrame ${name} not found!")
+        logger.warn(s"DataFrame ${name} not found! No sync message sent.")
+        Left(s"DataFrame ${name} not found!")
     }
   }
 

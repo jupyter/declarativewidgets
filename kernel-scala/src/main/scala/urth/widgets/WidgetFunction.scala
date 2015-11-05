@@ -10,6 +10,8 @@ import com.ibm.spark.kernel.protocol.v5.MsgData
 import play.api.libs.json.{JsString, JsValue, Json}
 import urth.widgets.util.{SerializationSupport, StandardFunctionSupport}
 
+import scala.util.{Failure, Success, Try}
+
 /**
  * A widget for invoking a function in the kernel.
  *
@@ -35,7 +37,6 @@ class WidgetFunction(comm: CommWriter)
         logger.trace(s"Sync data ${Comm.KeyFunctionName}: $name")
         val funcName = name.toString
         registerFunction(funcName)
-        sendSignature(funcName)
       case _ => logger.error(s"No ${Comm.KeyFunctionName} value provided!")
     }
 
@@ -68,22 +69,28 @@ class WidgetFunction(comm: CommWriter)
     logger.debug(s"Handling invoke message ${msg}...")
     (msg \ Comm.KeyArgs).asOpt[JsValue] match {
       case Some(args) =>
-        invokeFunc(name, args).map(serialize(_, limit)) match {
-          case Some(result) => sendResult(result)
-          case None => logger.error(s"No result for ${theFunctionName} invoke.")
+        invokeFunc(name, args, limit) match {
+          case Success(result) =>
+            sendResult(result)
+            sendOk()
+          case Failure(t) =>
+            sendError(s"Error invoking ${theFunctionName}: ${t.getCause}")
+            logger.error(s"Error invoking ${theFunctionName}: ${t.getCause}")
         }
-      case None => logger.warn(s"No arguments were provided for invocation!")
+      case None =>
+        sendError(s"No arguments were provided in message $msg for invocation!")
+        logger.warn(s"No arguments were provided for invocation!")
     }
   }
 
-  private[widgets] def invokeFunc(funcName: String, args: JsValue): Option[Any] = {
+  private[widgets] def invokeFunc(funcName: String, args: JsValue, limit: Int = limit): Try[JsValue] = {
     logger.debug(s"Invoking registered function with args ${args}")
-    val result = for {
-      map <- argMap(args)
-      res <- invokeFunction(funcName, map)
-    } yield res
-    logger.debug(s"Function invocation result: ${result}")
-    result
+    argMap(args) match {
+      case Some(map) => invokeFunction(funcName, map) map (serialize(_, limit))
+      case None => throw new RuntimeException(
+          s"Invalid arguments $args for function $funcName"
+      )
+    }
   }
 
   private def argMap(args: JsValue): Option[Map[String, String]] =
@@ -100,6 +107,10 @@ class WidgetFunction(comm: CommWriter)
   private[widgets] def registerFunction(funcName: String): Unit = {
     this.theFunctionName = funcName
     logger.debug(s"Registered function ${funcName}.")
+    sendSignature(funcName) match {
+      case Right(_)  => sendOk()
+      case Left(msg) => sendError(msg)
+    }
   }
 
   private[widgets] def registerLimit(limit: Int): Unit = {
@@ -107,13 +118,15 @@ class WidgetFunction(comm: CommWriter)
     logger.debug(s"Registered limit ${limit}.")
   }
 
-  private[widgets] def sendSignature(funcName: String): Unit = {
+  private[widgets] def sendSignature(funcName: String): Either[String, Unit] = {
     signature(funcName) match {
       case Some(sig) =>
         val sigJSON = Json.toJson(sig)
         logger.trace(s"Signature for ${funcName}: ${sigJSON}")
-        sendState(Comm.StateSignature, sigJSON)
-      case None => logger.warn(s"Could not determine signature for ${funcName}")
+        Right(sendState(Comm.StateSignature, sigJSON))
+      case None =>
+        logger.trace(s"Could not determine signature for function $funcName.")
+        Left(s"Invalid function name $funcName. Could not determine signature.")
     }
   }
 

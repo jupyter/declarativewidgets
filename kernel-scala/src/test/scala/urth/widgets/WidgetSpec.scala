@@ -68,6 +68,24 @@ class WidgetSpec extends FunSpec with Matchers with MockitoSugar {
       }
     }
 
+    describe("#sendError") {
+      it("should send a status error message with the widget's comm") {
+        val comm = mock[CommWriter]
+        val test = spy(new TestWidget(comm))
+        test.sendError("bayud")
+        verify(test).sendStatus(comm, Comm.StatusError, "bayud")
+      }
+    }
+
+    describe("#sendOk") {
+      it("should send a state message with the widget's comm") {
+        val comm = mock[CommWriter]
+        val test = spy(new TestWidget(comm))
+        test.sendOk("goodness")
+        verify(test).sendStatus(comm, Comm.StatusOk, "goodness")
+      }
+    }
+
     describe("#createWidgetInstance") {
       it("should create a function widget when given the function class name") {
         Widget.createWidgetInstance(WidgetClass.Function, mock[CommWriter]).getClass should

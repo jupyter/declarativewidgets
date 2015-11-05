@@ -13,6 +13,8 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import play.api.libs.json.{JsBoolean, JsString, Json}
 
+import scala.util.{Failure, Success}
+
 class WidgetFunctionSpec extends FunSpec with Matchers with MockitoSugar {
 
   class TestWidget(comm: CommWriter) extends WidgetFunction(comm)
@@ -22,7 +24,7 @@ class WidgetFunctionSpec extends FunSpec with Matchers with MockitoSugar {
   }
 
   class TestWidgetNoSignature(comm: CommWriter) extends WidgetFunction(comm) {
-    override def sendSignature(name: String) = ()
+    override def sendSignature(name: String) = Right(())
   }
 
   describe("WidgetFunction"){
@@ -60,12 +62,13 @@ class WidgetFunctionSpec extends FunSpec with Matchers with MockitoSugar {
     describe("#handleCustom") {
       it("should handle an invoke event using the message and current variables") {
         val test = spy(new TestWidgetNoInvoke(mock[CommWriter]))
-
+        doReturn(Some(Map())).when(test).signature(anyString())
         test.registerFunction("f")
         test.registerLimit(100)
 
         val msg = Json.obj(Comm.KeyEvent -> Comm.EventInvoke)
         test.handleCustom(msg)
+
         verify(test).handleInvoke(msg, "f", 100)
       }
 
@@ -76,7 +79,9 @@ class WidgetFunctionSpec extends FunSpec with Matchers with MockitoSugar {
 
         val msg = Json.obj(Comm.KeyEvent -> Comm.EventSync)
         test.handleCustom(msg)
-        verify(test).sendSignature("f")
+
+        // once from registerFunction, once from handleCustom
+        verify(test, times(2)).sendSignature("f")
       }
 
       it("should not handle an invalid event") {
@@ -90,14 +95,43 @@ class WidgetFunctionSpec extends FunSpec with Matchers with MockitoSugar {
     describe("#handleInvoke") {
       it("should invoke the function and send the serialized result") {
         val test = spy(new TestWidget(mock[CommWriter]))
-        doReturn(Some("result")).when(test).invokeFunc(anyString(), any())
+        doReturn(Success(JsString("result"))).when(test).invokeFunc(anyString(), any(), anyInt())
 
         val args = Json.obj("a" -> 1)
         val msg = Json.obj(Comm.KeyArgs -> args)
         test.handleInvoke(msg, "f", 100)
 
-        verify(test).invokeFunc("f", args)
+        verify(test).invokeFunc("f", args, 100)
         verify(test).sendResult(JsString("result"))
+      }
+
+      it("should send a status ok message when the invocation succeeds"){
+        val test = spy(new TestWidget(mock[CommWriter]))
+        doReturn(Success(JsString("result"))).when(test).invokeFunc(anyString(), any(), anyInt())
+
+        val args = Json.obj("a" -> 1)
+        val msg = Json.obj(Comm.KeyArgs -> args)
+        test.handleInvoke(msg, "f", 100)
+
+        verify(test).sendOk()
+      }
+
+      it("should send a status error message when the invocation fails"){
+        val test = spy(new TestWidget(mock[CommWriter]))
+        doReturn(Failure(new Exception)).when(test).invokeFunc(anyString(), any(), anyInt())
+        val args = Json.obj("a" -> 1)
+        val msg = Json.obj(Comm.KeyArgs -> args)
+        test.handleInvoke(msg, "f", 100)
+
+        verify(test).sendError(anyString())
+      }
+
+      it("should send a status error message when the msg does not contain arguments"){
+        val test = spy(new TestWidget(mock[CommWriter]))
+        val msg = Json.obj()
+        test.handleInvoke(msg, "f", 100)
+
+        verify(test).sendError(anyString())
       }
     }
 
@@ -107,8 +141,11 @@ class WidgetFunctionSpec extends FunSpec with Matchers with MockitoSugar {
 
         val args = Json.obj("a" -> "1")
 
-        doReturn(Some("")).when(test).invokeFunction(anyString(), any())
-        test.invokeFunc("f", args) should be(Some(""))
+        val output = Success("")
+        doReturn(output).when(test).invokeFunction(anyString(), any())
+        val result = test.invokeFunc("f", args)
+        result.isSuccess should be(true)
+        result.get should be(JsString(output.get))
         verify(test).invokeFunction("f", args.as[Map[String, String]])
       }
 
@@ -117,16 +154,42 @@ class WidgetFunctionSpec extends FunSpec with Matchers with MockitoSugar {
 
         val args = Json.obj("a" -> 1, "b" -> "2")
 
+        val output = Success("")
         val stringArgs = Map("a" -> "1", "b" -> "2")
-        doReturn(Some("")).when(test).invokeFunction(anyString(), any())
-        test.invokeFunc("f", args) should be(Some(""))
+        doReturn(output).when(test).invokeFunction(anyString(), any())
+        val result = test.invokeFunc("f", args)
+        result.isSuccess should be(true)
+        result.get should be(JsString(output.get))
         verify(test).invokeFunction("f", stringArgs)
+      }
+    }
+
+    describe("#registerFunction") {
+      it("should try to send the signature of the registered function"){
+        val test = spy(new TestWidgetNoSignature(mock[CommWriter]))
+
+        test.registerFunction("foo")
+        verify(test).sendSignature("foo")
+      }
+
+      it("should send a status ok if the signature sending succeeded"){
+        val test = spy(new TestWidget(mock[CommWriter]))
+        doReturn(Right(())).when(test).sendSignature(anyString())
+        test.registerFunction("foo")
+        verify(test).sendOk()
+      }
+
+      it("should send a status error if the signature sending failed"){
+        val test = spy(new TestWidget(mock[CommWriter]))
+        doReturn(Left(("uh oh"))).when(test).sendSignature(anyString())
+        test.registerFunction("foo")
+        verify(test).sendError("uh oh")
       }
     }
 
     describe("#sendSignature") {
       it("should send the argument spec with JavaScript types and " +
-         "required flags for a valid function") {
+         "required flags for a valid function, and return Right") {
         val test = spy(new TestWidget(mock[CommWriter]))
 
         val spec = Map("a" -> Map(
@@ -135,11 +198,21 @@ class WidgetFunctionSpec extends FunSpec with Matchers with MockitoSugar {
         ))
 
         doReturn(Some(spec)).when(test).signature(anyString())
-        test.sendSignature("f")
+        val result = test.sendSignature("f")
 
         val expected = Json.toJson(spec)
         verify(test).sendState(Comm.StateSignature, expected)
+        result.isRight should be(true)
       }
+
+      it("should return Left when signature inference fails"){
+        val test = spy(new TestWidget(mock[CommWriter]))
+
+        doReturn(None).when(test).signature(anyString())
+        val result = test.sendSignature("f")
+        result.isLeft should be(true)
+      }
+
     }
   }
 }

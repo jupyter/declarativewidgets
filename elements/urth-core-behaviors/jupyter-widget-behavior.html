@@ -6,6 +6,13 @@
 <!--
 This behavior is used to encapsulate some of the services needed for ipywidgets.
 -->
+<style>
+    .output_area pre.urth-widget-error {
+        color: red;
+        background-color: #fdd;
+        padding: 5px;
+    }
+</style>
 <script>
     'use strict';
     (function() {
@@ -200,7 +207,44 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
              * @method onModelChange
              * @param {Object} options
              */
-            onModelChange: function(options){}
+            onModelChange: function(options){},
+
+            /**
+             * Clears or displays error messages according to the status
+             * sent from the kernel. The status is "ok" when execution was
+             * successful, and "error" when an error occurred.
+             */
+            onModel__status__Change: function(newVal){
+                if (newVal.status === "ok"){
+                    this._clearErrorMessages();
+                } else {
+                    this.displayErrorMessage(newVal.msg);
+                }
+            },
+
+            _clearErrorMessages: function(){
+                var errs = this.getElementsByClassName("urth-widget-error");
+                var numErrs = errs.length;
+                for (var i = 0; i < numErrs; i++){
+                    this.removeChild(errs[0]);
+                }
+            },
+
+            /**
+             * Displays the given error message in the output area associated
+             * with this widget.
+             *
+             * @method displayErrorMessage
+             * @param String msg
+             */
+            displayErrorMessage: function(msg){
+                var errorNode = document.createElement("pre")
+                errorNode.innerHTML = msg;
+                errorNode.classList.add("urth-widget-error");
+                this.appendChild(errorNode);
+                var widgetName = this.nodeName.toLowerCase();
+                console.error(widgetName + ": " + msg);
+            }
         };
     })();
 </script>

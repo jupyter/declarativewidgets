@@ -6,6 +6,7 @@ from IPython.core.getipython import get_ipython
 
 from urth.util.serializer import Serializer
 from .urth_widget import UrthWidget
+from .urth_exception import UrthException
 
 
 class DataFrame(UrthWidget):
@@ -30,18 +31,21 @@ class DataFrame(UrthWidget):
         self.log.info("Changed value of limit to {}...".format(new))
 
     def _the_dataframe(self):
-        return self.shell.user_ns[self.variable_name]
+        if self.variable_name in self.shell.user_ns:
+            return self.shell.user_ns[self.variable_name]
+        else:
+            raise UrthException("Invalid DataFrame variable name {}".format(
+                self.variable_name))
 
     def _handle_state_msg(self, _, content):
         if content.get("event", "") == "sync":
             self._sync_state()
 
     def _sync_state(self):
-        val = self._the_dataframe()
-        serialized_result = self.serializer.serialize(val, limit=self.limit)
-        self._send({
-            "method": "update",
-            "state": {
-                "value": serialized_result
-            }
-        })
+        try:
+            val = self._the_dataframe()
+            serialized_result = self.serializer.serialize(val, limit=self.limit)
+            self._send_update("value", serialized_result)
+            self.ok()
+        except Exception as e:
+            self.error(str(e))

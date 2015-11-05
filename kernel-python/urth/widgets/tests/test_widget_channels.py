@@ -15,6 +15,7 @@ class TestWidgetChannels(unittest.TestCase):
     def setUp(self):
         comm = Mock(spec=Comm)
         self.widget = Channels(comm=comm)
+
         self.chan = 'c'
         self.name = 'x'
 
@@ -64,4 +65,20 @@ class TestWidgetChannels(unittest.TestCase):
         self.msg['data']['new_val'] = {"b": "c"}
         self.widget._handle_change_msg(None, self.msg)
         self.assertEqual(self.lst, [{"a": 1}, {"b": "c"}])
+
+    #### _handle_change_msg()
+    def test_handle_change_msg_invoke_error(self):
+        """should send an error message when handler invocation fails"""
+        self.widget.error = lambda msg: self.lst.append('err')
+        explosion = lambda x, y: 1 / 0
+        self.widget.watch(self.name, explosion, self.chan)
+        self.widget._handle_change_msg(None, self.msg)
+        self.assertEqual(self.lst, ['err'])
+
+    def test_hand_change_msg_invoke_success(self):
+        """should send an ok message when handler invocation succeeds"""
+        self.widget.ok = lambda: self.lst.append('ok')
+        self.widget.watch(self.name, self.handler, self.chan)
+        self.widget._handle_change_msg(None, self.msg)
+        self.assertEqual(self.lst, [1, 2, 'ok'])
 

@@ -533,23 +533,38 @@
         describe('onModelChange', function(){
 
             it('should call _handleItemChangeMessage with right path and value', function(){
-                var _handleItemChangeMessage = sinon.spy(channel, '_handleItemChangeMessage');
+                var _handleItemChangeMessage = sinon.stub(channel, '_handleItemChangeMessage');
 
                 channel.onModelChange({
                     changed: {
-                        "one": 1,
-                        "two": 2
+                        "one:one": 1,
+                        "two:two": 2
                     }
                 });
 
                 assert(_handleItemChangeMessage.calledTwice, "Method was called " + _handleItemChangeMessage.callCount + " expected 2");
-                expect(_handleItemChangeMessage.getCall(0).args[0]).to.equal('one');
+                expect(_handleItemChangeMessage.getCall(0).args[0]).to.equal('one:one');
                 expect(_handleItemChangeMessage.getCall(0).args[1]).to.equal(1);
 
-                expect(_handleItemChangeMessage.getCall(1).args[0]).to.equal('two');
+                expect(_handleItemChangeMessage.getCall(1).args[0]).to.equal('two:two');
                 expect(_handleItemChangeMessage.getCall(1).args[1]).to.equal(2);
             });
 
+            it('should not call _handleItemChangeMessage with invalid paths', function() {
+                var _handleItemChangeMessage = sinon.stub(channel, '_handleItemChangeMessage');
+
+                channel.onModelChange({
+                    changed: {
+                        "one:one": 1,
+                        "foo": 2
+                    }
+                });
+
+                assert(_handleItemChangeMessage.calledOnce, "Method was called " + _handleItemChangeMessage.callCount + " expected 1");
+                expect(_handleItemChangeMessage.getCall(0).args[0]).to.equal("one:one");
+                expect(_handleItemChangeMessage.getCall(0).args[1]).to.equal(1);
+
+            });
         });
 
         describe('_handleItemChangeMessage', function(){
@@ -557,12 +572,12 @@
             it('should call setItem with the right name, value and channel', function(){
                 var setItem = sinon.spy(channel, 'setItem');
 
-                channel._handleItemChangeMessage("aChannel:aName", "a value");
+                channel._handleItemChangeMessage("a:aName", "a value");
 
                 assert(setItem.calledOnce, "Method was called " + setItem.callCount + " expected 1");
                 expect(setItem.getCall(0).args[0]).to.equal('aName');
                 expect(setItem.getCall(0).args[1]).to.equal('a value');
-                expect(setItem.getCall(0).args[2]).to.equal('aChannel');
+                expect(setItem.getCall(0).args[2]).to.equal('a');
             });
 
         });

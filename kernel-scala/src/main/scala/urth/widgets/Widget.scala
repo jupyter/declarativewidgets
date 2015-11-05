@@ -103,6 +103,18 @@ abstract class Widget(comm: CommWriter) extends LogLike with MessageSupport {
   def sendState(key: String, value: JsValue): Unit = sendState(comm, key, value)
 
   /**
+   * Send a status error message to the front-end with the given message.
+   * @param msg An error message.
+   */
+  def sendError(msg: String) = sendStatus(comm, Comm.StatusError, msg)
+
+  /**
+   * Send a status ok message to the front-end with the given message.
+   * @param msg An optional status message.
+   */
+  def sendOk(msg: String = "") = sendStatus(comm, Comm.StatusOk, msg)
+
+  /**
    * Handles a Comm Message whose method is backbone.
    * @param msg The Comm Message.
    */
