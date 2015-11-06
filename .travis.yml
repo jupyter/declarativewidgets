@@ -20,6 +20,7 @@ script:
   - make test-scala
   - make sdist
   - make install
+  - make system-test BASEURL=http://127.0.0.1:9500
 
 notifications:
   slack: cloudet:rMfRKhvsbZuCIRZpTct3kBI4#urth-widgets
