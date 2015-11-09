@@ -1,19 +1,20 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: help clean sdist dist dev docs test test-js test-py test-scala init server install dev-build .killwatch
+.PHONY: help clean sdist dist dev docs test test-js test-py test-scala init server install dev-build system-test .killwatch
 .SUFFIXES:
 MAKEFLAGS=-r
 
 help:
-	@echo '      init - setups machine with base requirements for dev'
-	@echo '     clean - clean build files'
-	@echo '       dev - start container with source mounted for development'
-	@echo '      docs - start container that serves documentation'
-	@echo '     sdist - build a source distribution'
-	@echo '   install - install latest sdist into a container'
-	@echo '    server - starts a container with extension installed through pip'
-	@echo '      test - run unit tests'
+	@echo '       init - setups machine with base requirements for dev'
+	@echo '      clean - clean build files'
+	@echo '        dev - start container with source mounted for development'
+	@echo '       docs - start container that serves documentation'
+	@echo '      sdist - build a source distribution'
+	@echo '    install - install latest sdist into a container'
+	@echo '     server - starts a container with extension installed through pip'
+	@echo 'system-test - run system integration tests with selenium'
+	@echo '       test - run unit tests'
 
 init: node_modules
 
@@ -162,7 +163,7 @@ test-js: | $(URTH_COMP_LINKS)
 test-js-remote: | $(URTH_COMP_LINKS)
 ifdef SAUCE_USER_NAME
 	@echo 'Running web component tests remotely on Sauce Labs...'
-	@npm run test-sauce --silent -- --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
+	@npm run test-sauce --silent -- --sauce-tunnel-id \"$(TRAVIS_JOB_NUMBER)\" --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
 else
 	@npm run test -- --local firefox
 endif
@@ -202,9 +203,10 @@ install:
 server: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 server: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
 server: SERVER_NAME?=urth_widgets_server
+server: OPTIONS?=-it --rm
 server:
-	@echo 'Starting server...'
-	@docker run -it --rm --name $(SERVER_NAME) \
+	@echo 'Starting server... $(SERVER_NAME)'
+	@docker run $(OPTIONS) --name $(SERVER_NAME) \
 		-p 9500:8888 \
 		-e USE_HTTP=1 \
 		-v `pwd`:/widgets-nbexts \
@@ -212,6 +214,25 @@ server:
 		$(REPO) bash -c 'git config --global core.askpass true && \
 			pip install --no-binary ::all: $$(ls -1 /widgets-nbexts/dist/*.tar.gz | tail -n 1) && \
 			$(CMD)'
+
+system-test: BASEURL?=http://192.168.99.100:9500
+system-test: TEST_SERVER?=ondemand.saucelabs.com
+system-test: SERVER_NAME?=urth_widgets_integration_test_server
+system-test:
+ifdef SAUCE_USER_NAME
+	@echo 'Running system tests on Sauce Labs...'
+	-@docker rm -f $(SERVER_NAME)
+	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server
+	@echo 'Waiting 20 seconds for server to start...'
+	@sleep 20
+	@echo 'Running system integration tests...'
+	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER)
+	-@docker rm -f $(SERVER_NAME)
+else
+	@echo 'Skipping system tests...'
+endif
+
+
 
 docs: DOC_PORT?=4001
 docs: .watch dist/docs

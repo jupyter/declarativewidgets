@@ -10,6 +10,12 @@
     "http-server": "^0.8.5",
     "hydrolysis": "^1.19.1",
     "polybuild": "^1.0.5",
+    "mocha" :"^2.0.0",
+    "wd": "latest",
+    "chai": "latest",
+    "chai-as-promised": "latest",
+    "colors": "latest",
+    "minimist": "latest",
     "web-component-tester": "^3.3.10"
   },
   "config": {},
@@ -20,6 +26,7 @@
     "polybuild": "polybuild",
     "test": "wct elements/*/test",
     "test-sauce": "wct --skip-plugin local --plugin sauce elements/*/test",
+    "system-test": "node_modules/mocha/bin/mocha system-test/system-test-specs.js --timeout 300000 --reporter spec",
     "watch": "gulp watch"
   },
   "repository": {

@@ -7,6 +7,8 @@ services:
 
 addons:
   firefox: "latest"
+  sauce_connect:
+    no_ssl_bump_domains: all
 
 before_script:
   - curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
@@ -20,6 +22,7 @@ script:
   - make test-scala
   - make sdist
   - make install
+  - BASEURL=http://127.0.0.1:9500 make system-test
 
 notifications:
   slack: cloudet:rMfRKhvsbZuCIRZpTct3kBI4#urth-widgets
