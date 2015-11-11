@@ -12,5 +12,5 @@ c.NotebookApp.tornado_settings = {
 }
 c.NotebookApp.allow_origin = '*'
 c.NotebookApp.server_extensions = [
-    'urth.widgets.urth_import'
+    'urth.widgets.ext.urth_import'
 ]
