@@ -61,11 +61,28 @@ RUN conda install --yes \
     'scikit-learn=0.16*' \
     && conda clean -yt
 
+# Install Python 2 packages
+RUN conda create -p $CONDA_DIR/envs/python2 python=2.7 \
+    'ipython=3.2*' \
+    'pandas=0.16*' \
+    'matplotlib=1.4*' \
+    'scipy=0.15*' \
+    'seaborn=0.6*' \
+    'scikit-learn=0.16*' \
+    pyzmq \
+    && conda clean -yt
+
 # Scala Spark kernel spec
 RUN mkdir -p /opt/conda/share/jupyter/kernels/scala
 COPY kernel.json /opt/conda/share/jupyter/kernels/scala/
 
 USER root
+
+# Install Python 2 kernel spec globally to avoid permission problems when NB_UID
+# switching at runtime.
+RUN $CONDA_DIR/envs/python2/bin/python \
+    $CONDA_DIR/envs/python2/bin/ipython \
+    kernelspec install-self
 
 RUN apt-get install --yes npm && \
   apt-get install --yes nodejs && \
