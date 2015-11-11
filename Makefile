@@ -24,6 +24,9 @@ node_modules: package.json
 
 node_modules/bower: node_modules
 
+REPO?=cloudet/all-spark-notebook-bower:1.5.1
+PYTHON?=python3
+
 URTH_BOWER_FILES:=$(shell find elements -name bower.json)
 URTH_SRC_DIRS:=$(foreach dir, $(URTH_BOWER_FILES), $(shell dirname $(dir)))
 URTH_DIRS:=$(foreach dir, $(URTH_SRC_DIRS), $(shell basename $(dir)))
@@ -54,26 +57,6 @@ clean-watch:
 	-@rm .watch
 	-@kill -9 `pgrep gulp`
 
-dev: REPO?=cloudet/all-spark-notebook-bower:1.5.1
-dev: NB_HOME?=/home/jovyan/.ipython
-dev: NB_PORT=8888
-dev: DEV_NAME?=urth_widgets_dev
-dev: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
-dev: .watch dist
-	@docker run -it --rm --name $(DEV_NAME) \
-		-p $(NB_PORT):8888 \
-		-e USE_HTTP=1 \
-		-e JVM_OPT=-Dlog4j.logLevel=trace \
-		-v `pwd`/dist/urth_widgets:$(NB_HOME)/nbextensions/urth_widgets \
-		-v `pwd`/dist/urth:/opt/conda/lib/python3.4/site-packages/urth \
-		-v `pwd`/dist/urth-widgets.jar:/home/jovyan/kernel/lib/urth-widgets.jar \
-		-v `pwd`/etc:$(NB_HOME)/profile_default/nbconfig \
-		-v `pwd`/etc/ipython_notebook_config.py:$(NB_HOME)/profile_default/ipython_notebook_config.py \
-		-v `pwd`/notebooks:/home/jovyan/work \
-		$(REPO) bash -c 'git config --global core.askpass true && \
-			$(CMD)'
-	@$(MAKE) clean-watch
-
 dist/urth_widgets/js: ${shell find nb-extension/js}
 	@echo 'Moving src/nb-extension'
 	@mkdir -p dist/urth_widgets/js
@@ -102,7 +85,6 @@ dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/ext
 	@mkdir -p dist/urth
 	@cp -R kernel-python/urth/* dist/urth/.
 
-dist/urth_widgets/urth-widgets.jar: REPO?=cloudet/sbt-sparkkernel-image:1.5.1
 dist/urth_widgets/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala code'
@@ -111,7 +93,7 @@ else
 	@mkdir -p dist
 	@docker run -it --rm \
 		-v `pwd`:/src \
-		$(REPO) bash -c 'cp -r /src/kernel-scala /tmp/src && \
+		cloudet/sbt-sparkkernel-image:1.5.1 bash -c 'cp -r /src/kernel-scala /tmp/src && \
 			cd /tmp/src && \
 			sbt package && \
 			cp target/scala-2.10/urth-widgets*.jar /src/dist/urth_widgets/urth-widgets.jar'
@@ -144,7 +126,6 @@ dist/VERSION:
 
 dist: dist/urth_widgets dist/urth dist/urth_widgets/urth-widgets.jar dist/docs dist/VERSION
 
-sdist: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 sdist: dist
 	@cp -R MANIFEST.in dist/.
 	@cp -R setup.py dist/.
@@ -155,7 +136,6 @@ sdist: dist
 			python setup.py sdist $(POST_SDIST) && \
 			cp -r dist/*.tar.gz /src/.'
 
-test: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 test: test-js test-py test-scala
 
 test-js: | $(URTH_COMP_LINKS)
@@ -170,14 +150,19 @@ else
 	@npm run test -- --local firefox
 endif
 
-test-py: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 test-py: dist/urth
-	@echo 'Running python tests...'
-	@docker run -it --rm \
-			-v `pwd`/dist/urth:/usr/local/lib/python3.4/dist-packages/urth \
-			$(REPO) bash -c 'python3 -m unittest discover /usr/local/lib/python3.4/dist-packages/urth'
+	@echo 'Running python tests in $(PYTHON)...'
+	@$(MAKE) _test-py-$(PYTHON)
 
-test-scala: REPO?=cloudet/sbt-sparkkernel-image:1.5.1
+_test-py-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
+_test-py-python2: CMD=python --version; python -m unittest discover $(EXTENSION_DIR)
+_test-py-python2: SETUP_CMD=source activate python2; pip install -U mock;
+_test-py-python2: _dev
+
+_test-py-python3: EXTENSION_DIR=/usr/local/lib/python3.4/dist-packages/urth
+_test-py-python3: CMD=python --version; python -m unittest discover $(EXTENSION_DIR)
+_test-py-python3: _dev
+
 test-scala:
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala tests...'
@@ -185,7 +170,7 @@ else
 	@echo 'Running scala tests...'
 	@docker run -it --rm \
 		-v `pwd`/kernel-scala:/src \
-		$(REPO) bash -c 'cp -r /src /tmp/src && \
+		cloudet/sbt-sparkkernel-image:1.5.1 bash -c 'cp -r /src /tmp/src && \
 			cd /tmp/src && \
 			sbt test'
 endif
@@ -193,29 +178,58 @@ endif
 testdev: | $(URTH_COMP_LINKS)
 	@npm run test -- -p
 
-install: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 install: CMD?=exit
-install:
-	@docker run -it --rm \
-		-v `pwd`:/src \
-		$(REPO) bash -c 'cd /src/dist && \
-			pip install --no-binary :all: $$(ls -1 *.tar.gz | tail -n 1) && \
-			$(CMD)'
+install: SERVER_NAME?=urth_widgets_install_validation
+install: OPTIONS?=-it --rm
+install: _run-$(PYTHON)
 
-server: REPO?=cloudet/all-spark-notebook-bower:1.5.1
 server: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
 server: SERVER_NAME?=urth_widgets_server
 server: OPTIONS?=-it --rm
-server:
-	@echo 'Starting server... $(SERVER_NAME)'
+server: PORT_MAP?=-p 9500:8888
+server: VOL_MAP?=-v `pwd`/notebooks:/home/jovyan/work
+server: _run-$(PYTHON)
+
+_run-python3: _run
+
+_run-python2: SETUP_CMD=source activate python2; pip install ipython[notebook]==3.2;
+_run-python2: _run
+
+_run:
+	@echo 'Running container named $(SERVER_NAME) in $(PYTHON)'
 	@docker run $(OPTIONS) --name $(SERVER_NAME) \
-		-p 9500:8888 \
+		$(PORT_MAP) \
 		-e USE_HTTP=1 \
 		-v `pwd`:/widgets-nbexts \
-		-v `pwd`/notebooks:/home/jovyan/work \
-		$(REPO) bash -c 'git config --global core.askpass true && \
+		$(VOL_MAP) \
+		$(REPO) bash -c '$(SETUP_CMD) \
 			pip install --no-binary ::all: $$(ls -1 /widgets-nbexts/dist/*.tar.gz | tail -n 1) && \
 			$(CMD)'
+
+dev: CMD?=sh -c "python --version; ipython notebook --no-browser --port 8888 --ip='*'"
+dev: .watch dist
+	@CMD='$(CMD)' $(MAKE) _dev-$(PYTHON)
+	@$(MAKE) clean-watch
+
+_dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
+_dev-python2: SETUP_CMD=source activate python2; pip install ipython[notebook]==3.2;
+_dev-python2: _dev
+
+_dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.4/site-packages/urth
+_dev-python3: _dev
+
+_dev: NB_HOME?=/home/jovyan/.ipython
+_dev:
+	@docker run -it --rm \
+		-p 8888:8888 \
+		-e USE_HTTP=1 \
+		-e JVM_OPT=-Dlog4j.logLevel=trace \
+		-v `pwd`/dist/urth_widgets:$(NB_HOME)/nbextensions/urth_widgets \
+		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
+		-v `pwd`/etc:$(NB_HOME)/profile_default/nbconfig \
+		-v `pwd`/etc/ipython_notebook_config.py:$(NB_HOME)/profile_default/ipython_notebook_config.py \
+		-v `pwd`/notebooks:/home/jovyan/work \
+		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'
 
 system-test: BASEURL?=http://192.168.99.100:9500
 system-test: TEST_SERVER?=ondemand.saucelabs.com
