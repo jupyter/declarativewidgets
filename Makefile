@@ -1,13 +1,14 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: help clean sdist dist dev docs test test-js test-py test-scala init server install dev-build system-test .killwatch
+.PHONY: help clean sdist dist dev docs test test-js test-py test-scala init server install dev-build system-test clean-watch
 .SUFFIXES:
 MAKEFLAGS=-r
 
 help:
 	@echo '       init - setups machine with base requirements for dev'
 	@echo '      clean - clean build files'
+	@echo 'clean-watch - tries to stop the file watch started by dev'
 	@echo '        dev - start container with source mounted for development'
 	@echo '       docs - start container that serves documentation'
 	@echo '      sdist - build a source distribution'
@@ -48,7 +49,7 @@ clean:
 	@npm run watch &
 	@touch .watch
 
-.killwatch:
+clean-watch:
 	@echo 'Killing watch'
 	-@rm .watch
 	-@kill -9 `pgrep gulp`
@@ -71,9 +72,9 @@ dev: .watch dist
 		-v `pwd`/notebooks:/home/jovyan/work \
 		$(REPO) bash -c 'git config --global core.askpass true && \
 			$(CMD)'
-	@make .killwatch
+	@$(MAKE) clean-watch
 
-dist/urth_widgets/js: ${shell find nb-extension}
+dist/urth_widgets/js: ${shell find nb-extension/js}
 	@echo 'Moving src/nb-extension'
 	@mkdir -p dist/urth_widgets/js
 	@cp -R nb-extension/js/* dist/urth_widgets/js/.
@@ -91,12 +92,12 @@ dist/urth_widgets/bower_components: bower_components ${shell find elements} | $(
 
 dist/urth_widgets: dist/urth_widgets/bower_components dist/urth_widgets/js dist/urth_widgets/elements
 
-dist/urth/widgets/urth_import.py: nb-extension/python/urth/widgets/urth_import.py
+dist/urth/widgets/ext: ${shell find nb-extension/python/urth/widgets/ext}
 	@echo 'Moving frontend extension code'
-	@mkdir -p dist/urth/widgets
-	@cp -R nb-extension/python/urth/widgets/urth_import.py dist/urth/widgets/urth_import.py
+	@mkdir -p dist/urth/widgets/ext
+	@cp -R nb-extension/python/urth/widgets/ext/* dist/urth/widgets/ext/.
 
-dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/urth_import.py
+dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/ext
 	@echo 'Moving python code'
 	@mkdir -p dist/urth
 	@cp -R kernel-python/urth/* dist/urth/.
@@ -136,12 +137,14 @@ dist/docs/site/generated_docs.json: dist/docs/site bower_components ${shell find
 	@echo 'Running hydrolysis to generate doc json'
 	@node etc/docs/hydrolyze_elements.js 'etc/docs/urth-elements.html' 'dist/docs/site/generated_docs.json'
 
-dist: dist/urth_widgets dist/urth dist/urth_widgets/urth-widgets.jar dist/docs
+dist/VERSION: COMMIT=$(shell git rev-parse --short=12 --verify HEAD)
+dist/VERSION:
+	@mkdir -p dist
+	@echo "$(COMMIT)" > dist/VERSION
+
+dist: dist/urth_widgets dist/urth dist/urth_widgets/urth-widgets.jar dist/docs dist/VERSION
 
 sdist: REPO?=cloudet/all-spark-notebook-bower:1.5.1
-sdist: RELEASE?=
-sdist: GIT_COMMIT?=HEAD
-sdist: BUILD_NUMBER?=0
 sdist: dist
 	@cp -R MANIFEST.in dist/.
 	@cp -R setup.py dist/.
@@ -149,7 +152,6 @@ sdist: dist
 		-v `pwd`/dist:/src \
 		$(REPO) bash -c 'cp -r /src /tmp/src && \
 			cd /tmp/src && \
-			echo "$(BUILD_NUMBER)-$(GIT_COMMIT)" > VERSION && \
 			python setup.py sdist && \
 			cp -r dist/*.tar.gz /src/.'
 
@@ -232,9 +234,7 @@ else
 	@echo 'Skipping system tests...'
 endif
 
-
-
 docs: DOC_PORT?=4001
 docs: .watch dist/docs
 	@echo "Serving docs at http://127.0.0.1:$(DOC_PORT)"
-	@bash -c "trap 'make .killwatch' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
+	@bash -c "trap 'make clean-watch' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"

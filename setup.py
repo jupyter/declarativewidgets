@@ -8,9 +8,18 @@ from setuptools.command.install import install
 from IPython.html.nbextensions import install_nbextension
 from IPython.html.services.config import ConfigManager
 
-VERSION_FILE = os.path.join(os.path.dirname(__file__), 'VERSION')
-EXT_DIR = os.path.join(os.path.dirname(__file__), 'urth_widgets')
-SERVER_EXT_CONFIG = "c.NotebookApp.server_extensions.append('urth.widgets.urth_import')"
+
+# Get location of this file at runtime
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+# Eval the version tuple and string from the source
+VERSION_NS = {}
+with open(os.path.join(HERE, 'urth/widgets/ext/_version.py')) as f:
+    exec(f.read(), {}, VERSION_NS)
+
+EXT_DIR = os.path.join(HERE, 'urth_widgets')
+SERVER_EXT_CONFIG = "c.NotebookApp.server_extensions.append('urth.widgets.ext.urth_import')"
+VERSION_FILE = os.path.join(HERE, 'VERSION')
 
 class InstallCommand(install):
     def run(self):
@@ -39,23 +48,23 @@ class InstallCommand(install):
                 fh.write(SERVER_EXT_CONFIG)
 
 # Apply version to build
-VERSION = '0.1'
 if os.path.isfile(VERSION_FILE):
     # CI build, read metadata and append
     with open(VERSION_FILE, 'r') as fh:
         BUILD_INFO = fh.readline().strip()
-    BUILD_NUM, _ = BUILD_INFO.split('-')
-    VERSION += '.dev' + BUILD_NUM
-else:
-    # Local development build
-    VERSION += '.dev0'
+        fh.close()
+
+    with open(VERSION_FILE, 'w') as fh:
+        fh.write(VERSION_NS['__version__'] + '\n')
+        fh.write(BUILD_INFO + '\n')
+        fh.close()
 
 setup(
-    name='urth-widgets-nbexts',
+    name='jupyter_declarativewidgets',
     author='Jupyter Community',
     maintainer='Jupyter Community',
     description='IPython / Jupyter extensions for supporting declarative widgets',
-    version=VERSION,
+    version=VERSION_NS['__version__'],
     license='BDS',
     platforms=['IPython Notebook 3.x'],
     packages=find_packages(),
