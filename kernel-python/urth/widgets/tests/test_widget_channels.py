@@ -5,7 +5,11 @@
 
 import unittest
 from IPython.kernel.comm import Comm
-from unittest.mock import Mock
+
+try:
+    from unittest.mock import Mock
+except ImportError as e:
+    from mock import Mock
 
 from ..widget_channels import *
 
