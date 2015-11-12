@@ -61,9 +61,10 @@ if os.path.isfile(VERSION_FILE):
 
 setup(
     name='jupyter_declarativewidgets',
-    author='Jupyter Community',
-    maintainer='Jupyter Community',
+    author='Jupyter Development Team',
+    author_email='jupyter@googlegroups.com',
     description='IPython / Jupyter extensions for supporting declarative widgets',
+    url='https://github.com/jupyter-incubator/declarativewidgets',
     version=VERSION_NS['__version__'],
     license='BDS',
     platforms=['IPython Notebook 3.x'],

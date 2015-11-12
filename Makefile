@@ -152,7 +152,7 @@ sdist: dist
 		-v `pwd`/dist:/src \
 		$(REPO) bash -c 'cp -r /src /tmp/src && \
 			cd /tmp/src && \
-			python setup.py sdist && \
+			python setup.py sdist $(POST_SDIST) && \
 			cp -r dist/*.tar.gz /src/.'
 
 test: REPO?=cloudet/all-spark-notebook-bower:1.5.1
@@ -238,3 +238,6 @@ docs: DOC_PORT?=4001
 docs: .watch dist/docs
 	@echo "Serving docs at http://127.0.0.1:$(DOC_PORT)"
 	@bash -c "trap 'make clean-watch' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
+
+release: POST_SDIST=register upload
+release: sdist
