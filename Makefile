@@ -155,7 +155,7 @@ test-py: dist/urth
 	@$(MAKE) _test-py-$(PYTHON)
 
 _test-py-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
-_test-py-python2: CMD=python --version; python -m unittest discover $(EXTENSION_DIR)
+_test-py-python2: CMD=python --version; python -m unittest discover $(EXTENSION_DIR) "test*[!_py3].py"
 _test-py-python2: SETUP_CMD=source activate python2; pip install -U mock;
 _test-py-python2: _dev
 
