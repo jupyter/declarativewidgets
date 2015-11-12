@@ -34,7 +34,7 @@ class SerializerRegistrar(type):
             serializer_map[cls.klass()] = cls.serialize
 
 
-class BaseSerializer(object, metaclass=SerializerRegistrar):
+class BaseSerializer(object):
     """
     An abstract base class for serializers.
 
@@ -44,6 +44,8 @@ class BaseSerializer(object, metaclass=SerializerRegistrar):
     Adding a new subclass of BaseSerializer in this package will automatically
     register the subclass for use by the Serializer.
     """
+
+    __metaclass__ = SerializerRegistrar
 
     @staticmethod
     def klass():

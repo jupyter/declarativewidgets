@@ -1,13 +1,16 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-""" Utilities related to functions.
-
-"""
+""" Utilities related to functions. """
 
 import inspect
 import json
 
+try:
+    from inspect import signature # Python >=3.3 supports inspect.signature, Python 2.7 does not
+    from .functions_py3 import get_default_vals, parameter_types, required_parameter
+except ImportError:
+    from .functions_py2 import parameter_types, default_parameters, required_parameter
 
 def apply_with_conversion(func, args):
     """ Apply the function with arguments converted to their inferred types.
@@ -93,34 +96,15 @@ def signature_spec(func):
     for param in required_parameter(func):
         names[param]['required'] = True
 
-    default_values = _get_default_vals(func)
+    try:
+        default_values = get_default_vals(func)
+    except NameError:
+        default_values = default_parameters(func)
 
     for param, value in default_values.items():
         names[param]['value'] = value
 
     return names
-
-
-def parameter_types(func):
-    sig = inspect.signature(func)
-
-    types = {}
-    for (name, param) in sig.parameters.items():
-        tpe = _param_type(param)
-        types[name] = tpe
-
-    return types
-
-
-def required_parameter(func):
-    sig = inspect.signature(func)
-
-    required = []
-    for (name, param) in sig.parameters.items():
-        if not _has_default_val(param):
-            required.append(name)
-
-    return required
 
 
 def convert_args(args, spec):
@@ -153,32 +137,3 @@ def _convert(val, tpe, name):
             "Value {} of type {} could not be converted to inferred "
             "type {} for argument {}.".format(val, type(val), tpe, name))
     return val
-
-
-def _non_empty(val):
-    return id(val) != id(inspect._empty)
-
-def _param_type(param):
-    # use the type of the default value if present
-    if _has_default_val(param):
-        return type(param.default)
-
-    # use the annotation if it evaluates to a class
-    if _non_empty(param.annotation) and inspect.isclass(param.annotation):
-        return param.annotation
-
-    # return NoneType if we cannot determine the type
-    return type(None)
-
-def _has_default_val(param):
-    return _non_empty(param.default)
-
-def _get_default_vals(func):
-    sig = inspect.signature(func)
-
-    default = {}
-    for (name, param) in sig.parameters.items():
-        if _has_default_val(param):
-            default.update({name: param.default})
-
-    return default
