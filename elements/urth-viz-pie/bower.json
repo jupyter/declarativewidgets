@@ -1,0 +1,26 @@
+{
+  "name": "urth-viz-pie",
+  "version": "0.0.1",
+  "authors": [
+    "Jupyter Community"
+  ],
+  "description": "Represents a widget that draws a pie chart.",
+  "main": "urth-viz-pie.html",
+  "keywords": [
+    "urth",
+    "pie",
+    "chart",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0"
+  },
+  "private": true
+}

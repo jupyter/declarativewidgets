@@ -1,0 +1,26 @@
+{
+  "name": "urth-viz-area",
+  "version": "0.0.1",
+  "authors": [
+    "Jupyter Community"
+  ],
+  "description": "Represents a widget that draws a area chart.",
+  "main": "urth-viz-area.html",
+  "keywords": [
+    "urth",
+    "area",
+    "chart",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0"
+  },
+  "private": true
+}

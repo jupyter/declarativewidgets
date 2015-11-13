@@ -15,7 +15,8 @@
 <link rel="stylesheet" type="text/css" href="../nvd3/build/nv.d3.css">
 
 <!--
-Represents a widget that draws a chart.
+Helper widget that draws a chart using NVD3, which supports several chart types.                                             
+This widget is not meant to be used directly, but is used by other urth-viz widget implementations.                          
 The chart accepts data via attribute `datarows` and column headers via attribute `columns`:
 
 1. `datarows` should be of type Array of Arrays, representing list of rows.
@@ -59,9 +60,11 @@ The chart accepts data via attribute `datarows` and column headers via attribute
     'use strict';
     var requireConfigured;
 
-    Polymer({
-        is: 'urth-viz-chart',
+    if (typeof Urth == 'undefined') {
+        window.Urth = {};
+    }
 
+    Urth.VizChartCommonBehavior = {
         properties: {
 
             /**
@@ -145,7 +148,6 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             selection: {
                 type: Array,
                 value: function () { return []; },
-                readOnly: true,
                 notify: true
             },
 
@@ -174,8 +176,20 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             }
         },
 
+        // for elements which include VizChartCommonBehavior for containment, propagate render event
+        ready: function() {
+            if (this.is != 'urth-viz-chart') {
+                this.$.chart.addEventListener('urth-viz-chart-render', this.fire.bind(this, 'urth-viz-render'));
+            }
+        }
+    };
+
+    Polymer({
+        is: 'urth-viz-chart',
+
         behaviors: [
-            Polymer.IronResizableBehavior
+            Polymer.IronResizableBehavior,
+            Urth.VizChartCommonBehavior
         ],
 
         listeners: {
@@ -245,7 +259,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 
         _parseColumns: function() {
             var columnSettings = this.columnSettings = [];
-            Array.prototype.forEach.call(this.querySelectorAll(':scope > urth-viz-col'), function (col) {
+            this.queryAllEffectiveChildren('urth-viz-col').forEach(function (col) {
                 if (col.hasAttribute('index')) {
                     var index = col.getAttribute('index');
                     var set = columnSettings[index] = {};
@@ -254,6 +268,9 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                     });
                 }
             });
+
+            // force an update to transform data in required format
+            this.datarows = [].concat(this.datarows);
         },
 
         _update: function() {
@@ -364,11 +381,11 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                         .transition().duration(500)
                         .call(chart);
 
-                    this._setSelection([]);
+                    this.selection = [];
 
                     this.chart[modelProp].dispatch.on('elementClick', function(e) {
                           this.$$('.hover').classList.toggle('selected');
-                          this._setSelection(this._svgSelection(d3).selectAll('.nvd3 .selected').data());
+                          this.selection = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
                     }.bind(this));
 
                     return chart;
@@ -386,8 +403,6 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         },
 
         created: function() {
-            this._parseColumns();
-
             // Need the relative paths for d3 and nvd3 based on the
             // location of this Polymer element. This has to be done
             // inside the element to get the proper path. Calling
@@ -422,6 +437,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                 if (display === 'none' || document.readyState !== 'complete') {
                     this.async(this.ready, 200);
                 } else {
+                    this._parseColumns();
                     this._createChart();
                 }
             });
