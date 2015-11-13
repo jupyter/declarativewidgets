@@ -15,6 +15,7 @@ help:
 	@echo '    install - install latest sdist into a container'
 	@echo '     server - starts a container with extension installed through pip'
 	@echo 'system-test - run system integration tests with selenium'
+	@echo '       test - run all units'
 	@echo '    test-py - run python units'
 	@echo '    test-js - run javascript units'
 	@echo ' test-scala - run scala units'
