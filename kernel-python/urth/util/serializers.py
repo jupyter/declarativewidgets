@@ -18,80 +18,12 @@ NOTE: Due to changed syntax for meta-classes, this is not compatible with
       Python 2.x
 """
 
-# serializer_map maps class names to serialization functions
-serializer_map = {}
-
-
-class SerializerRegistrar(type):
-    """
-    A metaclass used to register each class extending BaseSerializer.
-
-    Specifically, adds a mapping of class to serialization function defined by
-    the subclass of BaseSerializer.
-    """
-    def __init__(cls, name, bases, attrs):
-        if cls.check_packages():
-            serializer_map[cls.klass()] = cls.serialize
-
-
-class BaseSerializer(object):
-    """
-    An abstract base class for serializers.
-
-    Each class extending BaseSerializer should serialize a single class,
-    whose name is returned by klass().
-
-    Adding a new subclass of BaseSerializer in this package will automatically
-    register the subclass for use by the Serializer.
-    """
-
-    __metaclass__ = SerializerRegistrar
-
-    @staticmethod
-    def klass():
-        """The class that this serializer can serialize.
-
-        Returns
-        -------
-        class
-            class object representing the class that this serializer will
-            serialize
-        """
-        pass
-
-    @staticmethod
-    def serialize(obj, **kwargs):
-        """Serializes an object, assumed to have the class returned by `klass()`
-
-        Parameters
-        ----------
-        obj : object
-            The object to serialize. `obj`'s class will be equal to the class
-            returned by `klass()`
-
-        **kwargs : dict
-            Allows for extra parameters to be sent to the serializer
-
-        Returns
-        -------
-        obj
-            The object in serialized form.
-        """
-        pass
-
-    @staticmethod
-    def check_packages():
-        """Serialization may require using external packages.
-
-        Override this function to check whether the packages needed
-        to serialize this serializer's klass can be imported.
-
-        Returns
-        -------
-        boolean
-            True if necessary packages for serialization can be imported.
-        """
-        pass
+import sys
+from urth.util.serializer_registrar import SerializerRegistrar
+if sys.version_info[0] == 2:
+    from urth.util.base_serializer_py2 import BaseSerializer
+else:
+    from urth.util.base_serializer_py3 import BaseSerializer
 
 
 class DataFrameSerializer(BaseSerializer):
