@@ -139,7 +139,7 @@ sdist: dist
 		$(EXTRA_OPTIONS) \
 		$(REPO) bash -c '$(SETUP_CMD) cp -r /src /tmp/src && \
 			cd /tmp/src && \
-			python setup.py sdist $(POST_SDIST) && \
+			python setup.py sdist && \
 			cp -r dist/*.tar.gz /src/.'
 
 test: test-js test-py test-scala
@@ -258,6 +258,24 @@ ifdef SAUCE_USER_NAME
 else
 	@echo 'Skipping system tests...'
 endif
+
+start-selenium:
+	@echo "Installing and starting Selenium Server..."
+	@npm install selenium-standalone@latest
+	@node_modules/selenium-standalone/bin/selenium-standalone install
+	@node_modules/selenium-standalone/bin/selenium-standalone start &
+
+system-test-local: BASEURL?=http://192.168.99.100:9500
+system-test-local: TEST_SERVER?=localhost:4444
+system-test-local: SERVER_NAME?=urth_widgets_integration_test_server
+system-test-local: start-selenium sdist
+	-@docker rm -f $(SERVER_NAME)
+	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server
+	@echo 'Waiting 20 seconds for server to start...'
+	@sleep 20
+	@echo 'Running system integration tests...'
+	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER)
+	-@docker rm -f $(SERVER_NAME)
 
 docs: DOC_PORT?=4001
 docs: .watch dist/docs
