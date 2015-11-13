@@ -17,15 +17,7 @@ before_script:
   - sh -e /etc/init.d/xvfb start
 
 script:
-  - make test-js-remote
-  - make test-py
-  - PYTHON=python2 make test-py
-  - make test-scala
-  - make sdist
-  - make install
-  - PYTHON=python2 make install
-  - BASEURL=http://127.0.0.1:9500 make system-test
-  - BASEURL=http://127.0.0.1:9500 PYTHON=python2 make system-test
+  - make all
 
 notifications:
   slack: cloudet:rMfRKhvsbZuCIRZpTct3kBI4#urth-widgets

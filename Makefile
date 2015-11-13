@@ -15,7 +15,11 @@ help:
 	@echo '    install - install latest sdist into a container'
 	@echo '     server - starts a container with extension installed through pip'
 	@echo 'system-test - run system integration tests with selenium'
-	@echo '       test - run unit tests'
+	@echo '    test-py - run python units'
+	@echo '    test-js - run javascript units'
+	@echo ' test-scala - run scala units'
+	@echo '        all - run all necessary streps to produce and validate a build'
+
 
 init: node_modules
 
@@ -252,6 +256,17 @@ docs: DOC_PORT?=4001
 docs: .watch dist/docs
 	@echo "Serving docs at http://127.0.0.1:$(DOC_PORT)"
 	@bash -c "trap 'make clean-watch' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
+
+all:
+	$(MAKE) test-js-remote
+	$(MAKE) test-py
+	PYTHON=python2 $(MAKE) test-py
+	$(MAKE) test-scala
+	$(MAKE) sdist
+	$(MAKE) install
+	PYTHON=python2 $(MAKE) install
+	BASEURL=http://127.0.0.1:9500 $(MAKE) system-test
+	BASEURL=http://127.0.0.1:9500 PYTHON=python2 $(MAKE) system-test
 
 release: POST_SDIST=register upload
 release: sdist
