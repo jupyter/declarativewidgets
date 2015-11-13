@@ -196,7 +196,7 @@ server: _run-$(PYTHON)
 
 _run-python3: _run
 
-_run-python2: SETUP_CMD=source activate python2; pip install ipython[notebook]==3.2;
+_run-python2: SETUP_CMD=source activate python2; pip install futures==3.0.3; pip install ipython[notebook]==3.2;
 _run-python2: _run
 
 _run:
@@ -216,7 +216,7 @@ dev: .watch dist
 	@$(MAKE) clean-watch
 
 _dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
-_dev-python2: SETUP_CMD=source activate python2; pip install ipython[notebook]==3.2;
+_dev-python2: SETUP_CMD=source activate python2; pip install futures==3.0.3; pip install ipython[notebook]==3.2;
 _dev-python2: _dev
 
 _dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.4/site-packages/urth
