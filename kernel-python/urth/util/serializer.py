@@ -16,7 +16,12 @@ in the urth.util.serializers package.
 
 """
 
-import urth.util.serializers as serializers
+import sys
+
+if sys.version_info[0] == 2:
+    import urth.util.serializers_py2 as serializers
+else:
+    import urth.util.serializers_py3 as serializers
 
 
 class Serializer():
