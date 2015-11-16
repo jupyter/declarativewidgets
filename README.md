@@ -22,7 +22,7 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 
 ## Runtime Requirements
 
-* IPython Notebook 3.2.x (not Jupyter Notebook 4.x, yet) running on Python 3.x
+* IPython Notebook 3.2.x (not Jupyter Notebook 4.x, yet) running on Python 3.x or Python 2.7.x
 * Bower - Necessary for installing 3rd party elements straight out of notebook
 * Spark Kernel if wanting to run Spark using Scala
 
@@ -80,6 +80,15 @@ To see the Jupyter instance with extensions working:
 1. Run `docker-machine ls` and note the IP of the dev machine.
 2. Visit http://THAT_IP:8888 in your browser
 
+##### Develop Against Python 2.7
+
+You can run a development environment against python 2.7 by adding an environment variable to your make calls.
+
+```
+# Run a development environment against 2.7
+PYTHON=python2 make dev
+```
+
 ## Build & Package
 
 Run `make sdist` to create a `pip` installable archive file in the `dist` directory. To test the package, run 'make server'. This command will run a docker container and pip install the package. It is usefull to validate the packaing and installation.
@@ -89,12 +98,13 @@ Run `make sdist` to create a `pip` installable archive file in the `dist` direct
 Ensure you have the following prerequisites met:
 * IPython Notebook 3.2.x (no Jupyter Notebook 4.x-pre yet)
 * Notebook instance running out of `profile_default`
-* Make sure you installing and running on a Python3 environment. (i.e. python, ipython, and pip)
 * Bower
 
 > Note: <br>
 > You should be able to install that tarball using pip anywhere you please with one caveat: the setup.py assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at pip install time.
 
+##### Additional requirements for Python 2.7
+* `pip install futures==3.0.3` 
 
 ## Test
 
@@ -137,7 +147,7 @@ The browser tests are written using the [Web Component Tester](https://github.co
 
 Tests are located in the `test` directory of each Polymer element in `elements/`.
 
-### Debugging Web Component Tester Test Failures
+##### Debugging Web Component Tester Test Failures
 
 Here are some steps that are useful for debugging test failures:
 
@@ -150,6 +160,15 @@ make testdev
 
     http://localhost:2000/generated-index.html
 4. Open the developer tools for the browser and refresh. The tests should execute and then stop at the `debugger;` line. The code can now be debugged by stepping through it in the developer tools debugger.
+
+##### Testing Against Python 2.7
+
+You can run a tests against python 2.7 by adding an environment variable to your make calls.
+
+```
+# Run unit tests against 2.7
+PYTHON=python2 make test
+```
 
 ## Documentation
 

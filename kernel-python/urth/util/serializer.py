@@ -17,6 +17,7 @@ in the urth.util.serializers package.
 """
 
 import urth.util.serializers as serializers
+import urth.util.serializer_registrar as sr
 
 
 class Serializer():
@@ -69,8 +70,7 @@ class Serializer():
             A map of classes to serialization functions.
 
         """
-
-        return serializers.serializer_map
+        return sr.serializer_map
 
     def _valid_serializer(self, cls):
         """Checks whether a class name represents a valid serializer class.
