@@ -21,29 +21,42 @@
     'use strict';
     window.Urth = window.Urth || {};
     Urth.DomBindBehavior = {
+        /**
+         * Fired whenever DOM is stamped by this template (rendering
+         * will be deferred until all HTML imports have resolved).
+         *
+         * @event dom-change
+         */
+
         created: function() {
             // Ensure dom-bind doesn't stamp until all possible dependencies
             // have resolved
-            // CHANGED: This line was modified from the original source.
-            // Polymer.ImportStatus.whenLoaded(this._markImportsReady.bind(this));
-            this._markImportsReady();
+            var self = this;
+            Polymer.RenderStatus.whenReady(function() {
+                 self._markImportsReady();
+            });
         },
+
         _ensureReady: function() {
             if (!this._readied) {
                 this._readySelf();
             }
         },
+
         _markImportsReady: function() {
             this._importsReady = true;
             this._ensureReady();
         },
+
         _registerFeatures: function() {
             this._prepConstructor();
         },
+
         _insertChildren: function() {
             var parentDom = Polymer.dom(Polymer.dom(this).parentNode);
             parentDom.insertBefore(this.root, this);
         },
+
         _removeChildren: function() {
             if (this._children) {
                 for (var i = 0; i < this._children.length; i++) {
@@ -51,11 +64,13 @@
                 }
             }
         },
+
         _initFeatures: function() {
             // defer _initFeatures and stamping until after attached, to support
             // document.createElement('template', 'dom-bind') use case,
             // where template content is filled in after creation
         },
+
         // avoid scoping elements as we expect dom-bind output to be in the main
         // document
         _scopeElementClass: function(element, selector) {
@@ -65,27 +80,29 @@
                 return selector;
             }
         },
+
         _prepConfigure: function() {
             var config = {};
             for (var prop in this._propertyEffects) {
-                // Otherwise this will attempt to look for properties in
-                // the __data__ field, which isn't initialized until
-                // Polymer.Base._initFeatures() is called.
-                if (this.__data__){
-                    config[prop] = this[prop];
-                }
+                config[prop] = this[prop];
             }
             // Pass values set before attached as initialConfig to _setupConfigure
-            this._setupConfigure = this._setupConfigure.bind(this, config);
+            var setupConfigure = this._setupConfigure;
+            this._setupConfigure = function() {
+                setupConfigure.call(this, config);
+            };
         },
+
         attached: function() {
             if (this._importsReady) {
                 this.render();
             }
         },
+
         detached: function() {
             this._removeChildren();
         },
+
         /**
          * Forces the element to render its content. This is typically only
          * necessary to call if HTMLImports with the async attribute are used.
@@ -99,8 +116,9 @@
                 this._prepBehaviors();
                 this._prepConfigure();
                 this._prepBindings();
+                this._prepPropertyInfo();
                 Polymer.Base._initFeatures.call(this);
-                this._children = Array.prototype.slice.call(this.root.childNodes);
+                this._children = Polymer.DomApi.arrayCopyChildNodes(this.root);
             }
             this._insertChildren();
             this.fire('dom-change');
