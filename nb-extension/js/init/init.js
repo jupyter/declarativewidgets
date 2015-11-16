@@ -22,26 +22,26 @@ define([
                 var deferred = $.Deferred();
 
                 return {
-                    href: bower_root + '/urth-core-channels/urth-core-channels.html',
+                    href: bower_root + '/urth-core-channel/urth-core-channel-broker.html',
                     onload: function() {
                         // Add the global data channel to the document body.
-                        var dataChannel = document.createElement('urth-core-channels');
-                        dataChannel.setAttribute('id', 'urthChannels');
-                        dataChannel.register(dataChannel, '*');
-                        dataChannel.addEventListener('connected', function() {
+                        var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
+                        broker.addEventListener('connected', function() {
                             deferred.resolve();
                         });
-                        document.body.appendChild(dataChannel);
 
                         // Exposing a global
-                        window.UrthData = dataChannel;
+                        window.UrthData = broker;
                     },
                     promise: deferred.promise()
                 };
             })(),
+            { href: bower_root + '/urth-core-channel/urth-core-channel.html' },
+            { href: bower_root + '/urth-core-channel/urth-core-channel-item.html' },
             { href: bower_root + '/urth-core-import/urth-core-import.html' },
             { href: bower_root + '/urth-core-dataframe/urth-core-dataframe.html' },
             { href: bower_root + '/urth-core-function/urth-core-function.html' },
+            { href: bower_root + '/urth-core-storage/urth-core-storage.html' },
             { href: bower_root + '/urth-core-watch/urth-core-watch.html' }
         ];
 

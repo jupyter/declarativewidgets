@@ -1,0 +1,366 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../urth-core-behaviors/jupyter-widget-behavior.html">
+<link rel="import" href="../urth-core-behaviors/jupyter-kernel-observer.html">
+<link rel="import" href="../urth-core-storage/urth-core-storage.html">
+
+<!--
+`urth-core-channel-broker` is a singleton element that is used to
+coordinate communication between `urth-core-channel` elements and
+the model. _This element is not intended for use as a standalone element._
+
+Example: _Retrieve the singleton instance._
+
+```javascript
+var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
+```
+
+@group Urth Core
+@element urth-core-channel-broker
+-->
+<dom-module id='urth-core-channel-broker'>
+    <template>
+        <urth-core-storage id='storage' collection='CHANNEL'>
+        </urth-core-storage>
+    </template>
+
+    <script>
+    (function() {
+        'use strict';
+
+        // A channel is a set of channel data, and a list of registered
+        // listeners for channel changes.
+        var initChannel = function(channelName) {
+            return {
+                'elements': [],
+                'data': {},
+                'initialized': false,
+                'name': channelName
+            };
+        };
+
+        // Maps channel names to channels objects.
+        var _globalChannels = {};
+
+        var singleton;
+
+        window.Urth = window.Urth || {};
+
+        window.Urth['urth-core-channel-broker'] = Polymer({
+            is: 'urth-core-channel-broker',
+            behaviors: [
+                Urth.JupyterWidgetBehavior,
+                Urth.JupyterKernelObserver
+            ],
+
+            /**
+             * Fired on any registered `urth-core-channel` elements when a
+             * property is modified on the channel.
+             *
+             * @event urth-channel-data-update
+             */
+
+            /**
+             * Registers an `urth-core-channel` element with the
+             * specified channel.
+             *
+             * @method addChannelElement
+             * @param {String} channelName The name of the channel.
+             * @param {HTMLElement} element An `urth-core-channel` DOM element.
+             * @return {Object} The data currently set on the specified channel.
+             */
+            addChannelElement: function(channelName, element) {
+                var channel = this._getOrCreateGlobalChannel(channelName);
+                var data = channel ? channel.data : {};
+
+                if (element && channel && channel.elements.indexOf(element) === -1) {
+                    channel.elements.push(element);
+                }
+
+                return data;
+            },
+
+            /**
+             * Clears all the data in the specified channel.
+             *
+             * @method clear
+             * @param {String} channelName The name of the channel.
+             */
+            clear: function(channelName) {
+                var globalChannel = this._getOrCreateGlobalChannel(channelName);
+                if (globalChannel) {
+                    // Iterate through all the properties and unset
+                    // them so registered elements get notified of
+                    // the data clear.
+                    Object.keys(globalChannel.data).forEach(function(key) {
+                        // Specifying no value so it gets cleared.
+                        this.set(channelName, key, undefined);
+                    }.bind(this))
+                    globalChannel.data = {};
+
+                    // Remove the channel data from storage.
+                    this.$.storage.remove(globalChannel.name);
+                }
+            },
+
+            detached: function() {
+                // Remove any event listeners that were previously added.
+                if (this._saveHandler) {
+                    this.removeEventCallback('before_save.Notebook', this._saveHandler);
+                }
+            },
+
+            /**
+             * Retrieves the value of the specified key on the specified
+             * channel or undefined if the key has not been set.
+             *
+             * @method get
+             * @param {String} channelName The name of the channel to use.
+             * @param {String} key The key of the value to return.
+             * @return {Object} The value stored for the key or undefined.
+             */
+            get: function(channelName, key) {
+                var globalChannel = this._getGlobalChannel(channelName);
+                if (globalChannel){
+                    return key ? globalChannel.data[key] : globalChannel.data;
+                }
+            },
+
+            /**
+             * When a kernel is available and ready, this handler sends the request
+             * to create a new kernel side channels proxy and establishes the comm.
+             *
+             * @method onKernelReady
+             */
+            onKernelReady: function() {
+                console.debug('urth-core-channel-broker onKernelReady, creating model...');
+                this.createModel('urth.widgets.widget_channels.Channels', 10);
+            },
+
+            /**
+             * Calls to this method occur when users make changes to channel data using
+             * the kernel language.
+             *
+             * @method onModelChange
+             * @param {Object} options
+             */
+            onModelChange: function(options) {
+                console.debug('urth-core-channel-broker onModelChange', options);
+
+                var changes = options.changed;
+                Object.keys(changes).filter(function(change){
+                    return this._validPath(change);
+                }.bind(this)).forEach(function(change){
+                    console.debug('urth-core-channel-broker onModelChange changed ', change, changes[change]);
+                    /**
+                     * Handle an item change represented by the given path and value.
+                     * The path is of the form <CHANNEL_NAME>:<ITEM_NAME>, e.g. "c:user".
+                     */
+                    var path = change.split(':');
+                    this.set(path[0], path[1], changes[change]);
+                }.bind(this));
+            },
+
+            onModelReady: function() {
+                console.debug('urth-core-channel-broker onModelReady');
+            },
+
+            ready: function() {
+                // Add event listener for saves of the notebook.
+                this._saveHandler = this._saveAll.bind(this);
+                this.addEventCallback('before_save.Notebook', this._saveHandler);
+            },
+
+            /**
+             * Reloads the data on the channel from saved values in storage
+             * for the specified channel name.
+             *
+             * @method save
+             * @param {String} channelName The name of the channel to reload.
+             */
+            reload: function(channelName) {
+                var globalChannel = this._getGlobalChannel(channelName);
+                var data = this.$.storage.get(globalChannel ?
+                        globalChannel.name : channelName);
+                if (data) {
+                    Object.keys(data).forEach(function(dataKey) {
+                        this.set(channelName, dataKey, data[dataKey]);
+                    }.bind(this));
+                }
+            },
+
+            /**
+             * Unregisters an `urth-core-channel` element with the specified
+             * channel.
+             *
+             * @method removeChannelElement
+             * @param {String} channelName The name of the channel.
+             * @param {HTMLElement} element An `urth-core-channel` DOM element.
+             * @return {Object} The data associated with the specified channel.
+             */
+            removeChannelElement: function(channelName, element) {
+                var channel = this._getGlobalChannel(channelName);
+                var data = channel ? channel.data : {};
+
+                if (channel && element) {
+                    var index = channel.elements.indexOf(element);
+                    if (index !== -1) {
+                        channel.elements.splice(index, 1);
+                    }
+                }
+
+                return data;
+            },
+
+            /**
+             * Saves the data on the channel to storage.
+             *
+             * @method save
+             * @param {String} channelName The name of the channel to save.
+             */
+            save: function(channelName) {
+                var globalChannel = this._getGlobalChannel(channelName);
+                if (globalChannel) {
+                    if (globalChannel.data) {
+                        this.$.storage.set(globalChannel.name, globalChannel.data);
+                    } else {
+                        this.$.storage.remove(globalChannel.name);
+                    }
+                }
+            },
+
+            /**
+             * Sets the value of a key on the channel. Setting a value
+             * will set the property value on all registered elements. Creates
+             * the channel if it does not exist. Fires an `urth-channel-data-update`
+             * event on any `urth-core-channel-elements` registered with the
+             * specified channel.
+             *
+             * @method set
+             * @param {String} channelName The name of the channel.
+             * @param {String} key The key to be associated with the value.
+             * @param {Object} value The value to set.
+             */
+            set: function(channelName, key, value) {
+                var globalChannel = this._getOrCreateGlobalChannel(channelName);
+                if (!globalChannel) {
+                    return;
+                }
+                channelName = globalChannel.name;
+                var oldVal = globalChannel && key ? this.get(channelName, key) : undefined;
+
+                if (key && globalChannel && oldVal !== value) {
+                    // 'undefined' value results in a delete of the key.
+                    if (typeof value === 'undefined') {
+                        globalChannel.data[key] = null;
+                        delete globalChannel.data[key];
+                    } else {
+                        globalChannel.data[key] = value;
+                    }
+
+                    this._sendItem(key, value, oldVal, channelName);
+
+                    globalChannel.elements.forEach(function(channelElement) {
+                        channelElement.fire('urth-channel-data-update', {
+                            key: key,
+                            oldValue: oldVal,
+                            value: value
+                        });
+                    }.bind(this));
+                }
+            },
+
+            _createGlobalChannel: function(channelName) {
+                if (!_globalChannels[channelName]) {
+                    _globalChannels[channelName] = initChannel(channelName);
+                    if (!_globalChannels[channelName].initialized) {
+                        this.reload(channelName);
+                        _globalChannels[channelName].initialized = true;
+                    }
+                    console.debug('urth-core-channel-broker _createGlobalChannel: ' +
+                        'created new channel', channelName, '.'
+                    );
+                }
+                return _globalChannels[channelName];
+            },
+
+            _getGlobalChannel: function(channelName) {
+                channelName = channelName || 'default';
+
+                if (_globalChannels[channelName]) {
+                    return _globalChannels[channelName];
+                } else {
+                    console.warn('urth-core-channel-broker _getGlobalChannel: ' +
+                        'channel', channelName, 'does not exist'
+                    );
+                }
+            },
+
+            _getOrCreateGlobalChannel: function(channelName) {
+                channelName = channelName || this.name || 'default';
+                var channel = this._getGlobalChannel(channelName);
+                return channel ? channel : this._createGlobalChannel(channelName);
+            },
+
+            _saveAll: function() {
+                Object.keys(_globalChannels).forEach(function(channel) {
+                    this.save(channel);
+                }.bind(this));
+            },
+
+            /**
+             * Sends the specified update to the model.
+             *
+             * @method sendItem
+             * @param {String} key The key that is being modified.
+             * @param {Object} newVal The new value to set for the key.
+             * @param {Object} oldVal The old value for the key.
+             * @param {String} channelName The string name of the channel to update.
+             */
+            _sendItem: function(key, newVal, oldVal, channelName) {
+                if (key && channelName) {
+                    if (this.model) {
+                        this.model.set(channelName + ':' + key, newVal, {silent : true});
+                    }
+                    this.send({
+                        event: 'change',
+                        data: {
+                            name: key,
+                            old_val: oldVal,
+                            new_val: newVal,
+                            channel: channelName
+                        }
+                    });
+                }
+            },
+
+            /**
+             * Decides whether the given string is valid for use.
+             *
+             * @method _validPath
+             * @param {String} path The path string to evalute.
+             * @return {Boolean} true if the path is valid.
+             */
+            _validPath: function(path){
+                var pathRegex = RegExp('[a-zA-Z_0-9]+:[a-zA-Z_0-9]+');
+                return pathRegex.exec(path);
+            }
+        });
+
+        /**
+         * Retrieves the singleton instance of `urth-core-channel-broker`.
+         *
+         * @method getChannelBroker
+         * @return {HTMLElement} The singleton `urth-core-channel-broker` element.
+         */
+        Urth['urth-core-channel-broker'].getChannelBroker = function() {
+            if (!singleton) {
+                singleton = new Urth['urth-core-channel-broker']();
+            }
+            return singleton;
+        }
+    })();
+</script>

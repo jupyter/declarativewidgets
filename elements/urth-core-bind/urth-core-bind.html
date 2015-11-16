@@ -4,7 +4,7 @@
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="./dom-bind-behavior.html">
-<link rel="import" href="../urth-core-channels/urth-core-channels-behavior.html">
+<link rel="import" href="../urth-core-channel/urth-core-channel.html">
 
 <!--
  Provides a mechanism to enable [Polymer binding](https://www.polymer-project.org/1.0/docs/devguide/data-binding.html)
@@ -27,49 +27,66 @@
  @group Urth Core
  @element urth-core-bind
  -->
-<script>
-    'use strict';
+<dom-module id='urth-core-bind'>
+    <script>
+    (function() {
+        'use strict';
 
-    window.Urth = window.Urth || {};
+        window.Urth = window.Urth || {};
 
-    window.Urth['urth-core-bind'] = Polymer({
-        /**
-         * Fired when DOM is stamped by this template.
-         *
-         * @event dom-change
-         */
+        window.Urth['urth-core-bind'] = Polymer({
+            /**
+             * Fired when DOM is stamped by this template.
+             *
+             * @event dom-change
+             */
 
-        is: 'urth-core-bind',
+            is: 'urth-core-bind',
+            extends: 'template',
+            properties: {
+                channel: {
+                    type: String,
+                    observer: '_onChannelChange'
+                }
+            },
+            behaviors: [Urth.DomBindBehavior],
 
-        properties: {
-            channel: {
-                type: String,
-                value: 'default',
-                observer: '_onChannelChange'
+            attached: function() {
+                this._createChannel();
+            },
+
+            detached: function() {
+                // Unregister from the channel when element is detached.
+                this.channelElement.unregister(this);
+            },
+
+            _createChannel: function() {
+                if (!this.channelElement) {
+                    this.channelElement = document.createElement('urth-core-channel');
+                    if (this.channel) {
+                        this.channelElement.setAttribute('name', this.channel);
+                    }
+                    Polymer.dom(this.root).appendChild(this.channelElement);
+                    this.channelElement.register(this);
+                }
+            },
+
+            _onChannelChange: function(newVal, oldVal) {
+                if (!this.channelElement) {
+                    this._createChannel();
+                } else {
+                    this.channelElement.setAttribute('name', newVal);
+                }
+            },
+
+            _propertyChanged: function(property, newVal, oldVal) {
+                // Only set the update on the channel if it is an actual
+                // value change. Channel change is handled separately.
+                if (newVal !== oldVal && property !== 'channel') {
+                    this.channelElement.set(property, newVal);
+                }
             }
-        },
-
-        extends: 'template',
-        behaviors: [Urth.DomBindBehavior, Urth.ChannelsBehavior],
-
-        detached: function() {
-            // Unregister from the channel when element is detached.
-            this.unregister(this, this.channel);
-        },
-
-        _onChannelChange: function(newVal, oldVal){
-            // Only change the channel if it is an actual value change.
-            if (newVal !== oldVal){
-                this.switchChannel(this, newVal, oldVal);
-            }
-        },
-
-        _propertyChanged: function(property, newVal, oldVal) {
-            // Only set the update on the channel if it is an actual
-            // value change. Channel change is handled separately.
-            if (newVal !== oldVal && property !== 'channel') {
-                this.setItem(property, newVal, this.channel);
-            }
-        }
-    });
-</script>
+        });
+    })();
+    </script>
+</dom-module>

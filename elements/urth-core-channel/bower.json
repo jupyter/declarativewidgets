@@ -1,11 +1,11 @@
 {
-  "name": "urth-core-channels",
+  "name": "urth-core-channel",
   "version": "0.0.1",
   "authors": [
     "Jupyter Community"
   ],
-  "description": "Monostate data channels.",
-  "main": "urth-core-channels.html",
+  "description": "Monostate data channel.",
+  "main": "urth-core-channel.html",
   "keywords": [
     "urth",
     "web-components",
