@@ -23,14 +23,22 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 ## Runtime Requirements
 
 * IPython Notebook 3.2.x (not Jupyter Notebook 4.x, yet) running on Python 3.x or Python 2.7.x
+* Notebook instance running out of `profile_default`
 * Bower - Necessary for installing 3rd party elements straight out of notebook
 * Spark Kernel if wanting to run Spark using Scala
 
 Note: These are satisfied automatically when you follow the setup instructions below.
 
+##### Additional requirements for Python 2.7
+* `pip install futures==3.0.3`
+
 ## Try It
 
 We're running a tmpnb instance at [http://jupyter.cloudet.xyz](http://jupyter.cloudet.xyz) with a snapshot of this project (and other related incubator projects) pre-installed.
+
+## Install It
+
+`pip install jupyter_declarativewidgets` and then restart your notebook server
 
 ## Develop
 
@@ -91,20 +99,7 @@ PYTHON=python2 make dev
 
 ## Build & Package
 
-Run `make sdist` to create a `pip` installable archive file in the `dist` directory. To test the package, run 'make server'. This command will run a docker container and pip install the package. It is usefull to validate the packaing and installation.
-
-## Install
-
-Ensure you have the following prerequisites met:
-* IPython Notebook 3.2.x (no Jupyter Notebook 4.x-pre yet)
-* Notebook instance running out of `profile_default`
-* Bower
-
-> Note: <br>
-> You should be able to install that tarball using pip anywhere you please with one caveat: the setup.py assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at pip install time.
-
-##### Additional requirements for Python 2.7
-* `pip install futures==3.0.3` 
+Run `make sdist` to create a `pip` installable archive file in the `dist` directory. To test the package, run 'make server'. This command will run a docker container and pip install the package. It is useful to validate the packaging and installation. You should be able to install that tarball using pip anywhere you please with one caveat: the setup.py assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at pip install time.
 
 ## Test
 
