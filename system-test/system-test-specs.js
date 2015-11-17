@@ -55,7 +55,7 @@ describe('system-test (' + desired.browserName + ')', function() {
         browser
             .init(desired)
             .get('/notebooks/tests/Walkthrough.ipynb')
-            .sleep(5000)
+            .sleep(7000)
             .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, 10000)
             .elementByLinkText("Cell")
             .click()
@@ -84,10 +84,7 @@ describe('system-test (' + desired.browserName + ')', function() {
 
     it('should prints the correct variable that is used for urth-core-function', function(done) {
         browser
-            .elementsByCssSelector('div.output_area').nth(1)
-            .sleep(3000)
-            .elementByCssSelector('>', 'input')
-            .type(' IBM-ET')
+            .sleep(5000)
             .elementsByCssSelector('<', 'div.output_area').nth(2)
             .elementByXPath('//button[text()="invoke"]').click()
             .sleep(5000)
@@ -95,7 +92,7 @@ describe('system-test (' + desired.browserName + ')', function() {
             .elementByXPath('//span[@id="test1"]')
             .text().then(function(txt) {
                 console.log("span test1 is: ", txt);
-                txt.should.include('IBM-ET');
+                txt.should.include('world');
             })
             .nodeify(done);
     });
@@ -103,7 +100,6 @@ describe('system-test (' + desired.browserName + ')', function() {
     it('should bind variable to channel a', function(done) {
         browser
             .elementsByCssSelector('div.output_area').nth(3)
-            .sleep(3000)
             .elementByCssSelector('>', 'input')
             .type('A')
             .elementsByCssSelector('<', 'div.output_area').nth(3)
@@ -118,7 +114,6 @@ describe('system-test (' + desired.browserName + ')', function() {
     it('should bind variable to channel b', function(done) {
         browser
             .elementsByCssSelector('div.output_area').nth(4)
-            .sleep(3000)
             .elementByCssSelector('>', 'input')
             .type('B')
             .elementsByCssSelector('<', 'div.output_area').nth(4)
@@ -133,7 +128,6 @@ describe('system-test (' + desired.browserName + ')', function() {
     it('should bind variables to channels independently', function(done) {
         browser
             .elementsByCssSelector('div.output_area').nth(3)
-            .sleep(3000)
             .elementByCssSelector('>', 'input')
             .type('2')
             .elementsByCssSelector('<', 'div.output_area').nth(3)
@@ -154,9 +148,9 @@ describe('system-test (' + desired.browserName + ')', function() {
     it('should watch for changes in a watched variable', function(done) {
         browser
             .elementsByCssSelector('div.output_area').nth(5)
-            .sleep(3000)
             .elementByCssSelector('>', 'input')
             .type('watched message')
+            .sleep(3000)
             .elementsByCssSelector('<', 'div.output_area').nth(6)
             .elementByXPath('//span[@id="test4"]')
             .text().then(function(txt) {

@@ -153,7 +153,7 @@ ifdef SAUCE_USER_NAME
 	@echo 'Running web component tests remotely on Sauce Labs...'
 	@npm run test-sauce --silent -- --sauce-tunnel-id \"$(TRAVIS_JOB_NUMBER)\" --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
 else
-	@npm run test -- --local chrome
+	@$(MAKE) system-test-local
 endif
 
 test-py: dist/urth
@@ -263,7 +263,7 @@ start-selenium:
 	@echo "Installing and starting Selenium Server..."
 	@npm install selenium-standalone@latest
 	@node_modules/selenium-standalone/bin/selenium-standalone install
-	@node_modules/selenium-standalone/bin/selenium-standalone start &
+	@node_modules/selenium-standalone/bin/selenium-standalone start & echo $$! > SELENIUM_PID
 
 system-test-local: BASEURL?=http://192.168.99.100:9500
 system-test-local: TEST_SERVER?=localhost:4444
@@ -274,9 +274,10 @@ system-test-local: start-selenium sdist
 	@echo 'Waiting 20 seconds for server to start...'
 	@sleep 20
 	@echo 'Running system integration tests...'
-	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER)
-	-@docker rm -f $(SERVER_NAME)
-
+	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER) || (docker rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
+	@echo 'System integration tests complete.'
+	@docker rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID
+	
 docs: DOC_PORT?=4001
 docs: .watch dist/docs
 	@echo "Serving docs at http://127.0.0.1:$(DOC_PORT)"
