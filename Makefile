@@ -136,7 +136,8 @@ sdist: dist
 	@cp -R setup.py dist/.
 	@docker run -it --rm \
 		-v `pwd`/dist:/src \
-		$(REPO) bash -c 'cp -r /src /tmp/src && \
+		$(EXTRA_OPTIONS) \
+		$(REPO) bash -c '$(SETUP_CMD) cp -r /src /tmp/src && \
 			cd /tmp/src && \
 			python setup.py sdist $(POST_SDIST) && \
 			cp -r dist/*.tar.gz /src/.'
@@ -274,5 +275,7 @@ all:
 	BASEURL=http://127.0.0.1:9500 $(MAKE) system-test
 	BASEURL=http://127.0.0.1:9500 PYTHON=python2 $(MAKE) system-test
 
+release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
+release: SETUP_CMD=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;
 release: POST_SDIST=register upload
 release: sdist
