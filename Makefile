@@ -129,7 +129,7 @@ dist/VERSION:
 	@mkdir -p dist
 	@echo "$(COMMIT)" > dist/VERSION
 
-dist: dist/urth_widgets dist/urth dist/urth_widgets/urth-widgets.jar dist/docs dist/VERSION
+dist: dist/urth_widgets dist/urth dist/urth_widgets/urth-widgets.jar dist/VERSION
 
 sdist: dist
 	@cp -R MANIFEST.in dist/.
