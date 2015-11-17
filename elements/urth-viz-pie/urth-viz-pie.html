@@ -1,0 +1,38 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../urth-viz-chart/urth-viz-chart.html">
+
+<!--
+Represents a widget that draws a pie chart.
+The chart accepts data via attribute `datarows` and column headers via attribute `columns`:
+
+1. `datarows` should be of type Array of Arrays, representing list of rows.
+
+2. 'columns' should also be of type Array of strings, representing column headers.
+
+@group Urth Viz
+@element urth-viz-pie
+-->
+
+<dom-module id="urth-viz-pie">
+
+    <template>
+        <urth-viz-chart id="chart" type="pie" datarows="[[datarows]]" columns="[[columns]]" palette="[[palette]]" selection="{{selection}}" primary="{{primary}}" secondary="{{secondary}}">
+            <content></content>
+        </urth-viz-chart>
+    </template>
+
+    <script>
+    'use strict';
+
+    Polymer({
+        is: 'urth-viz-pie',
+
+        behaviors: [
+            Urth.VizChartCommonBehavior
+        ]
+    });
+    </script>
+</dom-module>
