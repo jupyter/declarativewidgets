@@ -1,0 +1,144 @@
+<!--
+# (c) Copyright Jupyter Development Team
+# (c) Copyright IBM Corp. 2015
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+
+<script src="../requirejs/require.js"></script>
+
+<dom-module id="urth-viz-cloud">
+    <template>
+        <style>
+          :host {
+            display: block;
+            height: 100%;
+            width: 100%;
+          }
+        </style>
+        <div id="container">
+          <svg style="height: 500px"></svg>
+        </div>
+        <content></content>
+    </template>
+</dom-module>
+
+<script>
+    (function () {
+        'use strict';
+        var requireConfigured;
+
+        Polymer({
+            is: 'urth-viz-cloud',
+            properties: {
+                data: {
+                    type: Object,
+                    observer: '_dataChanged'
+                }
+            },
+
+            behaviors: [
+                Polymer.IronResizableBehavior
+            ],
+
+            listeners: {
+                'iron-resize': '_resize'
+            },
+
+            _dataChanged: function(newData) {
+                if (!newData) { return; }
+
+                var words = [];
+                for (var word in this.data) {
+                    words.push({text: word, size: 10 + this.data[word] * 90});
+                }
+
+                if (this.layout) {
+                    this.$.container.children[0].innerHTML = "";
+                    this.layout.words(words);
+                    this.layout.start();
+                }
+            },
+
+            _resize: function() {
+                if (this.layout) {
+                    this.$.container.children[0].innerHTML = "";
+                    var computedStyle = getComputedStyle(this.$.container);
+                    this.layout.size([parseInt(computedStyle.width), parseInt(computedStyle.height)]);
+                    this.layout.start();
+                }
+            },
+
+            created: function() {
+                // Need the relative paths for d3 and nvd3 based on the
+                // location of this Polymer element. This has to be done
+                // inside the element to get the proper path. Calling
+                // resolveUrl outside of the element's methods returns
+                // the incorrect path. Only want to do this once and not
+                // for each instance so a global is used to track.
+                if (!requireConfigured) {
+                    requirejs.config({
+                        paths: {
+                            d3: this.resolveUrl('../d3/d3'),
+                            'd3-cloud': this.resolveUrl('../d3-cloud/build/d3.layout.cloud')
+                        },
+                        shim: {
+                            'd3-cloud': {
+                                deps: ['d3.global']
+                            }
+                        }
+                    });
+
+                    // workaround for using global d3
+                    define('d3.global', ['d3'], function(d3Global) {
+                        d3 = d3Global;
+                    });
+                    requireConfigured = true;
+                }
+            },
+
+            ready: function() {
+                require(['d3', 'd3-cloud'], function(d3, cloud) {
+                    var fill = d3.scale.category20();
+
+                    var words = [];
+                    for (var word in this.data) {
+                        words.push({text: word, size: 10 + this.data[word] * 90});
+                    }
+
+                    var layout = this.layout = cloud()
+                        .size([500, 500])
+                        .words(words)
+                        .padding(5)
+                        .rotate(function() { return ~~(Math.random() * 2) * 90; })
+                        .font("Impact")
+                        .fontSize(function(d) { return d.size; })
+                        .on("end", draw.bind(this));
+
+                    layout.start();
+
+                    function draw(words) {
+                        d3.select(this.$.container).select('svg')
+                            .attr("width", layout.size()[0])
+                            .attr("height", layout.size()[1])
+                            .append("g")
+                            .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                            .selectAll("text")
+                            .data(words)
+                            .enter().append("text")
+                              .style("font-size", function(d) { return d.size + "px"; })
+                              .style("font-family", "Impact")
+                              .style("fill", function(d, i) { return fill(i); })
+                              .attr("text-anchor", "middle")
+                              .attr("transform", function(d) {
+                                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                              })
+                            .text(function(d) { return d.text; });
+
+                        this.fire('urth-viz-render');
+                    }
+                }.bind(this));
+            }
+        });
+    })();
+</script>

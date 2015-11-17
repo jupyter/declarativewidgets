@@ -1,0 +1,26 @@
+{
+  "name": "urth-viz-cloud",
+  "version": "0.0.1",
+  "description": "Represents a widget that displays a word cloud",
+  "main": "urth-viz-cloud.html",
+  "keywords": [
+    "urth",
+    "word cloud",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.0",
+    "d3-cloud": "latest",
+    "d3": "^3",
+    "requirejs": "^2.1.0"
+  },
+  "private": true
+}

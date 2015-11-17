@@ -1,0 +1,83 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-viz-cloud tests</title>
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../test-fixture/test-fixture-mocha.js"></script>
+    <link rel="import" href="../../test-fixture/test-fixture.html">
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel="import" href="../urth-viz-cloud.html">
+</head>
+
+<body>
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id="cloud">
+        <template>
+            <urth-viz-cloud id="cloud" data='{"smallest":0.01, "smaller": 0.1, "small":  0.2, "big":0.5, "bigger":0.8, "biggest":1}'></urth-viz-cloud>
+        </template>
+    </test-fixture>
+
+    <script>
+        // STEP 4: Define any globals needed by the test suite.
+        var cloud;
+
+        beforeEach(function(done) {
+            cloud = fixture('cloud');
+            if (!cloud.rendered) {
+                function listener() {
+                    cloud.removeEventListener('urth-viz-render', listener);
+                    done();
+                }
+                cloud.addEventListener('urth-viz-render', listener);
+            } else {
+                done();
+            }
+        });
+
+        afterEach(function() {
+        });
+
+        // STEP 5: Define suite(s) and tests.
+        describe('render cloud', function() {
+            it('should contain a top-level <div> element id=container with an <svg>', function() {
+                expect(cloud/*.shadowRoot*/.querySelector('#container svg')).to.exist;
+            });
+
+            it('should contain six <text> elements', function() {
+                expect(cloud/*.shadowRoot*/.querySelectorAll('#container svg g text').length).to.equal(6);
+            });
+        });
+
+/*
+        describe('update cloud data', function() {
+            beforeEach(function(done) {
+                function listener() {
+                    cloud.removeEventListener('urth-viz-render', listener);
+                    done();
+                }
+                cloud.addEventListener('urth-viz-render', listener);
+                cloud.data = {one: 1, two: 1, three: 1};
+            });
+
+            it('should contain same number of words as indicated by data', function() {
+                expect(cloud//.shadowRoot//.querySelectorAll('div.container svg g text').length).to.equal(3);
+            });
+        });
+*/
+    </script>
+</body>
+</html>
