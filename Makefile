@@ -269,6 +269,7 @@ system-test-local: BASEURL?=http://192.168.99.100:9500
 system-test-local: TEST_SERVER?=localhost:4444
 system-test-local: SERVER_NAME?=urth_widgets_integration_test_server
 system-test-local: start-selenium sdist
+	@echo 'Starting system integration tests...'
 	-@docker rm -f $(SERVER_NAME)
 	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server
 	@echo 'Waiting 20 seconds for server to start...'
