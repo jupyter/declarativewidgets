@@ -153,7 +153,7 @@ ifdef SAUCE_USER_NAME
 	@echo 'Running web component tests remotely on Sauce Labs...'
 	@npm run test-sauce --silent -- --sauce-tunnel-id \"$(TRAVIS_JOB_NUMBER)\" --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
 else
-	@$(MAKE) system-test-local
+	BASEURL=http://127.0.0.1:9500 $(MAKE) system-test-local
 endif
 
 test-py: dist/urth
