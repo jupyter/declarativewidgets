@@ -40,6 +40,7 @@ describe('system-test (' + desired.browserName + ')', function() {
 
     before(function(done) { 
             // http://user:apiKey@ondemand.saucelabs.com/wd/hub
+        console.log('http://' + (args.server || 'ondemand.saucelabs.com') + '/wd/hub');
         browser = wd.promiseChainRemote('http://' + (args.server || 'ondemand.saucelabs.com') + '/wd/hub');
 
         if (args.verbose) {

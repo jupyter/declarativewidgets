@@ -55,6 +55,7 @@ describe('system-test (' + desired.browserName + ')', function() {
             // http://user:apiKey@ondemand.saucelabs.com/wd/hub
         var auth = args['sauce-username'] && args['sauce-access-key'] ?
             args['sauce-username'] + ':' + args['sauce-access-key'] + '@' : '';
+        console.log('http://' + auth + (args.server || 'ondemand.saucelabs.com') + '/wd/hub');
         browser = wd.promiseChainRemote('http://' + auth + (args.server || 'ondemand.saucelabs.com') + '/wd/hub');
 
         if (args.verbose) {
@@ -69,7 +70,7 @@ describe('system-test (' + desired.browserName + ')', function() {
 
         browser
             .init(desired)
-            .get('/notebooks/examples/urth-viz-table.ipynb')
+            .get('/notebooks/tests/urth-viz-table.ipynb')
             .sleep(5000)
             .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, 10000)
             .elementByLinkText("Cell")

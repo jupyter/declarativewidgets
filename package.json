@@ -26,7 +26,7 @@
     "polybuild": "polybuild",
     "test": "wct elements/*/test",
     "test-sauce": "wct --skip-plugin local --plugin sauce elements/*/test",
-    "system-test": "node_modules/mocha/bin/mocha system-test/urth-viz-table-specs.js --timeout 300000 --reporter spec",
+    "system-test": "node_modules/mocha/bin/mocha system-test/system-test-specs.js --timeout 300000 --reporter spec",
     "watch": "gulp watch"
   },
   "repository": {
