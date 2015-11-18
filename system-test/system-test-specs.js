@@ -56,7 +56,7 @@ describe('system-test (' + desired.browserName + ')', function() {
         browser
             .init(desired)
             .get('/notebooks/tests/Walkthrough.ipynb')
-            .sleep(7000)
+            .sleep(300000)
             .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, 10000)
             .elementByLinkText("Cell")
             .click()
