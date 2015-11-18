@@ -16,6 +16,7 @@
     "chai-as-promised": "latest",
     "colors": "latest",
     "minimist": "latest",
+    "selenium-standalone": "latest",
     "web-component-tester": "~3.3"
   },
   "config": {},

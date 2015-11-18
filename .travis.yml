@@ -27,7 +27,6 @@ deploy:
     tags: true
 
 notifications:
-  slack: cloudet:rMfRKhvsbZuCIRZpTct3kBI4#urth-widgets
   email:
     on_success: change
     on_failure: always

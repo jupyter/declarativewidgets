@@ -261,7 +261,6 @@ endif
 
 start-selenium:
 	@echo "Installing and starting Selenium Server..."
-	@npm install selenium-standalone@latest
 	@node_modules/selenium-standalone/bin/selenium-standalone install
 	@node_modules/selenium-standalone/bin/selenium-standalone start & echo $$! > SELENIUM_PID
 
