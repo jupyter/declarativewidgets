@@ -38,22 +38,9 @@ describe('system-test (' + desired.browserName + ')', function() {
     var allPassed = true;
     var browserSupportsShadowDOM;
 
-    var tagChaiAssertionError = function(err) {
-        // throw error and tag as retriable to poll again
-        err.retriable = err instanceof chai.AssertionError;
-        throw err;
-    };
-
-    wd.PromiseChainWebdriver.prototype.waitForWidgetElement = function(selector, browserSupportsShadowDOM, timeout, pollFreq) {
-        return this.waitForElementByCssSelector(
-            browserSupportsShadowDOM ? 'urth-viz-table::shadow .handsontable' : 'urth-viz-table .handsontable',
-            wd.asserters.isDisplayed,
-            timeout)
-        .catch(tagChaiAssertionError);
-    };
-
     before(function(done) { 
             // http://user:apiKey@ondemand.saucelabs.com/wd/hub
+        console.log('http://' + (args.server || 'ondemand.saucelabs.com') + '/wd/hub');
         browser = wd.promiseChainRemote('http://' + (args.server || 'ondemand.saucelabs.com') + '/wd/hub');
 
         if (args.verbose) {
@@ -68,7 +55,8 @@ describe('system-test (' + desired.browserName + ')', function() {
 
         browser
             .init(desired)
-            .get('/notebooks/examples/urth-viz-table.ipynb')
+            .get('/notebooks/tests/Walkthrough.ipynb')
+            .sleep(7000)
             .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, 10000)
             .elementByLinkText("Cell")
             .click()
@@ -89,17 +77,107 @@ describe('system-test (' + desired.browserName + ')', function() {
     after(function(done) {
         var result = browser
             .quit();
-        if (result.sauceJobStatus) {
+        if (process.env.SAUCE_USER_NAME) {
             result = result.sauceJobStatus(allPassed);
         }
         result.nodeify(done);
     });
 
-    it('should run all cells and find a handsontable in the 3rd output area', function(done) {
+    it('should prints the correct variable that is used for urth-core-function', function(done) {
         browser
-            .waitForElementsByCssSelector('div.output_area').nth(3)
-            .waitForWidgetElement("urth-viz-table", browserSupportsShadowDOM, 10000)
+            .sleep(5000)
+            .elementsByCssSelector('<', 'div.output_area').nth(2)
+            .elementByXPath('//button[text()="invoke"]').click()
+            .sleep(5000)
+            .elementsByCssSelector('<', 'div.output_area').nth(2)
+            .elementByXPath('//span[@id="test1"]')
+            .text().then(function(txt) {
+                console.log("span test1 is: ", txt);
+                txt.should.include('world');
+            })
             .nodeify(done);
     });
 
+    it('should bind variable to channel a', function(done) {
+        browser
+            .elementsByCssSelector('div.output_area').nth(3)
+            .elementByCssSelector('>', 'input')
+            .type('A')
+            .elementsByCssSelector('<', 'div.output_area').nth(3)
+            .elementByXPath('//span[@id="test2"]')
+            .text().then(function(txt) {
+                console.log("span test2 is: ", txt);
+                txt.should.include('A');
+            })
+            .nodeify(done);
+    });
+
+    it('should bind variable to channel b', function(done) {
+        browser
+            .elementsByCssSelector('div.output_area').nth(4)
+            .elementByCssSelector('>', 'input')
+            .type('B')
+            .elementsByCssSelector('<', 'div.output_area').nth(4)
+            .elementByXPath('//span[@id="test3"]')
+            .text().then(function(txt) {
+                console.log("span test3 is: ", txt);
+                txt.should.include('B');
+            })
+            .nodeify(done);
+    });
+
+    it('should bind variables to channels independently', function(done) {
+        browser
+            .elementsByCssSelector('div.output_area').nth(3)
+            .elementByCssSelector('>', 'input')
+            .type('2')
+            .elementsByCssSelector('<', 'div.output_area').nth(3)
+            .elementByXPath('//span[@id="test2"]')
+            .text().then(function(txt) {
+                console.log("span test2 is: ", txt);
+                txt.should.include('A2');
+            })
+            .elementsByCssSelector('<', 'div.output_area').nth(4)
+            .elementByXPath('//span[@id="test3"]')
+            .text().then(function(txt) {
+                console.log("span test3 is: ", txt);
+                txt.should.include('B');
+            })
+            .nodeify(done);
+    });
+
+    it('should watch for changes in a watched variable', function(done) {
+        browser
+            .elementsByCssSelector('div.output_area').nth(5)
+            .elementByCssSelector('>', 'input')
+            .type('watched message')
+            .sleep(3000)
+            .elementsByCssSelector('<', 'div.output_area').nth(6)
+            .elementByXPath('//span[@id="test4"]')
+            .text().then(function(txt) {
+                console.log("span test4 is: ", txt);
+                txt.should.include('watched message');
+            })
+            .nodeify(done);
+    });
+
+    it('should update output when DataFrame is modified and set to auto', function(done) {
+        browser
+            .elementsByCssSelector('div.input').nth(10)
+            .click()
+            .sleep(3000)
+            .elementByLinkText("<", "Cell")
+            .click()
+            .waitForElementByLinkText("Run", wd.asserters.isDisplayed, 10000)
+            .elementByLinkText("Run")
+            .click()
+            .sleep(3000)
+            .elementsByCssSelector('<', 'div.output_area').nth(7)
+            .elementByXPath('//span[@class="test5"]')
+            .text().then(function(txt) {
+                console.log("span test5 is: ", txt);
+                txt.should.include('Jane Doe');
+            })
+            .nodeify(done);
+    });
 });
