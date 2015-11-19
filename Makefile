@@ -274,7 +274,7 @@ system-test-local: start-selenium sdist
 	@echo 'Waiting 20 seconds for server to start...'
 	@sleep 20
 	@echo 'Running system integration tests...'
-	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER) || (docker rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
+	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER) || (docker rm -f $(SERVER_NAME); -kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
 	@echo 'System integration tests complete.'
 	@docker rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID
 	
