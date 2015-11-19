@@ -153,7 +153,7 @@ ifdef SAUCE_USER_NAME
 	@echo 'Running web component tests remotely on Sauce Labs...'
 	@npm run test-sauce --silent -- --sauce-tunnel-id \"$(TRAVIS_JOB_NUMBER)\" --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
 else
-	BASEURL=http://127.0.0.1:9500 $(MAKE) system-test-local
+	$(MAKE) -e system-test-local
 endif
 
 test-py: dist/urth
@@ -277,22 +277,22 @@ system-test-local: start-selenium sdist
 	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER) || (docker rm -f $(SERVER_NAME); -kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
 	@echo 'System integration tests complete.'
 	@docker rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID
-	
+
 docs: DOC_PORT?=4001
 docs: .watch dist/docs
 	@echo "Serving docs at http://127.0.0.1:$(DOC_PORT)"
 	@bash -c "trap 'make clean-watch' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
 
 all:
-	$(MAKE) test-js-remote
+	$(MAKE) -e test-js-remote
 	$(MAKE) test-py
 	PYTHON=python2 $(MAKE) test-py
 	$(MAKE) test-scala
 	$(MAKE) sdist
 	$(MAKE) install
 	PYTHON=python2 $(MAKE) install
-	BASEURL=http://127.0.0.1:9500 $(MAKE) system-test
-	BASEURL=http://127.0.0.1:9500 PYTHON=python2 $(MAKE) system-test
+	$(MAKE) system-test
+	PYTHON=python2 $(MAKE) system-test
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
 release: SETUP_CMD=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;
