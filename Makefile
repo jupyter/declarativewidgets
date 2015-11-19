@@ -139,7 +139,7 @@ sdist: dist
 		$(EXTRA_OPTIONS) \
 		$(REPO) bash -c '$(SETUP_CMD) cp -r /src /tmp/src && \
 			cd /tmp/src && \
-			python setup.py sdist $(POST_SDIST) && \
+			python setup.py sdist && \
 			cp -r dist/*.tar.gz /src/.'
 
 test: test-js test-py test-scala
@@ -256,8 +256,27 @@ ifdef SAUCE_USER_NAME
 	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER)
 	-@docker rm -f $(SERVER_NAME)
 else
-	@echo 'Skipping system tests...'
+	@BASEURL=$(BASEURL) $(MAKE) system-test-local
 endif
+
+start-selenium:
+	@echo "Installing and starting Selenium Server..."
+	@node_modules/selenium-standalone/bin/selenium-standalone install
+	@node_modules/selenium-standalone/bin/selenium-standalone start & echo $$! > SELENIUM_PID
+
+system-test-local: BASEURL?=http://192.168.99.100:9500
+system-test-local: TEST_SERVER?=localhost:4444
+system-test-local: SERVER_NAME?=urth_widgets_integration_test_server
+system-test-local: start-selenium sdist
+	@echo 'Starting system integration tests locally...'
+	-@docker rm -f $(SERVER_NAME)
+	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server
+	@echo 'Waiting 20 seconds for server to start...'
+	@sleep 20
+	@echo 'Running system integration tests...'
+	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER) || (docker rm -f $(SERVER_NAME); -kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
+	@echo 'System integration tests complete.'
+	@docker rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID
 
 docs: DOC_PORT?=4001
 docs: .watch dist/docs
@@ -265,15 +284,15 @@ docs: .watch dist/docs
 	@bash -c "trap 'make clean-watch' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
 
 all:
-	$(MAKE) test-js-remote
+	$(MAKE) -e test-js-remote
 	$(MAKE) test-py
 	PYTHON=python2 $(MAKE) test-py
 	$(MAKE) test-scala
 	$(MAKE) sdist
 	$(MAKE) install
 	PYTHON=python2 $(MAKE) install
-	BASEURL=http://127.0.0.1:9500 $(MAKE) system-test
-	BASEURL=http://127.0.0.1:9500 PYTHON=python2 $(MAKE) system-test
+	@BASEURL=$(BASEURL) $(MAKE) system-test
+	@BASEURL=$(BASEURL) PYTHON=python2 $(MAKE) system-test
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
 release: SETUP_CMD=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;
