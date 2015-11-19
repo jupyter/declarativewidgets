@@ -153,7 +153,7 @@ ifdef SAUCE_USER_NAME
 	@echo 'Running web component tests remotely on Sauce Labs...'
 	@npm run test-sauce --silent -- --sauce-tunnel-id \"$(TRAVIS_JOB_NUMBER)\" --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
 else
-	$(MAKE) -e system-test-local
+	@npm run test -- --local chrome
 endif
 
 test-py: dist/urth
@@ -256,7 +256,7 @@ ifdef SAUCE_USER_NAME
 	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER)
 	-@docker rm -f $(SERVER_NAME)
 else
-	@echo 'Skipping system tests...'
+	@BASEURL=$(BASEURL) $(MAKE) system-test-local
 endif
 
 start-selenium:
@@ -268,7 +268,7 @@ system-test-local: BASEURL?=http://192.168.99.100:9500
 system-test-local: TEST_SERVER?=localhost:4444
 system-test-local: SERVER_NAME?=urth_widgets_integration_test_server
 system-test-local: start-selenium sdist
-	@echo 'Starting system integration tests...'
+	@echo 'Starting system integration tests locally...'
 	-@docker rm -f $(SERVER_NAME)
 	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server
 	@echo 'Waiting 20 seconds for server to start...'
@@ -291,8 +291,8 @@ all:
 	$(MAKE) sdist
 	$(MAKE) install
 	PYTHON=python2 $(MAKE) install
-	$(MAKE) system-test
-	PYTHON=python2 $(MAKE) system-test
+	@BASEURL=$(BASEURL) $(MAKE) system-test
+	@BASEURL=$(BASEURL) PYTHON=python2 $(MAKE) system-test
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
 release: SETUP_CMD=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;

@@ -17,7 +17,7 @@ before_script:
   - sh -e /etc/init.d/xvfb start
 
 script:
-  - BASEURL=http://127.0.0.1:9500; make -e all
+  - BASEURL=http://127.0.0.1:9500 make all
 
 deploy:
   skip_cleanup: true
