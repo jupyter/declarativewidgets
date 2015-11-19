@@ -242,28 +242,43 @@ _dev:
 		-v `pwd`/notebooks:/home/jovyan/work \
 		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'
 
+start-selenium:
+	@echo "Installing and starting Selenium Server..."
+	@node_modules/selenium-standalone/bin/selenium-standalone install
+	@node_modules/selenium-standalone/bin/selenium-standalone start & echo $$! > SELENIUM_PID
+
+run-test: SERVER_NAME?=urth_widgets_integration_test_server
+run-test:
+	-@docker rm -f $(SERVER_NAME)
+	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server
+	@echo 'Waiting for server to start...'
+	@LIMIT=60; while [ $$LIMIT -gt 0 ] && ! docker logs $(SERVER_NAME) 2>&1 | grep 'Notebook is running'; do echo waiting $$LIMIT...; sleep 1; LIMIT=$$(expr $$LIMIT - 1); done
+	@echo 'Running system integration tests...'
+	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER)
+
 system-test: BASEURL?=http://192.168.99.100:9500
-system-test: TEST_SERVER?=ondemand.saucelabs.com
 system-test: SERVER_NAME?=urth_widgets_integration_test_server
 system-test:
 ifdef SAUCE_USER_NAME
 	@echo 'Running system tests on Sauce Labs...'
-	-@docker rm -f $(SERVER_NAME)
-	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server
-	@echo 'Waiting 20 seconds for server to start...'
-	@sleep 20
-	@echo 'Running system integration tests...'
-	@npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER)
-	-@docker rm -f $(SERVER_NAME)
+	BASEURL=$(BASEURL) TEST_SERVER=ondemand.saucelabs.com $(MAKE) run-test
 else
-	@echo 'Skipping system tests...'
+	$(MAKE) start-selenium
+	$(MAKE) sdist
+	@echo 'Starting system integration tests locally...'
+	BASEURL=$(BASEURL) TEST_SERVER=localhost:4444 $(MAKE) run-test || (docker rm -f $(SERVER_NAME); -kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
+	-@kill `cat SELENIUM_PID`
+	-@rm SELENIUM_PID
 endif
+	@echo 'System integration tests complete.'
+	-@docker rm -f $(SERVER_NAME)
 
 docs: DOC_PORT?=4001
 docs: .watch dist/docs
 	@echo "Serving docs at http://127.0.0.1:$(DOC_PORT)"
 	@bash -c "trap 'make clean-watch' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
 
+all: BASEURL?=http://192.168.99.100:9500
 all:
 	$(MAKE) test-js-remote
 	$(MAKE) test-py
@@ -272,8 +287,8 @@ all:
 	$(MAKE) sdist
 	$(MAKE) install
 	PYTHON=python2 $(MAKE) install
-	BASEURL=http://127.0.0.1:9500 $(MAKE) system-test
-	BASEURL=http://127.0.0.1:9500 PYTHON=python2 $(MAKE) system-test
+	@BASEURL=$(BASEURL) $(MAKE) system-test
+	@BASEURL=$(BASEURL) PYTHON=python2 $(MAKE) system-test
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
 release: SETUP_CMD=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;

@@ -66,3 +66,4 @@ node_modules/
 npm-debug.*
 .watch
 project/
+SELENIUM_PID
