@@ -81,7 +81,14 @@ Example:
             }
         },
 
-        behaviors: [Urth.JupyterWidgetBehavior, Urth.ExecutionCompleteBehavior],
+        behaviors: [
+            Urth.JupyterWidgetBehavior,
+            Urth.ExecutionCompleteBehavior
+        ],
+
+        listeners: {
+            'watch_notify': 'refresh'
+        },
 
         created: function(){
             console.debug('urth-core-datafram created', arguments);
