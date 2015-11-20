@@ -41,7 +41,8 @@ define([
             })(),
             { href: bower_root + '/urth-core-import/urth-core-import.html' },
             { href: bower_root + '/urth-core-dataframe/urth-core-dataframe.html' },
-            { href: bower_root + '/urth-core-function/urth-core-function.html' }
+            { href: bower_root + '/urth-core-function/urth-core-function.html' },
+            { href: bower_root + '/urth-core-watch/urth-core-watch.html' }
         ];
 
         links = defaultLinks.concat( links || [] );
