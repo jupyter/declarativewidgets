@@ -130,12 +130,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
             send: function( msg ){
                 if(this.isConnected()){
                     console.debug('Urth.JupyterWidgetBehavior send - sending message', msg);
-                    // this.model is from IPython widgets widgets.js and
-                    // keeps track of a pending_msgs counter. Specifying
-                    // this.model.callbacks() as the callback handler for
-                    // send allows widgets.js to properly decrement the
-                    // counter when responses are received.
-                    this.model.send(msg, this.model.callbacks());
+                    this.model.send(msg, this._callbacks());
                 }
                 else{
                     console.warn('Urth.JupyterWidgetBehavior send - model not ready, cannot send message');
@@ -174,6 +169,38 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
              */
             isConnected: function(){
                 return !!this.model;
+            },
+
+            /**
+             * Returns the parent Code cell that may contain this element.
+             *
+             * Note: Not all element will be under a code cell, so this might return null.
+             *
+             * @method: parentCell
+             * @return {CodeCell| Returns the CodeCell that is the parent of this element or null if element is somewhere else
+             */
+            parentCell: function(){
+                var cellElement = $(this).parents(".cell");
+
+                var cellElementData = cellElement.data();
+                return cellElementData && cellElementData.cell;
+            },
+
+            _callbacks: function(){
+                // this.model is from IPython widgets widgets.js and
+                // keeps track of a pending_msgs counter. Specifying
+                // this.model.callbacks() as the callback handler for
+                // send allows widgets.js to properly decrement the
+                // counter when responses are received.
+
+                // parentCell also has additional callbacks that will handle
+                // 'display_type' messages (among others)
+                var parentCell = this.parentCell()
+
+                var callbacks = (parentCell && parentCell.get_callbacks()) || {iopub:{}};
+                this.mixin(callbacks.iopub,this.model.callbacks().iopub);
+
+                return callbacks;
             },
 
             /**
