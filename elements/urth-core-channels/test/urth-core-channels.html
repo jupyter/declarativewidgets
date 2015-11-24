@@ -80,6 +80,7 @@
             sinon.stub(Urth["urth-core-channels"].prototype, "createModel");
             sinon.stub(Urth.JupyterKernelObserver, "created");
             sinon.stub(Urth.JupyterWidgetBehavior, "detached");
+            sinon.stub(Urth["urth-core-channels"].prototype, "_callbacks");
         });
 
         beforeEach(function() {
