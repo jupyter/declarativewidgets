@@ -6,14 +6,15 @@ import json
 import tornado
 import subprocess
 
-from IPython.html.utils import url_path_join
-from IPython.utils.path import get_ipython_dir
-from IPython.html.base.handlers import FileFindHandler
+from notebook.utils import url_path_join
+from notebook.base.handlers import FileFindHandler
+from jupyter_core.paths import jupyter_data_dir
 from tornado.web import HTTPError, RequestHandler
 from concurrent.futures import ThreadPoolExecutor
 
 widgets_dir = ''
 logger = None
+
 
 class UrthImportHandler(RequestHandler):
 
@@ -58,6 +59,7 @@ class UrthImportHandler(RequestHandler):
             msg = 'Failed to install {0}.'.format(package_name)
             self.send_error(status_code=400, reason=msg)
 
+
 # Executes bower install requests in a subprocess and returns 0 for success
 # and non-zero for an error.
 def do_install(package_name):
@@ -71,6 +73,7 @@ def do_install(package_name):
 
     return 0
 
+
 def load_jupyter_server_extension(nb_app):
     global logger
     global widgets_dir
@@ -79,7 +82,7 @@ def load_jupyter_server_extension(nb_app):
     logger.info('Loading urth_import server extension.')
 
     # Determine the nbextensions directory and urth_widgets path
-    ipython_dir = get_ipython_dir()
+    ipython_dir = jupyter_data_dir()
     web_app = nb_app.web_app
     for path in web_app.settings['nbextensions_path']:
         if ipython_dir in path:

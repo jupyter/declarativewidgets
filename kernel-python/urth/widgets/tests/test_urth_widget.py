@@ -4,13 +4,13 @@
 """ Tests for the urth_widget.py module """
 
 import unittest
-from IPython.kernel.comm import Comm
 
 try:
     from unittest.mock import Mock
 except ImportError as e:
     from mock import Mock
 
+from ipykernel.comm import Comm
 from ..urth_widget import *
 
 

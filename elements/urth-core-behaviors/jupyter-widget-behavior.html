@@ -51,9 +51,9 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
 
             _doCreateModel: function(){
                 console.debug('Urth.JupyterWidgetBehavior createModel', this.kernelClass);
-                IPython.notebook.kernel.widget_manager.create_model(
+                IPython.notebook.kernel.widget_manager.new_widget(
                     {
-                        model_name: 'WidgetModel',
+                        model_name: 'DeclWidgetModel',
                         widget_class: this.kernelClass
                     }
                 ).then(function(model) {

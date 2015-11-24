@@ -7,5 +7,7 @@ define([
 ], function(init) {
     'use strict';
     init(IPython ? IPython.notebook.base_url : '/');
-    console.debug('Custom JS loaded');
+    return {
+      load_ipython_extension: function() { console.debug('Custom JS loaded'); }
+    };
 });

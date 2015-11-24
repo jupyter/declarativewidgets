@@ -29,7 +29,7 @@ node_modules: package.json
 
 node_modules/bower: node_modules
 
-REPO?=cloudet/all-spark-notebook-bower:1.5.1
+REPO?=cloudet/all-spark-notebook-bower:1.5.1_jupyter4
 PYTHON?=python3
 
 URTH_BOWER_FILES:=$(shell find elements -name bower.json)
@@ -203,7 +203,7 @@ server: _run-$(PYTHON)
 
 _run-python3: _run
 
-_run-python2: SETUP_CMD=source activate python2; pip install futures==3.0.3; pip install ipython[notebook]==3.2;
+_run-python2: SETUP_CMD=source activate python2; pip install futures==3.0.3;
 _run-python2: _run
 
 _run:
@@ -213,6 +213,7 @@ _run:
 		-e USE_HTTP=1 \
 		-v `pwd`:/widgets-nbexts \
 		$(VOL_MAP) \
+		--user jovyan \
 		$(REPO) bash -c '$(SETUP_CMD) \
 			pip install --no-binary ::all: $$(ls -1 /widgets-nbexts/dist/*.tar.gz | tail -n 1) && \
 			$(CMD)'
@@ -223,22 +224,23 @@ dev: .watch dist
 	@$(MAKE) clean-watch
 
 _dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
-_dev-python2: SETUP_CMD=source activate python2; pip install futures==3.0.3; pip install ipython[notebook]==3.2;
+_dev-python2: SETUP_CMD=source activate python2; pip install futures==3.0.3;
 _dev-python2: _dev
 
 _dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.4/site-packages/urth
 _dev-python3: _dev
 
-_dev: NB_HOME?=/home/jovyan/.ipython
+_dev: NB_HOME?=/root
 _dev:
 	@docker run -it --rm \
 		-p 8888:8888 \
 		-e USE_HTTP=1 \
 		-e JVM_OPT=-Dlog4j.logLevel=trace \
-		-v `pwd`/dist/urth_widgets:$(NB_HOME)/nbextensions/urth_widgets \
+		-v `pwd`/etc/notebook.json:$(NB_HOME)/.jupyter/nbconfig/notebook.json \
+		-v `pwd`/dist/urth_widgets:$(NB_HOME)/.local/share/jupyter/nbextensions/urth_widgets \
 		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
-		-v `pwd`/etc:$(NB_HOME)/profile_default/nbconfig \
-		-v `pwd`/etc/ipython_notebook_config.py:$(NB_HOME)/profile_default/ipython_notebook_config.py \
+		-v `pwd`/etc:$(NB_HOME)/nbconfig \
+		-v `pwd`/etc/jupyter_notebook_config.py:$(NB_HOME)/.jupyter/jupyter_notebook_config.py \
 		-v `pwd`/notebooks:/home/jovyan/work \
 		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'
 

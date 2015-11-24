@@ -7,7 +7,10 @@
  * Loads the web component polyfill and all web components specified in
  * elements.html.
  */
-define(['require', 'jquery'], function(require, $) {
+define([
+    'require',
+    'jquery',
+    '../widgets/DeclWidgetModel'], function(require, $) {
     'use strict';
 
     function loadComponents(bower_root, links) {

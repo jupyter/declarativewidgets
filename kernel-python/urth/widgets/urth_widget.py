@@ -2,7 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 import time
 
-from IPython.html import widgets  # Widget definitions
+from ipywidgets import widgets  # Widget definitions
 
 
 class UrthWidget(widgets.Widget):
@@ -12,7 +12,8 @@ class UrthWidget(widgets.Widget):
         super(UrthWidget, self).__init__(**kwargs)
 
     def send_state(self, key=None):
-        """Overrides the Widget send_state to prevent
+        """
+        Overrides the Widget send_state to prevent
         an unnecessary initial state message.
         """
         pass

@@ -41,7 +41,7 @@ class Channels(UrthWidget):
     def watch(self, key, handler, chan='default'):
         self.watch_handlers[chan][key] = handler
 
-    def _handle_change_msg(self, _, content):
+    def _handle_change_msg(self, wid, content, buffers):
         if content.get('event', '') == 'change':
             data = content.get('data', {})
             if 'channel' in data and data['channel'] in self.watch_handlers:

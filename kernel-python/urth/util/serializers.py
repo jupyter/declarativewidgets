@@ -37,9 +37,10 @@ class DataFrameSerializer(BaseSerializer):
     @staticmethod
     def serialize(obj, **kwargs):
         json = {
-            "columns": obj.columns.tolist(),
-            "data": obj.head(kwargs.get('limit', 100)).values.tolist(),
-            "index": obj.head(kwargs.get('limit', 100)).index.tolist()
+            'columns': [str(c) for c in obj.columns.tolist()],
+            'data': obj.head(kwargs.get('limit', 100)).values.tolist(),
+            'index': [str(i) for i in
+                      obj.head(kwargs.get('limit', 100)).index.tolist()]
         }
         return json
 
@@ -98,9 +99,9 @@ class SparkDataFrameSerializer(BaseSerializer):
             obj.limit(kwargs.get('limit', 100)).collect(), columns=obj.columns)
 
         json = {
-            "columns": df.columns.tolist(),
+            "columns": [str(c) for c in df.columns.tolist()],
             "data": df.values.tolist(),
-            "index": df.index.tolist()
+            "index": [str(i) for i in df.index.tolist()]
         }
         return json
 

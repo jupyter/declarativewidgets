@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from IPython.utils.traitlets import * # Used to declare attributes of our widget
+from traitlets import Unicode, Integer # Used to declare attributes of our widget
 from IPython.core.getipython import get_ipython
 
 from urth.util.serializer import Serializer
@@ -37,7 +37,7 @@ class DataFrame(UrthWidget):
             raise UrthException("Invalid DataFrame variable name {}".format(
                 self.variable_name))
 
-    def _handle_state_msg(self, _, content):
+    def _handle_state_msg(self, wid, content, buffers):
         if content.get("event", "") == "sync":
             self._sync_state()
 

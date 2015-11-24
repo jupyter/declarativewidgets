@@ -5,7 +5,7 @@
 
 OWNER:=cloudet
 IMAGE:=all-spark-notebook-bower
-VERSION:=1.5.1 # spark version
+VERSION:=1.5.1_jupyter4 # spark version
 COMMIT:=$(shell git rev-parse --short=12 --verify HEAD)
 
 help:
