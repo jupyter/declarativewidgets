@@ -158,6 +158,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 var physicalIndex = this.hot.sortIndex.length > 0 ? 
                                         this.hot.sortIndex[rowStart][0] : rowStart;
                 this._setSelection(this.datarows[physicalIndex]);
+                this.selectedRow = rowStart; //storing index
             },
 
             _willDataFit: function(datarows) {
@@ -229,6 +230,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         afterSelectionEnd: this._handleSelection.bind(this),
                         afterColumnSort: function() { 
                             this._handleSelection(0); 
+                        }.bind(this),
+                        afterDeselect: function() {
+                            this.hot.selectCell(this.selectedRow, 0, this.selectedRow, columnSettings.length-1);
                         }.bind(this)
                     };
 
