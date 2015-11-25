@@ -57,12 +57,6 @@ class Channels(UrthWidget):
                         self.error("Error executing watch handler for {} on "
                                    "channel {}: {}".format(
                                     data['name'], data['channel'], str(e)))
-                else:
-                    print("No watch handler for name field in {}".format(
-                        data))
-            else:
-                print("No watch handler for channel field in {}".format(
-                    data))
 
 
 class Channel:
