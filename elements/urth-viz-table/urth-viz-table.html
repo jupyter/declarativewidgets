@@ -153,7 +153,12 @@ The table accepts data via attribute `datarows` and column headers via attribute
              * Handle when selection has finished taking place on handson
              */
             _handleSelection: function (rowStart, colStart, rowEnd, colEnd) {
-                this._setSelection(this.datarows[rowStart]);
+                // if table has been sorted, we need to get physical index of the row in the datasource
+                // since rowStart is only the logical index of the table view
+                var physicalIndex = this.hot.sortIndex.length > 0 ? 
+                                        this.hot.sortIndex[rowStart][0] : rowStart;
+                this._setSelection(this.datarows[physicalIndex]);
+                this.selectedRow = rowStart; //storing index
             },
 
             _willDataFit: function(datarows) {
@@ -222,7 +227,13 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         columns: columnSettings,
                         stretchH: 'all',
                         beforeOnCellMouseDown: this._forceRowSelection.bind(this),
-                        afterSelectionEnd: this._handleSelection.bind(this)
+                        afterSelectionEnd: this._handleSelection.bind(this),
+                        afterColumnSort: function() { 
+                            this._handleSelection(0); 
+                        }.bind(this),
+                        afterDeselect: function() {
+                            this.hot.selectCell(this.selectedRow, 0, this.selectedRow, columnSettings.length-1);
+                        }.bind(this)
                     };
 
                     if (!this._willDataFit(datarows)) {
