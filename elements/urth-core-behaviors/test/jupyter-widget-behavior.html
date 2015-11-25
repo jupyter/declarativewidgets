@@ -40,7 +40,7 @@
                     changed: {
                         result: "new value"
                     }
-                }
+                };
 
                 var testObject = Polymer.Base.mixin({
                     onModelResultChange: function(){}
@@ -60,7 +60,7 @@
             it('should call _clearErrorMessages on status ok', function() {
                 var optionFixture = {
                     status: "ok"
-                }
+                };
 
                 var testObject = Polymer.Base.mixin({
                     _clearErrorMessages: function(){}
@@ -76,7 +76,7 @@
             it('should call displayErrorMessage on status error', function() {
                 var optionFixture = {
                     status: "error"
-                }
+                };
 
                 var testObject = Polymer.Base.mixin({
                     displayErrorMessage:function(){}
@@ -119,7 +119,7 @@
 
                 assert(save_changes.calledOnce, "save_changes was called " + save_changes.callCount);
 
-            })
+            }) ;
 
             it('should not call set nor save_changes on model if values is {}', function() {
 
@@ -138,7 +138,7 @@
                 assert(setFunc.callCount == 0, "set was called " + setFunc.callCount);
                 assert(save_changes.callCount == 0, "save_changes was called " + save_changes.callCount);
 
-            })
+            });
 
             it('should not call set nor save_changes on model if values is undefined', function() {
 
@@ -157,7 +157,76 @@
                 assert(setFunc.callCount == 0, "set was called " + setFunc.callCount);
                 assert(save_changes.callCount == 0, "save_changes was called " + save_changes.callCount);
 
-            })
+            });
+        });
+
+        describe('_callback', function() {
+            it('should return the minimum set of iopub callbacks if element does not have parent cell', function() {
+
+                var testObject = Polymer.Base.mixin(Urth.JupyterWidgetBehavior, {
+                    parentCell: function(){
+                        //mocked to return undefined
+                        return undefined;
+                    },
+                    model: {
+                        callbacks: function(){
+                           return {
+                               iopub: {
+                                   status: "the status handler"
+                               }
+                           }
+                        }
+                    },
+                    mixin: Polymer.Base.mixin
+                });
+
+                expect(testObject._callbacks()).to.eql( {
+                    iopub: {
+                        status: "the status handler"
+                    }
+                })
+            });
+
+            it('should return the a combination of parent cell callbacks and model callbacks if element has a parent cell', function() {
+
+                var testObject = Polymer.Base.mixin(Urth.JupyterWidgetBehavior, {
+                    parentCell: function(){
+                        //mocked to return undefined
+                        return {
+                            get_callbacks: function(){
+                                return {
+                                    shell: {
+                                        reply: "the reply handler"
+                                    },
+                                    iopub: {
+                                        output: "the output handler"
+                                    }
+                                }
+                            }
+                        };
+                    },
+                    model: {
+                        callbacks: function(){
+                            return {
+                                iopub: {
+                                    status: "the status handler"
+                                }
+                            }
+                        }
+                    },
+                    mixin: Polymer.Base.mixin
+                });
+
+                expect(testObject._callbacks()).to.eql( {
+                    shell: {
+                        reply: "the reply handler"
+                    },
+                    iopub: {
+                        output: "the output handler",
+                        status: "the status handler"
+                    }
+                })
+            });
         });
 
     </script>
