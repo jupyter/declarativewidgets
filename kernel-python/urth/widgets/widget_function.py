@@ -1,9 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import inspect
-
-from IPython.utils.traitlets import Integer, Unicode # Used to declare attributes of our widget
+from traitlets import Integer, Unicode # Used to declare attributes of our widget
 from IPython.core.getipython import get_ipython
 
 from urth.util.serializer import Serializer
@@ -35,7 +33,7 @@ class Function(UrthWidget):
         except Exception as e:
             self.error(str(e))
 
-    def _handle_custom_event_msg(self, _, content):
+    def _handle_custom_event_msg(self, wid, content, buffers):
         event = content.get('event', '')
         if event == 'invoke':
             self._invoke(content.get('args', {}))

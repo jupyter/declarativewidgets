@@ -33,14 +33,14 @@ class WidgetDataFrame(comm: CommWriter)
    */
   def handleBackbone(msg: MsgData): Unit = {
     logger.debug(s"Handling backbone message ${msg}...")
-    (msg \ Comm.KeySyncData \ Comm.KeyDataFrameName).asOpt[String] match {
-      case Some(dfName) => registerName(dfName)
-      case _ => logger.error(s"No ${Comm.KeyDataFrameName} value provided!")
-    }
     (msg \ Comm.KeySyncData \ Comm.KeyLimit).asOpt[Int] match {
       case Some(lim) => registerLimit(lim)
       case _ => logger.warn(
         s"No ${Comm.KeyLimit} value provided. Using limit = ${this.limit}.")
+    }
+    (msg \ Comm.KeySyncData \ Comm.KeyDataFrameName).asOpt[String] match {
+      case Some(dfName) => registerName(dfName)
+      case _ => logger.error(s"No ${Comm.KeyDataFrameName} value provided!")
     }
   }
 
@@ -63,6 +63,7 @@ class WidgetDataFrame(comm: CommWriter)
   private[widgets] def registerLimit(limit: Int): Unit = {
     this.limit = limit
     logger.debug(s"Registered limit ${limit}.")
+
   }
 
   private[widgets] def registerName(name: String): Unit = {
