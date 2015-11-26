@@ -93,6 +93,16 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             },
 
             /**
+             * 'xlabel' is an optional label for the x-axis
+             */
+            xlabel: String,
+
+            /**
+             * 'ylabel' is an optional label for the y-axis
+             */
+            ylabel: String,
+
+            /**
              * `rotatelabels` is an optional angle in degrees to rotate labels on the X axis
              *
              * @attribute rotatelabels
@@ -175,6 +185,8 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                 observer: '_update'
             }
         },
+
+        _update: function() {},
 
         // for elements which include VizChartCommonBehavior for containment, propagate render event
         ready: function() {
@@ -363,6 +375,14 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 
                     if (this.rotatelabels) {
                         chart.rotateLabels(this.rotatelabels)      //Angle to rotate x-axis labels.
+                    }
+
+                    if (this.xlabel) {
+                        chart.xAxis.axisLabel(this.xlabel);
+                    }
+
+                    if (this.ylabel) {
+                        chart.yAxis.axisLabel(this.ylabel);
                     }
 
                     if (this.staggerlabels) {
