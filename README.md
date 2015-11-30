@@ -17,12 +17,11 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 
 * Support for state persistance and downstream tools (nbviewer)
 * Interactions with DataFrames. Currently read-only.
-* Better error handling
-* More elements and support for other kernels.
+* More elements and support for other kernels (i.e R).
 
 ## Runtime Requirements
 
-* IPython Notebook 3.2.x (not Jupyter Notebook 4.x, yet) running on Python 3.x or Python 2.7.x
+* Jupyter Notebook 4.0.x running on Python 3.x or Python 2.7.x (see the [0.1.x branch](https://github.com/jupyter-incubator/declarativewidgets/tree/0.1.x) for IPython Notebook 3.2.x compatibility)
 * Notebook instance running out of `profile_default`
 * Bower - Necessary for installing 3rd party elements straight out of notebook
 * Spark Kernel if wanting to run Spark using Scala
