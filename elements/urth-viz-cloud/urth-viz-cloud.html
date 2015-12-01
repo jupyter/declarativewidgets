@@ -98,6 +98,12 @@
             },
 
             ready: function() {
+                var display = window.getComputedStyle(this).display;
+                if (display === 'none' || document.readyState !== 'complete') {
+                    this.async(this.ready, 200);
+                    return;
+                }
+
                 require(['d3', 'd3-cloud'], function(d3, cloud) {
                     var fill = d3.scale.category20();
 
@@ -106,8 +112,9 @@
                         words.push({text: word, size: 10 + this.data[word] * 90});
                     }
 
+                    var computedStyle = getComputedStyle(this.$.container);
                     var layout = this.layout = cloud()
-                        .size([500, 500])
+                        .size([parseInt(computedStyle.width), parseInt(computedStyle.height)])
                         .words(words)
                         .padding(5)
                         .rotate(function() { return ~~(Math.random() * 2) * 90; })
