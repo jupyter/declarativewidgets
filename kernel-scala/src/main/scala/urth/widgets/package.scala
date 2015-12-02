@@ -11,7 +11,7 @@ import org.apache.spark.repl.SparkIMain
 package object widgets {
 
   // Types
-  type WatchHandler = (_, _) => Unit
+  type WatchHandler[T] = (Option[T], T) => Unit
 
   object WidgetClass {
     val Function  = "urth.widgets.widget_function.Function"

@@ -414,7 +414,7 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
         val arg1 = JsNumber(1)
         val arg2 = JsNumber(2)
         var executed = false
-        val handler = (old: Int, noo: Int) => executed = true
+        val handler = (old: Option[Int], noo: Int) => executed = true
 
         support.invokeWatchHandler(arg1, arg2, handler) should be (Some(()))
         executed should be(true)
@@ -423,7 +423,7 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
       it ("should return None when execution fails"){
         val arg1 = JsNumber(1)
         val arg2 = JsNumber(2)
-        val handler = (old: Int, noo: Int) => { 1 / 0; ()}
+        val handler = (old: Option[Int], noo: Int) => { 1 / 0; ()}
 
         support.invokeWatchHandler(arg1, arg2, handler) should be (None)
       }
@@ -432,7 +432,7 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
         val arg1 = JsNumber(1)
         val arg2 = JsNumber(2)
         var executed = false
-        val handler = (old: String, noo: String) => executed = true
+        val handler = (old: Option[String], noo: String) => executed = true
 
         support.invokeWatchHandler(arg1, arg2, handler) should be (None)
         executed should be(false)
