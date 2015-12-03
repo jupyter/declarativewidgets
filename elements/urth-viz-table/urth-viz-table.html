@@ -107,7 +107,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
             _resizeTableWidth: function() {
                 if(this.hot) {
                     this.$.tableResizeWrapper.style.overflowY = "hidden";
-                    //this.$.tableResizeWrapper.style.width = this.offsetWidth;
+                    //this.$.tableResizeWrapper.style.width = this.offsetWidth + 'px';
                 }
             },
 
@@ -172,7 +172,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
             _handleSelection: function (rowStart, colStart, rowEnd, colEnd) {
                 // if table has been sorted, we need to get physical index of the row in the datasource
                 // since rowStart is only the logical index of the table view
-                var physicalIndex = this.hot.sortIndex.length > 0 ? 
+                var physicalIndex = this.hot.sortIndex.length > 0 ?
                                         this.hot.sortIndex[rowStart][0] : rowStart;
                 this._setSelection(this.datarows[physicalIndex]);
                 this.selectedRow = rowStart; //storing index
@@ -245,8 +245,8 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         stretchH: 'all',
                         beforeOnCellMouseDown: this._forceRowSelection.bind(this),
                         afterSelectionEnd: this._handleSelection.bind(this),
-                        afterColumnSort: function() { 
-                            this._handleSelection(0); 
+                        afterColumnSort: function() {
+                            this._handleSelection(0);
                         }.bind(this),
                         afterDeselect: function() {
                             this.hot.selectCell(this.selectedRow, 0, this.selectedRow, columnSettings.length-1);
