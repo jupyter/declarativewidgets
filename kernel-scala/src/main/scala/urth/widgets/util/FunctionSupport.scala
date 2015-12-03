@@ -48,7 +48,7 @@ trait FunctionSupport {
    * @return Some(()) if successful, None if an error occurs during invocation.
    */
   def invokeWatchHandler(
-    arg1Json: JsValue, arg2Json: JsValue, handler: WatchHandler): Option[Unit]
+    arg1Json: JsValue, arg2Json: JsValue, handler: WatchHandler[_]): Option[Unit]
 
   /**
    * Returns a Signature describing the parameters of the function
@@ -464,12 +464,11 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
    * @return Some(()) if successful, None if an error occurs during invocation.
    */
   override def invokeWatchHandler(
-    arg1Json: JsValue, arg2Json: JsValue, handler: WatchHandler
+    arg1Json: JsValue, arg2Json: JsValue, handler: WatchHandler[_]
   ): Option[Unit] = {
-    val arg1 = convertJsValue(arg1Json)
+    val arg1 = wrapValueInOption(convertJsValue(arg1Json))
     val arg2 = convertJsValue(arg2Json)
-    logger.trace(s"Invoking handler with arguments " +
-      s"$arg1: ${arg1.getClass.getName}, $arg2: ${arg2.getClass.getName}")
+    logger.trace(s"Invoking handler with arguments $arg1, $arg2")
     applySymbol(handler) flatMap {
       case (im, sym) => Try(im.reflectMethod(sym)(arg1, arg2)) match {
         case Success(v) => Some(())
@@ -478,6 +477,11 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
           None
       }
     }
+  }
+
+  private[util] def wrapValueInOption(x: Any): Option[Any] = x match {
+    case None => None
+    case _ => Some(x)
   }
 
   /**

@@ -3,7 +3,7 @@ package urth.widgets
 import com.ibm.spark.comm.CommWriter
 import com.ibm.spark.kernel.protocol.v5.MsgData
 import com.ibm.spark.utils.LogLike
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsNull, JsValue}
 import urth.widgets.util.{StandardFunctionSupport, MessageSupport, SerializationSupport}
 
 /**
@@ -66,9 +66,21 @@ class WidgetChannels(val comm: CommWriter)
   ): Option[(String, String, JsValue, JsValue)] = for {
       chan <- (msgContent \ Comm.ChangeData \ Comm.ChangeChannel).asOpt[String]
       name <- (msgContent \ Comm.ChangeData \ Comm.ChangeName).asOpt[String]
-      oldVal <- (msgContent \ Comm.ChangeData \ Comm.ChangeOldVal).asOpt[JsValue]
+      oldVal <- parseOldVal(msgContent)
       newVal <- (msgContent \ Comm.ChangeData \ Comm.ChangeNewVal).asOpt[JsValue]
     } yield (chan, name, oldVal, newVal)
+
+  /**
+   * Allow for a non-existent `old_val` by returning JsNull if it isn't present.
+   * @param msgContent Message to parse.
+   * @return Some(old_val) or Some(JsNull) if old_val isn't present.
+   */
+  private[widgets] def parseOldVal(msgContent: MsgData): Option[JsValue] = {
+    (msgContent \ Comm.ChangeData \ Comm.ChangeOldVal).asOpt[JsValue] match {
+      case s@Some(_) => s
+      case None => Some(JsNull)
+    }
+  }
 
   /**
    * Retrieves the registered WatchHandler for the given channel and name.
@@ -78,7 +90,7 @@ class WidgetChannels(val comm: CommWriter)
    */
   private[widgets] def getHandler(
     chan: String, name: String
-  ): Option[WatchHandler] = for {
+  ): Option[WatchHandler[_]] = for {
       handlers <- WidgetChannels.chanHandlers.get(chan)
       handler  <- handlers.get(name)
   } yield handler
@@ -108,7 +120,7 @@ case class Channel(comm: CommWriter, chan: String)
    * @param variable Name of the variable to watch.
    * @param handler Handler to execute when a change to `variable` occurs.
    */
-  def watch(variable: String, handler: WatchHandler): Unit =
+  def watch(variable: String, handler: WatchHandler[_]): Unit =
     WidgetChannels.watch(this.chan, variable, handler)
 
   private def chanKey(chan: String, key: String): String = s"$chan:$key"
@@ -125,7 +137,7 @@ object WidgetChannels extends LogLike {
   private[widgets] var theChannels: WidgetChannels = _
 
   // Maps channel name to a map of variable name to handler.
-  private[widgets] var chanHandlers: Map[String, Map[String, WatchHandler]] =
+  private[widgets] var chanHandlers: Map[String, Map[String, WatchHandler[_]]] =
     Map()
 
   /**
@@ -145,7 +157,7 @@ object WidgetChannels extends LogLike {
    * @param handler Handler to register.
    */
   private[widgets] def watch(
-     chan: String, variable: String, handler: WatchHandler
+     chan: String, variable: String, handler: WatchHandler[_]
   ): Unit = {
     logger.trace(s"Registering handler $handler for $variable on channel $chan")
     chanHandlers = chanHandlers +
