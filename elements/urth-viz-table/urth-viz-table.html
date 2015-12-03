@@ -6,6 +6,7 @@
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
 <!--
 Creates a Polymer element that displays a table with specified data and column headers.
@@ -27,7 +28,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
         <link rel="stylesheet" type="text/css" href="../handsontable/dist/handsontable.full.css">
         <link rel="stylesheet" type="text/css" href="urth-viz-table.css">
 
-        <table id="tableContainer" style="border-spacing: 0; display: block;"></table>
+        <div id="tableResizeWrapper">
+            <table id="tableContainer" style="border-spacing: 0; display: block;"></table>
+        </div>
         <content></content>
     </template>
     <script>
@@ -91,8 +94,22 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 }
             },
 
+            behaviors: [
+              Polymer.IronResizableBehavior
+            ],
+            listeners: {
+              'iron-resize': '_resizeTableWidth'
+            },
+
             ROW_HEIGHT: 25,
             COL_OPTIONS: ["type", "format"],
+
+            _resizeTableWidth: function() {
+                if(this.hot) {
+                    this.$.tableResizeWrapper.style.overflowY = "hidden";
+                    //this.$.tableResizeWrapper.style.width = this.offsetWidth;
+                }
+            },
 
             _updateColumns: function (newColumns) {
                 if(!newColumns) { return; }
