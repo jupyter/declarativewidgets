@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: help clean sdist dist dev docs test test-js test-py test-scala init server install dev-build system-test clean-watch
+.PHONY: help clean clean-dist sdist dist dev docs test test-js test-py test-scala init server install dev-build system-test clean-watch
 .SUFFIXES:
 MAKEFLAGS=-r
 
@@ -45,12 +45,14 @@ $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 bower_components: node_modules/bower bower.json
 	@npm run bower -- install
 
-clean:
-	@-rm -rf dist
+clean: clean-dist
 	@-rm -rf *.egg-info
 	@-rm -rf __pycache__ */__pycache__ */*/__pycache__
 	@-find . -name '*.pyc' -exec rm -fv {} \;
 	@-rm -rf bower_components node_modules
+
+clean-dist:
+	@-rm -rf dist
 
 .watch: node_modules
 	@echo 'Doing watch'
@@ -95,7 +97,7 @@ ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala code'
 else
 	@echo 'Building scala code'
-	@mkdir -p dist
+	@mkdir -p dist/urth_widgets
 	@docker run -it --rm \
 		-v `pwd`:/src \
 		cloudet/sbt-sparkkernel-image:1.5.1 bash -c 'cp -r /src/kernel-scala /tmp/src && \
