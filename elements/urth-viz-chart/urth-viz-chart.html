@@ -231,6 +231,10 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             primary = primary || this.primary;
             secondary = secondary || this.secondary;
 
+            if (this.columns.length && datarows[0] && this.columns.length != datarows[0].length) {
+                console.warn('Warning: arity of columns does not match data');
+            }
+
             var columnSettings = this.columnSettings;
             var values = (datarows[0] || []).map(function (rows, i) {
                 var t = function (d, i) {
