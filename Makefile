@@ -222,7 +222,7 @@ _run:
 
 dev: CMD?=sh -c "python --version; ipython notebook --no-browser --port 8888 --ip='*'"
 dev: .watch dist
-	@CMD='$(CMD)' $(MAKE) _dev-$(PYTHON)
+	-@CMD='$(CMD)' $(MAKE) _dev-$(PYTHON)
 	@$(MAKE) clean-watch
 
 _dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
