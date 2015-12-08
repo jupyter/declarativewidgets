@@ -19,6 +19,8 @@ NOTE: Due to changed syntax for meta-classes, this is not compatible with
 """
 
 import sys
+import json
+
 from urth.util.serializer_registrar import SerializerRegistrar
 if sys.version_info[0] == 2:
     from urth.util.base_serializer_py2 import BaseSerializer
@@ -26,7 +28,28 @@ else:
     from urth.util.base_serializer_py3 import BaseSerializer
 
 
-class DataFrameSerializer(BaseSerializer):
+class PandasSeriesSerializer(BaseSerializer):
+    """A serializer for pandas.Series"""
+    @staticmethod
+    def klass():
+        import pandas
+        return pandas.Series
+
+    @staticmethod
+    def serialize(obj, **kwargs):
+        # Default to index orientation
+        # {index -> {column -> value}}
+        return json.loads(obj.to_json(orient='index'))
+
+    @staticmethod
+    def check_packages():
+        try:
+            import pandas
+        except ImportError:
+            return False
+        return True
+    
+class PandasDataFrameSerializer(BaseSerializer):
     """A serializer for pandas.DataFrame"""
 
     @staticmethod
@@ -36,13 +59,10 @@ class DataFrameSerializer(BaseSerializer):
 
     @staticmethod
     def serialize(obj, **kwargs):
-        json = {
-            'columns': [str(c) for c in obj.columns.tolist()],
-            'data': obj.head(kwargs.get('limit', 100)).values.tolist(),
-            'index': [str(i) for i in
-                      obj.head(kwargs.get('limit', 100)).index.tolist()]
-        }
-        return json
+        limit = kwargs.get('limit', 100)
+        # Default to split orientation 
+        # {index -> [index], columns -> [columns], data -> [values]}
+        return json.loads(obj[:limit].to_json(orient='split'))
 
     @staticmethod
     def check_packages():
