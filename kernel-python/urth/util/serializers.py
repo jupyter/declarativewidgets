@@ -29,7 +29,6 @@ else:
 
 
 class PandasSeriesSerializer(BaseSerializer):
-    """A serializer for pandas.Series"""
     @staticmethod
     def klass():
         import pandas
@@ -39,7 +38,8 @@ class PandasSeriesSerializer(BaseSerializer):
     def serialize(obj, **kwargs):
         # Default to index orientation
         # {index -> {column -> value}}
-        return json.loads(obj.to_json(orient='index'))
+        date_format = kwargs.get('date_format', 'iso')
+        return json.loads(obj.to_json(orient='index', date_format=date_format))
 
     @staticmethod
     def check_packages():
@@ -62,7 +62,8 @@ class PandasDataFrameSerializer(BaseSerializer):
         limit = kwargs.get('limit', 100)
         # Default to split orientation 
         # {index -> [index], columns -> [columns], data -> [values]}
-        return json.loads(obj[:limit].to_json(orient='split'))
+        date_format = kwargs.get('date_format', 'iso')
+        return json.loads(obj[:limit].to_json(orient='split', date_format=date_format))
 
     @staticmethod
     def check_packages():
