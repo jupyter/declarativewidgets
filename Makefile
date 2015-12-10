@@ -1,25 +1,26 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: help clean clean-dist sdist dist dev docs test test-js test-py test-scala init server install dev-build system-test clean-watch
+.PHONY: help clean clean-dist sdist dist dev docs test test-js test-py test-scala init server install dev-build system-test clean-watch clean-watch-docs
 .SUFFIXES:
 MAKEFLAGS=-r
 
 help:
-	@echo '       init - setups machine with base requirements for dev'
-	@echo '      clean - clean build files'
-	@echo 'clean-watch - tries to stop the file watch started by dev'
-	@echo '        dev - start container with source mounted for development'
-	@echo '       docs - start container that serves documentation'
-	@echo '      sdist - build a source distribution'
-	@echo '    install - install latest sdist into a container'
-	@echo '     server - starts a container with extension installed through pip'
-	@echo 'system-test - run system integration tests with selenium'
-	@echo '       test - run all units'
-	@echo '    test-py - run python units'
-	@echo '    test-js - run javascript units'
-	@echo ' test-scala - run scala units'
-	@echo '        all - run all necessary streps to produce and validate a build'
+	@echo '            init - setups machine with base requirements for dev'
+	@echo '           clean - clean build files'
+	@echo '     clean-watch - tries to stop the file watch started by dev'
+	@echo 'clean-watch-docs - tries to stop the file watch started by docs'
+	@echo '             dev - start container with source mounted for development'
+	@echo '            docs - start container that serves documentation'
+	@echo '           sdist - build a source distribution'
+	@echo '         install - install latest sdist into a container'
+	@echo '          server - starts a container with extension installed through pip'
+	@echo '     system-test - run system integration tests with selenium'
+	@echo '            test - run all units'
+	@echo '         test-py - run python units'
+	@echo '         test-js - run javascript units'
+	@echo '      test-scala - run scala units'
+	@echo '             all - run all necessary streps to produce and validate a build'
 
 
 init: node_modules
@@ -56,13 +57,21 @@ clean-dist:
 
 .watch: node_modules
 	@echo 'Doing watch'
-	@npm run watch &
-	@touch .watch
+	@npm run watch & echo $$! > .watch
+
+.watch-docs: node_modules
+	@echo 'Doing watch-docs'
+	@npm run watch-docs & echo $$! > .watch-docs
 
 clean-watch:
 	@echo 'Killing watch'
+	-@kill -9 `pgrep -P $$(cat .watch)`
 	-@rm .watch
-	-@kill -9 `pgrep gulp`
+
+clean-watch-docs:
+	@echo 'Killing watch-docs'
+	-@kill -9 `pgrep -P $$(cat .watch-docs)`
+	-@rm .watch-docs
 
 dist/urth_widgets/js: ${shell find nb-extension/js}
 	@echo 'Moving src/nb-extension'
@@ -278,9 +287,10 @@ endif
 	-@docker rm -f $(SERVER_NAME)
 
 docs: DOC_PORT?=4001
-docs: .watch dist/docs
-	@echo "Serving docs at http://127.0.0.1:$(DOC_PORT)"
-	@bash -c "trap 'make clean-watch' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
+docs: BASEURL?=http://127.0.0.1
+docs: .watch-docs dist/docs
+	@echo "Serving docs at $(BASEURL):$(DOC_PORT)"
+	@bash -c "trap 'make clean-watch-docs' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
 
 all: BASEURL?=http://192.168.99.100:9500
 all:
@@ -293,6 +303,7 @@ all:
 	PYTHON=python2 $(MAKE) install
 	@BASEURL=$(BASEURL) $(MAKE) system-test
 	@BASEURL=$(BASEURL) PYTHON=python2 $(MAKE) system-test
+	$(MAKE) dist/docs
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
 release: SETUP_CMD=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;
