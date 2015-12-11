@@ -1,5 +1,7 @@
-urth-viz-table {
-    overflow: hidden; /* hack around broken ht sizing logic in getTrimmingContainer */
+#tableContainer {
+    overflow: scroll;
+    border-spacing: 0;
+    display: block;
 }
 
 .handsontable td {
