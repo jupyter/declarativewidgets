@@ -6,6 +6,7 @@
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
 <!--
 Creates a Polymer element that displays a table with specified data and column headers.
@@ -90,8 +91,28 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 }
             },
 
+            behaviors: [
+                // Handsontable resizes itself based on document.onResize, but
+                // the dashboard also uses iron-resize events when changing layout
+                Polymer.IronResizableBehavior
+            ],
+
+            listeners: {
+                'iron-resize': '_resizeTable'
+            },
+
             ROW_HEIGHT: 25,
             COL_OPTIONS: ["type", "format"],
+
+            _resizeTable: function() {
+                if (this.hot) {
+                    this.hot.view.wt.eventListeners.filter(function (listener) {
+                        return listener.event == 'resize';
+                    }).forEach(function(listener) {
+                        listener.callback.apply();
+                    });
+                }
+            },
 
             _updateColumns: function (newColumns) {
                 if(!newColumns) { return; }
