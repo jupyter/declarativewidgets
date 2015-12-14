@@ -6,6 +6,7 @@
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
 <!--
 Creates a Polymer element that displays a table with specified data and column headers.
@@ -27,7 +28,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
         <link rel="stylesheet" type="text/css" href="../handsontable/dist/handsontable.full.css">
         <link rel="stylesheet" type="text/css" href="urth-viz-table.css">
 
-        <table id="tableContainer" style="border-spacing: 0; display: block;"></table>
+        <div id="tableResizeWrapper">
+            <table id="tableContainer" style="border-spacing: 0; display: block;"></table>
+        </div>
         <content></content>
     </template>
     <script>
@@ -91,8 +94,22 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 }
             },
 
+            behaviors: [
+              Polymer.IronResizableBehavior
+            ],
+            listeners: {
+              'iron-resize': '_resizeTableWidth'
+            },
+
             ROW_HEIGHT: 25,
             COL_OPTIONS: ["type", "format"],
+
+            _resizeTableWidth: function() {
+                if(this.hot) {
+                    this.$.tableResizeWrapper.style.overflowY = "hidden";
+                    //this.$.tableResizeWrapper.style.width = this.offsetWidth + 'px';
+                }
+            },
 
             _updateColumns: function (newColumns) {
                 if(!newColumns) { return; }
@@ -155,7 +172,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
             _handleSelection: function (rowStart, colStart, rowEnd, colEnd) {
                 // if table has been sorted, we need to get physical index of the row in the datasource
                 // since rowStart is only the logical index of the table view
-                var physicalIndex = this.hot.sortIndex.length > 0 ? 
+                var physicalIndex = this.hot.sortIndex.length > 0 ?
                                         this.hot.sortIndex[rowStart][0] : rowStart;
                 this._setSelection(this.datarows[physicalIndex]);
                 this.selectedRow = rowStart; //storing index
@@ -228,8 +245,8 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         stretchH: 'all',
                         beforeOnCellMouseDown: this._forceRowSelection.bind(this),
                         afterSelectionEnd: this._handleSelection.bind(this),
-                        afterColumnSort: function() { 
-                            this._handleSelection(0); 
+                        afterColumnSort: function() {
+                            this._handleSelection(0);
                         }.bind(this),
                         afterDeselect: function() {
                             this.hot.selectCell(this.selectedRow, 0, this.selectedRow, columnSettings.length-1);
