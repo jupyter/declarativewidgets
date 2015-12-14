@@ -156,6 +156,10 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                 '_onArgsPropertyChanged(args.*)'
             ],
 
+            listeners: {
+                'watch_notify': 'invoke'
+            },
+
             created: function(){
                 console.debug('urth-core-function created', arguments);
                 this.createModel('urth.widgets.widget_function.Function');
