@@ -1,10 +1,34 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
+// npm compatibility
+function requireLocalFiles() {
+    require('../../../../node_modules/jupyter-js-widgets/static/widgets/js/manager-base');
+    require('../../../../node_modules/jupyter-js-widgets/static/widgets/js/widget');
+}
+
+if (typeof define !== 'function') {
+    var amdefine = require('amdefine')(module, require);
+
+    var mapping = {}
+    mapping['nbextensions/widgets/widgets/js/manager'] = '../../../../node_modules/jupyter-js-widgets/static/widgets/js/manager-base'
+    mapping['nbextensions/widgets/widgets/js/widget'] = '../../../../node_modules/jupyter-js-widgets/static/widgets/js/widget'
+
+    var define = function(){
+        var args = Array.prototype.slice.call(arguments);
+        if (args.length > 1) {
+            args[0] = args[0].map(function(arg) {
+                arg = mapping[arg] || arg;
+                return arg;
+            });
+        }
+        amdefine.apply(this, args);
+    }
+}
+
 define(["nbextensions/widgets/widgets/js/manager",
-    "nbextensions/widgets/widgets/js/widget",
-    "base/js/namespace"
-], function(widgetmanager, ipywidget, IPython) {
+    "nbextensions/widgets/widgets/js/widget"
+], function(widgetmanager, ipywidget) {
     "use strict";
 
     /**
@@ -33,7 +57,7 @@ define(["nbextensions/widgets/widgets/js/manager",
         this.comm.send(data, callbacks);
     };
 
-    widgetmanager.WidgetManager.register_widget_model('DeclWidgetModel', DeclWidgetModel);
+    widgetmanager.ManagerBase.register_widget_model('DeclWidgetModel', DeclWidgetModel);
 
     return DeclWidgetModel;
 
