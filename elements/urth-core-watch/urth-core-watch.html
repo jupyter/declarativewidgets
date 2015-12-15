@@ -34,7 +34,13 @@ Example: _One or more children. urth-core-function and urth-core-dataframe suppo
         <content></content>
     </template>
     <script>
-        Polymer({
+
+        window.Urth = window.Urth || {};
+
+        window.Urth['urth-core-watch'] = Polymer({
+
+            is: 'urth-core-watch',
+
             properties: {
                 /**
                  * Value that is observed for changes
