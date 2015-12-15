@@ -34,5 +34,5 @@ notifications:
 
 branches:
   only:
-    - master
     - 0.1.x
+    - /^0\.1\.[0-9]+$/
