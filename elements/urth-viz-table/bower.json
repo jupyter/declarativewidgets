@@ -19,7 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "handsontable": "ibm-et/handsontable#0.18.0-ibm",
+    "handsontable": "ibm-et/handsontable#0.20.2-ibm",
     "polymer": "Polymer/polymer#^1.2.2",
     "requirejs": "^2.1.0"
   },
