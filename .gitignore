@@ -65,5 +65,6 @@ bower_components
 node_modules/
 npm-debug.*
 .watch
+.watch-docs
 project/
 SELENIUM_PID
