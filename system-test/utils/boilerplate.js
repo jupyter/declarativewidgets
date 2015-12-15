@@ -84,15 +84,18 @@ Boilerplate.prototype.setup = function(testName, startingURL){
     desired.name = testName ? 'Urth Widgets System Test - ' + testName
         : 'Urth Widgets System Test';
 
+    var kernelStartTimeout = 200000;
+    var defaultTimeout = 10000;
+    var runAllCompletionTime = 50000;
     this.browser.init(desired)
         .get(startingURL || '/')
-        .waitForElementByCssSelector('#kernel_indicator_icon.kernel_idle_icon', wd.asserters.isDisplayed, 10000)
-        .waitForElementByLinkText('Cell', wd.asserters.isDisplayed, 10000)
+        .waitForElementByCssSelector("#kernel_indicator_icon.kernel_idle_icon", wd.asserters.isDisplayed, kernelStartTimeout)
+        .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, defaultTimeout)
         .safeExecute('localStorage.clear()')
-        .elementByLinkText('Cell')
+        .elementByLinkText("Cell")
         .click()
-        .waitForElementByLinkText('Run All', wd.asserters.isDisplayed, 10000)
-        .elementByLinkText('Run All')
+        .waitForElementByLinkText("Run All", wd.asserters.isDisplayed, defaultTimeout)
+        .elementByLinkText("Run All")
         .click()
         .eval('!!document.body.createShadowRoot', function(err, value) {
             this.browserSupportsShadowDOM = value;
