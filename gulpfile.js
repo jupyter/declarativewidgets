@@ -8,10 +8,16 @@ var gulp = require('gulp'),
 
 gulp.task('watch', function () {
     watch(['elements/**/*',
-           'etc/docs/**/*',
            'kernel-python/**/*',
            'kernel-scala/**/*',
            'nb-extension/**/*'], function(){
         run('make dist').exec();
+    });
+});
+
+gulp.task('watch-docs', function () {
+    watch(['elements/**/*',
+           'etc/docs/**/*'], function(){
+        run('make dist/docs').exec();
     });
 });
