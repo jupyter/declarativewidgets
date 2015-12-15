@@ -1,9 +1,0 @@
-#tableContainer {
-    overflow: scroll;
-    border-spacing: 0;
-    display: block;
-}
-
-.handsontable td {
-    white-space: normal;
-}
