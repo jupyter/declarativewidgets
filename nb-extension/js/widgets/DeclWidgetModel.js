@@ -3,16 +3,16 @@
 
 // npm compatibility
 function requireLocalFiles() {
-    require('../../../../node_modules/jupyter-js-widgets/static/widgets/js/manager-base');
-    require('../../../../node_modules/jupyter-js-widgets/static/widgets/js/widget');
+    require('../../../../../../node_modules/jupyter-js-widgets/static/widgets/js/manager-base');
+    require('../../../../../../node_modules/jupyter-js-widgets/static/widgets/js/widget');
 }
 
 if (typeof define !== 'function') {
     var amdefine = require('amdefine')(module, require);
 
     var mapping = {}
-    mapping['nbextensions/widgets/widgets/js/manager'] = '../../../../node_modules/jupyter-js-widgets/static/widgets/js/manager-base'
-    mapping['nbextensions/widgets/widgets/js/widget'] = '../../../../node_modules/jupyter-js-widgets/static/widgets/js/widget'
+    mapping['nbextensions/widgets/widgets/js/manager'] = '../../../../../../node_modules/jupyter-js-widgets/static/widgets/js/manager-base'
+    mapping['nbextensions/widgets/widgets/js/widget'] = '../../../../../../node_modules/jupyter-js-widgets/static/widgets/js/widget'
 
     var define = function(){
         var args = Array.prototype.slice.call(arguments);
