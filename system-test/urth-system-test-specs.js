@@ -70,12 +70,12 @@ describe('Widgets Python System Test', function() {
     });
 });
 
-describe.only('Widgets Scala System Test', function() {
+describe('Widgets Scala System Test', function() {
     boilerplate.setup(this.title, '/notebooks/tests/Walkthrough-Scala.ipynb');
 
-    var timeout = 30000;
+    var timeout = 50000;
 
-    it('should print the correct variable that is used for urth-core-function', function(done) {
+    it.only('should print the correct variable that is used for urth-core-function', function(done) {
 
         boilerplate.browser
             .elementsByCssSelector('div.code_cell').nth(5)

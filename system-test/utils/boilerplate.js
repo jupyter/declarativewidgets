@@ -80,7 +80,7 @@ Boilerplate.prototype.setup = function(testName, startingURL){
 
     var kernelStartTimeout = 200000;
     var defaultTimeout = 10000;
-    var runAllCompletionTime = 50000;
+    var runAllCompletionTime = 60000;
     this.browser.init(desired)
         .get(startingURL)
         .waitForElementByCssSelector("#kernel_indicator_icon.kernel_idle_icon", wd.asserters.isDisplayed, kernelStartTimeout)
