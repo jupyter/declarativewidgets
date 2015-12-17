@@ -28,7 +28,7 @@ export class WidgetManager extends ipywidgets.ManagerBase {
     }
     
     _create_comm(targetName, id, metadata) {
-        return this.commManager.new_comm(targetName, metadata, id);
+        return Promise.resolve( this.commManager.new_comm(targetName, metadata, id) );
     }
     
     _get_comm_info() {

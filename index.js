@@ -21,6 +21,19 @@
 //    };
 //};
 
+global.jQuery = global.$ = require('jquery');
 var init = require('./dist/urth_widgets/js/init/init');
 
 exports.init =  init;
+
+var Events = function () {};
+
+var events = new Events();
+
+
+//shim in IPython
+IPython = {
+    notebook: {
+        events: $([events])
+    }
+}

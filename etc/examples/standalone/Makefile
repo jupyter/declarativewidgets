@@ -23,7 +23,7 @@ build-urth-widgets:
 build: build-urth-widgets build-ipywidgets
 	@echo 'Building example'
 	npm install
-	cd node_modules/urth-widgets/dist/urth_widgets && ln -s bower_components/ urth_components
+	-cd node_modules/urth-widgets/dist/urth_widgets && ln -s bower_components/ urth_components
 
 run:
 	python -m SimpleHTTPServer 8000

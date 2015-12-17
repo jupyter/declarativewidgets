@@ -1,4 +1,4 @@
 [
-    "%%HTML",
-    "<H1>HELLO WORLD</H1>"
+    "from urth.widgets.widget_channels import channel",
+    "channel('a').set('msg', 'Hello from kernel')"
 ]

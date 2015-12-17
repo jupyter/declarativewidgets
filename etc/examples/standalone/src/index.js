@@ -6,6 +6,8 @@ var WidgetManager = require("./manager").WidgetManager;
 
 var urth_widgets = require('urth-widgets');
 
+
+
 var services = require('jupyter-js-services');
 var getKernelSpecs = services.getKernelSpecs;
 var startNewKernel = services.startNewKernel;
@@ -13,8 +15,6 @@ var startNewKernel = services.startNewKernel;
 var BASEURL = prompt('Notebook BASEURL', 'http://192.168.99.100:8888');
 
 var WSURL = 'ws:' + BASEURL.split(':').slice(1).join(':');
-
-debugger;
 
 urth_widgets.init('./node_modules/urth-widgets/dist/urth_widgets/');
 
@@ -44,7 +44,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
         // Create the widget area and widget manager
         var widgetarea = document.getElementsByClassName("widgetarea")[0];
         var manager = new WidgetManager(kernel, widgetarea);
-        
+
+        //more shimming
+        IPython.notebook.kernel = kernel;
+        IPython.notebook.kernel.widget_manager = manager;
+        IPython.notebook.events.trigger('kernel_ready.Kernel');
+
         // Run backend code to create the widgets.  You could also create the
         // widgets in the frontend, like the other /web/ examples demonstrate.
         kernel.execute({ code: code });
