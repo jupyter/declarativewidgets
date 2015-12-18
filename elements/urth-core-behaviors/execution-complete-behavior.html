@@ -16,7 +16,7 @@ This Behavior represents the completion of a code cell's execution.
       console.debug("Registering _onExecutionComplete for Execute Reply messages.");
       this.__replyCallback = this._onExecutionComplete.bind(this);
 
-      IPython.notebook.kernel.widget_manager.notebook.events.on(
+      IPython.notebook.events.on(
         'shell_reply.Kernel', this.__replyCallback
       );
     },
@@ -24,7 +24,7 @@ This Behavior represents the completion of a code cell's execution.
     detached: function() {
         console.debug("Unregistering _onExecutionComplete for Execute Reply messages.");
         if (this.__replyCallback){
-            IPython.notebook.kernel.widget_manager.notebook.events.off(
+            IPython.notebook.events.off(
                 'shell_reply.Kernel', this.__replyCallback
             );
         }

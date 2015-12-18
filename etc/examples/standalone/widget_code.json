@@ -1,4 +1,8 @@
 [
     "from urth.widgets.widget_channels import channel",
-    "channel('a').set('msg', 'Hello from kernel')"
+    "def hello(name):",
+    "    return 'Hello ' + name",
+    "channel('a').set('kernelready', True)"
 ]
+
+

@@ -52,6 +52,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         // Run backend code to create the widgets.  You could also create the
         // widgets in the frontend, like the other /web/ examples demonstrate.
-        kernel.execute({ code: code });
+        var execPromise = kernel.execute({ code: code });
+        execPromise.onReply = function(){
+            IPython.notebook.events.trigger('shell_reply.Kernel');
+        }
+
     });
 });

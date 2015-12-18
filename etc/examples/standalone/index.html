@@ -40,6 +40,10 @@
             <div class="inputarea"></div>
             <div class="widgetarea"></div>
             <template is='urth-core-bind' channel='a'>
+                <template is='dom-if' if='{{kernelready}}'>
+                    <urth-core-function ref="hello" arg-name="{{name}}" result="{{msg}}" auto></urth-core-function>
+                    name: <input type="text" value="{{name::input}}"></input>
+                </template>
                 <H1>{{msg}}</H1>
             </template>
         </div>
