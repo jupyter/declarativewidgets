@@ -22,6 +22,7 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 ## Runtime Requirements
 
 * Jupyter Notebook 4.0.x running on Python 3.x or Python 2.7.x (see the [0.1.x branch](https://github.com/jupyter-incubator/declarativewidgets/tree/0.1.x) for IPython Notebook 3.2.x compatibility)
+* [IPywidgets](https://github.com/ipython/ipywidgets) 4.1.x
 * Notebook instance running out of `profile_default`
 * Bower - Necessary for installing 3rd party elements straight out of notebook
 * Spark Kernel if wanting to run Spark using Scala
