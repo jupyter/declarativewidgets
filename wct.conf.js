@@ -8,24 +8,7 @@ module.exports = {
       browsers: ['chrome']
     },
     sauce: {
-      disabled: true,
-      browsers: [
-          {
-              browserName: "chrome",
-              platform: "Linux",
-              version: "45.0"
-          },
-          {
-              browserName: "chrome",
-              platform: "OS X 10.10",
-              version: "45.0"
-          },
-          {
-              browserName: "chrome",
-              platform: "Windows 10",
-              version: "45.0"
-          }
-      ]
+      disabled: true
     }
   },
   webserver: {

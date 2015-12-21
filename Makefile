@@ -166,7 +166,7 @@ test-js: | $(URTH_COMP_LINKS)
 test-js-remote: | $(URTH_COMP_LINKS)
 ifdef SAUCE_USER_NAME
 	@echo 'Running web component tests remotely on Sauce Labs...'
-	@npm run test-sauce --silent -- --sauce-tunnel-id \"$(TRAVIS_JOB_NUMBER)\" --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
+	@npm run test-sauce --silent -- --plugins.sauce.browsers "$(PLATFORM)/$(BROWSER)" --sauce-tunnel-id \"$(TRAVIS_JOB_NUMBER)\" --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
 else
 	@npm run test -- --local chrome
 endif
@@ -271,7 +271,7 @@ run-test:
 	@echo 'Waiting for server to start...'
 	@LIMIT=60; while [ $$LIMIT -gt 0 ] && ! docker logs $(SERVER_NAME) 2>&1 | grep 'Notebook is running'; do echo waiting $$LIMIT...; sleep 1; LIMIT=$$(expr $$LIMIT - 1); done
 	@echo 'Running system integration tests...'
-	@npm run system-test -- --baseurl $(BASEURL) --test-type $(TEST_TYPE)
+	@npm run system-test -- --baseurl $(BASEURL) --platform "$(PLATFORM)" --browser "$(BROWSER)" --test-type $(TEST_TYPE)
 
 system-test: BASEURL?=http://192.168.99.100:9500
 system-test: SERVER_NAME?=urth_widgets_integration_test_server
