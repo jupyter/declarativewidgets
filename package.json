@@ -10,6 +10,7 @@
     "http-server": "^0.8.5",
     "hydrolysis": "^1.19.1",
     "polybuild": "^1.0.5",
+    "polyclean": "~1.2",
     "mocha" :"^2.0.0",
     "wd": "latest",
     "chai": "latest",
@@ -17,7 +18,7 @@
     "colors": "latest",
     "minimist": "latest",
     "selenium-standalone": "latest",
-    "web-component-tester": "~3.4"
+    "web-component-tester": "^4"
   },
   "config": {},
   "scripts": {
