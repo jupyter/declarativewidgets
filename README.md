@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jupyter-incubator/declarativewidgets.svg)](https://travis-ci.org/jupyter-incubator/declarativewidgets)
+[![Build Status](https://travis-ci.org/jupyter-incubator/declarativewidgets.svg?branch=master)](https://travis-ci.org/jupyter-incubator/declarativewidgets)
 
 # Jupyter Declarative Widget Extension
 
