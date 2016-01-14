@@ -165,6 +165,13 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     if (this.hot) {
                         this._updateColumns(columns);
                         this._updateDatarows(datarows);
+
+                        // reset selection to null if it was previoulsy set
+                        if (this.selection) {
+                            this._setSelection(null);
+                            // deselect range that was previously highlighted
+                            this.hot.deselectCell();
+                        }
                     } else {
                         this._createTable(datarows);
                     }
@@ -252,6 +259,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         colHeaders: this.columns,
                         fillHandle: false,
                         manualColumnResize: true,
+                        outsideClickDeselects: false,
                         columnSorting: true,
                         sortIndicator: true,
                         columns: columnSettings,
@@ -260,9 +268,6 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         afterSelectionEnd: this._handleSelection.bind(this),
                         afterColumnSort: function() { 
                             this._handleSelection(0); 
-                        }.bind(this),
-                        afterDeselect: function() {
-                            this.hot.selectCell(this.selectedRow, 0, this.selectedRow, columnSettings.length-1);
                         }.bind(this)
                     };
 
