@@ -10,7 +10,6 @@
     "http-server": "^0.8.5",
     "hydrolysis": "^1.19.1",
     "polybuild": "^1.0.5",
-    "polyclean": "~1.2",
     "mocha" :"^2.0.0",
     "wd": "latest",
     "chai": "latest",
