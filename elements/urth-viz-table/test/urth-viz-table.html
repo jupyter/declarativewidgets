@@ -51,13 +51,25 @@
         // STEP 4: Define any globals needed by the test suite.
         beforeEach(function(done) {
             var table = fElmt = fixture('basic');
-            fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
-            fElmt.columns = ["Index","Series 1","Series 2"];
-            function listener() {
-                table.removeEventListener('urth-viz-render', listener);
+
+            // first listener responds to the fixture being complete
+            function listener1() {
+                table.removeEventListener('urth-viz-render', listener1);
+
+                fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
+                fElmt.columns = ["Index","Series 1","Series 2"];
+                fElmt.addEventListener('urth-viz-render', listener2);
+            }
+
+            // second listener responds to the attribute changes
+            function listener2() {
+                table.removeEventListener('urth-viz-render', listener2);
+
+                // both renderings are complete. it's safe to proceed with the test
                 done();
             }
-            fElmt.addEventListener('urth-viz-render', listener);
+
+            fElmt.addEventListener('urth-viz-render', listener1);
         });
 
         afterEach(function() {
@@ -66,14 +78,12 @@
         // STEP 5: Define suite(s) and tests.
         describe('urth-viz-table', function() {
             it('should render a tableContainer', function(done) {
-                setTimeout( function () {
-                    try {
-                        expect(fElmt.querySelectorAll('.handsontable')).to.have.length.above(0);
-                        done();
-                    } catch( e ) {
-                        done( e );
-                    }
-                }, 0);
+                try {
+                    expect(fElmt.querySelectorAll('.handsontable')).to.have.length.above(0);
+                    done();
+                } catch( e ) {
+                    done( e );
+                }
             });
         });
 
@@ -118,11 +128,14 @@
 
         describe('_updateColumns', function() {
             beforeEach(function(done) {
+                function listener() {
+                    fElmt.removeEventListener('urth-viz-render', listener);
+                    // rendering is complete.  proceed with test
+                    done();
+                }
+                fElmt.addEventListener('urth-viz-render', listener);
                 fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
                 fElmt.columns = ["Index","Series 1","Series 2"];
-                setTimeout(function() {
-                    done();
-                }, 0);
             });
 
             it('should not update table if new columns are not defined', function() {
@@ -144,12 +157,16 @@
 
         describe('_updateDatarows', function() {
             beforeEach(function(done) {
+                function listener() {
+                    fElmt.removeEventListener('urth-viz-render', listener);
+                    // rendering is complete.  proceed with test
+                    done();
+                }
+                fElmt.addEventListener('urth-viz-render', listener);
                 fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
                 fElmt.columns = ["Index","Series 1","Series 2"];
-                setTimeout(function() {
-                    done();
-                }, 0);
             });
+
             it('should not update table if new data is not defined', function() {
                 fElmt._updateDatarows();
                 expect(fElmt.hot.countRows()).to.equal(3);
@@ -168,43 +185,58 @@
 
 
         /* tests for urth-viz-col */
-/*
-        var table;
 
         describe('urth-viz-col', function() {
-            it('should format column to the correct format', function(done) {
+            var table;
+            beforeEach(function(done) {
+                function listener() {
+                    table.removeEventListener('urth-viz-render', listener);
+                    // rendering is complete.  proceed with test
+                    done();
+                }
                 table = fixture('colTest1');
-                table.datarows = [[1,8,5],[2,2,6],[3,5,7]];
+                table.addEventListener('urth-viz-render', listener);
+            });
 
-                sinon.stub(fElmt, "isDebouncerActive").returns(false);
-
-                setTimeout( function () {
+            it('should format column to the correct format', function(done) {
+                table.addEventListener('urth-viz-render', function() {
                     try { //cell should have format of $0,0.00
                         expect(table.hot.getCell(1,2).innerHTML).to.equal("$6.00");
                         done();
                     } catch(e) {
                         done(e);
                     }
-                }, 100);
+                });
+
+                table.datarows = [[1,8,5],[2,2,6],[3,5,7]];
+            });
+        });
+
+        describe('urth-viz-col2', function() {
+            var table;
+            beforeEach(function(done) {
+                function listener() {
+                    table.removeEventListener('urth-viz-render', listener);
+                    // rendering is complete.  proceed with test
+                    done();
+                }
+                table = fixture('colTest2');
+                table.addEventListener('urth-viz-render', listener);
             });
 
             it('should not format column if col index was not given', function(done) {
-                table = fixture('colTest2');
-                table.datarows = [[1,8,5],[2,2,6],[3,5,7]];
-
-                sinon.stub(fElmt, "isDebouncerActive").returns(false);
-
-                setTimeout( function () {
+                table.addEventListener('urth-viz-render', function() {
                     try { // cell should not have format of $0,0.00
                         expect(table.hot.getCell(1,2).innerHTML).to.equal("6");
                         done();
                     } catch(e) {
                         done(e);
                     }
-                }, 100);
+                });
+
+                table.datarows = [[1,8,5],[2,2,6],[3,5,7]];
             });
         });
-*/
 
     </script>
 </body>
