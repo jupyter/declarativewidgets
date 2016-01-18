@@ -393,7 +393,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                             notify: true,
                             reflectToAttribute: true,
                             observer: argPropObserverName,
-                            value: this[argPropName] || sig[param].value
+                            value: this[argPropName] !== undefined ? this[argPropName] : sig[param].value
                         }
 
                     }.bind(this));
