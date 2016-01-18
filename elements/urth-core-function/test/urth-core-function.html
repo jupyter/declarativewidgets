@@ -506,7 +506,7 @@
                 var fElmt = fixture('basic');
                 sinon.stub(fElmt, "_tryInvoke");
 
-                fElmt.args.x = NaN
+                fElmt.args.x = NaN;
 
                 fElmt._onSignatureChange({
                     x: {'value': 5}
@@ -519,6 +519,28 @@
                 expect(fElmt.hasOwnProperty('argX')).to.be.true;
 
                 expect(fElmt.argX).to.equal(5);
+            });
+
+            it('should set to values on property when they are either 0 or false', function() {
+                var fElmt = fixture('basic');
+                sinon.stub(fElmt, "_tryInvoke");
+
+                fElmt.argX = 0;
+                fElmt.argY = false;
+
+                fElmt._onSignatureChange({
+                    x: {'required': true},
+                    y: {'required': true},
+                    z: {}
+                });
+
+                expect(fElmt.args).to.eql({x: 0, y: false});
+
+                expect(fElmt.hasOwnProperty('argX')).to.be.true;
+                expect(fElmt.hasOwnProperty('argY')).to.be.true;
+
+                expect(fElmt.argX).to.equal(0);
+                expect(fElmt.argY).to.be.false;
             });
 
             it('should try to invoke the function if auto is set', function() {
