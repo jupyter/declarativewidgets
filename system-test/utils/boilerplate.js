@@ -63,9 +63,6 @@ var Boilerplate = function(){
   */
 Boilerplate.prototype.setup = function(testName, startingURL){
   var that = this;
-  startingURL = startingURL || '/';
-  desired.name = testName ? 'Urth Widgets System Test - ' + testName
-    : 'Urth Widgets System Test';
 
   before(function(done){
     if (args.verbose) {
@@ -78,8 +75,11 @@ Boilerplate.prototype.setup = function(testName, startingURL){
         });
     }
 
+    desired.name = testName ? 'Urth Widgets System Test - ' + testName
+        : 'Urth Widgets System Test';
+
     this.browser.init(desired)
-        .get(startingURL)
+        .get(startingURL || '/')
         .waitForElementByCssSelector("#kernel_indicator_icon.kernel_idle_icon", wd.asserters.isDisplayed, 10000)
         .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, 10000)
         .elementByLinkText("Cell")
