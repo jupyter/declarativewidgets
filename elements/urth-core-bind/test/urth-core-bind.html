@@ -18,11 +18,17 @@
 
     <!-- Step 2: Import the element to test. -->
     <link rel='import' href='../urth-core-bind.html'>
+    <link rel='import' href='../../urth-core-channel/urth-core-channel.html'>
 
 </head>
 
 <body>
     <!-- Step 3: Setup document with DOM to test. -->
+
+    <urth-core-channel id='channelDefault'></urth-core-channel>
+    <urth-core-channel id='channelA' name='a'></urth-core-channel>
+    <urth-core-channel id='channelB' name='b'></urth-core-channel>
+
     <template is='urth-core-bind' id='firstBind'>
         Hello
         <span id='firstUserSpan'>[[user]]</span>
@@ -79,61 +85,6 @@
         // Step 4: Define any globals needed by the test suite.
 
         // Step 5: Define suite(s) and tests.
-        describe('attached', function(done) {
-            var registerSpy;
-
-            afterEach(function() {
-                registerSpy.restore();
-            });
-
-            it('should register the element with the default data channel', function(done) {
-                var domBind = document.createElement('template', 'urth-core-bind');
-                registerSpy = sinon.spy(domBind, 'register');
-                var doc = domBind.content.ownerDocument;
-                var elem = doc.createElement('test-bind');
-                domBind.content.appendChild(elem);
-                document.body.appendChild(domBind);
-                // This is a workaround for a polyfill timing issue in Firefox.
-                // We explicitly wait for Polymer to register the domBind element
-                // prior to checking the whether the registerSpy has been called.
-                // Otherwise, the test will fail because the domBind element will
-                // not be initialized by the time the assertion is checked.
-                document.addEventListener("dom-change", function() {
-                    expect(registerSpy).to.have.been.calledWith(domBind, 'default');
-                }, false);
-                done();
-            });
-        });
-
-        describe('detached', function(done) {
-            var unregisterSpy;
-
-            afterEach(function() {
-                unregisterSpy.restore();
-            });
-
-            it('should unregister the element with the data channel', function(done) {
-                var domBind = document.createElement('template', 'urth-core-bind');
-                unregisterSpy = sinon.spy(domBind, 'unregister');
-                var doc = domBind.content.ownerDocument;
-                var elem = doc.createElement('test-bind');
-                domBind.content.appendChild(elem);
-                document.body.appendChild(domBind);
-                // This is a workaround for a polyfill timing issue in Firefox.
-                // We explicitly wait for Polymer to remove the domBind element,
-                // then wait again prior to checking whether the unregisterSpy
-                // has been called. Otherwise, the test will fail because the
-                // domBind element will not be removed by the time the
-                // assertion is checked.
-                document.addEventListener("dom-change", function() {
-                    document.addEventListener("DOMNodeRemoved", function() {
-                        expect(unregisterSpy).to.have.been.calledOnce;
-                    }, false);
-                    domBind.remove();
-                }, false);
-                done();
-            });
-        });
 
         describe('property change', function() {
             it('should flow top-down', function() {
@@ -164,9 +115,9 @@
                 defaultChannelBind.channel = 'default';
                 firstChannelBind.channel = 'a';
                 secondChannelBind.channel = 'b';
-                defaultChannelBind.clearData();
-                firstChannelBind.clearData('a');
-                secondChannelBind.clearData('b');
+                channelDefault.clear();
+                channelA.clear();
+                channelB.clear();
             });
 
             it('should switch element data to the new channels data', function() {
@@ -174,23 +125,6 @@
                 secondChannelBind.user = 'userB';
                 firstChannelBind.channel = secondChannelBind.channel;
                 expect(firstChannelBind.user).to.equal(secondChannelBind.user);
-            });
-
-            it('should unregister the element from the old channel', function() {
-                var unregisterSpy = sinon.spy(firstChannelBind, "unregister");
-                var oldChannel = firstChannelBind.channel;
-                var newChannel = 'c';
-                firstChannelBind.channel = newChannel;
-                expect(unregisterSpy).to.have.been.calledOnce;
-                expect(unregisterSpy).to.have.been.calledWith(firstChannelBind, oldChannel);
-                firstChannelBind.unregister.restore();
-            });
-
-            it('should not switch the channel when the channel name does not change', function() {
-                var switchSpy = sinon.spy(firstChannelBind, "switchChannel");
-                firstChannelBind._onChannelChange('a', 'a');
-                expect(switchSpy).to.not.have.been.called;
-                firstChannelBind.switchChannel.restore();
             });
 
             it('should receive property updates only from the subscribed channel', function() {
