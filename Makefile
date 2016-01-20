@@ -73,46 +73,46 @@ clean-watch-docs:
 	-@kill -9 `pgrep -P $$(cat .watch-docs)`
 	-@rm .watch-docs
 
-dist/urth_widgets/js: ${shell find nb-extension/js}
+dist/urth/widgets/ext/notebook/js: ${shell find nb-extension/js}
 	@echo 'Moving src/nb-extension'
-	@mkdir -p dist/urth_widgets/js
-	@cp -R nb-extension/js/* dist/urth_widgets/js/.
+	@mkdir -p dist/urth/widgets/ext/notebook/js
+	@cp -R nb-extension/js/* dist/urth/widgets/ext/notebook/js/.
 
-dist/urth_widgets/elements: ${shell find elements}
+dist/urth/widgets/ext/notebook/elements: ${shell find elements}
 	@echo 'Moving elements'
-	@mkdir -p dist/urth_widgets/elements
-	@cp -R elements/* dist/urth_widgets/elements/.
-	@touch dist/urth_widgets/elements
+	@mkdir -p dist/urth/widgets/ext/notebook/elements
+	@cp -R elements/* dist/urth/widgets/ext/notebook/elements/.
+	@touch dist/urth/widgets/ext/notebook/elements
 
-dist/urth_widgets/bower_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
+dist/urth/widgets/ext/notebook/bower_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
 	@echo 'Moving bower_components'
-	@mkdir -p dist/urth_widgets/bower_components
-	@cp -RL bower_components/* dist/urth_widgets/bower_components/.
+	@mkdir -p dist/urth/widgets/ext/notebook/bower_components
+	@cp -RL bower_components/* dist/urth/widgets/ext/notebook/bower_components/.
 
-dist/urth_widgets: dist/urth_widgets/bower_components dist/urth_widgets/js dist/urth_widgets/elements
+dist/urth/widgets/ext/notebook: dist/urth/widgets/ext/notebook/bower_components dist/urth/widgets/ext/notebook/js dist/urth/widgets/ext/notebook/elements
 
 dist/urth/widgets/ext: ${shell find nb-extension/python/urth/widgets/ext}
 	@echo 'Moving frontend extension code'
 	@mkdir -p dist/urth/widgets/ext
 	@cp -R nb-extension/python/urth/widgets/ext/* dist/urth/widgets/ext/.
 
-dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/ext
+dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/ext dist/urth/widgets/ext/notebook
 	@echo 'Moving python code'
 	@mkdir -p dist/urth
 	@cp -R kernel-python/urth/* dist/urth/.
 
-dist/urth_widgets/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
+dist/urth/widgets/ext/notebook/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala code'
 else
 	@echo 'Building scala code'
-	@mkdir -p dist/urth_widgets
+	@mkdir -p dist/urth/widgets/ext/notebook
 	@docker run -it --rm \
 		-v `pwd`:/src \
 		cloudet/sbt-sparkkernel-image:1.5.1 bash -c 'cp -r /src/kernel-scala /tmp/src && \
 			cd /tmp/src && \
 			sbt package && \
-			cp target/scala-2.10/urth-widgets*.jar /src/dist/urth_widgets/urth-widgets.jar'
+			cp target/scala-2.10/urth-widgets*.jar /src/dist/urth/widgets/ext/notebook/urth-widgets.jar'
 endif
 
 dist/docs: dist/docs/bower_components dist/docs/site dist/docs/site/generated_docs.json
@@ -135,12 +135,16 @@ dist/docs/site/generated_docs.json: dist/docs/site bower_components ${shell find
 	@echo 'Running hydrolysis to generate doc json'
 	@node etc/docs/hydrolyze_elements.js 'etc/docs/urth-elements.html' 'dist/docs/site/generated_docs.json'
 
+dist/scripts: etc/scripts/jupyter-declarativewidgets
+	@mkdir -p dist/scripts
+	@cp etc/scripts/jupyter-declarativewidgets dist/scripts/jupyter-declarativewidgets
+
 dist/VERSION: COMMIT=$(shell git rev-parse --short=12 --verify HEAD)
 dist/VERSION:
 	@mkdir -p dist
 	@echo "$(COMMIT)" > dist/VERSION
 
-dist: dist/urth_widgets dist/urth dist/urth_widgets/urth-widgets.jar dist/VERSION
+dist: dist/urth dist/urth/widgets/ext/notebook/urth-widgets.jar dist/scripts dist/VERSION
 
 sdist: dist
 	@cp -R MANIFEST.in dist/.
@@ -222,11 +226,12 @@ _run:
 	@docker run $(OPTIONS) --name $(SERVER_NAME) \
 		$(PORT_MAP) \
 		-e USE_HTTP=1 \
-		-v `pwd`:/widgets-nbexts \
+		-v `pwd`:/src \
 		$(VOL_MAP) \
-		--user jovyan \
 		$(REPO) bash -c '$(SETUP_CMD) \
-			pip install --no-binary ::all: $$(ls -1 /widgets-nbexts/dist/*.tar.gz | tail -n 1) && \
+			pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && \
+			jupyter declarativewidgets install --user && \
+			jupyter declarativewidgets activate && \
 			$(CMD)'
 
 dev: CMD?=sh -c "python --version; ipython notebook --no-browser --port 8888 --ip='*'"
@@ -245,12 +250,11 @@ _dev: NB_HOME?=/root
 _dev:
 	@docker run -it --rm \
 		-p 8888:8888 \
-		-e USE_HTTP=1 \
 		-e JVM_OPT=-Dlog4j.logLevel=trace \
-		-v `pwd`/etc/notebook.json:$(NB_HOME)/.jupyter/nbconfig/notebook.json \
-		-v `pwd`/dist/urth_widgets:$(NB_HOME)/.local/share/jupyter/nbextensions/urth_widgets \
+		-v `pwd`/dist/urth/widgets/ext/notebook:$(NB_HOME)/.local/share/jupyter/nbextensions/urth_widgets \
 		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
 		-v `pwd`/etc:$(NB_HOME)/nbconfig \
+		-v `pwd`/etc/notebook.json:$(NB_HOME)/.jupyter/nbconfig/notebook.json \
 		-v `pwd`/etc/jupyter_notebook_config.py:$(NB_HOME)/.jupyter/jupyter_notebook_config.py \
 		-v `pwd`/notebooks:/home/jovyan/work \
 		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'

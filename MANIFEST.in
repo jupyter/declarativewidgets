@@ -1,2 +1,2 @@
-recursive-include urth_widgets *.html *.js *.css *.jar *.json
+recursive-include urth/widgets/ext/notebook *.html *.js *.css *.jar *.json
 include VERSION
