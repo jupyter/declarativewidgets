@@ -6,6 +6,7 @@
 !examples
 !examples/*
 !demos
+!demos/*
 !demos/*/*
 !tests
 !tests/*
