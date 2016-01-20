@@ -38,13 +38,36 @@ We're running a tmpnb instance at [http://jupyter.cloudet.xyz](http://jupyter.cl
 
 ## Install It
 
-`pip install jupyter_declarativewidgets` and then restart your notebook server
+```bash
+# install the python package
+pip install jupyter_declarativewidgets
 
+# register the notebook frontend extensions into ~/.local/jupyter
+# see jupyter cms install --help for other options
+jupyter declarativewidgets install --user --symlink --overwrite
+# enable the JS and server extensions in your ~/.jupyter
+jupyter declarativewidgets activate
+
+# deactivate it later with
+jupyter declarativewidgets deactivate
+``` 
+
+Restart your notebook server
+
+## Uninstall It
+
+```bash
+jupyter declarativewidgets deactivate
+pip uninstall jupyter_declarativewidgets
+```
+
+Note that there is no Jupyter method for removing the installed JavaScript extension assets. You will need to clean them up manually from your chosen install location.
+ 
 ## Develop
 
 This repository is setup for a Dockerized development environment. On a Mac, do this one-time setup if you don't have a local Docker environment yet.
 
-```
+```bash
 brew update
 
 # make sure we have node and npm for frontend preprocessing
@@ -58,13 +81,13 @@ eval "$(docker-machine env dev)"
 
 Pull the Docker image that we'll use for development (super image with bower and spark kernel). This step is optional, `make dev` will bring in all requirements, including images.
 
-```
+```bash
 docker pull cloudet/pyspark-notebook-bower-sparkkernel
 ```
 
 Clone this repository in a local directory that docker can volume mount:
 
-```
+```bash
 # make a directory under ~ to put source
 mkdir -p ~/projects
 cd !$
@@ -75,7 +98,7 @@ git clone https://github.com/jupyter-incubator/declarativewidgets.git
 
 Run the notebook server in a docker container:
 
-```
+```bash
 # run notebook server in container
 cd declarativewidgets
 make dev
@@ -92,7 +115,7 @@ To see the Jupyter instance with extensions working:
 
 You can run a development environment against python 2.7 by adding an environment variable to your make calls.
 
-```
+```bash
 # Run a development environment against 2.7
 PYTHON=python2 make dev
 ```
@@ -147,7 +170,7 @@ Tests are located in the `test` directory of each Polymer element in `elements/`
 Here are some steps that are useful for debugging test failures:
 
 1. Execute web component tester in persistant mode from the root directory:
-```
+```bash
 make testdev
 ```
 2. Add a `debugger;` line to the test you want to debug.
@@ -160,7 +183,7 @@ make testdev
 
 You can run a tests against python 2.7 by adding an environment variable to your make calls.
 
-```
+```bash
 # Run unit tests against 2.7
 PYTHON=python2 make test
 ```
