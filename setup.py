@@ -2,6 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import os
+import sys
 from setuptools import setup, find_packages
 
 # Get location of this file at runtime
@@ -26,7 +27,7 @@ if os.path.isfile(VERSION_FILE):
         fh.write(BUILD_INFO + '\n')
         fh.close()
 
-setup(
+setup_args = dict(
     name='jupyter_declarativewidgets',
     author='Jupyter Development Team',
     author_email='jupyter@googlegroups.com',
@@ -41,3 +42,18 @@ setup(
         'scripts/jupyter-declarativewidgets'
     ]
 )
+
+if 'setuptools' in sys.modules:
+    # setupstools turns entrypoint scripts into executables on windows
+    setup_args['entry_points'] = {
+        'console_scripts': [
+            'jupyter-declarativewidgets = urth.widgets.ext.install.extensionapp:main'
+        ]
+    }
+    # Don't bother installing the .py scripts if if we're using entrypoints
+    setup_args.pop('scripts', None)
+
+if __name__ == '__main__':
+    setup(**setup_args)
+
+
