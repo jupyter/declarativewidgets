@@ -1,0 +1,158 @@
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-component-page/iron-component-page.html">
+<link rel="import" href="../../../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../../../bower_components/paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="../../../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+
+<dom-module id='urth-docs-panel'>
+    <template>
+        <style>
+            .iron-selected.selectable {
+                background: #fafafa;
+                color: #000000;
+            }
+
+            .project-name {
+                font-weight: 200;
+                letter-spacing: 0px;
+                letter-spacing: 0.05rem;
+                text-decoration: none;
+                color: #ffffff;
+            }
+
+            .selectable {
+                color: #D0D0D0;
+                font-size: 14px;
+                font-family: "Helvetica Neue",Arial,sans-serif;
+                height: 28px;
+                line-height: 28px;
+                padding-left: 20px;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            .selectable:hover:not(.iron-selected) {
+                cursor: pointer;
+                background: #4E4E4E;
+            }
+
+            .selector-header {
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 24px;
+                font-family: "Helvetica Neue",Arial,sans-serif;
+                -webkit-box-align: center;
+                -webkit-align-items: center;
+                -ms-flex-align: center;
+                align-items: center;
+                min-height: 28px;
+                display: -ms-flexbox;
+                display: -webkit-flex;
+                display: -webkit-box;
+                display: flex;
+                -ms-flex-direction: row;
+                -webkit-flex-direction: row;
+                -webkit-box-orient: horizontal;
+                -webkit-box-direction: normal;
+                flex-direction: row;
+                margin: 8px 0 4px 8px;
+                color: #888;
+            }
+
+            .top-nav-item {
+                color: #000000;
+                font-weight: 200;
+                letter-spacing: 1px;
+                letter-spacing: 0.1rem;
+                margin-left: auto;
+                text-decoration: none;
+            }
+
+            paper-header-panel[drawer] {
+                --paper-header-panel-waterfall-container: {
+                    background: #343131;
+                 };
+            }
+
+            paper-toolbar {
+                --paper-toolbar: {
+                    font-family: "Helvetica Neue",Arial,sans-serif;
+                    font-size: 16px;
+                    font-weight: 400;
+                };
+            }
+
+            paper-toolbar.elementbar {
+                --paper-toolbar-background: #2980B9;
+                --paper-toolbar-color: #ffffff;
+            }
+
+            paper-toolbar.navbar {
+                --paper-toolbar-background: #fafafa;
+                --paper-toolbar-color: #000000;
+            }
+        </style>
+        <paper-drawer-panel id="drawerPanel">
+            <paper-header-panel drawer mode="waterfall">
+                <paper-toolbar class="elementbar">
+                    <a class="project-name" href$="[[homeUrl]]">Jupyter Declaritive Widgets</a>
+                </paper-toolbar>
+                <iron-selector id="selector" attr-for-selected="name" selectable=".selectable" selected="{{activeDescriptor}}">
+                    <div class="selector-header">Elements</div>
+                    <template is="dom-repeat" items="[[elementDescriptors]]">
+                        <div class="selectable" name="[[item.is]]">[[item.is]]</div>
+                    </template>
+                    <div class="selector-header">Behaviors</div>
+                    <template is="dom-repeat" items="[[behaviorDescriptors]]">
+                        <div class="selectable" name="[[item.is]]">[[item.is]]</div>
+                    </template>
+                <iron-selector>
+            </paper-header-panel>
+            <paper-header-panel main mode="waterfall">
+                <paper-toolbar class="navbar">
+                    <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+                    <template is="dom-if" if="[[repositoryUrl]]">
+                        <a class="top-nav-item" href$="[[repositoryUrl]]">Repository</a>
+                    </template>
+                </paper-toolbar>
+                <iron-component-page catalog active="{{activeDescriptor}}" doc-elements="{{elementDescriptors}}"
+                        doc-behaviors="{{behaviorDescriptors}}" doc-src="[[docSrc]]">
+                </iron-component-page>
+            </paper-header-panel>
+        </paper-drawer-panel>
+    </template>
+
+    <script>
+    Polymer({
+        is: 'urth-docs-panel',
+        properties: {
+            /**
+             * Data rows for table. Must be an Array of Arrays
+             *
+             * @attribute datarows
+             * @type Array
+             */
+            docSrc: {
+                type: String
+            },
+            repositoryUrl: {
+                type: String
+            },
+            homeUrl: {
+                type: String,
+                value: '.'
+            }
+        },
+
+        ready: function() {
+            this.$.selector.addEventListener('iron-activate', function() {
+                if (this.$.drawerPanel.narrow) {
+                    this.$.drawerPanel.closeDrawer();
+                }
+            }.bind(this));
+        }
+    });
+    </script>
+</dom-module>
