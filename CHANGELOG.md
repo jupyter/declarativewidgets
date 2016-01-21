@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 (2016-01-20)
+
+* Modified install process to rely on `jupyter activate/deactivate`
+* New element `urth-core-channel` and javascript API to channel variables
+* New element `urth-core-watch`
+* Fixes to sizing of 'urth-viz-table'
+* Serialization support for Pandas.Series
+
 ## 0.2.0 (2015-12-01)
 
 * Make compatible with Jupyter Notebook 4.0.x
