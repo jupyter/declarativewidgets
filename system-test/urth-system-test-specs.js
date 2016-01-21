@@ -6,7 +6,7 @@ var Boilerplate = require('./utils/boilerplate');
 var boilerplate = new Boilerplate();
 
 describe('Widgets Python System Test', function() {
-    boilerplate.setup(this.title, '/notebooks/tests/Walkthrough.ipynb');
+    boilerplate.setup(this.title, '/notebooks/tests/Walkthrough.ipynb', 8);
 
     it('should print the correct variable that is used for urth-core-function', function(done) {
         boilerplate.browser
@@ -71,7 +71,7 @@ describe('Widgets Python System Test', function() {
 });
 
 describe('Widgets Scala System Test', function() {
-    boilerplate.setup(this.title, '/notebooks/tests/Walkthrough-Scala.ipynb');
+    boilerplate.setup(this.title, '/notebooks/tests/Walkthrough-Scala.ipynb', 8);
 
     var timeout = 30000;
 
