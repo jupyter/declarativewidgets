@@ -22,7 +22,7 @@ describe('Urth Viz Table Test', function() {
         .catch(tagChaiAssertionError);
     };
 
-    boilerplate.setup(this.title, '/notebooks/tests/urth-viz-table.ipynb');
+    boilerplate.setup(this.title, '/notebooks/tests/urth-viz-table.ipynb', 3);
 
     it('should run all cells and find a handsontable in the 3rd output area', function(done) {
         boilerplate.browser
