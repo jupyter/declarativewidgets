@@ -18,6 +18,13 @@ chai.use(chaiAsPromised);
 chai.should();
 chaiAsPromised.transferPromiseness = wd.transferPromiseness;
 
+// tagging chai assertion errors for retry
+var tagChaiAssertionError = function(err) {
+    // throw error and tag as retriable to poll again
+    err.retriable = err instanceof chai.AssertionError;
+    throw err;
+};
+
 // Configure webdriver
 wd.configureHttp({
     timeout: 60000,
@@ -61,8 +68,20 @@ var Boilerplate = function(){
   * Setups the before and after calls for each of your tests. The boilerplate
   * will start each test on startingURL, which is a relative path to the resource to load.
   */
-Boilerplate.prototype.setup = function(testName, startingURL){
+Boilerplate.prototype.setup = function(testName, startingURL, outputCount){
   var that = this;
+
+  var outputAsserter = new wd.Asserter(
+    function(target) { // browser or el
+      return target
+        .elementsByCss('div.output_area').then(function(nodes) {
+            nodes.should.have.length(outputCount);
+            return target; // this will be returned by waitFor
+            // and ignored by waitForElement.
+        })
+        .catch(tagChaiAssertionError); // tag errors for retry in catch.
+    }
+  );
 
   before(function(done){
     if (args.verbose) {
@@ -78,20 +97,25 @@ Boilerplate.prototype.setup = function(testName, startingURL){
     desired.name = testName ? 'Urth Widgets System Test - ' + testName
         : 'Urth Widgets System Test';
 
+    var kernelStartTimeout = 200000;
+    var defaultTimeout = 10000;
+    var runAllCompletionTimeout = 50000;
     this.browser.init(desired)
         .get(startingURL || '/')
-        .waitForElementByCssSelector("#kernel_indicator_icon.kernel_idle_icon", wd.asserters.isDisplayed, 10000)
-        .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, 10000)
+        .waitForElementByCssSelector("#kernel_indicator_icon.kernel_idle_icon", wd.asserters.isDisplayed, kernelStartTimeout)
+        .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, defaultTimeout)
         .elementByLinkText("Cell")
         .click()
-        .waitForElementByLinkText("Run All", wd.asserters.isDisplayed, 10000)
+        .waitForElementByLinkText("Run All", wd.asserters.isDisplayed, defaultTimeout)
         .elementByLinkText("Run All")
         .click()
         .eval("!!document.body.createShadowRoot", function(err, value) {
             this.browserSupportsShadowDOM = value;
         }.bind(this))
-        .waitForElementByCssSelector('div.output_area', wd.asserters.isDisplayed, 10000)
-        .sleep(5000)
+        .waitForElementByCssSelector('div.output_area', wd.asserters.isDisplayed, defaultTimeout)
+        .elementByCssSelector('div.code_cell .input').click() // to keep the first code cell in view on sauce
+        .waitFor(outputAsserter, runAllCompletionTimeout, 1000)
+        .sleep(defaultTimeout*2) //FIXME: shouldn't need this?
         .nodeify(done);
   }.bind(this));
 
