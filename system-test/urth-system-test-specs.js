@@ -4,6 +4,8 @@
 var wd = require('wd');
 var Boilerplate = require('./utils/boilerplate');
 var boilerplate = new Boilerplate();
+var parseArgs = require('minimist');
+var args = parseArgs(process.argv);
 
 describe('Widgets Python System Test', function() {
     boilerplate.setup(this.title, '/notebooks/tests/Walkthrough.ipynb', 8);
@@ -70,7 +72,7 @@ describe('Widgets Python System Test', function() {
     });
 });
 
-describe('Widgets Scala System Test', function() {
+args.python != "python2" && describe('Widgets Scala System Test', function() {
     boilerplate.setup(this.title, '/notebooks/tests/Walkthrough-Scala.ipynb', 8);
 
     var timeout = 30000;
