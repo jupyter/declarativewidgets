@@ -7,6 +7,14 @@
  * Loads the web component polyfill and all web components specified in
  * elements.html.
  */
+// npm compatibility
+function requireLocalFiles() {
+    require('jquery');
+    require('../widgets/DeclWidgetModel');
+}
+
+if (typeof define !== 'function') { var define = require('amdefine')(module, require); }
+
 define([
     'require',
     'jquery',

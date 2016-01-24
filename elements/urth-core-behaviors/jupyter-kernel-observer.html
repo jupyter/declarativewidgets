@@ -30,7 +30,7 @@ This behavior is used to implement handlers to kernel events
                     'kernel_ready.Kernel', this.__kernelReadyCallback
                 );
 
-                if( IPython.notebook.kernel.is_connected() ){
+                if( IPython.notebook.kernel && IPython.notebook.kernel.is_connected() ){
                   this.onKernelReady();
                 }
             },
