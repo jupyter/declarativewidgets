@@ -213,7 +213,7 @@ server: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
 server: SERVER_NAME?=urth_widgets_server
 server: OPTIONS?=-it --rm
 server: PORT_MAP?=-p 9500:8888
-server: VOL_MAP?=-v `pwd`/notebooks:/home/jovyan/work
+server: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server: _run-$(PYTHON)
 
 _run-python3: _run
@@ -256,7 +256,7 @@ _dev:
 		-v `pwd`/etc:$(NB_HOME)/nbconfig \
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/.jupyter/nbconfig/notebook.json \
 		-v `pwd`/etc/jupyter_notebook_config.py:$(NB_HOME)/.jupyter/jupyter_notebook_config.py \
-		-v `pwd`/notebooks:/home/jovyan/work \
+		-v `pwd`/etc/notebooks:/home/jovyan/work \
 		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'
 
 start-selenium:
