@@ -114,10 +114,10 @@ define([
         var bower_root = baseURL + 'urth_components';
 
         // expose suppressErrors, false by default to display errors
-        window.Urth.suppressErrors = config && config.suppressErrors || false;
+        window.Urth.suppressErrors = config && config.suppressErrors;
 
         loadPolyfill(bower_root, function() {
-            var links = config && config.links || [];
+            var links = config && config.links;
             loadComponents(bower_root, links);
         }, function (e) {
             console.error('Failed to load web components polyfill: ' + e);
