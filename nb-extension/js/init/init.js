@@ -98,7 +98,7 @@ define([
         document.head.appendChild(script);
     }
 
-    return function(baseURL, links) {
+    return function(baseURL, config) {
         // Enable shadow dom if it is there for polymer elements.
         window.Polymer = window.Polymer || {};
         window.Polymer.dom = 'shadow';
@@ -113,7 +113,11 @@ define([
 
         var bower_root = baseURL + 'urth_components';
 
+        // expose suppressErrors, false by default to display errors
+        window.Urth.suppressErrors = config && config.suppressErrors;
+
         loadPolyfill(bower_root, function() {
+            var links = config && config.links;
             loadComponents(bower_root, links);
         }, function (e) {
             console.error('Failed to load web components polyfill: ' + e);

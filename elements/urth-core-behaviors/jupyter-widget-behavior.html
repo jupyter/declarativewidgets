@@ -265,10 +265,12 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
              * @param String msg
              */
             displayErrorMessage: function(msg){
-                var errorNode = document.createElement("pre")
-                errorNode.innerHTML = msg;
-                errorNode.classList.add("urth-widget-error");
-                this.appendChild(errorNode);
+                if (!window.Urth.suppressErrors) {
+                    var errorNode = document.createElement("pre")
+                    errorNode.innerHTML = msg;
+                    errorNode.classList.add("urth-widget-error");
+                    this.appendChild(errorNode);
+                }
                 var widgetName = this.nodeName.toLowerCase();
                 console.error(widgetName + ": " + msg);
             },
