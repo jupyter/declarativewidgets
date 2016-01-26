@@ -30,12 +30,8 @@ Example:
         properties: {
 
             /**
-             * `ref` is name of the DataFrame variable that this element
+             * The name of the DataFrame variable that this element
              * will bind to.
-             *
-             * @attribute ref
-             * @type string
-             * @default ''
              */
             ref: {
                 type: String,
@@ -43,10 +39,7 @@ Example:
             },
 
             /**
-             * `value` is the serialized representation of the DataFrame `ref`.
-             *
-             * @attribute value
-             * @type Object
+             * The serialized representation of the DataFrame `ref`.
              */
             value: {
                 type: Object,
@@ -56,10 +49,6 @@ Example:
 
             /**
              * Toggles automatic updates upon the completion of code execution.
-             *
-             * @attribute auto
-             * @type boolean
-             * @default false
              */
             auto: {
                 type: Boolean,
@@ -67,11 +56,7 @@ Example:
             },
 
             /**
-             * Sets the maximun number of rows to bring to the client
-             *
-             * @attribute limit
-             * @type Number
-             * @default 100
+             * Sets the maximun number of rows to bring to the client.
              */
             limit: {
               type: Number,

@@ -43,10 +43,7 @@ Example: _One or more children. urth-core-function and urth-core-dataframe suppo
 
             properties: {
                 /**
-                 * Value that is observed for changes
-                 *
-                 * @attribute value
-                 * @type *
+                 * Value that is observed for changes.
                  */
                 value: Object
             },
@@ -56,7 +53,7 @@ Example: _One or more children. urth-core-function and urth-core-dataframe suppo
             ],
 
             _valueChanged: function() {
-                console.log("urth-core-watch: valueChanged");
+                console.log('urth-core-watch: valueChanged');
                 for (var i = 0, iLen = this.childNodes.length; i < iLen; i++) {
                     this.fire( 'watch_notify', null, {
                         node: this.childNodes[i]

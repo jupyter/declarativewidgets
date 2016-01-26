@@ -40,11 +40,8 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
             properties: {
 
                 /**
-                 * Name of the function to proxy. Must be a function that is defined in the kernel.
-                 *
-                 * @attribute ref
-                 * @type String
-                 * @default ''
+                 * Name of the function to proxy. Must be a function that is
+                 * defined in the kernel.
                  */
                 ref: {
                     type: String,
@@ -52,11 +49,8 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                 },
 
                 /**
-                 * Object reflecting the current values of the parameters to the function. This property can be used
-                 * for binding.
-                 *
-                 * @attribute args
-                 * @type Object
+                 * Object reflecting the current values of the parameters to the
+                 * function. This property can be used for binding.
                  */
                 args: {
                     type: Object,
@@ -65,9 +59,6 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
 
                 /**
                  * Object representing the function return value after invocation.
-                 *
-                 * @attribute result
-                 * @type Object
                  */
                 result: {
                     type: Object,
@@ -76,13 +67,9 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                 },
 
                 /**
-                 * Controls if the function is invoked automatically on any change to
-                 * its parameters, and whether the `signature` is refreshed
-                 * after each code execution.
-                 *
-                 * @attribute auto
-                 * @type Boolean
-                 * @default false
+                 * Controls if the function is invoked automatically on any
+                 * change to its parameters, and whether the `signature` is
+                 * refreshed after each code execution.
                  */
                 auto: {
                     type: Boolean,
@@ -91,11 +78,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                 },
 
                 /**
-                 * Sets the maximun number of rows to bring to the client
-                 *
-                 * @attribute limit
-                 * @type Number
-                 * @default 100
+                 * Sets the maximun number of rows to bring to the client.
                  */
                 limit: {
                   type: Number,
@@ -105,13 +88,11 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                 },
 
                 /**
-                 * Describes the signature of the parameters to the function. This object will
-                 * contain objects keyed by the parameter name and information about type and
-                 * requirement. It is used to determine if the current arguments are in a valid
-                 * state to invoke the function.
-                 *
-                 * @attribute signature
-                 * @type Object
+                 * Describes the signature of the parameters to the function.
+                 * This object will contain objects keyed by the parameter name
+                 * and information about type and requirement. It is used to
+                 * determine if the current arguments are in a valid state to
+                 * invoke the function.
                  */
                 signature: {
                     type: Object,
@@ -120,11 +101,9 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                 },
 
                 /**
-                 * Flag to signal that the function is ready to be called. Ready means that the
-                 * signature of the function is known and any required arguments have values assigned.
-                 *
-                 * @attribute isReady
-                 * @type Boolean
+                 * Flag to signal that the function is ready to be called.
+                 * Ready means that the signature of the function is known and
+                 * any required arguments have values assigned.
                  */
                 isReady: {
                     type: Boolean,
@@ -134,11 +113,9 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                 },
 
                 /**
-                 * Sets a delay time, in milliseconds, for debouncing the invocation of the function.
-                 * This time will debounce for every argument change as well as every call to invoke.
-                 *
-                 * @attribute delay
-                 * @type number
+                 * Sets a delay time, in milliseconds, for debouncing the
+                 * invocation of the function. This time will debounce for
+                 * every argument change as well as every call to invoke.
                  */
                 delay: {
                   type: Number

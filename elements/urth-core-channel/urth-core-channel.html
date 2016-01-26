@@ -67,7 +67,9 @@ dataChannel.set('user', 'Luke');
         window.Urth['urth-core-channel'] = Polymer({
             is: 'urth-core-channel',
             properties: {
-                /* The name of the channel to use. */
+                /**
+                 * The name of the channel to use.
+                 */
                 name: {
                     type: String,
                     observer: '_onNameChange',
@@ -75,14 +77,16 @@ dataChannel.set('user', 'Luke');
                     reflectToAttribute: true,
                     value: 'default'
                 },
-                /* An array of DOM elements registered with the channel. */
+                /**
+                 * An array of DOM elements registered with the channel.
+                 */
                 registeredElements: {
                     type: Array,
                     notify: true,
                     readOnly: true,
                     value: function() { return []; }
                 },
-                /*
+                /**
                  * An object containing the properties being watched and
                  * the associated handlers. Keys of the object are the
                  * properties being watched. Value of the keys is an
