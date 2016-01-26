@@ -69,6 +69,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     type: Array
                 },
 
+                /**
+                 * For implementation only, to trigger code when dependent attributes change
+                 */
                 tableView: {
                     type: Object,
                     computed: 'computeTableView(datarows, columns)'
@@ -167,7 +170,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         this._updateColumns(columns);
                         this._updateDatarows(datarows);
 
-                        // reset selection to null if it was previoulsy set
+                        this.fire('urth-viz-render');
+
+                        // reset selection to null if it was previously set
                         if (this.selection) {
                             this._setSelection(null);
                             // deselect range that was previously highlighted
@@ -269,6 +274,12 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         afterSelectionEnd: this._handleSelection.bind(this),
                         afterColumnSort: function() { 
                             this._handleSelection(0); 
+                        }.bind(this),
+                        afterRender: function(isForced) {
+                            if (isForced && !this._rendered) {
+                                this._rendered = true;
+                                this.fire('urth-viz-render');
+                            }
                         }.bind(this)
                     };
 
@@ -278,7 +289,6 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     }
 
                     this.hot = new Handsontable(tableContainer, tableSettings);
-                    this.fire('urth-viz-render');
                 }.bind(this));
             },
 
