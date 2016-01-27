@@ -8,7 +8,7 @@
     (function () {
         'use strict';
 
-        /** 
+        /**
          * `urth-viz-col` creates a Polymer element that adds a hook to existing Handsontable to update column settings afterLoadData
          *
          * @group Urth Viz
@@ -18,24 +18,22 @@
         Polymer({
             is: 'urth-viz-col',
             properties: {
-                /** 
-                 * the format this column is using. ex: "$0,0.00".
-                 * @attribute: format
+                /**
+                 * The format this column is using. ex: "$0,0.00".
                  */
                 format: {
                     type: String,
                     reflectToAttribute: true
                 },
-                /** 
-                 * the type of format this column is using. ex: "numeric".
-                 * @attribute: type
+                /**
+                 * The type of format this column is using. ex: "numeric".
                  */
                 type: {
                     type: String,
                     reflectToAttribute: true
                 },
-                /** the index this column is, relative to parent table, starting at 0.
-                 * @attribute: index
+                /**
+                 * The index this column is, relative to parent table, starting at 0.
                  */
                 index: {
                     type: Number,

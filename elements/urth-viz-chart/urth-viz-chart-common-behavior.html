@@ -1,0 +1,119 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<script>
+    'use strict';
+    (function() {
+        window.Urth = window.Urth || {};
+
+        /**
+         * Behavior that encapsulates some of the properties and functions
+         * needed by visualization elements.
+         *
+         * @group Urth Viz
+         * @polymerBehavior Urth.VizChartCommonBehavior
+         */
+        Urth.VizChartCommonBehavior = {
+            /**
+             * Fired on the element when the visualization has rendered.
+             *
+             * @event urth-viz-render
+             */
+
+            properties: {
+                /**
+                 * An array representing data.
+                 */
+                datarows: {
+                    type: Array,
+                    value: function() { return [[]]; },
+                    notify: true,
+                    observer: '_update'
+                },
+
+                /**
+                 * Label for the x-axis.
+                 */
+                xlabel: {
+                    type: String
+                },
+
+                /**
+                 * Label for the y-axis.
+                 */
+                ylabel: {
+                    type: String
+                },
+
+                /**
+                 * Angle in degrees to rotate labels on the X axis.
+                 */
+                rotatelabels: {
+                    type: Number
+                },
+
+                /**
+                 * Whether to stagger the layout of labels on the X axis.
+                 */
+                staggerlabels: {
+                    type: Boolean,
+                    value: false
+                },
+
+                /**
+                 * List of colors to override the default palette.
+                 */
+                palette: Array,
+
+                /**
+                 * Array of column names.
+                 */
+                columns: {
+                    type: Array,
+                    value: function() { return []; },
+                    notify: true,
+                    observer: '_update'
+                },
+
+                /**
+                 * The data based on the currently selected row.
+                 */
+                selection: {
+                    type: Array,
+                    value: function () { return []; },
+                    notify: true
+                },
+
+                /**
+                 * References the nth column in datarows, typically used to
+                 * identify independent or input (e.g. x axis).
+                 */
+                primary: {
+                    type: Number,
+                    value: 0,
+                    observer: '_update'
+                },
+
+                /**
+                 * References the nth column in datarows, typically used to
+                 * identify dependent or output (e.g. y axis).
+                 */
+                secondary: {
+                    type: Number,
+                    value: 1,
+                    observer: '_update'
+                }
+            },
+
+            _update: function() {},
+
+            // for elements which include VizChartCommonBehavior for containment, propagate render event
+            ready: function() {
+                if (this.is != 'urth-viz-chart' && this.$.chart) {
+                    this.$.chart.addEventListener('urth-viz-chart-render', this.fire.bind(this, 'urth-viz-render'));
+                }
+            }
+        };
+    })();
+</script>

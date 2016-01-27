@@ -7,6 +7,18 @@
 
 <script src="../requirejs/require.js"></script>
 
+<!--
+Represents a widget that creates a word cloud.
+
+Example:
+
+```html
+<urth-viz-cloud id="cloud" data='{"smaller": 0.1, "small":0.2, "big":0.5, "bigger":0.8}'></urth-viz-cloud>
+```
+
+@group Urth Viz
+@element urth-viz-cloud
+-->
 <dom-module id="urth-viz-cloud">
     <template>
         <style>
@@ -21,9 +33,8 @@
         </div>
         <content></content>
     </template>
-</dom-module>
 
-<script>
+    <script>
     (function () {
         'use strict';
         var requireConfigured;
@@ -148,4 +159,5 @@
             }
         });
     })();
-</script>
+    </script>
+</dom-module>

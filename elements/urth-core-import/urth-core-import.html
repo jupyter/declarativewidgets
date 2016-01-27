@@ -61,10 +61,8 @@
                 reflectToAttribute: true
             },
             /**
-             * If `true`, console output will be written to indicate the progress of
-             * importing the specified `package`.
-             *
-             * @default false
+             * If `true`, console output will be written to indicate the
+             * progress of importing the specified `package`.
              */
             debug: {
                 type: Boolean,
@@ -72,10 +70,10 @@
             },
 
             /**
-             * This is the URL to the import endpoint on the notebook
+             * This is the URL to the import endpoint on the notebook.
              */
             _importEndpointURL: {
-                computed: "_getImportEndpointURL(_baseURL)"
+                computed: '_getImportEndpointURL(_baseURL)'
             }
         },
 

@@ -9,14 +9,15 @@
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
+<link rel="import" href="./urth-viz-chart-common-behavior.html">
 
 <!-- import the nvd3 stylesheet into the main page as well as the shadow dom
      because the nvtooltip is a child of BODY -->
 <link rel="stylesheet" type="text/css" href="../nvd3/build/nv.d3.css">
 
 <!--
-Helper widget that draws a chart using NVD3, which supports several chart types.                                             
-This widget is not meant to be used directly, but is used by other urth-viz widget implementations.                          
+Helper widget that draws a chart using NVD3, which supports several chart types.
+This widget is not meant to be used directly, but is used by other urth-viz widget implementations.
 The chart accepts data via attribute `datarows` and column headers via attribute `columns`:
 
 1. `datarows` should be of type Array of Arrays, representing list of rows.
@@ -60,89 +61,21 @@ The chart accepts data via attribute `datarows` and column headers via attribute
     'use strict';
     var requireConfigured;
 
-    if (typeof Urth == 'undefined') {
-        window.Urth = {};
-    }
+    window.Urth = window.Urth || {};
 
-    Urth.VizChartCommonBehavior = {
+    Polymer({
+        is: 'urth-viz-chart',
+
+        /**
+         * Fired on the `urth-viz-chart` element when the chart has rendered.
+         *
+         * @event urth-viz-chart-render
+         */
+
         properties: {
-
             /**
-             * `type` is type of chart (e.g. bar, pie)
-             *
-             * @attribute type
-             * @default ''
-             */
-            type: {
-                type: String,
-                notify: true,
-                observer: '_typeChanged'
-            },
-
-            /**
-             * `datarows` is an array representing data
-             *
-             * @attribute datarows
-             * @default [[]]
-             */
-            datarows: {
-                type: Array,
-                value: function() { return [[]]; },
-                notify: true,
-                observer: '_update'
-            },
-
-            /**
-             * 'xlabel' is an optional label for the x-axis
-             */
-            xlabel: String,
-
-            /**
-             * 'ylabel' is an optional label for the y-axis
-             */
-            ylabel: String,
-
-            /**
-             * `rotatelabels` is an optional angle in degrees to rotate labels on the X axis
-             *
-             * @attribute rotatelabels
-             * @readonly
-             */
-            rotatelabels: Number,
-
-            /**
-             * `staggerlabels` will stagger the layout of labels on the X axis
-             *
-             * @attribute staggerlabels
-             * @readonly
-             */
-            staggerlabels: Boolean,
-
-            /**
-             * `palette` specifies an optional list of colors to override the default palette
-             *
-             * @attribute palette
-             * @readonly
-             */
-            palette: Array,
-
-            /**
-             * `columns` is an array representing column names
-             *
-             * @attribute columns
-             * @default []
-             */
-            columns: {
-                type: Array,
-                value: function() { return []; },
-                notify: true,
-                observer: '_update'
-            },
-
-            /**
-             * `datarows` is an array representing data
-             *
-             * @attribute datarows
+             * A computed Array value based on `datarows`, `columns`,
+             * `primary`, `secondary` and `type` properties.
              */
             data: {
                 type: Array,
@@ -150,54 +83,14 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             },
 
             /**
-             * The data based on the currently selected row
-             *
-             * @attribute selection
-             * @default []
+             * The type of chart (e.g. bar, pie).
              */
-            selection: {
-                type: Array,
-                value: function () { return []; },
-                notify: true
+            type: {
+                type: String,
+                notify: true,
+                observer: '_typeChanged'
             },
-
-            /**
-             * References the nth column in datarows, typically used to identify independent or input (e.g. x axis)
-             *
-             * @attribute primary
-             * @default 0
-             */
-            primary: {
-                type: Number,
-                value: 0,
-                observer: '_update'
-            },
-
-            /**
-             * References the nth column in datarows, typically used to identify dependent or output (e.g. y axis)
-             *
-             * @attribute secondary
-             * @default 1
-             */
-            secondary: {
-                type: Number,
-                value: 1,
-                observer: '_update'
-            }
         },
-
-        _update: function() {},
-
-        // for elements which include VizChartCommonBehavior for containment, propagate render event
-        ready: function() {
-            if (this.is != 'urth-viz-chart') {
-                this.$.chart.addEventListener('urth-viz-chart-render', this.fire.bind(this, 'urth-viz-render'));
-            }
-        }
-    };
-
-    Polymer({
-        is: 'urth-viz-chart',
 
         behaviors: [
             Polymer.IronResizableBehavior,
