@@ -58,6 +58,13 @@
         <test-bind id='notifyBind' notifyingvalue='{{user}}'></test-bind>
     </template>
 
+    <template is='urth-core-bind' id='parentBind' channel='a'>
+        <div>Parent <span id='parentUser'>[[user]]</span></div>
+        <template is='urth-core-bind' id='childBind' channel='b'>
+            <div>Child <span id='childUser'>[[user]]</span></div>
+        </template>
+    </template>
+
     <!-- This is a custom element that will be used to test
          data binding with urth-core-bind -->
     <dom-module id="test-bind">
@@ -85,6 +92,12 @@
         // Step 4: Define any globals needed by the test suite.
 
         // Step 5: Define suite(s) and tests.
+
+        afterEach(function(){
+            channelDefault.clear();
+            channelA.clear();
+            channelB.clear();
+        });
 
         describe('property change', function() {
             it('should flow top-down', function() {
@@ -115,9 +128,6 @@
                 defaultChannelBind.channel = 'default';
                 firstChannelBind.channel = 'a';
                 secondChannelBind.channel = 'b';
-                channelDefault.clear();
-                channelA.clear();
-                channelB.clear();
             });
 
             it('should switch element data to the new channels data', function() {
@@ -153,7 +163,16 @@
                 firstChannelBind.channel = oldChannel;
                 expect(firstChannelBind.user).to.equal(undefined);
             });
+        });
 
+        describe('nested templates', function() {
+            it('should use proper channel data', function() {
+                parentBind.user = 'foo';
+                childBind.user = 'bar';
+                console.log(parentUser.textContent);
+                expect(parentUser.textContent).to.equal('foo');
+                expect(childUser.textContent).to.equal('bar');
+            });
         });
     </script>
 

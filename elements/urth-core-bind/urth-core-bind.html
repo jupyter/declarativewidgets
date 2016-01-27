@@ -55,10 +55,6 @@
             },
             behaviors: [Urth.DomBindBehavior],
 
-            created: function() {
-                this._createChannel();
-            },
-
             detached: function() {
                 // Unregister from the channel when element is detached.
                 this.channelElement.unregister(this);
