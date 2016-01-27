@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: help clean clean-dist sdist dist dev docs test test-js test-py test-scala init server install dev-build system-test clean-watch clean-watch-docs
+.PHONY: help clean clean-dist sdist dist dev docs test test-js test-py test-scala init dev_image server install dev-build system-test clean-watch clean-watch-docs
 .SUFFIXES:
 MAKEFLAGS=-r
 
@@ -23,14 +23,9 @@ help:
 	@echo '             all - run all necessary streps to produce and validate a build'
 
 
-init: node_modules
+ROOT_REPO:=jupyter/pyspark-notebook:2988869079e6
+REPO:=jupyter/pyspark-notebook-bower:2988869079e6
 
-node_modules: package.json
-	@npm install
-
-node_modules/bower: node_modules
-
-REPO?=cloudet/all-spark-notebook-bower:1.5.1_jupyter4
 PYTHON?=python3
 
 URTH_BOWER_FILES:=$(shell find elements -name bower.json)
@@ -43,8 +38,26 @@ $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 	@$(foreach dir, $(URTH_SRC_DIRS), cd $(abspath $(dir)) && $(NPM_BIN_DIR)/bower link;)
 	@$(foreach name, $(URTH_DIRS), $(NPM_BIN_DIR)/bower link $(name);)
 
+init: node_modules dev_image
+
+node_modules: package.json
+	@npm install
+
+node_modules/bower: node_modules
+
 bower_components: node_modules/bower bower.json
 	@npm run bower -- install
+
+dev_image:
+	@-docker rm -f bower-build
+	@docker run -it --user root --name bower-build \
+		$(ROOT_REPO) bash -c 'apt-get update && \
+		apt-get install --yes curl && \
+		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
+		apt-get install --yes nodejs && \
+		npm install -g bower'
+	@docker commit bower-build $(REPO)
+	@-docker rm -f bower-build
 
 clean: clean-dist
 	@-rm -rf *.egg-info
@@ -297,7 +310,7 @@ docs: .watch-docs dist/docs
 	@bash -c "trap 'make clean-watch-docs' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
 
 all: BASEURL?=http://192.168.99.100:9500
-all:
+all: init
 	$(MAKE) test-js-remote
 	$(MAKE) test-py
 	PYTHON=python2 $(MAKE) test-py
