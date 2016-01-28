@@ -20,7 +20,7 @@
   ],
   "dependencies": {
     "handsontable": "ibm-et/handsontable#0.20.2-ibm",
-    "polymer": "Polymer/polymer#^1.2.2",
+    "polymer": "Polymer/polymer#^1.2.4",
     "requirejs": "^2.1.0"
   },
   "private": true

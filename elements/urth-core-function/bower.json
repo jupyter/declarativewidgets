@@ -19,7 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.2.2"
+    "polymer": "Polymer/polymer#^1.2.4"
   },
   "private": true
 }
