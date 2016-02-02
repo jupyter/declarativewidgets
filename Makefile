@@ -23,8 +23,8 @@ help:
 	@echo '             all - run all necessary streps to produce and validate a build'
 
 
-ROOT_REPO:=jupyter/pyspark-notebook:2988869079e6
-REPO:=jupyter/pyspark-notebook-bower:2988869079e6
+ROOT_REPO:=jupyter/all-spark-notebook:0017b56d93c9
+REPO:=jupyter/all-spark-notebook-bower:0017b56d93c9
 
 PYTHON?=python3
 
@@ -54,7 +54,8 @@ dev_image:
 		$(ROOT_REPO) bash -c 'apt-get update && \
 		apt-get install --yes curl && \
 		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
-		apt-get install --yes nodejs && \
+		apt-get install --yes nodejs npm && \
+		ln -s /usr/bin/nodejs /usr/bin/node && \
 		npm install -g bower'
 	@docker commit bower-build $(REPO)
 	@-docker rm -f bower-build
