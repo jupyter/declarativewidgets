@@ -79,12 +79,6 @@ docker-machine create -d virtualbox dev
 eval "$(docker-machine env dev)"
 ```
 
-Pull the Docker image that we'll use for development (super image with bower and spark kernel). This step is optional, `make dev` will bring in all requirements, including images.
-
-```bash
-docker pull cloudet/pyspark-notebook-bower-sparkkernel
-```
-
 Clone this repository in a local directory that docker can volume mount:
 
 ```bash
@@ -99,8 +93,12 @@ git clone https://github.com/jupyter-incubator/declarativewidgets.git
 Run the notebook server in a docker container:
 
 ```bash
-# run notebook server in container
 cd declarativewidgets
+
+# one time only setup needed to create docker image
+make init
+
+# run notebook server in container
 make dev
 ```
 
