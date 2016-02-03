@@ -2,6 +2,12 @@ sudo: required
 
 language: c
 
+env:
+  matrix:
+    - PLATFORM=Linux BROWSER=chrome
+    - PLATFORM="Windows 10" BROWSER=firefox
+    - PLATFORM="OS X 10.10" BROWSER=safari
+
 services:
   - docker
 
@@ -17,7 +23,7 @@ before_script:
   - sh -e /etc/init.d/xvfb start
 
 script:
-  - BASEURL=http://127.0.0.1:9500 make all
+  - BASEURL=http://127.0.0.1:9500 PLATFORM=$PLATFORM BROWSER=$BROWSER make all
 
 deploy:
   skip_cleanup: true
@@ -35,3 +41,4 @@ notifications:
 branches:
   only:
     - master
+    - issue123
