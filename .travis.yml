@@ -1,3 +1,9 @@
+env:
+  global:
+    - DISPLAY=:99.0
+    - BASEURL=http://localhost:9500
+    - BROWSER_LIST="chrome firefox"
+
 sudo: required
 
 language: c
@@ -13,11 +19,10 @@ addons:
 before_script:
   - curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
   - sudo apt-get install -y nodejs
-  - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 
 script:
-  - BASEURL=http://127.0.0.1:9500 make all
+  - make all
 
 deploy:
   skip_cleanup: true
