@@ -264,6 +264,7 @@ _run:
 		$(PORT_MAP) \
 		-e SPARK_OPTS="--master=local[4]" \
 		-e USE_HTTP=1 \
+		-e JVM_OPT=-Dlog4j.logLevel=trace \
 		-v `pwd`:/src \
 		$(VOL_MAP) \
 		$(REPO) bash -c '$(SETUP_CMD) \
