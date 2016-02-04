@@ -6,7 +6,10 @@ env:
 
 sudo: required
 
-language: c
+language: node_js
+
+node_js:
+  - "4.1"
 
 services:
   - docker
@@ -18,7 +21,6 @@ addons:
 
 before_script:
   - curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-  - sudo apt-get install -y nodejs
   - sh -e /etc/init.d/xvfb start
 
 script:
