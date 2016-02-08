@@ -110,7 +110,7 @@ dataChannel.set('user', 'Luke');
             },
 
             created: function() {
-                this._broker = new Urth['urth-core-channel-broker'].getChannelBroker();
+                this._broker = Urth['urth-core-channel-broker'].getChannelBroker();
             },
 
             detached: function() {

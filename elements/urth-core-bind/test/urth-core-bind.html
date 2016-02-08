@@ -169,9 +169,38 @@
             it('should use proper channel data', function() {
                 parentBind.user = 'foo';
                 childBind.user = 'bar';
-                console.log(parentUser.textContent);
                 expect(parentUser.textContent).to.equal('foo');
                 expect(childUser.textContent).to.equal('bar');
+            });
+        });
+
+        describe('_customRender', function() {
+            it('should get invoked when the element is attached', function() {
+                var renderTemplate = new window.Urth['urth-core-bind']();
+                var renderSpy = sinon.spy(renderTemplate, '_customRender');
+                document.body.appendChild(renderTemplate);
+                renderSpy.restore();
+                expect(renderSpy).to.have.been.calledOnce;
+            });
+
+            it('should retrieve the pending imports', function() {
+                var importBroker = window.Urth['urth-core-import-broker'].getImportBroker();
+                var importSpy = sinon.spy(importBroker, 'getPendingImports');
+                var renderTemplate = new window.Urth['urth-core-bind']();
+                renderTemplate._customRender();
+                importSpy.restore();
+                expect(importSpy).to.have.been.calledOnce;
+            });
+
+            it('should not retrieve the pending imports if "no-wait" is specified', function() {
+                debugger;
+                var importBroker = window.Urth['urth-core-import-broker'].getImportBroker();
+                var importSpy = sinon.spy(importBroker, 'getPendingImports');
+                var renderTemplate = new window.Urth['urth-core-bind']();
+                renderTemplate.setAttribute('no-wait', true);
+                renderTemplate._customRender();
+                importSpy.restore();
+                expect(importSpy).to.have.not.been.called;
             });
         });
     </script>

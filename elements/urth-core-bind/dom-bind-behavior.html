@@ -16,6 +16,7 @@
  subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../promise-polyfill/promise-polyfill-lite.html">
 
 <script>
     'use strict';
@@ -110,20 +111,33 @@
          * necessary to call if HTMLImports with the async attribute are used.
          */
         render: function() {
-            this._ensureReady();
-            if (!this._children) {
-                this._template = this;
-                this._prepAnnotations();
-                this._prepEffects();
-                this._prepBehaviors();
-                this._prepConfigure();
-                this._prepBindings();
-                this._prepPropertyInfo();
-                Polymer.Base._initFeatures.call(this);
-                this._children = Polymer.TreeApi.arrayCopyChildNodes(this.root);
-            }
-            this._insertChildren();
-            this.fire('dom-change');
+            this._customRender().then(function() {
+                this._ensureReady();
+                if (!this._children) {
+                    this._template = this;
+                    this._prepAnnotations();
+                    this._prepEffects();
+                    this._prepBehaviors();
+                    this._prepConfigure();
+                    this._prepBindings();
+                    this._prepPropertyInfo();
+                    Polymer.Base._initFeatures.call(this);
+                    this._children = Polymer.TreeApi.arrayCopyChildNodes(this.root);
+                }
+
+                this._insertChildren();
+                this.fire('dom-change');
+            }.bind(this));
+        },
+
+        // BEGIN URTH_CUSTOM
+        /**
+         * Method which can be overridden by elements implementing this behavior
+         * to customize the render process.
+         */
+        _customRender: function() {
+            return Promise.resolve(true);
         }
+        // END URTH_CUSTOM
     };
 </script>
