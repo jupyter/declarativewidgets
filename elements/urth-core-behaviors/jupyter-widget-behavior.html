@@ -6,7 +6,7 @@
 <!--
 This behavior is used to encapsulate some of the services needed for ipywidgets.
 -->
-<link rel='import' href='general-behavior.html'>
+<link rel='import' href='error-display-behavior.html'>
 <script>
     'use strict';
     (function() {
@@ -283,7 +283,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
             }
         };
 
-        // JupyterWidgetBehavior inherits GeneralBehavior
-        Urth.JupyterWidgetBehavior = [Urth.GeneralBehavior, Urth.JupyterWidgetBehaviorImpl];
+        // JupyterWidgetBehavior inherits DisplayErrorBehavior
+        Urth.JupyterWidgetBehavior = [Urth.DisplayErrorBehavior, Urth.JupyterWidgetBehaviorImpl];
     })();
 </script>
