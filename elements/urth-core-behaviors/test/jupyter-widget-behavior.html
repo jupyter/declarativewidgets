@@ -44,7 +44,7 @@
 
                 var testObject = Polymer.Base.mixin({
                     onModelResultChange: function(){}
-                }, Urth.JupyterWidgetBehavior);
+                }, Urth.JupyterWidgetBehaviorImpl);
 
                 var onModelResultChange = sinon.spy(testObject, "onModelResultChange")
 
@@ -57,22 +57,6 @@
         });
 
         describe('onModel__status__Change', function() {
-            it('should call _clearErrorMessages on status ok', function() {
-                var optionFixture = {
-                    status: "ok"
-                };
-
-                var testObject = Polymer.Base.mixin({
-                    _clearErrorMessages: function(){}
-                }, Urth.JupyterWidgetBehavior);
-
-                var clearFunc = sinon.stub(testObject, "_clearErrorMessages");
-
-                testObject.onModel__status__Change(optionFixture);
-
-                assert(clearFunc.calledOnce, "_clearErrorMessages was called " + clearFunc.callCount);
-            });
-
             it('should call displayErrorMessage on status error', function() {
                 var optionFixture = {
                     status: "error"
@@ -80,7 +64,7 @@
 
                 var testObject = Polymer.Base.mixin({
                     displayErrorMessage:function(){}
-                }, Urth.JupyterWidgetBehavior);
+                }, Urth.JupyterWidgetBehaviorImpl);
 
                 var displayFunc = sinon.stub(testObject, "displayErrorMessage");
 
@@ -99,7 +83,7 @@
                         set:function(){},
                         save_changes: function(){}
                     }
-                }, Urth.JupyterWidgetBehavior);
+                }, Urth.JupyterWidgetBehaviorImpl);
 
                 var setFunc = sinon.spy(testObject.model, "set");
                 var save_changes = sinon.spy(testObject.model, "save_changes");
@@ -128,7 +112,7 @@
                         set:function(){},
                         save_changes: function(){}
                     }
-                }, Urth.JupyterWidgetBehavior);
+                }, Urth.JupyterWidgetBehaviorImpl);
 
                 var setFunc = sinon.spy(testObject.model, "set");
                 var save_changes = sinon.spy(testObject.model, "save_changes");
@@ -147,7 +131,7 @@
                         set:function(){},
                         save_changes: function(){}
                     }
-                }, Urth.JupyterWidgetBehavior);
+                }, Urth.JupyterWidgetBehaviorImpl);
 
                 var setFunc = sinon.spy(testObject.model, "set");
                 var save_changes = sinon.spy(testObject.model, "save_changes");
@@ -163,7 +147,7 @@
         describe('_callback', function() {
             it('should return the minimum set of iopub callbacks if element does not have parent cell', function() {
 
-                var testObject = Polymer.Base.mixin(Urth.JupyterWidgetBehavior, {
+                var testObject = Polymer.Base.mixin(Urth.JupyterWidgetBehaviorImpl, {
                     parentCell: function(){
                         //mocked to return undefined
                         return undefined;
@@ -189,7 +173,7 @@
 
             it('should return the a combination of parent cell callbacks and model callbacks if element has a parent cell', function() {
 
-                var testObject = Polymer.Base.mixin(Urth.JupyterWidgetBehavior, {
+                var testObject = Polymer.Base.mixin(Urth.JupyterWidgetBehaviorImpl, {
                     parentCell: function(){
                         //mocked to return undefined
                         return {

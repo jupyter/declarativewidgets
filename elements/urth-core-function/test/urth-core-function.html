@@ -60,6 +60,7 @@
              * must be mocked there.
              */
             sinon.stub(Urth["urth-core-function"].prototype, "createModel");
+            sinon.stub(Urth["urth-core-function"].prototype, "displayErrorMessage");
             sinon.stub(Urth.ExecutionCompleteBehavior, "ready");
             sinon.stub(Urth.ExecutionCompleteBehavior, "detached");
         });
@@ -226,6 +227,7 @@
 
             it('should return false if any required args in signature is missing from args', function() {
                 var fElmt = fixture('basic');
+
                 fElmt.args = {
                     x: "5",
                     y: "4"
@@ -240,6 +242,7 @@
 
             it('should return false if more required args in signature than are in args', function() {
                 var fElmt = fixture('basic');
+                
                 fElmt.args = {
                     x: "5",
                     y: "4"
