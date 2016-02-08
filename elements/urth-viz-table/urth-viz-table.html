@@ -6,6 +6,7 @@
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
+<link rel="import" href="../urth-core-behaviors/general-behavior.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
 <!--
@@ -105,7 +106,8 @@ The table accepts data via attribute `datarows` and column headers via attribute
             behaviors: [
                 // Handsontable resizes itself based on document.onResize, but
                 // the dashboard also uses iron-resize events when changing layout
-                Polymer.IronResizableBehavior
+                Polymer.IronResizableBehavior,
+                Urth.GeneralBehavior
             ],
 
             listeners: {
@@ -162,7 +164,11 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     this.cancelDebouncer(jName);
                 }
                 this.debounce(jName, function () {
-                    if (!datarows || !columns) { return; }
+                    if (!datarows || !columns) { 
+                        this.displayErrorMessage("urth-viz-table: invalid datarows or columns");
+                        return;
+                    }
+                    this._clearErrorMessages();
                     if (this.hot) {
                         this._updateColumns(columns);
                         this._updateDatarows(datarows);
@@ -319,6 +325,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     } else {
                         if (this.datarows) {
                             this._createTable(this.datarows);
+                            this._clearErrorMessages();
+                        } else {
+                            this.displayErrorMessage("urth-viz-table: invalid datarows");
                         }
                     }
                 });

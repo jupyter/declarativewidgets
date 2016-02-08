@@ -6,13 +6,7 @@
 <!--
 This behavior is used to encapsulate some of the services needed for ipywidgets.
 -->
-<style>
-    .output_area pre.urth-widget-error {
-        color: red;
-        background-color: #fdd;
-        padding: 5px;
-    }
-</style>
+<link rel='import' href='general-behavior.html'>
 <script>
     'use strict';
     (function() {
@@ -25,7 +19,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
          * @group Urth Core
          * @polymerBehavior Urth.JupyterWidgetBehavior
          */
-        Urth.JupyterWidgetBehavior = {
+        Urth.JupyterWidgetBehaviorImpl = {
 
             detached: function() {
                 this._unRegisterModelCallbacks();
@@ -242,37 +236,21 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
              * successful, and "error" when an error occurred.
              */
             onModel__status__Change: function(newVal){
-                if (newVal.status === "ok"){
-                    this._clearErrorMessages();
-                } else {
-                    this.displayErrorMessage(newVal.msg);
-                }
-            },
+                this._statusMsg = newVal;
 
-            _clearErrorMessages: function(){
-                var errs = this.getElementsByClassName("urth-widget-error");
-                var numErrs = errs.length;
-                for (var i = 0; i < numErrs; i++){
-                    this.removeChild(errs[0]);
-                }
+                if (newVal.status === "error") {
+                    this.displayErrorMessage(newVal.msg);
+                } /* the error message can be cleared once user excecutes the cell and there's no kernel or client side error (see any widget element's code) */
             },
 
             /**
-             * Displays the given error message in the output area associated
-             * with this widget.
+             * returns the model's __status__ object, 
+             * so elements who has this behavior can check for error if __status__.status is "error"
              *
-             * @method displayErrorMessage
-             * @param String msg
+             * @method getModelStatusMsg
              */
-            displayErrorMessage: function(msg){
-                if (!window.Urth.suppressErrors) {
-                    var errorNode = document.createElement("pre")
-                    errorNode.innerHTML = msg;
-                    errorNode.classList.add("urth-widget-error");
-                    this.appendChild(errorNode);
-                }
-                var widgetName = this.nodeName.toLowerCase();
-                console.error(widgetName + ": " + msg);
+            getModelStatusMsg: function() {
+                return this._statusMsg || { status: 'ok', msg: '' };
             },
 
             /**
@@ -304,5 +282,8 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                 }
             }
         };
+
+        // JupyterWidgetBehavior inherits GeneralBehavior
+        Urth.JupyterWidgetBehavior = [Urth.GeneralBehavior, Urth.JupyterWidgetBehaviorImpl];
     })();
 </script>
