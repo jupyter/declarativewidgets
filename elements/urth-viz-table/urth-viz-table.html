@@ -6,7 +6,7 @@
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
-<link rel="import" href="../urth-core-behaviors/general-behavior.html">
+<link rel="import" href="../urth-core-behaviors/error-display-behavior.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
 <!--
@@ -107,7 +107,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 // Handsontable resizes itself based on document.onResize, but
                 // the dashboard also uses iron-resize events when changing layout
                 Polymer.IronResizableBehavior,
-                Urth.GeneralBehavior
+                Urth.DisplayErrorBehavior
             ],
 
             listeners: {

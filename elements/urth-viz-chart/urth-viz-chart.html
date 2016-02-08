@@ -10,7 +10,7 @@
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
 <link rel="import" href="./urth-viz-chart-common-behavior.html">
-<link rel="import" href="../urth-core-behaviors/general-behavior.html">
+<link rel="import" href="../urth-core-behaviors/error-display-behavior.html">
 
 <!-- import the nvd3 stylesheet into the main page as well as the shadow dom
      because the nvtooltip is a child of BODY -->
@@ -96,7 +96,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         behaviors: [
             Polymer.IronResizableBehavior,
             Urth.VizChartCommonBehavior,
-            Urth.GeneralBehavior
+            Urth.DisplayErrorBehavior
         ],
 
         listeners: {

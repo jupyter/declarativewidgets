@@ -17,9 +17,9 @@ This behavior is used to encapsulate some of the services needed for urth elemen
          * Behavior that encapsulate some of the functions needed by
          * both urth-core and urth-viz elements.
          *
-         * @polymerBehavior Urth.GeneralBehavior
+         * @polymerBehavior Urth.DisplayErrorBehavior
          */
-        Urth.GeneralBehavior = {
+        Urth.DisplayErrorBehavior = {
 
             _clearErrorMessages: function(){
                 var errs = Polymer.dom(this.root).querySelectorAll(".urth-widget-error");
