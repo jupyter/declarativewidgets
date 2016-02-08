@@ -7,7 +7,7 @@
 <head>
     <meta charset="utf-8">
     <!-- STEP 1: Provide a title for the test suite. -->
-    <title>urth-core-bind tests</title>
+    <title>urth-core-import tests</title>
     <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
 
     <!-- Need the web component polyfill for browsers without native support. -->
@@ -40,6 +40,20 @@
     <test-fixture id='validHref'>
         <template>
             <link rel='import' href='/elements/iron-ajax/iron-ajax.html'
+                    is='urth-core-import' package='PolymerElements/iron-ajax'>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='loadingHref'>
+        <template>
+            <link rel='import' href='elements/iron-ajax/iron-ajax.html'
+                    is='urth-core-import' package='PolymerElements/iron-ajax'>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='errorLoadHref'>
+        <template>
+            <link rel='import' href='elementsNo/iron-ajax/iron-ajax.html'
                     is='urth-core-import' package='PolymerElements/iron-ajax'>
         </template>
     </test-fixture>
@@ -107,10 +121,69 @@
                 var importSpy = sinon.spy(link, 'importHref');
 
                 link.addEventListener('importerror', function(event) {
+                    importSpy.restore();
                     expect(event.detail.msg).to.not.be.null;
                     expect(importSpy).to.be.calledOnce;
                     done();
                 });
+            });
+        });
+
+        describe('href', function() {
+            it('change should add the url to the pending imports', function() {
+                var dummyURL = '../../dummy/dummy.html';
+                var link = fixture('invalidHref');
+
+                var importBroker = window.Urth['urth-core-import-broker'].getImportBroker();
+                var addSpy = sinon.spy(importBroker, 'addImport');
+                link.href = dummyURL;
+
+                addSpy.restore();
+
+                expect(addSpy).to.be.calledOnce;
+                var addSpyArgs = addSpy.getCall(0).args;
+                expect(addSpyArgs[0]).to.equal(link);
+                expect(addSpyArgs[1]).to.equal(dummyURL);
+                expect(addSpyArgs[2]).to.equal(link.package);
+            });
+        });
+
+        describe('loading event', function() {
+            it('should fire when the element is attached and bubble to body', function(done) {
+                var handler = function(event) {
+                    document.body.removeEventListener('loading', handler);
+                    done();
+                };
+                document.body.addEventListener('loading', handler);
+                var link = fixture('validHref');
+            });
+        });
+
+        describe('finished event', function() {
+            it('should fire when the element has loaded and bubble to body', function(done) {
+                var handler = function(event) {
+                    if (event.detail && event.detail.href === link.getAttribute('href')) {
+                        document.body.removeEventListener('finished', handler);
+                        expect(event.detail.loaded).to.be.true;
+                        done();
+                    }
+                };
+                document.body.addEventListener('finished', handler);
+
+                var link = fixture('loadingHref');
+            });
+
+            it('should fire when the element has failed to load and bubble to body', function(done) {
+                var handler = function(event) {
+                    if (event.detail && event.detail.href === link.getAttribute('href')) {
+                        document.body.removeEventListener('finished', handler);
+                        expect(event.detail.loaded).to.be.false;
+                        done();
+                    }
+                };
+                document.body.addEventListener('finished', handler);
+
+                var link = fixture('errorLoadHref');
             });
         });
 
