@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 (2016-02-08)
+
+* Support for Polymer 1.2.4+
+
 ## 0.3.0 (2016-01-20)
 
 * Modified install process to rely on `jupyter activate/deactivate`
