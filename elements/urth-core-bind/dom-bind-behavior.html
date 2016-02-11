@@ -28,12 +28,14 @@
          * @event dom-change
          */
 
+        _template: null,
+
         created: function() {
             // Ensure dom-bind doesn't stamp until all possible dependencies
             // have resolved
             var self = this;
             Polymer.RenderStatus.whenReady(function() {
-                 self._markImportsReady();
+                self._markImportsReady();
             });
         },
 
@@ -118,7 +120,7 @@
                 this._prepBindings();
                 this._prepPropertyInfo();
                 Polymer.Base._initFeatures.call(this);
-                this._children = Polymer.DomApi.arrayCopyChildNodes(this.root);
+                this._children = Polymer.TreeApi.arrayCopyChildNodes(this.root);
             }
             this._insertChildren();
             this.fire('dom-change');
