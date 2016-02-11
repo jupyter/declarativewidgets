@@ -244,42 +244,13 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
             },
 
             /**
-             * returns the model's __status__ object, 
+             * returns the model's __status__ object,
              * so elements who has this behavior can check for error if __status__.status is "error"
              *
              * @method getModelStatusMsg
              */
             getModelStatusMsg: function() {
                 return this._statusMsg || { status: 'ok', msg: '' };
-            },
-
-            /**
-             * Registers a function to be invoked when the specified Jupyter
-             * notebook event occurs.
-             *
-             * @method addEventCallback
-             * @param {String} event The IPython notebook event.
-             * @param {Function} callback The function to invoke.
-             */
-            addEventCallback: function(event, callback) {
-                if (window.IPython && window.IPython.notebook && window.IPython.notebook.events) {
-                    IPython.notebook.events.on(event, callback);
-                }
-            },
-
-            /**
-             * Removes a previously registered callback function for a Jupyter
-             * notebook event.
-             *
-             * @method removeEventCallback
-             * @param {String} event The IPython notebook event.
-             * @param {Function} callback The function that was previously
-             * registered.
-             */
-            removeEventCallback: function(event, callback) {
-                if (window.IPython && window.IPython.notebook && window.IPython.notebook.events) {
-                    IPython.notebook.events.off(event, callback);
-                }
             }
         };
 

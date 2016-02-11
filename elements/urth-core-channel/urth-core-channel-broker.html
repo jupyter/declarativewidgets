@@ -5,6 +5,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-core-behaviors/jupyter-widget-behavior.html">
 <link rel="import" href="../urth-core-behaviors/jupyter-kernel-observer.html">
+<link rel="import" href="../urth-core-behaviors/jupyter-save-behavior.html">
 <link rel="import" href="../urth-core-storage/urth-core-storage.html">
 
 <!--
@@ -53,7 +54,8 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
             is: 'urth-core-channel-broker',
             behaviors: [
                 Urth.JupyterWidgetBehavior,
-                Urth.JupyterKernelObserver
+                Urth.JupyterKernelObserver,
+                Urth.JupyterSaveBehavior
             ],
 
             /**
@@ -103,13 +105,6 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
 
                     // Remove the channel data from storage.
                     this.$.storage.remove(globalChannel.name);
-                }
-            },
-
-            detached: function() {
-                // Remove any event listeners that were previously added.
-                if (this._saveHandler) {
-                    this.removeEventCallback('before_save.Notebook', this._saveHandler);
                 }
             },
 
@@ -168,10 +163,15 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
                 console.debug('urth-core-channel-broker onModelReady');
             },
 
-            ready: function() {
-                // Add event listener for saves of the notebook.
-                this._saveHandler = this._saveAll.bind(this);
-                this.addEventCallback('before_save.Notebook', this._saveHandler);
+            /**
+             * Saves the data in all of the currently defined channels.
+             *
+             * @method onSave
+             */
+            onSave: function() {
+                Object.keys(_globalChannels).forEach(function(channel) {
+                    this.save(channel);
+                }.bind(this));
             },
 
             /**
@@ -303,12 +303,6 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
                 channelName = channelName || this.name || 'default';
                 var channel = this._getGlobalChannel(channelName);
                 return channel ? channel : this._createGlobalChannel(channelName);
-            },
-
-            _saveAll: function() {
-                Object.keys(_globalChannels).forEach(function(channel) {
-                    this.save(channel);
-                }.bind(this));
             },
 
             /**
