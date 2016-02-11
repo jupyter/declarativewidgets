@@ -7,7 +7,7 @@
  * Loads the web component polyfill and all web components specified in
  * elements.html.
  */
-define(['require', 'jquery'], function(require, $) {
+define(['require', 'module', 'jquery'], function(require, module, $) {
     'use strict';
 
     function loadComponents(bower_root, links) {
@@ -94,6 +94,41 @@ define(['require', 'jquery'], function(require, $) {
         document.head.appendChild(script);
     }
 
+    /**
+     * Function used to a direct path to bower_components based from where this modules was loaded
+     * @return {string}
+     */
+    function getModuleBasedComponentRoot() {
+        var moduleuri = module.uri;
+        return moduleuri.substring(0, moduleuri.lastIndexOf('/'))+"/../../bower_components";
+    }
+
+    /**
+     * Sniff test to see if the server side extensions are available. We are using a well-known element as the test.
+     * @param callback
+     */
+    function isServerExtensionAvailable(callback) {
+        urlExist(window.Urth.BASE_URL+'urth_components' + "/urth-core-bind/urth-core-bind.html", callback)
+    }
+
+    /**
+     * Utility function to check if a URL exist. Callback is invoked with either true or false.
+     * @param url
+     * @param callback
+     */
+    function urlExist(url, callback){
+        $.ajax({
+            type: 'HEAD',
+            url: url,
+            success: function(){
+                callback(true);
+            },
+            error: function() {
+                callback(false);
+            }
+        });
+    }
+
     return function(baseURL, links) {
         // Enable shadow dom if it is there for polymer elements.
         window.Polymer = window.Polymer || {};
@@ -107,12 +142,20 @@ define(['require', 'jquery'], function(require, $) {
         window.Urth.widgets = window.Urth.widgets || {};
         window.Urth.widgets.whenReady = $.Deferred();
 
-        var bower_root = baseURL + 'urth_components';
+        isServerExtensionAvailable(function(isAvailable){
+            console.log( "Server extension is " + (isAvailable?"":"NOT ") + "available!");
 
-        loadPolyfill(bower_root, function() {
-            loadComponents(bower_root, links);
-        }, function (e) {
-            console.error('Failed to load web components polyfill: ' + e);
+            //if server extension is available, use the 'urth_components' route, else use a direct path based on this
+            //module's uri
+            var components_root = isAvailable
+                ? baseURL + 'urth_components'
+                : getModuleBasedComponentRoot(module)
+
+            loadPolyfill(components_root, function() {
+                loadComponents(components_root, links);
+            }, function (e) {
+                console.error('Failed to load web components polyfill: ' + e);
+            });
         });
 
         return window.Urth.widgets.whenReady;
