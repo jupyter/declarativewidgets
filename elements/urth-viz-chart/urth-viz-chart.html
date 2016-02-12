@@ -91,6 +91,15 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                 notify: true,
                 observer: '_typeChanged'
             },
+
+            /**
+             * Allows user to select multiple chart components (bar in barchart, slice in pie chart, etc).
+             */
+            multiSelect: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            }
         },
 
         behaviors: [
@@ -303,6 +312,12 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                     this.selection = [];
 
                     this.chart[modelProp].dispatch.on('elementClick', function(e) {
+                          if (!this.multiSelect) {
+                            var selected;
+                            while (selected = this.$$('.selected')) {
+                                selected.classList.remove('selected');
+                            }
+                          }
                           this.$$('.hover').classList.toggle('selected');
                           this.selection = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
                     }.bind(this));
