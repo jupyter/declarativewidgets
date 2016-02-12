@@ -23,8 +23,9 @@ help:
 	@echo '             all - run all necessary streps to produce and validate a build'
 
 
-ROOT_REPO:=jupyter/all-spark-notebook:0017b56d93c9
-REPO:=jupyter/all-spark-notebook-bower:0017b56d93c9
+ROOT_REPO:=jupyter/all-spark-notebook:8021f892543c
+REPO:=jupyter/all-spark-notebook-bower:8021f892543c
+SCALA_BUILD_REPO:=jupyter/sbt-toree-image:0.1.0
 
 PYTHON?=python3
 
@@ -38,7 +39,7 @@ $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 	@$(foreach dir, $(URTH_SRC_DIRS), cd $(abspath $(dir)) && $(NPM_BIN_DIR)/bower link;)
 	@$(foreach name, $(URTH_DIRS), $(NPM_BIN_DIR)/bower link $(name);)
 
-init: node_modules dev_image
+init: node_modules dev_image scala_build_image
 
 node_modules: package.json
 	@npm install
@@ -59,6 +60,15 @@ dev_image:
 		npm install -g bower'
 	@docker commit bower-build $(REPO)
 	@-docker rm -f bower-build
+
+scala_build_image:
+	@-docker rm -f scala-build
+	@docker run -it --user root --name scala-build \
+		cloudet/sbt-sparkkernel-image:1.5.1 bash -c '\
+		curl --location https://pypi.python.org/packages/source/t/toree/toree-0.1.0.dev3.tar.gz >> /opt/toree.tar.gz && \
+		cd /opt; tar -xf toree.tar.gz; mv toree-* toree'
+	@docker commit scala-build $(SCALA_BUILD_REPO)
+	@-docker rm -f scala-build
 
 clean: clean-dist
 	@-rm -rf *.egg-info
@@ -123,8 +133,9 @@ else
 	@mkdir -p dist/urth/widgets/ext/notebook
 	@docker run -it --rm \
 		-v `pwd`:/src \
-		cloudet/sbt-sparkkernel-image:1.5.1 bash -c 'cp -r /src/kernel-scala /tmp/src && \
+		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/kernel-scala /tmp/src && \
 			cd /tmp/src && \
+			mkdir -p /tmp/src/lib && cp /opt/toree/toree/lib/*.jar /tmp/src/lib/. && \
 			sbt package && \
 			cp target/scala-2.10/urth-widgets*.jar /src/dist/urth/widgets/ext/notebook/urth-widgets.jar'
 endif
@@ -210,8 +221,9 @@ else
 	@echo 'Running scala tests...'
 	@docker run -it --rm \
 		-v `pwd`/kernel-scala:/src \
-		cloudet/sbt-sparkkernel-image:1.5.1 bash -c 'cp -r /src /tmp/src && \
+		$(SCALA_BUILD_REPO) bash -c 'cp -r /src /tmp/src && \
 			cd /tmp/src && \
+			mkdir -p /tmp/src/lib && cp /opt/toree/toree/lib/*.jar /tmp/src/lib/. && \
 			sbt test'
 endif
 

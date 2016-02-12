@@ -5,8 +5,8 @@
 
 package urth.widgets
 
-import com.ibm.spark.comm.CommWriter
-import com.ibm.spark.kernel.protocol.v5.MsgData
+import org.apache.toree.comm.CommWriter
+import org.apache.toree.kernel.protocol.v5.MsgData
 import play.api.libs.json.{JsString, JsValue, Json}
 import urth.widgets.util.{SerializationSupport, StandardFunctionSupport}
 

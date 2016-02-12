@@ -5,8 +5,8 @@
 
 package urth.widgets
 
-import com.ibm.spark.comm.CommWriter
-import com.ibm.spark.interpreter.Interpreter
+import org.apache.toree.comm.CommWriter
+import org.apache.toree.interpreter.Interpreter
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.FunSpec

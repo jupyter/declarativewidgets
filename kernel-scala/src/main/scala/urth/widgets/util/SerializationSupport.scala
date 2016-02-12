@@ -5,7 +5,7 @@
 
 package urth.widgets.util
 
-import com.ibm.spark.utils.LogLike
+import org.apache.toree.utils.LogLike
 import org.apache.spark.sql.DataFrame
 import play.api.libs.json._
 import urth.widgets.Default
