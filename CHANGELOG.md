@@ -1,4 +1,7 @@
 # Changelog
+## 0.4.0 (2016-02-12)
+* Upgrade to use Apache Toree for scala kernel
+* Upgrade to Polymer 1.2.4+
 
 ## 0.3.0 (2016-01-20)
 
