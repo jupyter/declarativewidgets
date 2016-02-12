@@ -33,7 +33,7 @@ Example:
             <span title="Pie Chart" name="pie" class="fa fa-pie-chart fa-2x"></span>
         </iron-selector>
         <urth-core-dataframe id="f1" ref$="{{ref}}" value="{{df}}" auto></urth-core-dataframe>
-        <urth-viz-chart id="c1" type$="{{type}}" datarows="{{df.data}}" columns="{{df.columns}}"></urth-viz-chart>
+        <urth-viz-chart id="c1" type$="{{type}}" datarows="{{df.data}}" columns="{{df.columns}}" multi-select="[[multiSelect]]"></urth-viz-chart>
         <urth-viz-table id="t1" datarows="{{df.data}}" columns="{{df.columns}}"></urth-viz-table>
         <content></content>
     </template>
@@ -56,6 +56,15 @@ Example:
                 notify: true,
                 observer: '_typeChanged'
             },
+
+            /**
+             * Allows user to select multiple chart components (bars in barchart, slices in pie chart, etc).
+             */
+            multiSelect: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            }
         },
 
         _typeChanged: function(newValue, oldValue) {
