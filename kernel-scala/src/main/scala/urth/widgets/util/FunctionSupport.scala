@@ -5,7 +5,7 @@
 
 package urth.widgets.util
 
-import com.ibm.spark.interpreter.Interpreter
+import org.apache.toree.interpreter.Interpreter
 import play.api.libs.json._
 
 import scala.util.{Failure, Success, Try}
@@ -13,7 +13,7 @@ import scala.util.{Failure, Success, Try}
 import urth.widgets._
 import org.apache.spark.repl.SparkIMain
 
-import com.ibm.spark.utils.LogLike
+import org.apache.toree.utils.LogLike
 
 import scala.reflect.runtime.universe._
 

@@ -1,7 +1,7 @@
 package urth.widgets
 
-import com.ibm.spark.comm.CommWriter
-import com.ibm.spark.kernel.protocol.v5._
+import org.apache.toree.comm.CommWriter
+import org.apache.toree.kernel.protocol.v5._
 import org.mockito.Matchers._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, FunSpec}

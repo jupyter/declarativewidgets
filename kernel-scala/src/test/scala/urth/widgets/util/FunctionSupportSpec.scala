@@ -7,9 +7,11 @@ package urth.widgets.util
 
 import java.io.{OutputStream, ByteArrayOutputStream}
 
-import com.ibm.spark.global.StreamState
-import com.ibm.spark.interpreter.Interpreter
-import com.ibm.spark.kernel.interpreter.scala._
+import org.apache.toree.global.StreamState
+import org.apache.toree.interpreter.Interpreter
+import org.apache.toree.kernel.interpreter.scala._
+import org.apache.toree.kernel.api.KernelLike
+import org.apache.toree.utils.MultiOutputStream
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, FunSpec}
 import org.mockito.Matchers._
@@ -31,10 +33,26 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
   private var interpreter: Interpreter = _
   private val outputResult = new ByteArrayOutputStream()
 
-  interpreter = new ScalaInterpreter(Nil, mock[OutputStream])
-    with StandardSparkIMainProducer
-    with StandardTaskManagerProducer
-    with StandardSettingsProducer
+  interpreter = new ScalaInterpreter {
+    override protected val multiOutputStream = MultiOutputStream(List(mock[OutputStream], lastResultOut))
+    override def init(kernel: KernelLike): Interpreter = {
+      settings = newSettings(List[String]())
+
+      val urls = _thisClassloader match {
+        case cl: java.net.URLClassLoader => cl.getURLs.toList
+        case a => // TODO: Should we really be using sys.error here?
+          sys.error("[SparkInterpreter] Unexpected class loader: " + a.getClass)
+      }
+      val classpath = urls.map(_.toString)
+
+      settings.classpath.value =
+        classpath.distinct.mkString(java.io.File.pathSeparator)
+      settings.embeddedDefaults(_runtimeClassloader)
+
+      this
+    }
+  }
+  interpreter.init(mock[KernelLike])
   interpreter.start()
 
   StreamState.setStreams(outputStream = outputResult)

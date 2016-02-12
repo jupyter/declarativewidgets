@@ -5,7 +5,7 @@
 
 package urth
 
-import com.ibm.spark.kernel.api.Kernel
+import org.apache.toree.kernel.api.Kernel
 import org.apache.spark.repl.SparkIMain
 
 package object widgets {

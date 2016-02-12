@@ -1,7 +1,7 @@
 package urth.widgets.util
 
-import com.ibm.spark.comm.CommWriter
-import com.ibm.spark.utils.LogLike
+import org.apache.toree.comm.CommWriter
+import org.apache.toree.utils.LogLike
 import play.api.libs.json.{Json, JsValue}
 import urth.widgets.Comm
 
