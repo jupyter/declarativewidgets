@@ -73,12 +73,12 @@ dist/urth_widgets/elements: ${shell find elements}
 	@cp -R elements/* dist/urth_widgets/elements/.
 	@touch dist/urth_widgets/elements
 
-dist/urth_widgets/bower_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
+dist/urth_widgets/urth_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
 	@echo 'Moving bower_components'
-	@mkdir -p dist/urth_widgets/bower_components
-	@cp -RL bower_components/* dist/urth_widgets/bower_components/.
+	@mkdir -p dist/urth_widgets/urth_components
+	@cp -RL bower_components/* dist/urth_widgets/urth_components/.
 
-dist/urth_widgets: dist/urth_widgets/bower_components dist/urth_widgets/js dist/urth_widgets/elements
+dist/urth_widgets: dist/urth_widgets/urth_components dist/urth_widgets/js dist/urth_widgets/elements
 
 dist/urth/widgets/ext: ${shell find nb-extension/python/urth/widgets/ext}
 	@echo 'Moving frontend extension code'

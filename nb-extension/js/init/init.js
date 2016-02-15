@@ -10,16 +10,18 @@
 define(['require', 'module', 'jquery'], function(require, module, $) {
     'use strict';
 
-    function loadComponents(bower_root, links) {
-        console.debug('Bower root is: ', bower_root);
+    var COMPONENTS_DIR = 'urth_components';
+
+    function loadComponents(components_root, links) {
+        console.debug('Components root is: ', components_root);
 
         var defaultLinks = [
-            { href: bower_root + '/urth-core-bind/urth-core-bind.html' },
+            { href: components_root + '/urth-core-bind/urth-core-bind.html' },
             (function() {
                 var deferred = $.Deferred();
 
                 return {
-                    href: bower_root + '/urth-core-channels/urth-core-channels.html',
+                    href: components_root + '/urth-core-channels/urth-core-channels.html',
                     onload: function() {
                         // Add the global data channel to the document body.
                         var dataChannel = document.createElement('urth-core-channels');
@@ -36,9 +38,9 @@ define(['require', 'module', 'jquery'], function(require, module, $) {
                     promise: deferred.promise()
                 };
             })(),
-            { href: bower_root + '/urth-core-import/urth-core-import.html' },
-            { href: bower_root + '/urth-core-dataframe/urth-core-dataframe.html' },
-            { href: bower_root + '/urth-core-function/urth-core-function.html' }
+            { href: components_root + '/urth-core-import/urth-core-import.html' },
+            { href: components_root + '/urth-core-dataframe/urth-core-dataframe.html' },
+            { href: components_root + '/urth-core-function/urth-core-function.html' }
         ];
 
         links = defaultLinks.concat( links || [] );
@@ -85,30 +87,33 @@ define(['require', 'module', 'jquery'], function(require, module, $) {
         });
     }
 
-    function loadPolyfill(bower_root, loadHandler, errorHandler) {
+    function loadPolyfill(components_root, loadHandler, errorHandler) {
         var script = document.createElement('script');
         script.type = 'text/javascript';
-        script.setAttribute('src', bower_root+'/webcomponentsjs/webcomponents-lite.min.js');
+        script.setAttribute('src', components_root+'/webcomponentsjs/webcomponents-lite.min.js');
         script.onload = loadHandler;
         script.onerror = errorHandler;
         document.head.appendChild(script);
     }
 
     /**
-     * Function used to a direct path to bower_components based from where this modules was loaded
+     * Function used to a get direct path from where this modules was loaded.
      * @return {string}
      */
     function getModuleBasedComponentRoot() {
         var moduleuri = module.uri;
-        return moduleuri.substring(0, moduleuri.lastIndexOf('/'))+"/../../bower_components";
+        return moduleuri.substring(0, moduleuri.lastIndexOf('/')) + '/../../';
     }
 
     /**
-     * Sniff test to see if the server side extensions are available. We are using a well-known element as the test.
+     * Sniff test to see if the server side extensions are available.
+     * We are using a well-known element as the test.
      * @param callback
      */
-    function isServerExtensionAvailable(callback) {
-        urlExist(window.Urth.BASE_URL+'urth_components' + "/urth-core-bind/urth-core-bind.html", callback)
+    function isServerExtensionAvailable(components_root, callback) {
+        // Request jupyter-notebook-env.html since it is a small file with
+        // no dependencies.
+        urlExist(components_root + '/urth-core-behaviors/jupyter-notebook-env.html', callback)
     }
 
     /**
@@ -117,8 +122,10 @@ define(['require', 'module', 'jquery'], function(require, module, $) {
      * @param callback
      */
     function urlExist(url, callback){
+        // Using a `GET` request instead of a `HEAD` request because the `HEAD`
+        // request was causing system test failures on Sauce Labs.
         $.ajax({
-            type: 'HEAD',
+            type: 'GET',
             url: url,
             success: function(){
                 callback(true);
@@ -136,20 +143,22 @@ define(['require', 'module', 'jquery'], function(require, module, $) {
 
         // Expose the base URL being used.
         window.Urth = window.Urth || {};
-        window.Urth.BASE_URL = baseURL;
 
         // Global promise which is resolved when widgets are fully initialized
         window.Urth.widgets = window.Urth.widgets || {};
         window.Urth.widgets.whenReady = $.Deferred();
 
-        isServerExtensionAvailable(function(isAvailable){
-            console.log( "Server extension is " + (isAvailable?"":"NOT ") + "available!");
+        isServerExtensionAvailable(baseURL + COMPONENTS_DIR, function(isAvailable){
+            console.log('Server extension is ' + (isAvailable ? '' : 'NOT ') + 'available!');
 
-            //if server extension is available, use the 'urth_components' route, else use a direct path based on this
-            //module's uri
+            // If server extension is available, use the baseURL route, else
+            // use a direct path based on this module's uri.
             var components_root = isAvailable
-                ? baseURL + 'urth_components'
+                ? baseURL
                 : getModuleBasedComponentRoot(module)
+
+            window.Urth.BASE_URL = components_root;
+            components_root += COMPONENTS_DIR;
 
             loadPolyfill(components_root, function() {
                 loadComponents(components_root, links);

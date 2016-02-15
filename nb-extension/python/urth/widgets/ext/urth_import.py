@@ -94,19 +94,20 @@ def load_jupyter_server_extension(nb_app):
         with open(bowerrc, 'a') as f:
             f.write("""{
             "analytics": false,
-            "interactive": false
+            "interactive": false,
+            "directory": "urth_components"
             }""")
 
     # The import handler serves from /urth_import and any requests
-    # containing /urth_components/ will get served from the bower_components
-    # directory.
+    # containing /urth_components/ will get served from the actual
+    # urth_components directory.
     import_route_pattern = url_path_join(web_app.settings['base_url'], '/urth_import')
     components_route_pattern = url_path_join(web_app.settings['base_url'], '/urth_components/(.*)')
-    bower_path = os.path.join(widgets_dir, 'bower_components/')
+    components_path = os.path.join(widgets_dir, 'urth_components/')
 
     # Register the Urth import handler and static file handler.
     logger.debug('Adding handlers for {0} and {1}'.format(import_route_pattern, components_route_pattern))
     web_app.add_handlers('.*$', [
         (import_route_pattern, UrthImportHandler, dict(executor=ThreadPoolExecutor(max_workers=1))),
-        (components_route_pattern, FileFindHandler, {'path': [bower_path]})
+        (components_route_pattern, FileFindHandler, {'path': [components_path]})
     ])
