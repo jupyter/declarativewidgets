@@ -108,12 +108,12 @@ dist/urth/widgets/ext/notebook/elements: ${shell find elements}
 	@cp -R elements/* dist/urth/widgets/ext/notebook/elements/.
 	@touch dist/urth/widgets/ext/notebook/elements
 
-dist/urth/widgets/ext/notebook/bower_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
+dist/urth/widgets/ext/notebook/urth_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
 	@echo 'Moving bower_components'
-	@mkdir -p dist/urth/widgets/ext/notebook/bower_components
-	@cp -RL bower_components/* dist/urth/widgets/ext/notebook/bower_components/.
+	@mkdir -p dist/urth/widgets/ext/notebook/urth_components
+	@cp -RL bower_components/* dist/urth/widgets/ext/notebook/urth_components/.
 
-dist/urth/widgets/ext/notebook: dist/urth/widgets/ext/notebook/bower_components dist/urth/widgets/ext/notebook/js dist/urth/widgets/ext/notebook/elements
+dist/urth/widgets/ext/notebook: dist/urth/widgets/ext/notebook/urth_components dist/urth/widgets/ext/notebook/js dist/urth/widgets/ext/notebook/elements
 
 dist/urth/widgets/ext: ${shell find nb-extension/python/urth/widgets/ext}
 	@echo 'Moving frontend extension code'
