@@ -136,7 +136,7 @@
 
                 var importBroker = window.Urth['urth-core-import-broker'].getImportBroker();
                 var addSpy = sinon.spy(importBroker, 'addImport');
-                link.href = dummyURL;
+                link.setAttribute('href', dummyURL);
 
                 addSpy.restore();
 
