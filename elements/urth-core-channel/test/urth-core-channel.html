@@ -84,7 +84,7 @@
              */
             sinon.stub(Urth['urth-core-channel-broker'].prototype, 'createModel');
             sinon.stub(Urth.JupyterKernelObserver, 'created');
-            sinon.stub(Urth.JupyterWidgetBehavior, 'detached');
+            sinon.stub(Urth.JupyterWidgetBehaviorImpl, 'detached');
             sinon.stub(Urth['urth-core-channel-broker'].prototype, '_callbacks');
         });
 
@@ -425,7 +425,6 @@
 
         describe('unwatch', function() {
             it('should remove watcher from channel updates', function() {
-                debugger;
                 var watchSpy = sinon.spy();
                 channel.watch('foo', watchSpy);
                 channel.unwatch('foo', watchSpy);

@@ -109,6 +109,18 @@ Example:
             this._setValue(newVal || {data:[]});
         },
 
+        /* 
+         * to override onModel__status__Change in jupyter-widget-behavior.html
+         * We need to clear error message on status ok
+         */
+        onModel__status__Change: function(newStatus) {
+            if (newStatus.status === "ok") {
+              this._clearErrorMessages();
+            } else {
+              this.displayErrorMessage(newStatus.msg);
+            }
+        },
+
         _onExecutionComplete: function(){
             if (this.auto) {
                 this.refresh();
@@ -122,8 +134,15 @@ Example:
          * @method refresh
          */
         refresh: function() {
-            console.debug("urth-core-dataframe sending sync message...");
-            this.send({ "event": "sync" });
+            var jName = "urth-core-dataframe.refresh";
+            if( this.isDebouncerActive(jName) ) {
+                this.cancelDebouncer(jName);
+            }
+
+            this.debounce(jName, function(){
+              console.debug("urth-core-dataframe sending sync message...");
+              this.send({ "event": "sync" });
+            }.bind(this), 200);
         },
 
         _onLimitChange: function(){

@@ -238,15 +238,15 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
              * @param {boolean} skipValidate Optional flag to skip validation of params before sending message to invoke
              */
             invoke: function(skipValidate){
-
                 if(!skipValidate && !this.isValid()){
-                    throw new Error("Function arguments are not in valid state")
+                    throw new Error("Function arguments are not in valid state");
                 }
 
                 var jName = "urth-core-function.invoke";
                 if( this.isDebouncerActive(jName) ) {
                     this.cancelDebouncer(jName);
                 }
+
                 this.debounce(jName, function(){
                     console.debug("urth-core-function invoking...");
 
@@ -262,7 +262,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                         event: 'invoke',
                         args: serArgs
                     });
-                }.bind(this), this.delay)
+                }.bind(this), this.delay);
             },
 
             /**
@@ -336,7 +336,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
             _onParameterChange: function( argName, argValue ){
                 console.debug("urth-core-function _onParameterChange", argName, argValue);
 
-                if( this.auto ) {
+                if (this.auto) {
                     this._tryInvoke();
                 }
             },
@@ -355,7 +355,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
              */
             _onSignatureChange: function(sig){
                 console.debug('urth-core-function _onSignatureChange got new signature', sig);
-
+                this._clearErrorMessages();
                 this.resetDynamicProperties();
 
                 var paramNames = Object.keys(sig);
@@ -399,7 +399,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                     this._syncParamAttributes(paramsToSync);
                 }
 
-                if( this.auto ) {
+                if (this.auto) {
                     this._tryInvoke();
                 }
             },
@@ -435,11 +435,12 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
             },
 
             _tryInvoke: function() {
-                if(this.isValid()){
+                if(this.isValid()) {
                     this.invoke(true);
                 }
-                else{
+                else {
                     console.warn('urth-core-function tried to invoke but arguments are not in valid state', this.args);
+                    this.displayErrorMessage("urth-core-function tried to invoke but arguments are not in valid state");
                 }
             },
 
