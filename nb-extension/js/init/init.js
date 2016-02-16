@@ -29,9 +29,6 @@ define([
                         broker.addEventListener('connected', function() {
                             deferred.resolve();
                         });
-
-                        // Exposing a global
-                        window.UrthData = broker;
                     },
                     promise: deferred.promise()
                 };
