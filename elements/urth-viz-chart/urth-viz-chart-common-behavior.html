@@ -103,6 +103,15 @@
                     type: Number,
                     value: 1,
                     observer: '_update'
+                },
+
+                /**
+                 * Allows user to select multiple chart components (bar in barchart, slice in pie chart, etc).
+                 */
+                multiSelect: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
                 }
             },
 

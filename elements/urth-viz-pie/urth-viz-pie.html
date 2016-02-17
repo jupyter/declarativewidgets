@@ -31,17 +31,6 @@ The chart accepts data via attribute `datarows` and column headers via attribute
     Polymer({
         is: 'urth-viz-pie',
 
-        properties: {
-            /**
-             * Allows user to select multiple slices.
-             */
-            multiSelect: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
-            }
-        },
-
         behaviors: [
             Urth.VizChartCommonBehavior
         ]
