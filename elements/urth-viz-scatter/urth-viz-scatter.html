@@ -31,17 +31,6 @@ The chart accepts data via attribute `datarows` and column headers via attribute
     Polymer({
         is: 'urth-viz-scatter',
 
-        properties: {
-            /**
-             * Allows user to select multiple points
-             */
-            multiSelect: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
-            }
-        },
-
         behaviors: [
             Urth.VizChartCommonBehavior
         ]
