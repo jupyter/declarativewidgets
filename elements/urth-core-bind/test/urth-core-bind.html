@@ -175,12 +175,17 @@
         });
 
         describe('_customRender', function() {
-            it('should get invoked when the element is attached', function() {
+            it('should get invoked when the element is attached', function(done) {
                 var renderTemplate = new window.Urth['urth-core-bind']();
                 var renderSpy = sinon.spy(renderTemplate, '_customRender');
                 document.body.appendChild(renderTemplate);
-                renderSpy.restore();
-                expect(renderSpy).to.have.been.calledOnce;
+                /* Force flush because some browsers don't attach synchronously
+                 * and the following tests were being executed too soon. */
+                flush(function() {
+                    renderSpy.restore();
+                    expect(renderSpy).to.have.been.calledOnce;
+                    done();
+                });
             });
 
             it('should retrieve the pending imports', function() {
