@@ -90,7 +90,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                 type: String,
                 notify: true,
                 observer: '_typeChanged'
-            },
+            }
         },
 
         behaviors: [
@@ -303,6 +303,12 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                     this.selection = [];
 
                     this.chart[modelProp].dispatch.on('elementClick', function(e) {
+                          if (!this.multiSelect) {
+                            var selected;
+                            while (selected = this.$$('.selected')) {
+                                selected.classList.remove('selected');
+                            }
+                          }
                           this.$$('.hover').classList.toggle('selected');
                           this.selection = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
                     }.bind(this));
