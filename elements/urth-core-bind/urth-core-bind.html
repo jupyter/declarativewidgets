@@ -135,7 +135,7 @@
                 // value change. Channel change is handled separately.
                 if (newVal !== oldVal && property !== 'channel' &&
                         property !== 'noWait') {
-                    this.channelElement.set(property, newVal);
+                    this.channelElement.set(property, newVal, { oldValue: oldVal });
                 }
             }
         });
