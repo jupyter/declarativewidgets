@@ -38,7 +38,6 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
             return {
                 'elements': [],
                 'data': {},
-                'initialized': false,
                 'name': channelName
             };
         };
@@ -75,11 +74,14 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
              * @return {Object} The data currently set on the specified channel.
              */
             addChannelElement: function(channelName, element) {
-                var channel = this._getOrCreateGlobalChannel(channelName);
-                var data = channel ? channel.data : {};
+                var data;
+                var globalChannel = this._getOrCreateGlobalChannel(channelName);
+                if (globalChannel && element) {
+                    data = Polymer.Base.get(globalChannel.name, this);
 
-                if (element && channel && channel.elements.indexOf(element) === -1) {
-                    channel.elements.push(element);
+                    if (globalChannel.elements.indexOf(element) === -1) {
+                        globalChannel.elements.push(element);
+                    }
                 }
 
                 return data;
@@ -97,11 +99,12 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
                     // Iterate through all the properties and unset
                     // them so registered elements get notified of
                     // the data clear.
-                    Object.keys(globalChannel.data).forEach(function(key) {
+                    var data = Polymer.Base.get(globalChannel.name, this) || {};
+                    Object.keys(data).forEach(function(key) {
                         // Specifying no value so it gets cleared.
                         this.set(channelName, key, undefined);
                     }.bind(this))
-                    globalChannel.data = {};
+                    Polymer.Base.set(globalChannel.name, {}, this);
 
                     // Remove the channel data from storage.
                     this.$.storage.remove(globalChannel.name);
@@ -120,7 +123,8 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
             get: function(channelName, key) {
                 var globalChannel = this._getGlobalChannel(channelName);
                 if (globalChannel){
-                    return key ? globalChannel.data[key] : globalChannel.data;
+                    var channelKey = globalChannel.name + (key ? '.' + key : '');
+                    return Polymer.Base.get(channelKey, this);
                 }
             },
 
@@ -202,13 +206,13 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
              * @return {Object} The data associated with the specified channel.
              */
             removeChannelElement: function(channelName, element) {
-                var channel = this._getGlobalChannel(channelName);
-                var data = channel ? channel.data : {};
+                var globalChannel = this._getGlobalChannel(channelName);
+                var data = globalChannel ? Polymer.Base.get(globalChannel.name, this) : {};
 
-                if (channel && element) {
-                    var index = channel.elements.indexOf(element);
+                if (globalChannel && element) {
+                    var index = globalChannel.elements.indexOf(element);
                     if (index !== -1) {
-                        channel.elements.splice(index, 1);
+                        globalChannel.elements.splice(index, 1);
                     }
                 }
 
@@ -224,8 +228,9 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
             save: function(channelName) {
                 var globalChannel = this._getGlobalChannel(channelName);
                 if (globalChannel) {
-                    if (globalChannel.data) {
-                        this.$.storage.set(globalChannel.name, globalChannel.data);
+                    var data = Polymer.Base.get(globalChannel.name, this);
+                    if (data) {
+                        this.$.storage.set(globalChannel.name, data);
                     } else {
                         this.$.storage.remove(globalChannel.name);
                     }
@@ -243,31 +248,78 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
              * @param {String} channelName The name of the channel.
              * @param {String} key The key to be associated with the value.
              * @param {Object} value The value to set.
+             * @param {Object} options Additional options. Currently
+             * only `oldValue` is supported. If not specified, the current value
+             * will be retrieved with the `get` method.
              */
-            set: function(channelName, key, value) {
+            set: function(channelName, key, value, options) {
                 var globalChannel = this._getOrCreateGlobalChannel(channelName);
-                if (!globalChannel) {
+                if (!key || !globalChannel) {
                     return;
                 }
                 channelName = globalChannel.name;
-                var oldVal = globalChannel && key ? this.get(channelName, key) : undefined;
 
-                if (key && globalChannel && oldVal !== value) {
-                    // 'undefined' value results in a delete of the key.
-                    if (typeof value === 'undefined') {
-                        globalChannel.data[key] = null;
-                        delete globalChannel.data[key];
-                    } else {
-                        globalChannel.data[key] = value;
+                // Retrieve the current (old) value unless an old value was passed in.
+                // Note, it could be specified but the value is undefined which
+                // is valid.
+                //
+                // The `set` method basically gets invoked in one of two ways:
+                //    1. Directly through broker or channel API. In this case if
+                //       options is not specified then the old value should be
+                //       retrievable through the `get` method.
+                //    2. Automatically by `_propertyChanged` on `urth-core-bind`.
+                //       In this case the Polymer framework will pass the old
+                //       value and it will be in the options argument. This is
+                //       good because invoking `get` for this situation would
+                //       return the new value instead of the old value due to
+                //       Polymer already having set it.
+                var oldVal = options && options.hasOwnProperty('oldValue') ?
+                        options.oldValue : this.get(channelName, key);
+
+                // Use the JSON value saved from a previous `set` invocation to
+                // determine if this `set` value has already been saved. If it
+                // hasn't or the value has changed, need to process it. Either
+                // way, the value of `oldVal` is used instead since it properly
+                // handles paths (ie. myarray.#0.value)
+                if (globalChannel.data[key] !== JSON.stringify(value)) {
+                    var rootKey = key,
+                        rootNewVal = value,
+                        rootOldVal = oldVal,
+                        dotIndex = key.indexOf('.'),
+                        rootInfo;
+
+                    Polymer.Base.set(channelName + '.' + key, value, this);
+                    // Store the JSON version of the value for later comparison
+                    // to determine if it has changed. Although doing this
+                    // potentially has some issues around object property
+                    // ordering, it should be sufficient for preventing looping.
+                    globalChannel.data[key] = value ?
+                            JSON.stringify(value) : value;
+
+                    // If the key that was modified is a path (ie. myarray.#0.prop)
+                    // then send information about the root of the path to the
+                    // kernel and listening elements.
+                    if (dotIndex >= 0) {
+                        rootKey = key.slice(0, dotIndex);
+                        rootNewVal = this.get(channelName, rootKey);
+                        rootOldVal = JSON.parse(globalChannel.data[rootKey]);
+                        rootInfo = {
+                            key: rootKey,
+                            oldValue: rootOldVal,
+                            value: rootNewVal
+                        };
+                        globalChannel.data[rootKey] = rootNewVal ?
+                                JSON.stringify(rootNewVal) : rootNewVal;
                     }
 
-                    this._sendItem(key, value, oldVal, channelName);
+                    this._sendItem(rootKey, rootNewVal, rootOldVal, channelName);
 
                     globalChannel.elements.forEach(function(channelElement) {
                         channelElement.fire('urth-channel-data-update', {
                             key: key,
                             oldValue: oldVal,
-                            value: value
+                            value: value,
+                            root: rootInfo
                         });
                     }.bind(this));
                 }
@@ -276,10 +328,8 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
             _createGlobalChannel: function(channelName) {
                 if (!_globalChannels[channelName]) {
                     _globalChannels[channelName] = initChannel(channelName);
-                    if (!_globalChannels[channelName].initialized) {
-                        this.reload(channelName);
-                        _globalChannels[channelName].initialized = true;
-                    }
+                    Polymer.Base.set(channelName, {}, this);
+                    this.reload(channelName);
                     console.debug('urth-core-channel-broker _createGlobalChannel: ' +
                         'created new channel', channelName, '.'
                     );
