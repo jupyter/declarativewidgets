@@ -68,3 +68,6 @@ npm-debug.*
 .watch-docs
 project/
 SELENIUM_PID
+.ipynb_checkpoints/
+metastore_db/
+Untitled*.ipynb
