@@ -250,17 +250,9 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                 this.debounce(jName, function(){
                     console.debug("urth-core-function invoking...");
 
-                    var serArgs = {};
-                    Object.keys(this.args).filter(function(arg){
-                        //remove args that contain the default value.
-                        return this.signature[arg] && this.args[arg] !== this.signature[arg].value;
-                    }.bind(this)).forEach(function(arg){
-                        serArgs[arg] = this.serialize(this.args[arg]);
-                    }.bind(this));
-
                     this.send({
                         event: 'invoke',
-                        args: serArgs
+                        args: this._serializeParamsForSend()
                     });
                 }.bind(this), this.delay);
             },
@@ -280,6 +272,23 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                         .every(function(arg){
                             return this.args[arg] !== undefined;
                         }.bind(this));
+            },
+
+            /**
+             * Builds the `args` section of the 'invoke' message by serializing each
+             * param as necessary.
+             */
+            _serializeParamsForSend: function(){
+                var serArgs = {};
+                Object.keys(this.args).filter(function(arg){
+                    //remove args that contain the default value.
+                    return this.signature[arg] && this.args[arg] !== this.signature[arg].value;
+                }.bind(this)).forEach(function(arg){
+                    var value = this.args[arg];
+                    serArgs[arg] = (typeof value == 'boolean') ? value : this.serialize(value);
+                }.bind(this));
+
+                return serArgs;
             },
 
             _isParameterAttribute: function(attr /*attribute or string*/){
