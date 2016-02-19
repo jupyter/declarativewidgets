@@ -789,6 +789,142 @@
                 });
 
             });
+
+            it('should send invoke message with boolean arg set to false', function(done) {
+                var fElmt = fixture('basic');
+
+                //stub the debouncing support
+                sinon.stub(fElmt, "isDebouncerActive").returns(false);
+
+                sinon.stub(fElmt, "isValid").returns(true);
+
+                var send = sinon.spy(fElmt, "send");
+
+                fElmt.argX = false;
+
+                fElmt._setSignature({
+                    x: {'value': true}
+                });
+
+                fElmt.invoke();
+                setTimeout(function(){
+                    assert(send.calledOnce, "Method was called " + send.callCount + " expected 1");
+                    expect(send.getCall(0).args[0].event).to.equal('invoke');
+                    expect(send.getCall(0).args[0].args).to.deep.equal({
+                        'x':false
+                    });
+                    done()
+                });
+
+            });
+
+            it('should send invoke message without boolean arg if it matches default of true', function(done) {
+                var fElmt = fixture('basic');
+
+                //stub the debouncing support
+                sinon.stub(fElmt, "isDebouncerActive").returns(false);
+
+                sinon.stub(fElmt, "isValid").returns(true);
+
+                var send = sinon.spy(fElmt, "send");
+
+                fElmt.argX = true;
+
+                fElmt._setSignature({
+                    x: {'value': true}
+                });
+
+                fElmt.invoke();
+                setTimeout(function(){
+                    assert(send.calledOnce, "Method was called " + send.callCount + " expected 1");
+                    expect(send.getCall(0).args[0].event).to.equal('invoke');
+                    expect(send.getCall(0).args[0].args).to.deep.equal({});
+                    done()
+                });
+
+            });
+
+            it('should send invoke message without boolean arg if it matches default of false', function(done) {
+                var fElmt = fixture('basic');
+
+                //stub the debouncing support
+                sinon.stub(fElmt, "isDebouncerActive").returns(false);
+
+                sinon.stub(fElmt, "isValid").returns(true);
+
+                var send = sinon.spy(fElmt, "send");
+
+                fElmt.argX = false;
+
+                fElmt._setSignature({
+                    x: {'value': false}
+                });
+
+                fElmt.invoke();
+                setTimeout(function(){
+                    assert(send.calledOnce, "Method was called " + send.callCount + " expected 1");
+                    expect(send.getCall(0).args[0].event).to.equal('invoke');
+                    expect(send.getCall(0).args[0].args).to.deep.equal({});
+                    done()
+                });
+
+            });
+
+            it('should send invoke message with boolean arg of true if required', function(done) {
+                var fElmt = fixture('basic');
+
+                //stub the debouncing support
+                sinon.stub(fElmt, "isDebouncerActive").returns(false);
+
+                sinon.stub(fElmt, "isValid").returns(true);
+
+                var send = sinon.spy(fElmt, "send");
+
+                fElmt.argX = true;
+
+                fElmt._setSignature({
+                    x: {required: true}
+                });
+
+                fElmt.invoke();
+                setTimeout(function(){
+                    assert(send.calledOnce, "Method was called " + send.callCount + " expected 1");
+                    expect(send.getCall(0).args[0].event).to.equal('invoke');
+                    expect(send.getCall(0).args[0].args).to.deep.equal({
+                        'x':true
+                    });
+                    done()
+                });
+
+            });
+
+            it('should send invoke message with boolean arg of false if required', function(done) {
+                var fElmt = fixture('basic');
+
+                //stub the debouncing support
+                sinon.stub(fElmt, "isDebouncerActive").returns(false);
+
+                sinon.stub(fElmt, "isValid").returns(true);
+
+                var send = sinon.spy(fElmt, "send");
+
+                fElmt.argX = false;
+
+                fElmt._setSignature({
+                    x: {required: true}
+                });
+
+                fElmt.invoke();
+                setTimeout(function(){
+                    assert(send.calledOnce, "Method was called " + send.callCount + " expected 1");
+                    expect(send.getCall(0).args[0].event).to.equal('invoke');
+                    expect(send.getCall(0).args[0].args).to.deep.equal({
+                        'x':false
+                    });
+                    done()
+                });
+
+            });
         });
     </script>
 </body>
