@@ -125,24 +125,13 @@
                 expect(fElmt.selection).to.eql([2,2,6]);
             });
 
-            before(function(done) {
-                function listener() {
-                    fElmt.removeEventListener('urth-viz-render', listener);
-                    // rendering is complete.  proceed with test
-                    done();
-                }
-                fElmt.addEventListener('urth-viz-render', listener);
-                fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
-                fElmt.columns = ["Index","Series 1","Series 2"];
-                fElmt.selectionAsObject = true;
-            });
-
             it('should set the selection property to an object if selectionAsObject is set', function() {
+                fElmt.selectionAsObject = true;
                 fElmt._handleSelection(1);
                 expect(fElmt.selection).to.eql({
                     Index: 2,
-                    Series 1: 2,
-                    Series 2: 6
+                    Series_1: 2,
+                    Series_2: 6
                 });
             });
         });
