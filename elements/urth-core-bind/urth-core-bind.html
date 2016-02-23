@@ -66,7 +66,9 @@
                  */
                 noWait: {
                     type: Boolean,
-                    value: false,
+                    // Not defining a default value because Polymer > v1.3 does
+                    // not set the value specified here anyway since this
+                    // element extends `template` and does its own stamping.
                     reflectToAttribute: true
                 },
                 /**
@@ -74,11 +76,18 @@
                  */
                 channel: {
                     type: String,
-                    value: 'default',
+                    // Not defining a default value since `urth-core-channel`
+                    // defines it and Polymer > v1.3 does not set the value
+                    // specified here anyway since this element extends
+                    // `template` and does its own stamping.
                     observer: '_onChannelChange'
                 }
             },
             behaviors: [Urth.DomBindBehavior],
+
+            created: function() {
+                this._createChannel();
+            },
 
             detached: function() {
                 // Unregister from the channel when element is detached.
@@ -118,11 +127,7 @@
             },
 
             _onChannelChange: function(newVal, oldVal) {
-                if (!this.channelElement) {
-                    this._createChannel();
-                } else {
-                    this.channelElement.setAttribute('name', newVal);
-                }
+                this.channelElement.setAttribute('name', newVal);
             },
 
             _propertyChanged: function(property, newVal, oldVal) {
