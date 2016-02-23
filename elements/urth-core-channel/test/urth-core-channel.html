@@ -549,6 +549,76 @@
                 expect(watch2SpyArgs[1]).to.equal('none');
                 expect(watch2SpyArgs[2]).to.equal('open');
             });
+
+            it('should register an array watcher that gets invoked when an item from the array is modified.', function() {
+                var foo = [
+                    {name: 'bar', value: 'none'},
+                    {name: 'open', value: 'yes'}
+                ];
+                channel.set('foo', foo);
+                var watchSpy = sinon.spy();
+                var propSpy = sinon.spy();
+
+                // Modifying an item in the array should call watchers for the
+                // top level array and for the path that was modified.
+                channel.watch('foo', watchSpy);
+                channel.watch('foo.#1.value', propSpy);
+
+                channel.set('foo.#1.value', 'no');
+
+                expect(watchSpy).to.have.been.calledOnce;
+                var watchSpyArgs = watchSpy.getCall(0).args;
+                expect(watchSpyArgs[0]).to.equal('foo');
+                expect(watchSpyArgs[1]).to.deep.equal([
+                    {name: 'bar', value: 'none'},
+                    {name: 'open', value: 'yes'}
+                ]);
+                expect(watchSpyArgs[2]).to.deep.equal([
+                    {name: 'bar', value: 'none'},
+                    {name: 'open', value: 'no'}
+                ]);
+
+                expect(propSpy).to.have.been.calledOnce;
+                var propSpyArgs = propSpy.getCall(0).args;
+                expect(propSpyArgs[0]).to.equal('foo.#1.value');
+                expect(propSpyArgs[1]).to.equal('yes');
+                expect(propSpyArgs[2]).to.equal('no');
+            });
+
+            it('should register an object watcher that gets invoked when a property from the object is modified.', function() {
+                var foo = {
+                    name: 'bar',
+                    value: 'none'
+                };
+                channel.set('foo', foo);
+                var watchSpy = sinon.spy();
+                var propSpy = sinon.spy();
+
+                // Modifying a property in an object should call watchers for the
+                // top level object and for the path that was modified.
+                channel.watch('foo', watchSpy);
+                channel.watch('foo.value', propSpy);
+
+                channel.set('foo.value', 'all');
+
+                expect(watchSpy).to.have.been.calledOnce;
+                var watchSpyArgs = watchSpy.getCall(0).args;
+                expect(watchSpyArgs[0]).to.equal('foo');
+                expect(watchSpyArgs[1]).to.deep.equal({
+                    name: 'bar',
+                    value: 'none'
+                });
+                expect(watchSpyArgs[2]).to.deep.equal({
+                    name: 'bar',
+                    value: 'all'
+                });
+
+                expect(propSpy).to.have.been.calledOnce;
+                var propSpyArgs = propSpy.getCall(0).args;
+                expect(propSpyArgs[0]).to.equal('foo.value');
+                expect(propSpyArgs[1]).to.equal('none');
+                expect(propSpyArgs[2]).to.equal('all');
+            });
         });
     </script>
 </body>

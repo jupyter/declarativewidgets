@@ -198,7 +198,6 @@
             });
 
             it('should not retrieve the pending imports if "no-wait" is specified', function() {
-                debugger;
                 var importBroker = window.Urth['urth-core-import-broker'].getImportBroker();
                 var importSpy = sinon.spy(importBroker, 'getPendingImports');
                 var renderTemplate = new window.Urth['urth-core-bind']();

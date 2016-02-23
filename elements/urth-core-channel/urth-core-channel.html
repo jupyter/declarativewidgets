@@ -234,9 +234,12 @@ dataChannel.set('user', 'Luke');
              * @method set
              * @param {String} key The key to be associated with the value.
              * @param {Object} value The value to set.
+             * @param {Object} options Additional options. Currently
+             * only `oldValue` is supported. If not specified, the current value
+             * will be retrieved with the `get` method.
              */
-            set: function(key, value) {
-                this._broker.set(this.name, key, value);
+            set: function(key, value, options) {
+                this._broker.set(this.name, key, value, options);
             },
 
             /**
@@ -331,7 +334,7 @@ dataChannel.set('user', 'Luke');
                         Object.keys(oldData).filter(function(key) {
                             return typeof newData[key] === 'undefined';
                         }).forEach(function(key) {
-                            this._updateRegistered(key, undefined, undefined, false);
+                            this._updateRegistered(key, undefined, oldData[key], false);
                         }.bind(this));
                     }
 
@@ -350,25 +353,47 @@ dataChannel.set('user', 'Luke');
             _updateData: function(item) {
                 if (item && item.detail && item.detail.key) {
                     this._updateRegistered(item.detail.key,
-                        item.detail.value, item.detail.oldValue, true);
+                        item.detail.value, item.detail.oldValue, true,
+                        item.detail.root);
                 }
             },
 
-            _updateRegistered: function(key, newVal, oldVal, updateWatchers) {
-                if (key) {
+            _updateRegistered: function(key, newVal, oldVal, updateWatchers, root) {
+                if (key && oldVal !== newVal) {
                     if (this.registeredElements) {
                         this.registeredElements.forEach(function(element) {
-                            if (this !== element || element[key] !== newVal) {
-                                element[key] = newVal;
+                            if (this !== element) {
+                                // $$ is a function that is added to Polymer
+                                // elements. If the element is a Polymer element
+                                // then use the `set` API which handles paths
+                                // correctly, otherwise have to resort to just
+                                // setting a value for the property directly on
+                                // the element.
+                                typeof element.$$ === 'function' ?
+                                        element.set(key, newVal) :
+                                        element[key] = newVal;
                             }
                         }.bind(this));
                     }
 
-                    if (updateWatchers && this.watchers && Array.isArray(this.watchers[key])) {
-                        this.watchers[key].forEach(function(handler) {
-                            handler(key, oldVal, newVal);
-                        });
+                    if (updateWatchers) {
+                        this._updateWatchers(key, newVal, oldVal);
+
+                        // If this was a complex path update (ie. key = myprop.#0.myvar),
+                        // then send the watchers on the root the updated info.
+                        if (root && root.key) {
+                            this._updateWatchers(root.key, root.value, root.oldValue);
+                        }
                     }
+
+                }
+            },
+
+            _updateWatchers: function(key, newVal, oldVal) {
+                if (this.watchers && Array.isArray(this.watchers[key])) {
+                    this.watchers[key].forEach(function(handler) {
+                        handler(key, oldVal, newVal);
+                    });
                 }
             }
         });
