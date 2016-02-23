@@ -1,4 +1,9 @@
 # Changelog
+## 0.4.1 (2016-02-23)
+* Support for Polymer 1.3
+* Fixes to complex object changes across templates
+* Delay template rendering until imports completed
+
 ## 0.4.0 (2016-02-12)
 * Upgrade to use Apache Toree for scala kernel
 * Upgrade to Polymer 1.2.4+
