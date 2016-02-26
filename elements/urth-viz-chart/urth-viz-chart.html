@@ -272,6 +272,20 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                     formatTicks(chart.xAxis, this.primary);
                     formatTicks(chart.yAxis, this.secondary);
 
+                    if (this.height) {
+                        chart.height(this.height);
+                        this._svgSelection(d3).style('height', this.height);
+                    }
+
+                    if (this.width) {
+                        chart.width(this.width);
+                        this._svgSelection(d3).style('width', this.width);
+                    }
+
+                    if (this.margin) {
+                        chart.margin(this.margin);
+                    }
+
                     if (this.rotatelabels) {
                         chart.xAxis.rotateLabels(this.rotatelabels);      //Angle to rotate x-axis labels.
                     }
