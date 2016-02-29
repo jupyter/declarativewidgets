@@ -124,6 +124,16 @@
                 fElmt._handleSelection(1);
                 expect(fElmt.selection).to.eql([2,2,6]);
             });
+
+            it('should set the selection property to an object if selectionAsObject is set', function() {
+                fElmt.selectionAsObject = true;
+                fElmt._handleSelection(1);
+                expect(fElmt.selection).to.eql({
+                    Index: 2,
+                    Series_1: 2,
+                    Series_2: 6
+                });
+            });
         });
 
         describe('_updateColumns', function() {

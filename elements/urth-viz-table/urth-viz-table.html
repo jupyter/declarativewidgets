@@ -100,6 +100,16 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     type: Number,
                     value: function () {return 15;},
                     reflectToAttribute: true
+                },
+
+                /**
+                 * False by default to return 'selection' as an array of values.
+                 * If true, will return 'selection' as an object with key-value pairs (with column names as keys).
+                 */
+                selectionAsObject: {
+                    type: Boolean,
+                    value: function() { return false; },
+                    reflectToAttribute: true
                 }
             },
 
@@ -203,7 +213,17 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 // since rowStart is only the logical index of the table view
                 var physicalIndex = this.hot.sortIndex.length > 0 ?
                                         this.hot.sortIndex[rowStart][0] : rowStart;
-                this._setSelection(this.datarows[physicalIndex]);
+                if(this.selectionAsObject) {
+                    var sel = {};
+                    var row = this.datarows[physicalIndex];
+                    this.columns.map(function(col, i) {
+                        col = col.replace(" ", "_");
+                        sel[col] = row[i];
+                    });
+                    this._setSelection(sel);
+                } else {
+                    this._setSelection(this.datarows[physicalIndex]);
+                }
                 this.selectedRow = rowStart; //storing index
             },
 
