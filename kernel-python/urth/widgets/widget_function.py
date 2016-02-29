@@ -60,5 +60,8 @@ class Function(UrthWidget):
             self.error("Error while invoking function: {}".format(str(e)))
 
     def _sync_state(self):
-        signature = signature_spec(self._the_function())
-        self._send_update("signature", signature)
+        try:
+            signature = signature_spec(self._the_function())
+            self._send_update("signature", signature)
+        except Exception as e:
+            self.error("Error while getting function signature: {}".format(str(e)))
