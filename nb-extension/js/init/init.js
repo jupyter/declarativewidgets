@@ -9,20 +9,23 @@
  */
 define([
     'require',
+    'module',
     'jquery',
-    '../widgets/DeclWidgetModel'], function(require, $) {
+    '../widgets/DeclWidgetModel'], function(require, module, $) {
     'use strict';
 
-    function loadComponents(bower_root, links) {
-        console.debug('Bower root is: ', bower_root);
+    var COMPONENTS_DIR = 'urth_components';
+
+    function loadComponents(components_root, links) {
+        console.debug('Components root is: ', components_root);
 
         var defaultLinks = [
-            { href: bower_root + '/urth-core-bind/urth-core-bind.html' },
+            { href: components_root + '/urth-core-bind/urth-core-bind.html' },
             (function() {
                 var deferred = $.Deferred();
 
                 return {
-                    href: bower_root + '/urth-core-channel/urth-core-channel-broker.html',
+                    href: components_root + '/urth-core-channel/urth-core-channel-broker.html',
                     onload: function() {
                         // Add the global data channel to the document body.
                         var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
@@ -33,13 +36,13 @@ define([
                     promise: deferred.promise()
                 };
             })(),
-            { href: bower_root + '/urth-core-channel/urth-core-channel.html' },
-            { href: bower_root + '/urth-core-channel/urth-core-channel-item.html' },
-            { href: bower_root + '/urth-core-import/urth-core-import.html' },
-            { href: bower_root + '/urth-core-dataframe/urth-core-dataframe.html' },
-            { href: bower_root + '/urth-core-function/urth-core-function.html' },
-            { href: bower_root + '/urth-core-storage/urth-core-storage.html' },
-            { href: bower_root + '/urth-core-watch/urth-core-watch.html' }
+            { href: components_root + '/urth-core-channel/urth-core-channel.html' },
+            { href: components_root + '/urth-core-channel/urth-core-channel-item.html' },
+            { href: components_root + '/urth-core-import/urth-core-import.html' },
+            { href: components_root + '/urth-core-dataframe/urth-core-dataframe.html' },
+            { href: components_root + '/urth-core-function/urth-core-function.html' },
+            { href: components_root + '/urth-core-storage/urth-core-storage.html' },
+            { href: components_root + '/urth-core-watch/urth-core-watch.html' }
         ];
 
         links = defaultLinks.concat( links || [] );
@@ -86,13 +89,53 @@ define([
         });
     }
 
-    function loadPolyfill(bower_root, loadHandler, errorHandler) {
+    function loadPolyfill(components_root, loadHandler, errorHandler) {
         var script = document.createElement('script');
         script.type = 'text/javascript';
-        script.setAttribute('src', bower_root+'/webcomponentsjs/webcomponents-lite.min.js');
+        script.setAttribute('src', components_root+'/webcomponentsjs/webcomponents-lite.min.js');
         script.onload = loadHandler;
         script.onerror = errorHandler;
         document.head.appendChild(script);
+    }
+
+    /**
+     * Function used to a get direct path from where this modules was loaded.
+     * @return {string}
+     */
+    function getModuleBasedComponentRoot() {
+        var moduleuri = module.uri;
+        return moduleuri.substring(0, moduleuri.lastIndexOf('/')) + '/../../';
+    }
+
+    /**
+     * Sniff test to see if the server side extensions are available.
+     * We are using a well-known element as the test.
+     * @param callback
+     */
+    function isServerExtensionAvailable(components_root, callback) {
+        // Request jupyter-notebook-env.html since it is a small file with
+        // no dependencies.
+        urlExist(components_root + '/urth-core-behaviors/jupyter-notebook-env.html', callback)
+    }
+
+    /**
+     * Utility function to check if a URL exist. Callback is invoked with either true or false.
+     * @param url
+     * @param callback
+     */
+    function urlExist(url, callback){
+        // Using a `GET` request instead of a `HEAD` request because the `HEAD`
+        // request was causing system test failures on Sauce Labs.
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(){
+                callback(true);
+            },
+            error: function() {
+                callback(false);
+            }
+        });
     }
 
     return function(baseURL, config) {
@@ -102,22 +145,32 @@ define([
 
         // Expose the base URL being used.
         window.Urth = window.Urth || {};
-        window.Urth.BASE_URL = baseURL;
 
         // Global promise which is resolved when widgets are fully initialized
         window.Urth.widgets = window.Urth.widgets || {};
         window.Urth.widgets.whenReady = $.Deferred();
 
-        var bower_root = baseURL + 'urth_components';
-
         // expose suppressErrors, false by default to display errors
         window.Urth.suppressErrors = config && config.suppressErrors;
 
-        loadPolyfill(bower_root, function() {
-            var links = config && config.links;
-            loadComponents(bower_root, links);
-        }, function (e) {
-            console.error('Failed to load web components polyfill: ' + e);
+        isServerExtensionAvailable(baseURL + COMPONENTS_DIR, function(isAvailable){
+            console.log('Server extension is ' + (isAvailable ? '' : 'NOT ') + 'available!');
+
+            // If server extension is available, use the baseURL route, else
+            // use a direct path based on this module's uri.
+            var components_root = isAvailable
+                ? baseURL
+                : getModuleBasedComponentRoot(module)
+
+            window.Urth.BASE_URL = components_root;
+            components_root += COMPONENTS_DIR;
+
+            loadPolyfill(components_root, function() {
+                var links = config && config.links;
+                loadComponents(components_root, links);
+            }, function (e) {
+                console.error('Failed to load web components polyfill: ' + e);
+            });
         });
 
         return window.Urth.widgets.whenReady;
