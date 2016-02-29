@@ -52,12 +52,14 @@ bower_components: node_modules/bower bower.json
 dev_image:
 	@-docker rm -f bower-build
 	@docker run -it --user root --name bower-build \
+		-v `pwd`/etc/r:/src-kernel-r \
 		$(ROOT_REPO) bash -c 'apt-get update && \
 		apt-get install --yes curl && \
 		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
 		apt-get install --yes nodejs npm && \
 		ln -s /usr/bin/nodejs /usr/bin/node && \
-		npm install -g bower'
+		npm install -g bower && \
+		R CMD BATCH /src-kernel-r/install.r'
 	@docker commit bower-build $(REPO)
 	@-docker rm -f bower-build
 
@@ -260,7 +262,7 @@ _run:
 			jupyter declarativewidgets activate && \
 			$(CMD)'
 
-dev: CMD?=sh -c "python --version; ipython notebook --no-browser --port 8888 --ip='*'"
+dev: CMD?=sh -c "R CMD INSTALL /src-kernel-r/declarativewidgets; python --version; ipython notebook --no-browser --port 8888 --ip='*'"
 dev: .watch dist
 	-@CMD='$(CMD)' $(MAKE) _dev-$(PYTHON)
 	@$(MAKE) clean-watch
@@ -283,6 +285,7 @@ _dev:
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/.jupyter/nbconfig/notebook.json \
 		-v `pwd`/etc/jupyter_notebook_config.py:$(NB_HOME)/.jupyter/jupyter_notebook_config.py \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
+		-v `pwd`/kernel-r/declarativewidgets:/src-kernel-r/declarativewidgets \
 		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'
 
 start-selenium:
