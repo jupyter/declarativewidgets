@@ -102,6 +102,10 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     reflectToAttribute: true
                 },
 
+                /**
+                 * False by default to return 'selection' as an array of values.
+                 * If true, will return 'selection' as an object with key-value pairs (with column names as keys).
+                 */
                 selectionAsObject: {
                     type: Boolean,
                     value: function() { return false; },
