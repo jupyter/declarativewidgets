@@ -35,7 +35,6 @@
             handle-as='json'
             method='POST'></iron-ajax>
     </template>
-</dom-module>
 
 <script>
 (function() {
@@ -122,6 +121,10 @@
                 href: href,
                 package: this.package
             });
+        },
+
+        created: function() {
+            importBroker.addImport(this, this.getAttribute('href'), this.getAttribute('package'));
         },
 
         ready: function() {
@@ -232,3 +235,4 @@
     });
 })();
 </script>
+</dom-module>

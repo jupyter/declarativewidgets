@@ -1,5 +1,6 @@
 export(initWidgets)
 export(Serializer)
+import(IRdisplay)
 import(IRkernel)
 import(uuid)
 import(R6)

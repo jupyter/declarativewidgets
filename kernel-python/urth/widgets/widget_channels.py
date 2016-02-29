@@ -8,6 +8,12 @@ from .urth_widget import UrthWidget
 # Global variable used to store the current Channels instance
 the_channels = None
 
+# maps channel name to a map of variable name to map of value and arguments
+channel_data = defaultdict(dict)
+
+# maps channel name to a map of variable name to handler function
+channel_watchers = defaultdict(dict)
+
 
 class Channels(UrthWidget):
     """ A widget that provides an API for setting bound channel variables. """
@@ -15,15 +21,20 @@ class Channels(UrthWidget):
     def __init__(self, value=None, **kwargs):
         self.log.info("Created a new Channels widget.")
         self.serializer = None
-        global the_channels
+        global the_channels, channel_data, channel_watchers
         the_channels = self
 
         self.on_msg(self._handle_change_msg)
 
-        # maps channel name to a map of variable name to handler function
-        self.watch_handlers = defaultdict(dict)
+        # Watchers may have been requested prior to the Channels model creation.
+        self.watch_handlers = channel_watchers
 
         super(Channels, self).__init__(**kwargs)
+
+        # Set any channel data that was specified prior to Channels model creation.
+        for channel, data in channel_data.items():
+            for key, params in data.items():
+                self.set(key, params['value'], channel, **params['args'])
 
     def set(self, key, value, chan='default', **kwargs):
 
@@ -66,12 +77,26 @@ class Channel:
         self.chan = chan
 
     def set(self, key, value, **kwargs):
-        global the_channels
-        the_channels.set(key, value, self.chan, **kwargs)
+        global the_channels, channel_data
+        # If the Channels model hasn't been created yet, keep track of values
+        # that have been specified, otherwise go ahead and set the value.
+        if the_channels is None:
+            channel_data[self.chan][key] = {
+                'value': value,
+                'args': kwargs
+            }
+        else:
+            the_channels.set(key, value, self.chan, **kwargs)
 
     def watch(self, key, handler):
-        global the_channels
-        the_channels.watch(key, handler, self.chan)
+        global the_channels, channel_watchers
+        # If the Channels models hasn't been created yet, keep track of watch
+        # handlers that have been specified, otherwise go ahead and set the
+        # watch handler.
+        if the_channels is None:
+            channel_watchers[self.chan][key] = handler
+        else:
+            the_channels.watch(key, handler, self.chan)
 
 
 def channel(chan='default'):
@@ -89,4 +114,3 @@ def channel(chan='default'):
 
     """
     return Channel(chan)
-

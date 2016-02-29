@@ -107,6 +107,7 @@ initWidgets <- function() {
         #create the widget instance
         widget <- create_widget_instance(widget_class, comm, serializer)
     }
+    library(IRdisplay)
     library(IRkernel)
     comm_manager <- get("comm_manager", envir = as.environment("package:IRkernel"))()
 
@@ -115,4 +116,31 @@ initWidgets <- function() {
 
     # Support for ipywidgets 5.x client
     comm_manager$register_target("jupyter.widget", target_handler)
+
+    # JavaScript code to load the declarative widgets extension.
+    # Code sent to the front end from here may be executed after
+    # extension initialization (iterative cell execution) or
+    # before (Run All, Reload). This code works together with the
+    # extension initialization to ensure that the required API is
+    # available in all scenarios.
+    #
+    # Urth._initialized is a deferred that is resolved by the extension
+    # initialization after the global Urth instance has been setup.
+    # If extension initialization has not completed a new deferred is
+    # initialized which extension initialization will resolve.
+    #
+    # Urth.whenReady is a public API defined by extension initialization
+    # to delay javascript execution until dependencies have loaded. If
+    # extension initialization has not completed a wrapper implementation
+    # is setup which will invoke the real implementation when it is available.
+    display_javascript('
+        window.Urth = window.Urth || {};
+        Urth._initialized = Urth._initialized || $.Deferred();
+        Urth.whenReady = Urth.whenReady || function(cb) {
+            Urth._initialized.then(function() {
+                Urth.whenReady(cb);
+            });
+        };
+        Urth.whenReady(function() { console.log("Declarative widgets connected.") });
+    ')
 }
