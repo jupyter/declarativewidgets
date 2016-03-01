@@ -52,7 +52,7 @@ bower_components: node_modules/bower bower.json
 dev_image:
 	@-docker rm -f bower-build
 	@docker run -it --user root --name bower-build \
-		-v `pwd`/etc/r:/src-kernel-r \
+		-v `pwd`/etc/r/install.r:/src-kernel-r/install.r \
 		$(ROOT_REPO) bash -c 'apt-get update && \
 		apt-get install --yes curl && \
 		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
