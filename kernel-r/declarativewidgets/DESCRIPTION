@@ -19,3 +19,5 @@ Collate:
     'widget_function.r'
     'widget_channels.r'
     'widget_dataframe.r'
+    'serializer.r'
+    'serializers.r'
