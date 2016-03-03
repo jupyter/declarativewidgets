@@ -130,7 +130,6 @@
                     }
                 });
 
-                //another attribute set.
                 assert(_syncParamAttributes.calledOnce, "_syncParamAttributes was called " + _syncParamAttributes.callCount);
                 assert(_syncParamAttributes.calledWith({
                     x:"1",
@@ -151,10 +150,11 @@
                 var _onParameterChange = sinon.spy(fElmt, "_onParameterChange");
                 fElmt._onArgsPropertyChanged({
                     path: "args.x",
-                    value: "1"
+                    base: {
+                        x: "1"
+                    }
                 });
 
-                //another attribute set.
                 assert(_syncParamAttributes.calledOnce, "_syncParamAttributes was called " + _syncParamAttributes.callCount);
                 assert(_syncParamAttributes.calledWith({
                     x:"1"
@@ -162,6 +162,100 @@
 
                 assert(_onParameterChange.calledOnce, "_onParameterChange was called " + _onParameterChange.callCount);
                 assert(_onParameterChange.calledWith("x", "1"), "_onParameterChange called with wrong arguments");
+            });
+
+            it('should call _syncParamAttributes and _onParameterChange for array parameters', function() {
+                var fElmt = fixture('basic');
+
+                var _syncParamAttributes = sinon.spy(fElmt, "_syncParamAttributes");
+                var _onParameterChange = sinon.spy(fElmt, "_onParameterChange");
+
+                fElmt.set("args.x", [1,2,3])
+
+                assert(_syncParamAttributes.calledOnce, "_syncParamAttributes was called " + _syncParamAttributes.callCount);
+                assert(_syncParamAttributes.calledWith({
+                    x: [1,2,3]
+                }), "_syncParamAttributes called with wrong arguments");
+
+                assert(_onParameterChange.calledOnce, "_onParameterChange was called " + _onParameterChange.callCount);
+                assert(_onParameterChange.calledWith("x", [1,2,3]), "_onParameterChange called with wrong arguments");
+
+                _syncParamAttributes.reset();
+                _onParameterChange.reset();
+
+                fElmt.push("args.x", 4);
+
+                //NOTE: Polymer sends 2 events when arrays are spliced
+                assert(_syncParamAttributes.calledTwice, "_syncParamAttributes was called " + _syncParamAttributes.callCount);
+                assert(_syncParamAttributes.calledWith({
+                    x: [1,2,3,4]
+                }), "_syncParamAttributes called with wrong arguments");
+
+                assert(_onParameterChange.calledTwice, "_onParameterChange was called " + _onParameterChange.callCount);
+                assert(_onParameterChange.calledWith("x", [1,2,3,4]), "_onParameterChange called with wrong arguments");
+
+            });
+
+            it('should call _syncParamAttributes and _onParameterChange for object parameters', function() {
+                var fElmt = fixture('basic');
+
+                var _syncParamAttributes = sinon.spy(fElmt, "_syncParamAttributes");
+                var _onParameterChange = sinon.spy(fElmt, "_onParameterChange");
+
+                fElmt.set("args.x", {a:1,b:2})
+
+                assert(_syncParamAttributes.calledOnce, "_syncParamAttributes was called " + _syncParamAttributes.callCount);
+                assert(_syncParamAttributes.calledWith({
+                    x: {a:1,b:2}
+                }), "_syncParamAttributes called with wrong arguments");
+
+                assert(_onParameterChange.calledOnce, "_onParameterChange was called " + _onParameterChange.callCount);
+                assert(_onParameterChange.calledWith("x", {a:1,b:2}), "_onParameterChange called with wrong arguments");
+
+                _syncParamAttributes.reset();
+                _onParameterChange.reset();
+
+                fElmt.set("args.x.c", 3);
+
+                assert(_syncParamAttributes.calledOnce, "_syncParamAttributes was called " + _syncParamAttributes.callCount);
+                assert(_syncParamAttributes.calledWith({
+                    x: {a:1,b:2,c:3}
+                }), "_syncParamAttributes called with wrong arguments");
+
+                assert(_onParameterChange.calledOnce, "_onParameterChange was called " + _onParameterChange.callCount);
+                assert(_onParameterChange.calledWith("x", {a:1,b:2,c:3}), "_onParameterChange called with wrong arguments");
+
+            });
+
+            it('should call _syncParamAttributes and _onParameterChange for simple parameters', function() {
+                var fElmt = fixture('basic');
+
+                var _syncParamAttributes = sinon.spy(fElmt, "_syncParamAttributes");
+                var _onParameterChange = sinon.spy(fElmt, "_onParameterChange");
+
+                fElmt.set("args.x", 1)
+
+                assert(_syncParamAttributes.calledOnce, "_syncParamAttributes was called " + _syncParamAttributes.callCount);
+                assert(_syncParamAttributes.calledWith({
+                    x: 1
+                }), "_syncParamAttributes called with wrong arguments");
+
+                assert(_onParameterChange.calledOnce, "_onParameterChange was called " + _onParameterChange.callCount);
+                assert(_onParameterChange.calledWith("x", 1), "_onParameterChange called with wrong arguments");
+
+                _syncParamAttributes.reset();
+                _onParameterChange.reset();
+
+                fElmt.set("args.x", 2);
+
+                assert(_syncParamAttributes.calledOnce, "_syncParamAttributes was called " + _syncParamAttributes.callCount);
+                assert(_syncParamAttributes.calledWith({
+                    x: 2
+                }), "_syncParamAttributes called with wrong arguments");
+
+                assert(_onParameterChange.calledOnce, "_onParameterChange was called " + _onParameterChange.callCount);
+                assert(_onParameterChange.calledWith("x", 2), "_onParameterChange called with wrong arguments");
+
             });
 
 
