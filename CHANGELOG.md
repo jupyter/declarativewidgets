@@ -1,4 +1,8 @@
 # Changelog
+## 0.4.2 (2016-03-03)
+* Make selection in urth-viz-table available as an object
+* Allow height, width, and margin adjustment to urth-viz-chart's
+
 ## 0.4.1 (2016-02-23)
 * Support for Polymer 1.3
 * Fixes to complex object changes across templates
