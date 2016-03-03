@@ -1,4 +1,4 @@
-#' @include widget.r
+#' @include widget.r serializer.r
 NULL
 
 #' Widget_Channel
@@ -33,13 +33,11 @@ the_channel <- function(chan='default'){
 Widget_Channels <- R6Class(
     'Widget_Channels',
     inherit = Widget,
-    #serializer = Serializer,
     public = list(
         #channel to function
         watch_handlers = list(),
+        serializer = NULL,
         handle_change = function(data) {
-            print("received handle_change_msg")
-            print(data)
             #if data has channel information
             #if channel in message use it, else default to 'default';
             #if name in mesaage
@@ -50,7 +48,6 @@ Widget_Channels <- R6Class(
             if('channel' %in% names(data)) {
                 channel <- data[['channel']]
             }
-            print(c("channel: ", channel))
             if('name' %in% names(data)) {
                 full_channel_name <- paste(channel, ":", data[['name']], sep = "")
                 if(full_channel_name %in% names(self$watch_handlers)) {
@@ -65,32 +62,31 @@ Widget_Channels <- R6Class(
                         print(e)
                     })
                 } else {
-                    print(c(full_channel_name, " not in watch_handlers"))
+                    #print(c(full_channel_name, " not in watch_handlers"))
                 }
             }
         },
         set = function(key, value, channel_id) {
             attr <- paste(channel_id, ":", key, sep = "")
-            self$send_update(attr, value)
+            serialized <- self$serializer$serialize(value)
+            self$send_update(attr, serialized)
         },
         watch = function(key, handler, channel_id='default') {
             qualified_name <- paste(channel_id, ":", key, sep = "")
-            print(c("qualified_name in watch assigned: ", qualified_name))
             self$watch_handlers[[qualified_name]] <- handler
         },
         handle_custom = function(msg) {
-            print("handle_msg in Widget_Channels")
             if(!is.null(msg$event) && msg$event == 'change') {
                 self$handle_change(msg$data)
             }
         },
         initialize = function(comm) {
-            print("Initializing Widget_Channels")
             #expose channel to global env
             assign("the_channels", self, envir = .GlobalEnv)
             assign("channel", the_channel, envir = .GlobalEnv)
             #initialize super class Widget
             super$initialize(comm)
+            self$serializer <- Serializer$new()
         }
     )
 )
