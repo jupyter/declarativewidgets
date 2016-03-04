@@ -1020,6 +1020,61 @@
 
             });
         });
+        describe('#dynamic property modification', function() {
+            it('should invoke _onParameterChange when adding to an array type', function() {
+                var fElmt = fixture('basic');
+
+                fElmt._setSignature({
+                    x: {}
+                });
+
+                fElmt.argX = [1,2,3];
+
+                var _onParameterChange = sinon.spy(fElmt, "_onParameterChange");
+
+                fElmt.push("argX", 4);
+
+                assert(_onParameterChange.calledOnce, "_onParameterChange was called " + _onParameterChange.callCount);
+                assert(_onParameterChange.calledWith("x", [1,2,3,4]), "_onParameterChange called with wrong arguments");
+
+            });
+
+            it('should invoke _onParameterChange when adding setting a key in an object type', function() {
+                var fElmt = fixture('basic');
+
+                fElmt._setSignature({
+                    x: {}
+                });
+
+                fElmt.argX = {a:1, b:2};
+
+                var _onParameterChange = sinon.spy(fElmt, "_onParameterChange");
+
+                fElmt.set("argX.c", 3);
+
+                assert(_onParameterChange.calledOnce, "_onParameterChange was called " + _onParameterChange.callCount);
+                assert(_onParameterChange.calledWith("x", {a:1, b:2, c:3}), "_onParameterChange called with wrong arguments");
+
+            });
+
+            it('should invoke _onParameterChange when adding setting a length key in an object type', function() {
+                var fElmt = fixture('basic');
+
+                fElmt._setSignature({
+                    x: {}
+                });
+
+                fElmt.argX = {a:1, b:2};
+
+                var _onParameterChange = sinon.spy(fElmt, "_onParameterChange");
+
+                fElmt.set("argX.length", 3);
+
+                assert(_onParameterChange.calledOnce, "_onParameterChange was called " + _onParameterChange.callCount);
+                assert(_onParameterChange.calledWith("x", {a:1, b:2, length:3}), "_onParameterChange called with wrong arguments");
+
+            });
+        });
     </script>
 </body>
 </html>
