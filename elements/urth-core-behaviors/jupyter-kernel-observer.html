@@ -7,9 +7,9 @@
 This behavior is used to implement handlers to kernel events
 -->
 <script>
-    'use strict';
     (function() {
-        window.Urth = window.Urth || {};
+        'use strict';
+        var Urth = window.Urth = window.Urth || {};
 
         /**
          * Behavior that provides pre-attached callbacks to kernel events.
@@ -20,25 +20,25 @@ This behavior is used to implement handlers to kernel events
         Urth.JupyterKernelObserver = {
 
             created: function(){
-                if (!window.IPython) {
+                if (!Urth.events) {
                     return;
                 }
                 console.debug("Registering onKernelReady for Kernel Ready messages.")
 
                 this.__kernelReadyCallback = this.onKernelReady.bind(this);
-                IPython.notebook.events.on(
+                Urth.events.on(
                     'kernel_ready.Kernel', this.__kernelReadyCallback
                 );
 
-                if( IPython.notebook.kernel.is_connected() ){
+                if (Urth.kernel && Urth.kernel.is_connected()) {
                   this.onKernelReady();
                 }
             },
 
             detached: function(){
-                if (window.IPython && this.__kernelReadyCallback) {
+                if (this.__kernelReadyCallback) {
                     console.debug("Unregistering onKernelReady for Kernel Ready messages.")
-                    IPython.notebook.events.off(
+                    Urth.events.off(
                         'kernel_ready.Kernel', this.__kernelReadyCallback
                     );
                 }

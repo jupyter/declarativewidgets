@@ -9,7 +9,7 @@ This behavior is used to encapsulate Notebook specific properties
 <script>
     'use strict';
     (function() {
-        window.Urth = window.Urth || {};
+        var Urth = window.Urth = window.Urth || {};
 
         /**
          * Behavior that contains notebook related properties
@@ -22,7 +22,7 @@ This behavior is used to encapsulate Notebook specific properties
             properties: {
                 _baseURL: {
                     value: function(){
-                        return window['IPython'] ? IPython.notebook.base_url : '/';
+                        return Urth._baseURL || '/';
                     }
                 },
 

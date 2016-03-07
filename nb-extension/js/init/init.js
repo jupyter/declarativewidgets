@@ -8,10 +8,10 @@
  * elements.html.
  */
 define([
-    'require',
     'module',
     'jquery',
-    '../widgets/DeclWidgetModel'], function(require, module, $) {
+    '../widgets/DeclWidgetModel'
+], function(module, $, DeclWidgetModel) {
     'use strict';
 
     var COMPONENTS_DIR = 'urth_components';
@@ -115,7 +115,7 @@ define([
     function isServerExtensionAvailable(components_root, callback) {
         // Request jupyter-notebook-env.html since it is a small file with
         // no dependencies.
-        urlExist(components_root + '/urth-core-behaviors/jupyter-notebook-env.html', callback)
+        urlExist(components_root + '/urth-core-behaviors/jupyter-notebook-env.html', callback);
     }
 
     /**
@@ -138,20 +138,55 @@ define([
         });
     }
 
-    return function(baseURL, config) {
+    /**
+     * Initialize Declarative Widgets
+     * @param  {Object} config - configuration; see following entries for more information
+     * @param  {Object} config.namespace - Jupyter Notebook namespace object (or shim)
+     * @param  {Object} config.events - Notebook events object
+     * @param  {Object} config.WidgetManager - widget manager class
+     * @param  {Object} config.WidgetModel - widget model class
+     * @return {Promise} resolved when widgets have been fully initialized
+     */
+    return function(config) {
+        var Jupyter = config.namespace;
+
+        var baseURL;
+        if (typeof config === 'string') {
+            // backwards compatibility with old API, which took `baseURL` as first argument and
+            // optional `config` as second arg
+            baseURL = config;
+            config = arguments[1] || {};
+        } else {
+            baseURL = Jupyter ? Jupyter.notebook.base_url : '/';
+        }
+
+        DeclWidgetModel.register(config.WidgetManager, config.WidgetModel);
+
         // Enable shadow dom if it is there for polymer elements.
         window.Polymer = window.Polymer || {};
         window.Polymer.dom = 'shadow';
 
         // Expose the base URL being used.
-        window.Urth = window.Urth || {};
+        var Urth = window.Urth = window.Urth || {};
 
         // Global promise which is resolved when widgets are fully initialized
-        window.Urth.widgets = window.Urth.widgets || {};
-        window.Urth.widgets.whenReady = $.Deferred();
+        Urth.widgets = Urth.widgets || {};
+        Urth.widgets.whenReady = $.Deferred();
 
         // expose suppressErrors, false by default to display errors
-        window.Urth.suppressErrors = config && config.suppressErrors;
+        Urth.suppressErrors = config.suppressErrors;
+
+        Urth.events = config.events;
+
+        // specify a getter for the kernel instance, since it can be restarted and a new kernel
+        // instantiated
+        Object.defineProperty(Urth, 'kernel', {
+            get: function() {
+                // TODO What is the correct way of handling this outside of the notebook? What
+                //      should we do when using jupyter-js-services and kernel is restarted?
+                return Jupyter.notebook.kernel;
+            }
+        });
 
         isServerExtensionAvailable(baseURL + COMPONENTS_DIR, function(isAvailable){
             console.log('Server extension is ' + (isAvailable ? '' : 'NOT ') + 'available!');
@@ -160,19 +195,20 @@ define([
             // use a direct path based on this module's uri.
             var components_root = isAvailable
                 ? baseURL
-                : getModuleBasedComponentRoot(module)
+                : getModuleBasedComponentRoot(module);
 
-            window.Urth.BASE_URL = components_root;
+            Urth.BASE_URL = components_root;
+            Urth._baseURL = baseURL;
             components_root += COMPONENTS_DIR;
 
             loadPolyfill(components_root, function() {
-                var links = config && config.links;
+                var links = config.links;
                 loadComponents(components_root, links);
             }, function (e) {
                 console.error('Failed to load web components polyfill: ' + e);
             });
         });
 
-        return window.Urth.widgets.whenReady;
+        return Urth.widgets.whenReady;
     };
 });
