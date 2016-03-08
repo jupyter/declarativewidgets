@@ -31,7 +31,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
     'use strict';
 
         var ParamAttrPattern = /^arg-(.+)/;
-        var ParamPropPathPattern = /^args.(.+)/;
+        var ParamPropPathPattern = /^args\.([^\.\n]+)\.?/;
 
         window.Urth = window.Urth || {};
 
@@ -199,9 +199,10 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                         console.debug('urth-core-function got change for param', param);
                         //reflect on the attibutes
                         var params = {};
-                        params[param] = rec.value;
+                        var newVal = rec.base[param];
+                        params[param] = newVal;
                         this._syncParamAttributes(params);
-                        this._onParameterChange(param, rec.value);
+                        this._onParameterChange(param, newVal);
 
                     }
                 }
@@ -388,7 +389,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
 
                     }.bind(this));
 
-                    this.addDynamicProperties(paramProperties);
+                    this.setDynamicProperties(paramProperties);
 
                     //set the defaults values and sync if necessary
                     var paramsToSync = {};
