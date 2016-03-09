@@ -20,7 +20,7 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
     }
   }
 
-  describe("SerializationSupport"){
+  describe("SerializationSupport") {
 
     describe("#serialize") {
       it("should serialize as a DataFrame when the argument is a DataFrame") {
@@ -38,7 +38,7 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
 
         val support = spy(new TestSupport)
 
-        support.serialize(d) should be (JsNumber(3.0))
+        support.serialize(d) should be(JsNumber(3.0))
       }
 
       it("should serialize an Int as a Number") {
@@ -46,7 +46,7 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
 
         val support = spy(new TestSupport)
 
-        support.serialize(d) should be (JsNumber(3))
+        support.serialize(d) should be(JsNumber(3))
       }
 
       it("should serialize a sequence as a JsArray") {
@@ -54,7 +54,7 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
 
         val support = spy(new TestSupport)
 
-        support.serialize(d) should be (
+        support.serialize(d) should be(
           JsArray(Seq(JsNumber(3), JsString("a"), JsNumber(4.1)))
         )
       }
@@ -64,7 +64,7 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
 
         val support = spy(new TestSupport)
 
-        support.serialize(d) should be (
+        support.serialize(d) should be(
           JsObject(Seq(("a", JsNumber(2)), ("b", JsString("c"))))
         )
       }
@@ -74,7 +74,7 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
 
         val support = spy(new TestSupport)
 
-        support.serialize(d) should be (Json.toJson(d.toString))
+        support.serialize(d) should be(Json.toJson(d.toString))
 
       }
 
@@ -83,7 +83,7 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
 
         val support = spy(new TestSupport)
 
-        support.serialize(d) should be (JsBoolean(true))
+        support.serialize(d) should be(JsBoolean(true))
 
       }
 
@@ -92,10 +92,35 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
 
         val support = spy(new TestSupport)
 
-        support.serialize(d) should be (JsBoolean(false))
+        support.serialize(d) should be(JsBoolean(false))
 
       }
     }
 
+    describe("toArray") {
+      it("should return an array in the order specified by columns") {
+        val support = new TestSupport();
+
+        val rowJson = Json.parse(
+          """
+            {
+              "name": "Joe",
+              "age": 35,
+              "last_name": "Smith",
+              "b_day": "01-01-80"
+            }
+          """.stripMargin).as[JsObject]
+
+
+        support.toArray(rowJson, Array("name", "last_name", "age", "b_day")) should be(
+          Array(
+            JsString("Joe"),
+            JsString("Smith"),
+            JsNumber(35),
+            JsString("01-01-80")
+          )
+        )
+      }
+    }
   }
 }
