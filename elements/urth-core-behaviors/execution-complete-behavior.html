@@ -7,33 +7,35 @@
 This Behavior represents the completion of a code cell's execution.
 -->
 <script>
-  window.Urth = window.Urth || {};
+  (function() {
+    'use strict';
+    var Urth = window.Urth = window.Urth || {};
 
-  Urth.ExecutionCompleteBehavior = {
+    Urth.ExecutionCompleteBehavior = {
 
-    ready: function() {
-      // Code execution defined to be complete when an ExecuteReply is received.
-      console.debug("Registering _onExecutionComplete for Execute Reply messages.");
-      this.__replyCallback = this._onExecutionComplete.bind(this);
+      ready: function() {
+        // Code execution defined to be complete when an ExecuteReply is received.
+        console.debug("Registering _onExecutionComplete for Execute Reply messages.");
+        this.__replyCallback = this._onExecutionComplete.bind(this);
 
-      IPython.notebook.kernel.widget_manager.notebook.events.on(
-        'shell_reply.Kernel', this.__replyCallback
-      );
-    },
+        Urth.events.on(
+          'shell_reply.Kernel', this.__replyCallback
+        );
+      },
 
-    detached: function() {
-        console.debug("Unregistering _onExecutionComplete for Execute Reply messages.");
-        if (this.__replyCallback){
-            IPython.notebook.kernel.widget_manager.notebook.events.off(
-                'shell_reply.Kernel', this.__replyCallback
-            );
-        }
-    },
+      detached: function() {
+          console.debug("Unregistering _onExecutionComplete for Execute Reply messages.");
+          if (this.__replyCallback){
+              Urth.events.off(
+                  'shell_reply.Kernel', this.__replyCallback
+              );
+          }
+      },
 
-    /**
-     * A callback fired when code execution has completed for a cell.
-     */
-    _onExecutionComplete: function() {}
-  }
-
+      /**
+       * A callback fired when code execution has completed for a cell.
+       */
+      _onExecutionComplete: function() {}
+    };
+  })();
 </script>

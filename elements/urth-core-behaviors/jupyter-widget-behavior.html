@@ -8,9 +8,9 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
 -->
 <link rel='import' href='error-display-behavior.html'>
 <script>
-    'use strict';
     (function() {
-        window.Urth = window.Urth || {};
+        'use strict';
+        var Urth = window.Urth = window.Urth || {};
 
         /**
          * Behavior that encapsulate some of the functions needed by
@@ -45,11 +45,12 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
 
             _doCreateModel: function(){
                 console.debug('Urth.JupyterWidgetBehavior createModel', this.kernelClass);
-                IPython.notebook.kernel.widget_manager.new_widget(
+                Urth.kernel.widget_manager.new_widget(
                     {
                         model_name: 'DeclWidgetModel',
                         widget_class: this.kernelClass
-                    }
+                    },
+                    {}
                 ).then(function(model) {
                         console.log('Model creation successful!', model);
                         this.__modelChangeCallback = this._onModelChange.bind(this);
@@ -75,7 +76,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                     this._doCreateModel();
                 }.bind(this);
 
-                IPython.notebook.events.one(
+                Urth.events.one(
                     'shell_reply.Kernel', this.__shellReplyCallback
                 );
             },
@@ -109,7 +110,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
              */
             _unRegisterNotebookCallbacks: function() {
                 if (this.__shellReplyCallback){
-                    IPython.notebook.events.off(
+                    Urth.events.off(
                         'shell_reply.Kernel', this.__shellReplyCallback
                     );
                 }
@@ -181,7 +182,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
             },
 
             _callbacks: function(){
-                // this.model is from IPython widgets widgets.js and
+                // this.model is from Jupyter widgets widgets.js and
                 // keeps track of a pending_msgs counter. Specifying
                 // this.model.callbacks() as the callback handler for
                 // send allows widgets.js to properly decrement the
@@ -189,7 +190,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
 
                 // parentCell also has additional callbacks that will handle
                 // 'display_type' messages (among others)
-                var parentCell = this.parentCell()
+                var parentCell = this.parentCell();
 
                 var callbacks = (parentCell && parentCell.get_callbacks()) || {iopub:{}};
                 this.mixin(callbacks.iopub,this.model.callbacks().iopub);
@@ -212,7 +213,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                     if(this[funcName]){
                         this[funcName].call(this, changes[change]);
                     }
-                }.bind(this))
+                }.bind(this));
 
                 this.onModelChange.call(this, options);
             },

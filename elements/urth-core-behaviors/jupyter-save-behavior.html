@@ -4,10 +4,10 @@
 -->
 
 <script>
-    'use strict';
     (function() {
+        'use strict';
         var SAVE_EVENT = 'before_save.Notebook';
-        window.Urth = window.Urth || {};
+        var Urth = window.Urth = window.Urth || {};
 
         /**
          * Behavior that provides registration with the save event. Elements
@@ -19,15 +19,15 @@
          */
         Urth.JupyterSaveBehavior = {
             created: function(event, callback) {
-                if (window.IPython && window.IPython.notebook && window.IPython.notebook.events) {
+                if (Urth.events) {
                     this.__saveCallback = this.onSave.bind(this);
-                    IPython.notebook.events.on(SAVE_EVENT, this.__saveCallback);
+                    Urth.events.on(SAVE_EVENT, this.__saveCallback);
                 }
             },
 
             detached: function(event, callback) {
                 if (this.__saveCallback) {
-                    IPython.notebook.events.off(SAVE_EVENT, this.__saveCallback);
+                    Urth.events.off(SAVE_EVENT, this.__saveCallback);
                 }
             },
 
