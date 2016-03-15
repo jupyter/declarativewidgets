@@ -86,3 +86,40 @@ Spark_DataFrame_Serializer <- R6Class(
         }
     )
 )
+
+Time_Series_Serializer <- R6Class(
+    'Time_Series_Serializer',
+    inherit = Serializer,
+    public = list(
+        klass = function() {
+            library(base)
+            return("ts")
+        },
+        index_to_list = function(a_ts) {
+            index_list <- list()
+            start <- tsp(a_ts)[1]
+            for(i in 1:length(unclass(a_ts))) {
+                index_list <- append(index_list, start)
+                start <- start + (1/tsp(a_ts)[3])
+            }
+            return (index_list)
+        },
+        serialize = function(obj, limit) {
+            json <- list()
+            json[['data']] <- as.list(unclass(obj))
+            json[['index']] <- self$index_to_list(obj)
+            return (json)
+        },
+        check_packages = function() {
+            tryCatch({
+                library(base)
+            }, error = function(e) {
+                return (False)
+            })
+            return (True)
+        },
+        initialize = function() {
+            #initialize must exists on this class
+        }
+    )
+)
