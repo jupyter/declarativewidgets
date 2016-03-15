@@ -37,6 +37,27 @@
         </template>
     </test-fixture>
 
+    <test-fixture id='invalidHref2'>
+        <template>
+            <link rel='import' href='../../doesnotexist/doesnotexist2.html'
+                    is='urth-core-import' package='UrthTest/urthtest'>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='invalidHref3'>
+        <template>
+            <link rel='import' href='../../doesnotexist/doesnotexist3.html'
+                    is='urth-core-import' package='UrthTest/urthtest'>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='invalidHref4'>
+        <template>
+            <link rel='import' href='../../doesnotexist/doesnotexist4.html'
+                    is='urth-core-import' package='UrthTest/urthtest'>
+        </template>
+    </test-fixture>
+
     <test-fixture id='validHref'>
         <template>
             <link rel='import' href='/elements/iron-ajax/iron-ajax.html'
@@ -119,21 +140,31 @@
 
         describe('importerror', function() {
             it('should fire if the server is not responding', function(done) {
-                var link = fixture('invalidHref');
+                var link = fixture('invalidHref2');
 
                 link.addEventListener('importerror', function(event) {
                     expect(event.detail.msg).to.not.be.null;
+                    done();
+                });
+
+                link.addEventListener('load', function(event) {
+                    expect.fail();
                     done();
                 });
             });
 
             it('should fire if the href can not be loaded', function(done) {
                 setupServer();
-                var link = fixture('invalidHref');
+                var link = fixture('invalidHref3');
 
                 link.addEventListener('importerror', function(event) {
                     expect(event.detail.msg).to.not.be.null;
                     expect(serverUrthImportCalledCount).to.equal(1);
+                    done();
+                });
+
+                link.addEventListener('load', function(event) {
+                    expect.fail();
                     done();
                 });
             });
@@ -142,7 +173,7 @@
         describe('href', function() {
             it('change should add the url to the pending imports', function() {
                 var dummyURL = '../../dummy/dummy.html';
-                var link = fixture('invalidHref');
+                var link = fixture('invalidHref4');
 
                 var importBroker = window.Urth['urth-core-import-broker'].getImportBroker();
                 var addSpy = sinon.spy(importBroker, 'addImport');
