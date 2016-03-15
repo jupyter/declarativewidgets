@@ -290,6 +290,14 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                         chart.xAxis.rotateLabels(this.rotatelabels);      //Angle to rotate x-axis labels.
                     }
 
+                    if (this.xbounds) {
+                        chart.forceX(this.xbounds);
+                    }
+
+                    if (this.ybounds) {
+                        chart.forceY(this.ybounds);
+                    }
+
                     if (this.xlabel) {
                         chart.xAxis.axisLabel(this.xlabel);
                     }
