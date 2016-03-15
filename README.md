@@ -11,7 +11,7 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 * A base extension that enable the use of [Web Components](http://webcomponents.org) and [Polymer](https://www.polymer-project.org/1.0/) elements
 * A set of core elements facilitate interacting with code running on the kernel
 * Extensions to data binding support and installing of 3rd party elements.
-* Implementations for Python Kernel and Scala using [Apache Toree](https://github.com/apache/incubator-toree)
+* Implementations for Python Kernel, Scala using [Apache Toree](https://github.com/apache/incubator-toree), and R using [IRkernel](https://github.com/IRkernel/IRkernel)
 
 ## What It Lacks
 
@@ -25,7 +25,7 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 * Notebook instance running out of `profile_default`
 * Bower - Necessary for installing 3rd party elements straight out of notebook
 * Apache Toree for access to Spark using Scala
-* [R Kernel](https://github.com/IRkernel/IRkernel) for R language 
+* [IRkernel](https://github.com/IRkernel/IRkernel) for R language
 
 Note: These are satisfied automatically when you follow the setup instructions below.
 
