@@ -151,6 +151,20 @@ dist/urth/widgets/ext/notebook/bower.json: bower.json
 	@mkdir -p dist/urth/widgets/ext/notebook
 	@cp bower.json dist/urth/widgets/ext/notebook/bower.json
 
+dist/urth/widgets/ext/notebook/urth-widgets.tgz: ${shell find kernel-r/declarativewidgets}
+ifeq ($(NOR), true)
+	@echo 'Skipping R code'
+else
+	@echo 'Building R code'
+	@mkdir -p dist/urth/widgets/ext/notebook
+	@docker run -it --rm \
+		-v `pwd`:/src \
+		$(REPO) bash -c 'cp -r /src/kernel-r/declarativewidgets /tmp/src && \
+			cd /tmp/src && \
+			R CMD INSTALL --build . && \
+			cp declarativewidgets_0.1_R_x86_64-pc-linux-gnu.tar.gz /src/dist/urth/widgets/ext/notebook/urth-widgets.tgz'
+endif
+
 dist/docs: dist/docs/bower_components dist/docs/site dist/docs/site/generated_docs.json
 
 dist/docs/bower_components: node_modules etc/docs/bower.json
@@ -180,7 +194,7 @@ dist/VERSION:
 	@mkdir -p dist
 	@echo "$(COMMIT)" > dist/VERSION
 
-dist: dist/urth dist/urth/widgets/ext/notebook/urth-widgets.jar dist/scripts dist/VERSION
+dist: dist/urth dist/urth/widgets/ext/notebook/urth-widgets.jar dist/urth/widgets/ext/notebook/urth-widgets.tgz dist/scripts dist/VERSION
 
 sdist: dist
 	@cp -R MANIFEST.in dist/.
@@ -271,6 +285,7 @@ _run:
 		$(REPO) bash -c '$(SETUP_CMD) \
 			pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && \
 			jupyter declarativewidgets install --user && \
+			jupyter declarativewidgets installr && \
 			jupyter declarativewidgets activate && \
 			$(CMD)'
 
