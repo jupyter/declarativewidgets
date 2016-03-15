@@ -131,7 +131,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             }
 
             var columnSettings = this.columnSettings;
-            var values = (datarows[0] || []).map(function (rows, i) {
+            var values = (datarows[0] || []).map(function (topDatum, i) {
                 var t = function (d, i) {
                     var result = d[i];
 
@@ -155,6 +155,9 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 
             // TODO: make this generic
             if (this.type == 'pie') {
+                if (secondary == -1) {
+                    secondary = 1;
+                }
                 return values[secondary];
             }
 
@@ -163,8 +166,10 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                     key: columns[i],
                     values: values
                 };
-            }).filter(function (values, i) {
+            }).filter(secondary == -1 ? function (values, i) {
                 return i != primary;
+            } : function (values, i) {
+                return i == secondary;
             });
         },
 
@@ -270,7 +275,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                     }.bind(this);
 
                     formatTicks(chart.xAxis, this.primary);
-                    formatTicks(chart.yAxis, this.secondary);
+                    formatTicks(chart.yAxis, this.secondary == -1 ? 1 : this.secondary);
 
                     if (this.height) {
                         chart.height(this.height);
