@@ -11,13 +11,12 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 * A base extension that enable the use of [Web Components](http://webcomponents.org) and [Polymer](https://www.polymer-project.org/1.0/) elements
 * A set of core elements facilitate interacting with code running on the kernel
 * Extensions to data binding support and installing of 3rd party elements.
-* Implementations for Python Kernel and [Spark Kernel](https://github.com/ibm-et/spark-kernel)
+* Implementations for Python Kernel, [Spark Kernel](https://github.com/ibm-et/spark-kernel), and [R Kernel](https://github.com/IRkernel/IRkernel)
 
 ## What It Lacks
 
 * Support for state persistance and downstream tools (nbviewer)
 * Interactions with DataFrames. Currently read-only.
-* More elements and support for other kernels (i.e R).
 
 ## Runtime Requirements
 
@@ -26,6 +25,7 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 * Notebook instance running out of `profile_default`
 * Bower - Necessary for installing 3rd party elements straight out of notebook
 * Spark Kernel if wanting to run Spark using Scala
+* [R Kernel](https://github.com/IRkernel/IRkernel)
 
 Note: These are satisfied automatically when you follow the setup instructions below.
 
