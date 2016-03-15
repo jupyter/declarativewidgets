@@ -50,13 +50,8 @@ trait SerializationSupport extends LogLike {
   def dataFrameWrites(limit: Int) = Writes {
     (df: DataFrame) => {
       val columns: Array[String] = df.columns
-      val data: Array[Array[String]] =
-        df.take(limit).map(row => {row.toSeq.toArray.map {
-            case null => null
-            case x => x.toString
-          }
-        })
 
+      val data: Array[Array[JsValue]] = df.toJSON.take(limit).map( jsonRow => toArray(Json.parse(jsonRow).as[JsObject], columns))
 
       val index: Array[String] = (0 until data.length).map(_.toString).toArray
 
@@ -66,6 +61,16 @@ trait SerializationSupport extends LogLike {
         "data"    -> data
       )
     }
+  }
+
+  /**
+   * Transform the JsObject into an Array of JsValue ordered by the columns array.
+   * @param jsonRow
+   * @param columns
+   * @return
+   */
+  def toArray( jsonRow:JsObject, columns:Array[String] ): Array[JsValue] = {
+    columns.map(fieldName => jsonRow \ fieldName)
   }
 
 }
