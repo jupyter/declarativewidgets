@@ -62,12 +62,17 @@ Widget_Function <- R6Class(
             self$handle_function_response(response)
         },
         invoke_function = function(func_name, args, limit=self$limit) {
+            #get function from user/global env
             func <- get(func_name, envir = .GlobalEnv)
+            #resolve args from defined env with args from client
             converted_args <- self$convert_args(func, args)
+            #call the function with the list of args (convert_args is a list of values in order)
             result <- do.call(func, converted_args)
             serialized_result <- self$serializer$serialize(result)
             return (serialized_result)
         },
+        #used to resolve the difference between the default variable values of the function
+        #with the variable values from the client args sent over
         convert_args = function(func, args) {
             func_param_list <- formals(func)
             the_converted_args <- list()
@@ -110,6 +115,7 @@ Widget_Function <- R6Class(
                 return (err_msg)
             }
         },
+        #is required if variable from the function definition does not have a default value
         func_variable_is_required = function(var) {
             return (var == '' && class(var) == 'name')
         },

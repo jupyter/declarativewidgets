@@ -17,14 +17,14 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 
 * Support for state persistance and downstream tools (nbviewer)
 * Interactions with DataFrames. Currently read-only.
-* More elements and support for other kernels (i.e R).
 
 ## Runtime Requirements
 
 * Jupyter Notebook 4.0.x running on Python 3.x or Python 2.7.x (see the [0.1.x branch](https://github.com/jupyter-incubator/declarativewidgets/tree/0.1.x) for IPython Notebook 3.2.x compatibility)
 * [IPywidgets](https://github.com/ipython/ipywidgets) 4.1.x
 * Bower - Necessary for installing 3rd party elements straight out of notebook
-* Apache Toree if wanting to run Spark using Scala
+* Apache Toree for access to Spark using Scala
+* [R Kernel](https://github.com/IRkernel/IRkernel) for R language 
 
 Note: These are satisfied automatically when you follow the setup instructions below.
 
