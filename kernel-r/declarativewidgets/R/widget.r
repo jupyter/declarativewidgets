@@ -19,6 +19,7 @@ Widget <- R6Class("Widget",
         },
         handle_custom_content = function(msg) {
             if(!is.null(msg$content)) {
+                #handle_custom for widget_X
                 self$handle_custom(msg$content)
             } else {
                 print(c('No content in custom message', msg))
@@ -26,6 +27,7 @@ Widget <- R6Class("Widget",
         },
         handle_backbone_content = function(msg) {
             if(!is.null(msg)) {
+                #handle_backbone for widget_X
                 self$handle_backbone(msg)
             } else {
                 print(c('No content in backbone message', msg))
@@ -42,6 +44,8 @@ Widget <- R6Class("Widget",
         handle_close = function(msg) {
             print("handle_close in Widget")
         },
+        #Used by all widgets to send back a response indicating that
+        #the result was successfully serialized and sent to the client
         handle_function_response = function(response) {
             if(class(response) == "character") {
                 self$send_error(response)
