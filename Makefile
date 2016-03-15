@@ -251,6 +251,7 @@ _run:
 	@echo 'Running container named $(SERVER_NAME) in $(PYTHON)'
 	@docker run $(OPTIONS) --name $(SERVER_NAME) \
 		$(PORT_MAP) \
+		-e SPARK_OPTS="--master=local[4]" \
 		-e USE_HTTP=1 \
 		-v `pwd`:/src \
 		$(VOL_MAP) \
@@ -276,7 +277,8 @@ _dev: NB_HOME?=/root
 _dev:
 	@docker run -it --rm \
 		-p 8888:8888 \
-		-e JVM_OPT=-Dlog4j.logLevel=trace \
+		-p 4040:4040 \
+		-e SPARK_OPTS="--master=local[4] --driver-java-options=-Dlog4j.logLevel=trace" \
 		-v `pwd`/dist/urth/widgets/ext/notebook:$(NB_HOME)/.local/share/jupyter/nbextensions/urth_widgets \
 		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
 		-v `pwd`/etc:$(NB_HOME)/nbconfig \
