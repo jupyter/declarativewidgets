@@ -45,7 +45,7 @@ Widget_Dataframe <- R6Class(
         },
         serialize_and_send = function(name, limit) {
             if(self$df_in_interpreter(name)) {
-                serialized_df <- self$serializer$serialize(get(name, envir = .GlobalEnv))
+                serialized_df <- self$serializer$serialize(get(name, envir = .GlobalEnv), limit)
                 self$send_update("value", serialized_df)
                 return (TRUE)
             } else {

@@ -5,11 +5,11 @@ Serializer <- R6Class(
     'Serializer',
     public = list(
         serializer_list = list(),
-        serialize = function(obj) {
+        serialize = function(obj, limit=100) {
             #if serializer for the class is registered use it else just return the object
             for(klass in names(self$serializer_list)) {
                 if(class(obj) == klass) {
-                    return (self$serializer_list[[klass]](obj))
+                    return (self$serializer_list[[klass]](obj, limit))
                 }
             }
             return (obj)

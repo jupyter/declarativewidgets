@@ -25,7 +25,7 @@ DataFrame_Serializer <- R6Class(
             }
             return (rows)
         },
-        serialize = function(obj, row_limit=100) {
+        serialize = function(obj, row_limit) {
             json <- list()
             json[['columns']] <- colnames(obj)
             json[['data']] <- self$df_to_lists(obj, row_limit)
@@ -65,7 +65,7 @@ Spark_DataFrame_Serializer <- R6Class(
             }
             return (rows)
         },
-        serialize = function(obj, row_limit=100) {
+        serialize = function(obj, row_limit) {
             df <- collect(limit(obj, row_limit))
             json <- list()
             json[['columns']] <- colnames(df)
