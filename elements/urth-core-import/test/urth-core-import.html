@@ -83,6 +83,7 @@
         // STEP 4: Define any globals needed by the test suite.
         var server;
         var serverUrthImportCalledCount = 0;
+        var restEndpoint = '/urth_import';
 
         beforeEach(function() {
             server = sinon.fakeServer.create();
@@ -96,14 +97,14 @@
         function setupServer() {
             serverUrthImportCalledCount = 0;
 
-            server.respondWith('POST', '/urth_import', function(xhr, id) {
+            server.respondWith('POST', restEndpoint, function(xhr, id) {
                 serverUrthImportCalledCount++;
                 xhr.respond(200, { 'Content-Type': 'application/json' }, '{ "status": 0}');
             });
 
             server.xhr.useFilters = true;
             server.xhr.addFilter(function(method, uri) {
-                return !uri.startsWith('/urth_import');
+                return !uri || !(uri.substr(0, restEndpoint.length) === restEndpoint);
             });
         }
 
