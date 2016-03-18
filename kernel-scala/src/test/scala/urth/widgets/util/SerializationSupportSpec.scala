@@ -59,6 +59,26 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
         )
       }
 
+      it("should serialize a array as a JsArray") {
+        val d = Array(3, "a", 4.1)
+
+        val support = spy(new TestSupport)
+
+        support.serialize(d) should be(
+          JsArray(Seq(JsNumber(3), JsString("a"), JsNumber(4.1)))
+        )
+      }
+
+      it("should serialize a list as a JsArray") {
+        val d = List(3, "a", 4.1)
+
+        val support = spy(new TestSupport)
+
+        support.serialize(d) should be(
+          JsArray(Seq(JsNumber(3), JsString("a"), JsNumber(4.1)))
+        )
+      }
+
       it("should serialize a map as a JsObject") {
         val d = Map("a" -> 2, "b" -> "c")
 

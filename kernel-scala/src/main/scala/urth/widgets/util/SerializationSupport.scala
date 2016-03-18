@@ -34,7 +34,8 @@ trait SerializationSupport extends LogLike {
       case x: Boolean    => JsBoolean(x)
       case x: BigDecimal => JsNumber(x)
       case s: Seq[Any]   => JsArray((s map(serialize(_, limit))))
-      case m: Map[_, _] => JsObject(
+      case a: Array[Any] => JsArray((a map(serialize(_, limit))))
+      case m: Map[_, _]  => JsObject(
         m.map(p => (p._1.toString, serialize(p._2, limit))).toSeq
       )
       case j: JsValue => j
