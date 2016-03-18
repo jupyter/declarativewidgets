@@ -71,14 +71,16 @@
                  * Label for the x-axis.
                  */
                 xlabel: {
-                    type: String
+                    type: String,
+                    observer: '_update'
                 },
 
                 /**
                  * Label for the y-axis.
                  */
                 ylabel: {
-                    type: String
+                    type: String,
+                    observer: '_update'
                 },
 
                 /**
