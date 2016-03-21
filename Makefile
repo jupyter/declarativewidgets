@@ -188,9 +188,10 @@ sdist: dist
 
 test: test-js test-py test-scala
 
+test-js:BROWSER?=chrome
 test-js: | $(URTH_COMP_LINKS)
 	@echo 'Running web component tests...'
-	@npm run test
+	@npm run test -- --local $(BROWSER)
 
 test-js-remote: | $(URTH_COMP_LINKS)
 ifdef SAUCE_USER_NAME
@@ -231,8 +232,9 @@ else
 			sbt test'
 endif
 
+testdev:BROWSER?=chrome
 testdev: | $(URTH_COMP_LINKS)
-	@npm run test -- -p
+	@npm run test -- -p --local $(BROWSER)
 
 install: CMD?=exit
 install: SERVER_NAME?=urth_widgets_install_validation
