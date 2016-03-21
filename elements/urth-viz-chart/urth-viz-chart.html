@@ -55,8 +55,9 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         <div id="chart1">
             <svg style='height:500px'></svg>
         </div>
-        <content></content>
+        <content id="content"></content>
     </template>
+
     <script>
 
     'use strict';
@@ -405,6 +406,8 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         },
 
         ready: function() {
+            Polymer.dom(this.$.content).observeNodes(this._parseColumns.bind(this));
+
             this.async(function(){
                 var display = window.getComputedStyle(this).display;
                 if (display === 'none' || document.readyState !== 'complete') {
