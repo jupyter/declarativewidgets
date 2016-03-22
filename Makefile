@@ -332,6 +332,7 @@ docs: .watch-docs dist/docs
 	@bash -c "trap 'make clean-watch-docs' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
 
 all: BASEURL?=http://192.168.99.100:9500
+all: BROWSER_LIST?=chrome
 all: init
 	$(MAKE) test-js-remote
 	$(MAKE) test-py
