@@ -1,4 +1,6 @@
 # Changelog
+## 0.3.2 (2016-03-22)
+* Ability to peg Polymer version at runtime `[1.2.4-1.4.0)`
 
 ## 0.3.1 (2016-02-08)
 
