@@ -78,7 +78,7 @@ dist/urth_widgets/urth_components: bower_components ${shell find elements} | $(U
 	@mkdir -p dist/urth_widgets/urth_components
 	@cp -RL bower_components/* dist/urth_widgets/urth_components/.
 
-dist/urth_widgets: dist/urth_widgets/urth_components dist/urth_widgets/js dist/urth_widgets/elements
+dist/urth_widgets: dist/urth_widgets/bower.json dist/urth_widgets/urth_components dist/urth_widgets/js dist/urth_widgets/elements
 
 dist/urth/widgets/ext: ${shell find nb-extension/python/urth/widgets/ext}
 	@echo 'Moving frontend extension code'
@@ -103,6 +103,10 @@ else
 			sbt package && \
 			cp target/scala-2.10/urth-widgets*.jar /src/dist/urth_widgets/urth-widgets.jar'
 endif
+
+dist/urth_widgets/bower.json: bower.json
+	@mkdir -p dist/urth_widgets
+	@cp bower.json dist/urth_widgets/bower.json
 
 dist/docs: dist/docs/bower_components dist/docs/site dist/docs/site/generated_docs.json
 
