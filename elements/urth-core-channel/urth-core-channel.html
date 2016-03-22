@@ -4,6 +4,7 @@
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="./urth-core-channel-broker.html">
+<link rel="import" href="./urth-core-channel-viewer.html">
 
 
 <!--
@@ -56,6 +57,9 @@ dataChannel.set('user', 'Luke');
 <dom-module id='urth-core-channel'>
     <template>
         <content id='contentItems' select='urth-core-channel-item'></content>
+        <template is='dom-if' if='{{debug}}'>
+            <urth-core-channel-viewer on-clear='clear' name='{{name}}'></urth-core-channel-viewer>
+        </template>
     </template>
 
     <script>
@@ -97,6 +101,14 @@ dataChannel.set('user', 'Luke');
                     notify: true,
                     readOnly: true,
                     value: function() { return {}; }
+                },
+                /**
+                 * A boolean that when set to true renders the content of the channel
+                 * in the DOM.
+                 */
+                debug: {
+                    type: Boolean,
+                    value: false
                 }
             },
 
@@ -180,6 +192,10 @@ dataChannel.set('user', 'Luke');
                             this._itemChangeHandler);
                     }.bind(this));
                 }.bind(this));
+
+                if(this.debug) {
+                    this._updateViewer();
+                }
             },
 
             /**
@@ -355,6 +371,10 @@ dataChannel.set('user', 'Luke');
                     this._updateRegistered(item.detail.key,
                         item.detail.value, item.detail.oldValue, true,
                         item.detail.root);
+
+                    if(this.debug) {
+                        this._updateViewer();
+                    }
                 }
             },
 
@@ -395,6 +415,17 @@ dataChannel.set('user', 'Luke');
                         handler(key, oldVal, newVal);
                     });
                 }
+            },
+
+            _updateViewer: function(){
+                var jName = "urth-core-channel._updateViewer";
+                if( this.isDebouncerActive(jName) ) {
+                    this.cancelDebouncer(jName);
+                }
+
+                this.debounce(jName, function(){
+                    this.$$('urth-core-channel-viewer').updateData(this._broker.get(this.name));
+                }.bind(this), 250);
             }
         });
     })();
