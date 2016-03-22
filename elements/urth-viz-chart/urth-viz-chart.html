@@ -55,8 +55,9 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         <div id="chart1">
             <svg style='height:500px'></svg>
         </div>
-        <content></content>
+        <content id="content"></content>
     </template>
+
     <script>
 
     'use strict';
@@ -131,7 +132,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
             }
 
             var columnSettings = this.columnSettings;
-            var values = (datarows[0] || []).map(function (rows, i) {
+            var values = (datarows[0] || []).map(function (topDatum, i) {
                 var t = function (d, i) {
                     var result = d[i];
 
@@ -155,6 +156,9 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 
             // TODO: make this generic
             if (this.type == 'pie') {
+                if (secondary == -1) {
+                    secondary = 1;
+                }
                 return values[secondary];
             }
 
@@ -163,8 +167,10 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                     key: columns[i],
                     values: values
                 };
-            }).filter(function (values, i) {
+            }).filter(secondary == -1 ? function (values, i) {
                 return i != primary;
+            } : function (values, i) {
+                return i == secondary;
             });
         },
 
@@ -180,14 +186,57 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                 }
             });
 
+            if (this.chart) {
+                this._formatAxes();
+            }
+
             // force an update to transform data in required format
             this.datarows = [].concat(this.datarows);
+        },
+
+        _formatAxes: function() {
+            // Format axis tick marks according to type and format,
+            // if supplied by urth-viz-col
+            var formatTicks = function(axis, dataIndex) {
+                if (axis && this.columnSettings) {
+                    var axisSettings = this.columnSettings[dataIndex] || [];
+                    switch (axisSettings.type) {
+                        case 'numeric':
+                            axis.tickFormat(axisSettings.format ? d3.format(axisSettings.format) : function(d) { return d; });
+                            break;
+
+                        case 'date':
+//                            Cannot use time scale for discrete values (e.g. bar)  Need to explicitly convert to Date
+//                              chart[dataIndex == this.primary ? 'xScale' : 'yScale'](d3.time.scale());
+                            axis.tickFormat(axisSettings.format ?
+                                function(d) { return d3.time.format(axisSettings.format)(new Date(d)); }
+                                : function(d) { return new Date(d).toLocaleDateString(); });
+                            break;
+
+                        default:
+                            axis.tickFormat(function(d) {return d;});
+                    }
+                }
+            }.bind(this);
+
+            formatTicks(this.chart.xAxis, this.primary);
+            formatTicks(this.chart.yAxis, this.secondary == -1 ? 1 : this.secondary);
         },
 
         _update: function() {
             require(['d3'], function(d3) {
                 this._svgSelection(d3).datum(this.data);
                 if (this.chart) {
+                    this._formatAxes();
+
+                    if (this.xlabel) {
+                        this.chart.xAxis.axisLabel(this.xlabel);
+                    }
+
+                    if (this.ylabel) {
+                        this.chart.yAxis.axisLabel(this.ylabel);
+                    }
+
                     this._fireWhenReady();
                     this.chart.update();
                 }
@@ -248,29 +297,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                         config(chart);
                     }
 
-                    // Format axis tick marks according to type and format,
-                    // if supplied by urth-viz-col
-                    var formatTicks = function(axis, dataIndex) {
-                        if (axis) {
-                            var axisSettings = this.columnSettings[dataIndex] || [];
-                            switch (axisSettings.type) {
-                                case 'numeric':
-                                    if (axisSettings.format) {
-                                        axis.tickFormat(d3.format(axisSettings.format));
-                                    }
-                                    break;
-                                case 'date':
-//                                  Cannot use time scale for discrete values (e.g. bar)  Need to explicitly convert to Date
-//                                    chart[dataIndex == this.primary ? 'xScale' : 'yScale'](d3.time.scale());
-                                    axis.tickFormat(axisSettings.format ?
-                                        function(d) { return d3.time.format(axisSettings.format)(new Date(d)); }
-                                        : function(d) { return new Date(d).toLocaleDateString(); });
-                            }
-                        }
-                    }.bind(this);
-
-                    formatTicks(chart.xAxis, this.primary);
-                    formatTicks(chart.yAxis, this.secondary);
+                    this._formatAxes();
 
                     if (this.height) {
                         chart.height(this.height);
@@ -288,6 +315,14 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 
                     if (this.rotatelabels) {
                         chart.xAxis.rotateLabels(this.rotatelabels);      //Angle to rotate x-axis labels.
+                    }
+
+                    if (this.xbounds) {
+                        chart.forceX(this.xbounds);
+                    }
+
+                    if (this.ybounds) {
+                        chart.forceY(this.ybounds);
                     }
 
                     if (this.xlabel) {
@@ -371,13 +406,15 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         },
 
         ready: function() {
+            Polymer.dom(this.$.content).observeNodes(this._parseColumns.bind(this));
+
             this.async(function(){
                 var display = window.getComputedStyle(this).display;
                 if (display === 'none' || document.readyState !== 'complete') {
                     this.async(this.ready, 200);
                 } else {
-                    this._parseColumns();
                     this._createChart();
+//                    this._parseColumns();
                 }
             });
         },

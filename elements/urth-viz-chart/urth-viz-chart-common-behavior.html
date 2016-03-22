@@ -54,17 +54,33 @@
                 },
 
                 /**
+                 * Minimum and maximum values for the x axis
+                 */
+                xbounds: {
+                    type: Object
+                },
+
+                /**
+                 * Minimum and maximum values for the y axis
+                 */
+                ybounds: {
+                    type: Object
+                },
+
+                /**
                  * Label for the x-axis.
                  */
                 xlabel: {
-                    type: String
+                    type: String,
+                    observer: '_update'
                 },
 
                 /**
                  * Label for the y-axis.
                  */
                 ylabel: {
-                    type: String
+                    type: String,
+                    observer: '_update'
                 },
 
                 /**
@@ -122,7 +138,7 @@
                  */
                 secondary: {
                     type: Number,
-                    value: 1,
+                    value: -1,
                     observer: '_update'
                 },
 
