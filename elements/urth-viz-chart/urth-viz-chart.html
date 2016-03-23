@@ -368,7 +368,13 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                         }
                         this.$$('.hover').classList.toggle('selected');
                         this.selectionInfo = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
-                        this.selection = this.selectionInfo.map(function(d){ return d.length ? d[0].row : d.row; });
+                        this.selection = this.selectionInfo.map(function(d) {
+                            if (d.data) {
+                               // event shape for type='pie'
+                               d = d.data;
+                            }
+                            return d.length ? d[0].row : d.row;
+                        });
                     }.bind(this));
 
                     return chart;
