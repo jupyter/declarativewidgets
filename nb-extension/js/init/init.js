@@ -142,8 +142,6 @@ define([
      * @param  {Object} config - configuration; see following entries for more information
      * @param  {Object} config.namespace - Jupyter Notebook namespace object (or shim)
      * @param  {Object} config.events - Notebook events object
-     * @param  {Object} config.WidgetManager - widget manager class
-     * @param  {Object} config.WidgetModel - widget model class
      * @return {Promise} resolved when widgets have been fully initialized
      */
     return function(config) {

@@ -5,10 +5,8 @@
 define([
     'base/js/namespace',
     'base/js/events',
-    'nbextensions/widgets/widgets/js/init',
-    'nbextensions/widgets/widgets/js/widget',
     './init/init'
-], function(Jupyter, events, widgetManager, ipywidget, init) {
+], function(Jupyter, events, init) {
     'use strict';
 
     // Some versions of IE do not have window.console defined. Some versions
@@ -22,9 +20,7 @@ define([
     
     init({
         namespace: Jupyter,
-        events: events,
-        WidgetManager: widgetManager.WidgetManager,
-        WidgetModel: ipywidget.WidgetModel
+        events: events
     });
 
     return {

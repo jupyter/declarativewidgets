@@ -33,7 +33,7 @@ define(["nbextensions/widgets/widgets/js/widget"], function(Widget) {
             this.comm.send(data, callbacks);
         }
     });
-
+    
     return {
         DeclWidgetModel: DeclWidgetModel
     };
