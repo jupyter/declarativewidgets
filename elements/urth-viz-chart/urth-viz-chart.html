@@ -349,8 +349,6 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                         .transition().duration(500)
                         .call(chart);
 
-                    this.selection = [];
-
                     this.chart[modelProp].dispatch.on('elementMouseover.urth', function(e) {
                         if (e.point) {
                             var data = this.chart.tooltip.data();
@@ -369,7 +367,8 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                             }
                         }
                         this.$$('.hover').classList.toggle('selected');
-                        this.selection = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
+                        this.selectionInfo = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
+                        this.selection = this.selectionInfo.map(function(d){ return d.length ? d[0].row : d.row; });
                     }.bind(this));
 
                     return chart;
