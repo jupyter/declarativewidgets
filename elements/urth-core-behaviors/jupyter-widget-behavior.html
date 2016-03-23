@@ -47,6 +47,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                 console.debug('Urth.JupyterWidgetBehavior createModel', this.kernelClass);
                 Urth.kernel.widget_manager.new_widget(
                     {
+                        model_module: 'nbextensions/urth_widgets/js/widgets/DeclWidgetModel',
                         model_name: 'DeclWidgetModel',
                         widget_class: this.kernelClass
                     },

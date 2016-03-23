@@ -9,9 +9,8 @@
  */
 define([
     'module',
-    'jquery',
-    '../widgets/DeclWidgetModel'
-], function(module, $, DeclWidgetModel) {
+    'jquery'
+], function(module, $) {
     'use strict';
 
     var COMPONENTS_DIR = 'urth_components';
@@ -159,8 +158,6 @@ define([
         } else {
             baseURL = Jupyter ? Jupyter.notebook.base_url : '/';
         }
-
-        DeclWidgetModel.register(config.WidgetManager, config.WidgetModel);
 
         // Enable shadow dom if it is there for polymer elements.
         window.Polymer = window.Polymer || {};
