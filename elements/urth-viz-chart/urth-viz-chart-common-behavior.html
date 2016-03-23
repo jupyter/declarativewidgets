@@ -114,9 +114,18 @@
                 },
 
                 /**
-                 * The data based on the currently selected row.
+                 * The data rows corresponding to the currently selected row.
                  */
                 selection: {
+                    type: Array,
+                    value: function () { return []; },
+                    notify: true
+                },
+
+                /**
+                 * UI information based on the current selection
+                 */
+                selectionInfo: {
                     type: Array,
                     value: function () { return []; },
                     notify: true
