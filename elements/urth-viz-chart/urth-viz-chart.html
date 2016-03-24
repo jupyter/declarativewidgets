@@ -150,7 +150,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                 };
 
                 return datarows.map(function (d) {
-                    return { x: t(d, primary), y: t(d, i) };
+                    return { row: d, x: t(d, primary), y: t(d, i) };
                 });
             });
 
@@ -349,17 +349,42 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                         .transition().duration(500)
                         .call(chart);
 
-                    this.selection = [];
+                    this.chart[modelProp].dispatch.on('elementMouseover.urth', function(e) {
+                        if (e.point) {
+                            var data = this.chart.tooltip.data();
+                            var series = data && data.series;
+                            if (series) {
+                                series[0].row = e.point.row;
+                            }
+                        }
+                    }.bind(this));
 
-                    this.chart[modelProp].dispatch.on('elementClick', function(e) {
-                          if (!this.multiSelect) {
+                    this.chart[modelProp].dispatch.on('elementClick.urth', function(e) {
+                        if (!this.multiSelect) {
                             var selected;
                             while (selected = this.$$('.selected')) {
                                 selected.classList.remove('selected');
                             }
-                          }
-                          this.$$('.hover').classList.toggle('selected');
-                          this.selection = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
+                        }
+                        this.$$('.hover').classList.toggle('selected');
+                        this.selectionInfo = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
+                        var selection = this.selectionInfo.map(function(d) {
+                            if (d.data) {
+                               // event shape for type='pie'
+                               d = d.data;
+                            }
+                            return d.length ? d[0].row : d.row;
+                        });
+                        if (this.selectionAsObject) {
+                            selection = selection.map(function(row) {
+                                var obj = {};
+                                this.columns.forEach(function(col, i) {
+                                    obj[col.replace(' ', '_')] = row[i];
+                                });
+                                return obj;
+                            }.bind(this));
+                        }
+                        this.selection = selection;
                     }.bind(this));
 
                     return chart;
