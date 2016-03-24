@@ -50,8 +50,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                         model_module: 'nbextensions/urth_widgets/js/widgets/DeclWidgetModel',
                         model_name: 'DeclWidgetModel',
                         widget_class: this.kernelClass
-                    },
-                    {}
+                    }
                 ).then(function(model) {
                         console.log('Model creation successful!', model);
                         this.__modelChangeCallback = this._onModelChange.bind(this);
