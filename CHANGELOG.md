@@ -1,4 +1,12 @@
 # Changelog
+## 0.4.3 (2016-03-24)
+* Ability to inspect the content of an urth-core-channel
+* Improved selection content from urth-viz-chart elements
+* Misc bug fixes on urth-viz-chart
+* Ability to peg Polymer version at runtime [1.2.4-1.4.0)
+* Fixes to urth-core-function to better support complex parameters
+* Serialization fixes for Toree/Scala
+
 ## 0.4.2 (2016-03-03)
 * Make selection in urth-viz-table available as an object
 * Allow height, width, and margin adjustment to urth-viz-chart's
