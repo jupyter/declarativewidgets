@@ -36,7 +36,13 @@
             // have resolved
             var self = this;
             Polymer.RenderStatus.whenReady(function() {
-                 self._markImportsReady();
+                if (document.readyState == 'loading') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        self._markImportsReady();
+                    });
+                } else {
+                    self._markImportsReady();
+                }
             });
         },
 
@@ -54,6 +60,17 @@
         _registerFeatures: function() {
             this._prepConstructor();
         },
+
+        // BEGIN URTH_CUSTOM
+        _finishRegisterFeatures: function() {
+            // Polmer 1.4 added lazy registration. That feature split some of
+            // the functionality in `_registerFeatures` out into a method named
+            // `_finishRegisterFeatures`. Since this behavior does its own
+            // initialization, need to override this method with empty
+            // functionality to prevent errors that can occur with template
+            // property initialization.
+        },
+        // END URTH_CUSTOM
 
         _insertChildren: function() {
             var parentDom = Polymer.dom(Polymer.dom(this).parentNode);
