@@ -366,8 +366,18 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                                 selected.classList.remove('selected');
                             }
                         }
+
                         this.$$('.hover').classList.toggle('selected');
+
                         this.selectionInfo = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
+
+                        // workaround for type=scatter, which does not have unique data objects bound
+                        // to the selected DOM element.  Maintain a flag on the values array instead.
+                        if (this.type == 'scatter') {
+                            e.point.selected = !e.point.selected;
+                            this.selectionInfo = e.series.values.filter(function(d) { return d.selected; });
+                        }
+
                         var selection = this.selectionInfo.map(function(d) {
                             if (d.data) {
                                // event shape for type='pie'
@@ -375,6 +385,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                             }
                             return d.length ? d[0].row : d.row;
                         });
+
                         if (this.selectionAsObject) {
                             selection = selection.map(function(row) {
                                 var obj = {};
@@ -384,6 +395,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                                 return obj;
                             }.bind(this));
                         }
+
                         this.selection = selection;
                     }.bind(this));
 
