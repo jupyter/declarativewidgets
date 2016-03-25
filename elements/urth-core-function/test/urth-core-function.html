@@ -67,30 +67,6 @@
 
         // STEP 5: Define suite(s) and tests.
         describe('onModelResultChange', function() {
-            it('should call _setResult with {} when null is passed in', function () {
-                var fElmt = fixture('basic');
-
-                var _setResult = sinon.spy(fElmt, "_setResult");
-
-                fElmt.onModelResultChange(null);
-
-                //another attribute set.
-                assert(_setResult.calledOnce, "_setResult was called " + _setResult.callCount);
-                assert(_setResult.calledWith({}), "_setResult called with wrong arguments");
-            });
-
-            it('should call _setResult with {} when undefined is passed in', function () {
-                var fElmt = fixture('basic');
-
-                var _setResult = sinon.spy(fElmt, "_setResult");
-
-                fElmt.onModelResultChange(undefined);
-
-                //another attribute set.
-                assert(_setResult.calledOnce, "_setResult was called " + _setResult.callCount);
-                assert(_setResult.calledWith({}), "_setResult called with wrong arguments");
-            });
-
             it('should call _setResult with newVal when object is passed in', function () {
                 var fElmt = fixture('basic');
 
