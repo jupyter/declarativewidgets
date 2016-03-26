@@ -354,7 +354,10 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                             var data = this.chart.tooltip.data();
                             var series = data && data.series;
                             if (series) {
-                                series[0].row = e.point.row;
+                                if (series.length) {
+                                    series = series[0];
+                                }
+                                series.row = e.point.row;
                             }
                         }
                     }.bind(this));
@@ -365,18 +368,21 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                             while (selected = this.$$('.selected')) {
                                 selected.classList.remove('selected');
                             }
+                            e.series.values.forEach(function(d) { delete d.selected; });
                         }
 
                         this.$$('.hover').classList.toggle('selected');
 
-                        this.selectionInfo = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
+                        var selectionInfo = d3.select(this).data();
 
                         // workaround for type=scatter, which does not have unique data objects bound
                         // to the selected DOM element.  Maintain a flag on the values array instead.
                         if (this.type == 'scatter') {
                             e.point.selected = !e.point.selected;
-                            this.selectionInfo = e.series.values.filter(function(d) { return d.selected; });
+                            selectionInfo = e.series.values.filter(function(d) { return d.selected; });
                         }
+
+                        this.selectionInfo = selectionInfo;
 
                         var selection = this.selectionInfo.map(function(d) {
                             if (d.data) {
