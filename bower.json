@@ -19,7 +19,7 @@
   ],
   "private": true,
   "dependencies": {
-    "polymer": "Polymer/polymer#>=1.2.4 <1.4.0",
+    "polymer": "Polymer/polymer#>=1.2.4 <1.4.1",
     "webcomponentsjs": "^0.7.2"
   },
   "devDependencies": {
