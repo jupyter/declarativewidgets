@@ -114,34 +114,6 @@
                 },
 
                 /**
-                 * The data rows corresponding to the currently selected row.
-                 */
-                selection: {
-                    type: Array,
-                    value: function () { return []; },
-                    notify: true
-                },
-
-                /**
-                 * False by default to return 'selection' as an array of values.
-                 * If true, will return 'selection' as an object with key-value pairs (with column names as keys).
-                 */
-                selectionAsObject: {
-                    type: Boolean,
-                    value: false,
-                    reflectToAttribute: true
-                },
-
-                /**
-                 * UI information based on the current selection
-                 */
-                selectionInfo: {
-                    type: Array,
-                    value: function () { return []; },
-                    notify: true
-                },
-
-                /**
                  * References the nth column in datarows, typically used to
                  * identify independent or input (e.g. x axis).
                  */
@@ -159,6 +131,16 @@
                     type: Number,
                     value: -1,
                     observer: '_update'
+                },
+
+                /**
+                 * UI information based on the current selection
+                 */
+                selectionInfo: {
+                    type: Array,
+                    value: function () { return []; },
+                    readOnly: true,
+                    notify: true
                 },
 
                 /**

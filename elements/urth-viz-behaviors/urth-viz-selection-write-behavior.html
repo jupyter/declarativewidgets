@@ -1,0 +1,31 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="urth-viz-selection-behavior.html">
+
+<script>
+    'use strict';
+    (function() {
+        /**
+         * Like VisSelectionBehavior, except it removes the readOnly properties to allow data binding
+         *
+         * @group Urth Viz
+         * @polymerBehavior Urth.VizSelectionWriteBehavior
+         */
+        Urth.VizSelectionWriteBehavior = {
+            properties: {}
+        };
+
+        // Make a shallow copy of each property, minus the readOnly property
+        var props = Urth.VizSelectionWriteBehavior.properties,
+            origProps = Urth.VizSelectionBehavior.properties;
+        for (var name in origProps) {
+            props[name] = {};
+            for (var attrName in origProps[name]) {
+                props[name][attrName] = origProps[name][attrName];
+            }
+            delete props[name].readOnly;
+        }
+    })();
+</script>

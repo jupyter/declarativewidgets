@@ -10,6 +10,7 @@
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
 <link rel="import" href="./urth-viz-chart-common-behavior.html">
+<link rel="import" href="../urth-viz-behaviors/urth-viz-selection-behavior.html">
 <link rel="import" href="../urth-core-behaviors/error-display-behavior.html">
 
 <!-- import the nvd3 stylesheet into the main page as well as the shadow dom
@@ -97,6 +98,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         behaviors: [
             Polymer.IronResizableBehavior,
             Urth.VizChartCommonBehavior,
+            Urth.VizSelectionBehavior,
             Urth.DisplayErrorBehavior
         ],
 
@@ -384,7 +386,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                             selectionInfo = e.series.values.filter(function(d) { return d.selected; });
                         }
 
-                        this.selectionInfo = selectionInfo;
+                        this._setSelectionInfo(selectionInfo);
 
                         var selection = this.selectionInfo.map(function(d) {
                             if (d.data) {
@@ -404,7 +406,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                             }.bind(this));
                         }
 
-                        this.selection = selection;
+                        this._setSelection(selection);
                     }.bind(this));
 
                     return chart;

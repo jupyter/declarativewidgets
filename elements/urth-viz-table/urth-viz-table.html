@@ -6,6 +6,7 @@
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
+<link rel="import" href="../urth-viz-behaviors/urth-viz-selection-behavior.html">
 <link rel="import" href="../urth-core-behaviors/error-display-behavior.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
@@ -82,15 +83,6 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 },
 
                 /**
-                 * The data based on the currently selected row.
-                 */
-                selection: {
-                    type: Array,
-                    readOnly: true,
-                    notify: true
-                },
-
-                /**
                  * Number of rows user wants visible at a time,
                  * (the rest is hidden in scrollable area)
                  * If table is shorter in height this number, the shorter height
@@ -98,17 +90,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                  */
                 rowsVisible: {
                     type: Number,
-                    value: function () {return 15;},
-                    reflectToAttribute: true
-                },
-
-                /**
-                 * False by default to return 'selection' as an array of values.
-                 * If true, will return 'selection' as an object with key-value pairs (with column names as keys).
-                 */
-                selectionAsObject: {
-                    type: Boolean,
-                    value: function() { return false; },
+                    value: 15,
                     reflectToAttribute: true
                 }
             },
@@ -117,6 +99,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 // Handsontable resizes itself based on document.onResize, but
                 // the dashboard also uses iron-resize events when changing layout
                 Polymer.IronResizableBehavior,
+                Urth.VizSelectionBehavior,
                 Urth.DisplayErrorBehavior
             ],
 

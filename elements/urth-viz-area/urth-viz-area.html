@@ -4,6 +4,7 @@
 -->
 <link rel="import" href="../urth-viz-chart/urth-viz-chart.html">
 <link rel="import" href="../urth-viz-chart/urth-viz-chart-common-behavior.html">
+<link rel="import" href="../urth-viz-behaviors/urth-viz-selection-write-behavior.html">
 
 <!--
 Represents a widget that draws a area chart.
@@ -32,7 +33,8 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         is: 'urth-viz-area',
 
         behaviors: [
-            Urth.VizChartCommonBehavior
+            Urth.VizChartCommonBehavior,
+            Urth.VizSelectionWriteBehavior
         ]
     });
     </script>
