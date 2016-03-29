@@ -40,7 +40,7 @@ class ExtensionInstallRApp(InstallNBExtensionApp):
 
     def start(self):
         self.log.info("installing r widget extensions")
-        subprocess.call("R CMD INSTALL /src/dist/urth/widgets/ext/notebook/widgets_0.1.tgz", shell=True)
+        subprocess.call("R CMD INSTALL /src/dist/urth/widgets/ext/notebook/urth-widgets.tgz", shell=True)
 
 class ExtensionInstallApp(InstallNBExtensionApp):
     '''Subclass that installs this particular extension.'''
