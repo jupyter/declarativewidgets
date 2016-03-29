@@ -1,0 +1,110 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-viz-scatter tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../urth-viz-scatter.html'>
+</head>
+
+<body>
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id='scatter'>
+        <template>
+            <urth-viz-scatter id='scatterChart' type='scatter' multi-select='true' datarows='[[1,8,5],[2,2,6],[3,5,7]]' columns='["Index","Series 1","Series 2"]'></urth-viz-scatter>
+        </template>
+    </test-fixture>
+
+
+    <script>
+        // STEP 4: Define any globals needed by the test suite.
+        var chart;
+
+        beforeEach(function(done) {
+            chart = fixture('scatter');
+            if (!chart.rendered) {
+                function listener() {
+                    chart.removeEventListener('urth-viz-chart-render', listener);
+                    done();
+                }
+                chart.addEventListener('urth-viz-chart-render', listener);
+            } else {
+                done();
+            }
+        });
+
+        // STEP 5: Define suite(s) and tests.
+        describe('render scatter chart', function() {
+            it('should contain a top-level <g> element for the scatter chart', function() {
+                expect(chart/*.shadowRoot*/.querySelector('g.nv-scatterChart')).to.exist;
+            });
+
+            it('should contain six point, each represented by a <path> element', function() {
+                expect(chart/*.shadowRoot*/.querySelectorAll('path.nv-point').length).to.equal(6);
+            });
+        });
+
+        describe('select two points', function() {
+            beforeEach(function(done) {
+                chart.async(function() {
+                    var evObj1 = document.createEvent('MouseEvents'),
+                        evObj2 = document.createEvent('MouseEvents'),
+                        evObj3 = document.createEvent('MouseEvents'),
+                        path0 = chart.querySelector('#nv-path-0'),
+                        path1 = chart.querySelector('#nv-path-1');
+
+                    evObj1.initEvent('mouseover', true, false);
+                    evObj2.initEvent('click', true, false);
+                    evObj3.initEvent('mouseout', true, false);
+
+                    chart.async(function(){
+                        path0.dispatchEvent(evObj1);
+                    });
+                    chart.async(function(){
+                        path0.dispatchEvent(evObj2);
+                    });
+                    chart.async(function(){
+                        path0.dispatchEvent(evObj3);
+                    });
+                    chart.async(function(){
+                        path1.dispatchEvent(evObj1);
+                    });
+                    chart.async(function(){
+                        path1.dispatchEvent(evObj2);
+                    });
+                    chart.async(done);
+                }, 100);
+            });
+
+            it('should contain two elements with class "selected"', function() {
+                expect(chart/*.shadowRoot*/.querySelectorAll('.selected').length).to.equal(2);
+            });
+
+            it('selection should contain two rows', function() {
+                expect(chart.selection.length).to.equal(2);
+            });
+
+            it('selection should equal expected values', function() {
+                expect(chart.selection).to.eql([[1,8,5],[2,2,6]]);
+            });
+        });
+
+    </script>
+</body>
+</html>
