@@ -61,7 +61,6 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
                  * Object representing the function return value after invocation.
                  */
                 result: {
-                    type: Object,
                     readOnly: true,
                     notify: true
                 },
@@ -172,7 +171,7 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
             onModelResultChange: function(newVal){
                 console.debug( 'urth-core-function onModelResultChange', newVal );
                 //Using _setName function because we want result to be read-pnly to the outside world
-                this._setResult( (newVal == null) ? {} : newVal );
+                this._setResult( newVal );
             },
 
             onModelSignatureChange: function(newVal){
