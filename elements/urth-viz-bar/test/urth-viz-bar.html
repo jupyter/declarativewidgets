@@ -78,6 +78,43 @@
             });
         });
 
+        describe('select a bar', function() {
+            beforeEach(function(done) {
+                chart.async(function() {
+                    var bar1 = chart.querySelectorAll('.nv-bar')[2];
+                        bar2 = chart.querySelectorAll('.nv-bar')[0];
+
+                    chart.async(function(){
+                        bar1.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+                    });
+                    chart.async(function(){
+                        bar1.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                    });
+                    chart.async(function(){
+                        bar1.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }));
+                    });
+                    chart.async(function(){
+                        bar2.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+                    });
+                    chart.async(function(){
+                        bar2.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                    });
+                    chart.async(done);
+                }, 100);
+            });
+
+            it('should contain one elements with class "selected"', function() {
+                expect(chart/*.shadowRoot*/.querySelectorAll('.selected').length).to.equal(1);
+            });
+
+            it('selection should contain one row', function() {
+                expect(chart.selection.length).to.equal(1);
+            });
+
+            it('selection should equal expected values', function() {
+                expect(chart.selection).to.eql([[1,8,5]]);
+            });
+        });
     </script>
 </body>
 </html>
