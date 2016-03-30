@@ -1,0 +1,514 @@
+;difficult_aspects_themes;difficult_aspects_keywords
+1;development;diff(s|ing)?($|\W)
+5;development;workspace|ides?($|\W),variables
+6;hosting,version_control;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,(version|source) (control|management|tracking|history|notebooks)
+7;dissemination,version_control;report generation,(version|source) (control|management|tracking|history|notebooks)
+10;;
+11;ux,dissemination,language;python,copy(-|&|\sand\s|\/)paste|c&p|and paste,export(ing)?
+17;hosting,version_control;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,git(hub)?
+19;performance,ux,dissemination;"css|themes?|fonts?|contrast|icons?,performance,(dashboard|presentation|""view only"") mode"
+21;development,ux,version_control;diff(s|ing)?($|\W),debug(ger|ging)?(\stools)?,git(hub)?,multi(ple)? cells?
+22;ux,development,language,editor;workspace|ides?($|\W),modules,(code )?edit(or|ing)(\scode)?,double(\s|-)?click(ing)?,python
+23;ux,development;debug(ger|ging)?(\stools)?,transform cells,multi(ple)? cells?,copy(-|&|\sand\s|\/)paste|c&p|and paste
+26;development,ux,versions,stability,version_control;changing api,api,freeze|hang(s|ing)|locks? up|crashes|dying|dies,git(hub)?,scroll(\s)?bar|scroll(ing)?
+28;documentation;doc(s|umentation)?($|\W)
+29;performance,ux;slow(er)?,scroll(\s)?bar|scroll(ing)?
+31;hosting,development,dissemination;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,pdf,debug(ger|ging)?(\stools)?
+33;documentation,hosting,versions;configur(ing|ation),doc(s|umentation)?($|\W),dependencies|package (updates|management)
+35;ux,content_management,development;debug(ger|ging)?(\stools)?,multi(ple)? cells?,file(\s|-)?system,cell.*numbers|numbering|numbered cells|cell ordering
+37;hosting,file_format,editor;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,(json|\.py|ipynb) files,(auto|code\s|tab\s)complet(e|ion)
+39;development,dissemination,version_control;shar(e|ing),diff(s|ing)?($|\W),git(hub)?
+40;ux,editor;scroll(\s)?bar|scroll(ing)?,(code )?edit(or|ing)(\scode)?
+41;development;variables
+42;development;remain in memory,variables
+48;documentation,dissemination;doc(s|umentation)?($|\W),nbconvert
+49;;
+51;dissemination;non-interactive graphs
+54;development,hosting;diff(s|ing)?($|\W),debug(ger|ging)?(\stools)?,install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,client-server|server
+55;;
+56;ux;multi(ple)? cells?
+59;ux;web based|browser
+61;language;python
+63;development;debug(ger|ging)?(\stools)?,variables
+66;ux,content_management,version_control;muddle|messy|clutter|clunky,web based|browser,file (browser|explorer),(version|source) (control|management|tracking|history|notebooks)
+68;documentation;doc(s|umentation)?($|\W)
+77;stability;freeze|hang(s|ing)|locks? up|crashes|dying|dies
+78;content_management;file (browser|explorer)
+79;version_control;git(hub)?
+81;stability;testing
+87;;
+92;versions;versions
+93;hosting;deploy(ing)?
+94;hosting,development;single (user|computer),workspace|ides?($|\W)
+95;version_control;git(hub)?
+97;ux;mouse
+98;dissemination;shar(e|ing)
+99;;
+101;editor;(code )?edit(or|ing)(\scode)?
+102;content_management,development;managing.*(notebooks|files),rstudio|knitr,variables
+103;ux,version_control;(u|i)ndo,(version|source) (control|management|tracking|history|notebooks),drag-and
+104;version_control,editor;linting,(version|source) (control|management|tracking|history|notebooks)
+105;version_control;git(hub)?,(version|source) (control|management|tracking|history|notebooks)
+107;;
+109;hosting;deploy(ing)?
+110;ux;web based|browser
+117;;
+119;ux;web based|browser
+123;ux,dissemination;css|themes?|fonts?|contrast|icons?,presentations,cell.*numbers|numbering|numbered cells|cell ordering
+126;ux;scroll(\s)?bar|scroll(ing)?,drag-and
+128;hosting;virtual(env|\senvironment)
+131;hosting;client-server|server
+135;ux,editor;hard to edit,copy(-|&|\sand\s|\/)paste|c&p|and paste
+138;file_format;(json|\.py|ipynb) files
+139;ux;mouse
+145;development;variables,namespace|everything is global|bad programming|programming practices
+146;hosting,collab,versions;versionn?ing,collaborat(e|ion),production
+148;;
+149;editor;key(board|\s?bindings?)|short-?cuts?|hotkeys?,vim?($|\W)|sublime|atom|emacs
+150;ux;muddle|messy|clutter|clunky,scroll(\s)?bar|scroll(ing)?
+151;hosting;configur(ing|ation)
+152;ux;css|themes?|fonts?|contrast|icons?
+154;version_control;git(hub)?
+155;;
+157;language;python
+159;hosting,stability,versions,dissemination;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,reboot(ing)?|restart(ing)? (notebook|kernel)|kernel restarts,shar(e|ing),dependencies|package (updates|management)
+160;development,ux,dissemination;diff(s|ing)?($|\W),(u|i)ndo,presentations
+163;version_control;(version|source) (control|management|tracking|history|notebooks)
+167;;
+173;ux;web based|browser
+176;documentation,content_management,ux,hosting,editor;css|themes?|fonts?|contrast|icons?,doc(s|umentation)?($|\W),install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,(code )?edit(or|ing)(\scode)?,(long|large) notebooks?
+179;;
+184;editor;key(board|\s?bindings?)|short-?cuts?|hotkeys?
+186;performance,ux,content_management;css|themes?|fonts?|contrast|icons?,slow(er)?,(long|large) notebooks?
+198;documentation,content_management;doc(s|umentation)?($|\W),search(-and-replace)?|find and|finding
+201;performance,ux;slow(er)?,muddle|messy|clutter|clunky
+204;ux;web based|browser
+210;development,editor;workspace|ides?($|\W),(code )?edit(or|ing)(\scode)?
+211;content_management,development,editor;api,search(-and-replace)?|find and|finding,(code )?edit(or|ing)(\scode)?,key(board|\s?bindings?)|short-?cuts?|hotkeys?
+216;hosting,content_management;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,configur(ing|ation),managing.*(notebooks|files),client-server|server
+219;ux;more clicks
+220;documentation,hosting;doc(s|umentation)?($|\W),jupyter\s?hub
+221;;
+227;;
+229;version_control;not versioned
+231;content_management;search(-and-replace)?|find and|finding
+232;;
+237;ux,development;debug(ger|ging)?(\stools)?,print(ing)?
+238;hosting,version_control;virtual(env|\senvironment),git(hub)?
+241;hosting,language;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,R($|\W)
+243;ux,content_management;scroll(\s)?bar|scroll(ing)?,(long|large) notebooks?
+246;versions,language;versionn?ing,python
+249;ux,dissemination;report generation,jump(ing)?
+254;editor;(code )?edit(or|ing)(\scode)?
+259;editor;key(board|\s?bindings?)|short-?cuts?|hotkeys?
+262;hosting,dissemination;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,interactive (widgets|plots)
+264;;
+267;hosting,ux,dissemination;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,pdf,deploy(ing)?,copy(-|&|\sand\s|\/)paste|c&p|and paste,jupyter\s?hub
+268;ux;(wasted|screen) space|bloated ui|too much whitespace|margins|width,web based|browser
+270;language,editor;python,vim?($|\W)|sublime|atom|emacs
+275;development,stability,editor;debug(ger|ging)?(\stools)?,(code )?edit(or|ing)(\scode)?,brittle|(los(e|ing)|preserve) state|work is lost
+277;ux;open notebooks
+279;hosting,version_control;(version|source) (control|management|tracking|history|notebooks),production
+282;version_control;(version|source) (control|management|tracking|history|notebooks)
+284;ux,content_management,development;diff(s|ing)?($|\W),scroll(\s)?bar|scroll(ing)?,(long|large) notebooks?
+286;;
+290;editor;(auto|code\s|tab\s)complet(e|ion),key(board|\s?bindings?)|short-?cuts?|hotkeys?
+293;hosting;host(ed|ing)
+295;ux,content_management;(wasted|screen) space|bloated ui|too much whitespace|margins|width,large files
+298;content_management;(folders?|director(y|ies))(\smanagement)?
+300;development,editor;diff(s|ing)?($|\W),spell check,linting
+305;ux,collab,language;scroll(\s)?bar|scroll(ing)?,collaborat(e|ion),python
+309;stability,editor;freeze|hang(s|ing)|locks? up|crashes|dying|dies,vim?($|\W)|sublime|atom|emacs
+310;hosting,language;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,virtual(env|\senvironment),python
+311;ux,dissemination;shar(e|ing),web based|browser
+312;development,hosting,content_management,ux;debug(ger|ging)?(\stools)?,web based|browser,debug errors,client-server|server,(folders?|director(y|ies))(\smanagement)?
+314;development;workspace|ides?($|\W)
+316;;
+332;development,version_control,editor;diff(s|ing)?($|\W),completion of parenthesis,git(hub)?
+333;development,version_control;diff(s|ing)?($|\W),git(hub)?
+338;version_control;(version|source) (control|management|tracking|history|notebooks)
+340;editor;vim?($|\W)|sublime|atom|emacs
+341;development;tips,variables
+342;version_control;(version|source) (control|management|tracking|history|notebooks)
+344;ux,dissemination;pdf,print(ing)?
+345;ux,editor;web based|browser,key(board|\s?bindings?)|short-?cuts?|hotkeys?,vim?($|\W)|sublime|atom|emacs
+348;development,version_control;diff(s|ing)?($|\W),git(hub)?
+350;editor;(code )?edit(or|ing)(\scode)?
+352;ux,versions;versionn?ing,(u|i)ndo
+353;version_control;(version|source) (control|management|tracking|history|notebooks)
+355;hosting;client-server|server
+356;ux,version_control;(u|i)ndo,(version|source) (control|management|tracking|history|notebooks)
+366;;
+370;ux,version_control,editor;(manipulating|mov(e|ing)|copy(ing)?) cells|rearranging,(version|source) (control|management|tracking|history|notebooks),(code )?edit(or|ing)(\scode)?
+374;;
+377;content_management;(folders?|director(y|ies))(\smanagement)?
+384;ux,stability;freeze|hang(s|ing)|locks? up|crashes|dying|dies,web based|browser,scroll(\s)?bar|scroll(ing)?
+385;development,version_control;diff(s|ing)?($|\W),(version|source) (control|management|tracking|history|notebooks)
+389;development,language,editor;spell check,(code )?edit(or|ing)(\scode)?,python
+394;hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up
+398;hosting,versions;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,versions
+399;hosting,language;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,R($|\W)
+400;version_control;(version|source) (control|management|tracking|history|notebooks)
+403;ux,editor;scroll(\s)?bar|scroll(ing)?,web based|browser,(code )?edit(or|ing)(\scode)?,vim?($|\W)|sublime|atom|emacs
+406;ux;web based|browser
+408;performance;performance
+411;hosting;client-server|server
+413;dissemination,version_control;git(hub)?,nbconvert
+414;ux,development,stability;freeze|hang(s|ing)|locks? up|crashes|dying|dies,reboot(ing)?|restart(ing)? (notebook|kernel)|kernel restarts,modules,cells (up and down|out of place)
+418;version_control;git(hub)?
+421;development;workspace|ides?($|\W)
+425;version_control,editor;git(hub)?,vim?($|\W)|sublime|atom|emacs
+426;hosting;host(ed|ing),client-server|server
+428;hosting,dissemination;shar(e|ing),client-server|server
+431;documentation;doc(s|umentation)?($|\W)
+434;ux,editor;(auto|code\s|tab\s)complet(e|ion),click on
+439;development,editor;debug(ger|ging)?(\stools)?,key(board|\s?bindings?)|short-?cuts?|hotkeys?
+441;content_management;(file|notebook|content) management,(folders?|director(y|ies))(\smanagement)?
+445;performance,stability,language;slow(er)?,freeze|hang(s|ing)|locks? up|crashes|dying|dies,R($|\W)
+448;dissemination;export(ing)?
+450;editor;(code )?edit(or|ing)(\scode)?,vim?($|\W)|sublime|atom|emacs
+452;development;variables
+453;hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,cloud
+458;ux,dissemination,version_control;git(hub)?,nbconvert,copy(-|&|\sand\s|\/)paste|c&p|and paste
+460;development;debug(ger|ging)?(\stools)?
+462;ux;(u|i)ndo
+463;ux,performance;web based|browser,launching the notebook,cach(e|ing)
+471;ux;copy(-|&|\sand\s|\/)paste|c&p|and paste
+472;stability;reboot(ing)?|restart(ing)? (notebook|kernel)|kernel restarts
+473;performance,editor;slow(er)?,(code )?edit(or|ing)(\scode)?
+474;development,editor;debug(ger|ging)?(\stools)?,(code )?edit(or|ing)(\scode)?
+475;content_management,editor;(code )?edit(or|ing)(\scode)?,(folders?|director(y|ies))(\smanagement)?
+480;language;R($|\W),python
+483;hosting,ux,editor;web based|browser,(code )?edit(or|ing)(\scode)?,client-server|server,vim?($|\W)|sublime|atom|emacs
+486;dissemination;pdf,export(ing)?
+487;;
+491;editor;multiple curs(o|e)r,rename all
+493;language;languages?
+495;;
+496;development,ux;css|themes?|fonts?|contrast|icons?,workspace|ides?($|\W)
+498;hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up
+499;;
+500;ux;modal
+504;ux;(wasted|screen) space|bloated ui|too much whitespace|margins|width
+505;stability;reboot(ing)?|restart(ing)? (notebook|kernel)|kernel restarts
+508;dissemination,version_control;distribution,(version|source) (control|management|tracking|history|notebooks)
+509;editor;(code )?edit(or|ing)(\scode)?
+515;;
+517;content_management,versions,collab;versionn?ing,(file|notebook|content) management,collaborat(e|ion),dependencies|package (updates|management)
+519;development;environment window
+525;;
+534;hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up
+535;ux;double(\s|-)?click(ing)?,click on
+540;development;multiprocessing|parallel (code|programming)
+541;;
+542;ux,language,editor;css|themes?|fonts?|contrast|icons?,scroll(\s)?bar|scroll(ing)?,python,(code )?edit(or|ing)(\scode)?
+551;ux,versions;scroll(\s)?bar|scroll(ing)?,dependencies|package (updates|management)
+559;version_control;(version|source) (control|management|tracking|history|notebooks)
+561;ux;web based|browser,small screens|tablet|mobile
+575;language;python
+578;content_management,ux,development,editor;workspace|ides?($|\W),structure notebooks,(code )?edit(or|ing)(\scode)?,copy(-|&|\sand\s|\/)paste|c&p|and paste
+579;collab,version_control;multiple authors,git(hub)?
+580;development,stability;freeze|hang(s|ing)|locks? up|crashes|dying|dies,workspace|ides?($|\W)
+584;stability;freeze|hang(s|ing)|locks? up|crashes|dying|dies
+587;ux;(u|i)ndo
+592;version_control;(version|source) (control|management|tracking|history|notebooks)
+594;ux,language,editor;languages?,key(board|\s?bindings?)|short-?cuts?|hotkeys?,python,status
+595;language;language support,languages?
+605;editor;key(board|\s?bindings?)|short-?cuts?|hotkeys?
+606;ux;(manipulating|mov(e|ing)|copy(ing)?) cells|rearranging
+607;versions;dependencies|package (updates|management)
+612;development,ux,content_management,editor;workspace|ides?($|\W),search(-and-replace)?|find and|finding,(code )?edit(or|ing)(\scode)?,hide
+616;content_management;search(-and-replace)?|find and|finding,(long|large) notebooks?
+617;hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up
+620;ux;cell.*numbers|numbering|numbered cells|cell ordering
+627;;
+630;ux;(manipulating|mov(e|ing)|copy(ing)?) cells|rearranging,multi(ple)? cells?
+641;ux,versions;v3,(wasted|screen) space|bloated ui|too much whitespace|margins|width,conda
+643;editor;(code )?edit(or|ing)(\scode)?
+646;ux,dissemination,version_control,editor;git(hub)?,key(board|\s?bindings?)|short-?cuts?|hotkeys?,(code )?edit(or|ing)(\scode)?,vim?($|\W)|sublime|atom|emacs,cell.*numbers|numbering|numbered cells|cell ordering,shar(e|ing)
+651;development,ux;workspace|ides?($|\W),hide
+654;ux,development;workspace|ides?($|\W),(manipulating|mov(e|ing)|copy(ing)?) cells|rearranging,cells (up and down|out of place),(u|i)ndo
+661;;
+662;dissemination,language;python,export(ing)?
+663;content_management;search(-and-replace)?|find and|finding
+664;development,stability;freeze|hang(s|ing)|locks? up|crashes|dying|dies,multiprocessing|parallel (code|programming)
+666;content_management;multiple files
+668;hosting;virtual(env|\senvironment)
+669;;
+671;;
+672;documentation;doc(s|umentation)?($|\W)
+676;development,hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,workspace|ides?($|\W)
+677;ux,version_control;muddle|messy|clutter|clunky,git(hub)?
+681;development,ux,editor;workspace|ides?($|\W),web based|browser,(code )?edit(or|ing)(\scode)?
+682;hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,native
+689;;
+700;hosting;remote access
+706;language;python
+710;dissemination;pdf,export(ing)?
+711;development,version_control;diff(s|ing)?($|\W),git(hub)?
+712;hosting,versions,language;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,virtual(env|\senvironment),incompatibilities,python
+716;hosting;personalization
+718;ux,editor;muddle|messy|clutter|clunky,web based|browser,(code )?edit(or|ing)(\scode)?,vim?($|\W)|sublime|atom|emacs
+725;ux,content_management;muddle|messy|clutter|clunky,managing.*(notebooks|files)
+729;hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up
+731;development,language;modules,python
+738;editor;(code )?edit(or|ing)(\scode)?
+740;content_management;(folders?|director(y|ies))(\smanagement)?
+742;hosting,editor;deploy(ing)?,install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,key(board|\s?bindings?)|short-?cuts?|hotkeys?,cloud
+749;performance,development,stability;reboot(ing)?|restart(ing)? (notebook|kernel)|kernel restarts,cach(e|ing),namespace|everything is global|bad programming|programming practices
+753;;
+755;hosting,language;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,configur(ing|ation),R($|\W)
+757;editor;(code )?edit(or|ing)(\scode)?
+759;ux,content_management,editor;fold code,split a notebook,(fold|collapse) code
+765;file_format,editor;(json|\.py|ipynb) files,(code )?edit(or|ing)(\scode)?
+773;ux;scroll(\s)?bar|scroll(ing)?
+780;ux,development,stability,editor;freeze|hang(s|ing)|locks? up|crashes|dying|dies,scroll(\s)?bar|scroll(ing)?,modules,(code )?edit(or|ing)(\scode)?
+781;development;modules
+786;performance,development,ux,content_management;diff(s|ing)?($|\W),print(ing)?,search(-and-replace)?|find and|finding,slow(er)?,cell.*numbers|numbering|numbered cells|cell ordering
+800;hosting;production
+803;content_management,ux;(wasted|screen) space|bloated ui|too much whitespace|margins|width,(folders?|director(y|ies))(\smanagement)?
+806;development;api
+808;dissemination;"(dashboard|presentation|""view only"") mode"
+814;ux,editor;key(board|\s?bindings?)|short-?cuts?|hotkeys?,vim?($|\W)|sublime|atom|emacs,cell.*numbers|numbering|numbered cells|cell ordering
+815;language;python
+816;;
+821;hosting,language;virtual(env|\senvironment),python
+823;hosting,ux,editor;native,key(board|\s?bindings?)|short-?cuts?|hotkeys?,vim?($|\W)|sublime|atom|emacs,double(\s|-)?click(ing)?
+828;performance,ux,editor;performance,web based|browser,key(board|\s?bindings?)|short-?cuts?|hotkeys?
+829;;
+830;;
+835;;
+838;collab,versions;collaborat(e|ion),dependencies|package (updates|management)
+841;hosting,dissemination;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,shar(e|ing)
+845;file_format,editor;(json|\.py|ipynb) files,(code )?edit(or|ing)(\scode)?
+859;ux,stability,editor;web based|browser,key(board|\s?bindings?)|short-?cuts?|hotkeys?,brittle|(los(e|ing)|preserve) state|work is lost
+863;development,ux;workspace|ides?($|\W),jump(ing)?
+864;editor;(code )?edit(or|ing)(\scode)?
+866;ux,editor;modal,scroll(\s)?bar|scroll(ing)?,key(board|\s?bindings?)|short-?cuts?|hotkeys?
+869;;
+872;ux;(manipulating|mov(e|ing)|copy(ing)?) cells|rearranging,multi(ple)? cells?
+877;ux,editor;web based|browser,(code )?edit(or|ing)(\scode)?,key(board|\s?bindings?)|short-?cuts?|hotkeys?
+884;;
+887;hosting,editor;(auto|code\s|tab\s)complet(e|ion),resource intensive|memory us(e|age)
+892;ux,editor;small screens|tablet|mobile,(code )?edit(or|ing)(\scode)?
+894;documentation,development,ux,language;R($|\W),rstudio|knitr,doc(s|umentation)?($|\W),css|themes?|fonts?|contrast|icons?
+898;editor;(auto|code\s|tab\s)complet(e|ion)
+905;development,version_control;code re-?use,(version|source) (control|management|tracking|history|notebooks)
+906;language;languages?
+915;dissemination,version_control,editor;shar(e|ing),(code )?edit(or|ing)(\scode)?,(version|source) (control|management|tracking|history|notebooks),interactive graphic,vim?($|\W)|sublime|atom|emacs
+916;;
+918;development,version_control;diff(s|ing)?($|\W),git(hub)?
+919;hosting,ux;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,(wasted|screen) space|bloated ui|too much whitespace|margins|width,css|themes?|fonts?|contrast|icons?
+922;editor;(code )?edit(or|ing)(\scode)?
+926;editor;key(board|\s?bindings?)|short-?cuts?|hotkeys?,vim?($|\W)|sublime|atom|emacs
+933;development;multiprocessing|parallel (code|programming)
+940;development;workspace|ides?($|\W)
+960;content_management,ux,hosting;css|themes?|fonts?|contrast|icons?,install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,too small,(long|large) notebooks?
+966;;
+969;language;python
+971;;
+972;;
+974;development;modules,namespace|everything is global|bad programming|programming practices
+979;development,stability;debug(ger|ging)?(\stools)?,testing
+987;development,hosting,stability;freeze|hang(s|ing)|locks? up|crashes|dying|dies,variables,client-server|server,resource intensive|memory us(e|age)
+998;ux,editor;(code )?edit(or|ing)(\scode)?,vim?($|\W)|sublime|atom|emacs,cell.*numbers|numbering|numbered cells|cell ordering
+1000;stability,editor;freeze|hang(s|ing)|locks? up|crashes|dying|dies,(code )?edit(or|ing)(\scode)?,vim?($|\W)|sublime|atom|emacs
+1002;editor;key combinations
+1016;development,stability,dissemination;"debug(ger|ging)?(\stools)?,freeze|hang(s|ing)|locks? up|crashes|dying|dies,(dashboard|presentation|""view only"") mode"
+1018;versions,language;3 vs 2,conda,python
+1020;;
+1022;;
+1024;ux,editor;tab function,scroll(\s)?bar|scroll(ing)?,key(board|\s?bindings?)|short-?cuts?|hotkeys?
+1031;version_control;git(hub)?
+1032;hosting;resource intensive|memory us(e|age)
+1035;development;namespace|everything is global|bad programming|programming practices
+1042;ux;scroll(\s)?bar|scroll(ing)?
+1047;editor;key(board|\s?bindings?)|short-?cuts?|hotkeys?
+1048;file_format,dissemination,version_control;shar(e|ing),(version|source) (control|management|tracking|history|notebooks),notebook format
+1050;hosting,dissemination,editor;shar(e|ing),host(ed|ing),vim?($|\W)|sublime|atom|emacs
+1053;development;workspace|ides?($|\W)
+1054;ux,stability;freeze|hang(s|ing)|locks? up|crashes|dying|dies,print(ing)?
+1064;;
+1065;ux,stability;brittle|(los(e|ing)|preserve) state|work is lost,print(ing)?
+1066;documentation;doc(s|umentation)?($|\W)
+1074;;
+1076;;
+1083;ux,hosting;muddle|messy|clutter|clunky,multi-?user
+1087;development;workspace|ides?($|\W)
+1090;version_control;control version
+1092;hosting,language;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,python
+1095;ux,development,editor;variables,(fold|collapse) code,vim?($|\W)|sublime|atom|emacs
+1107;content_management;where all my notebooks are
+1116;development,version_control,editor;workspace|ides?($|\W),(code )?edit(or|ing)(\scode)?,version-controlled
+1122;versions;version upgrades
+1124;hosting;client-server|server
+1125;;
+1129;editor,ux,file_format,version_control,hosting,dissemination;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,(json|\.py|ipynb) files,key(board|\s?bindings?)|short-?cuts?|hotkeys?,(version|source) (control|management|tracking|history|notebooks),shar(e|ing),small screens|tablet|mobile
+1133;hosting,language;deploy(ing)?,python
+1135;ux,editor;web based|browser,(code )?edit(or|ing)(\scode)?,vim?($|\W)|sublime|atom|emacs
+1145;development,content_management;large projects,workspace|ides?($|\W)
+1151;dissemination;shar(e|ing)
+1157;ux;scroll(\s)?bar|scroll(ing)?,small screens|tablet|mobile
+1159;development,file_format,versions,version_control;diff(s|ing)?($|\W),versions,(version|source) (control|management|tracking|history|notebooks),.ipynb
+1161;content_management,editor;(code )?edit(or|ing)(\scode)?,file(\s|-)?system
+1162;content_management;search(-and-replace)?|find and|finding
+1169;editor;(code )?edit(or|ing)(\scode)?
+1172;development,language,editor;R($|\W),modules,(code )?edit(or|ing)(\scode)?,python
+1178;ux,versions;muddle|messy|clutter|clunky,versionn?ing
+1184;development;workspace|ides?($|\W)
+1192;;
+1204;;
+1212;;
+1218;ux;hard to navigate
+1220;performance;performance
+1226;development;development environment
+1230;development,dissemination,version_control,editor;shar(e|ing),variables,(version|source) (control|management|tracking|history|notebooks),vim?($|\W)|sublime|atom|emacs,key(board|\s?bindings?)|short-?cuts?|hotkeys?
+1234;hosting,versions;deploy(ing)?,dependencies|package (updates|management)
+1236;performance,development,language;slow(er)?,loaded variables,variables,multiprocessing|parallel (code|programming),python
+1239;development,ux,dissemination;too much programming,hide,pdf,workspace|ides?($|\W),interactive (widgets|plots)
+1241;dissemination;pdf,export(ing)?
+1243;development,ux,dissemination;pdf,workspace|ides?($|\W),hide
+1247;ux;print(ing)?
+1249;stability;freeze|hang(s|ing)|locks? up|crashes|dying|dies
+1254;ux,file_format,version_control;git(hub)?,copy(-|&|\sand\s|\/)paste|c&p|and paste,filesize
+1255;ux,editor;scroll(\s)?bar|scroll(ing)?,key(board|\s?bindings?)|short-?cuts?|hotkeys?,vim?($|\W)|sublime|atom|emacs
+1257;ux;web based|browser,small screens|tablet|mobile
+1264;documentation,development,file_format,hosting;api,doc(s|umentation)?($|\W),large documents,permissions?
+1272;documentation,content_management,dissemination;report generation,doc(s|umentation)?($|\W),navigation tools
+1274;performance;slow(er)?
+1282;content_management,ux;css|themes?|fonts?|contrast|icons?,(folders?|director(y|ies))(\smanagement)?
+1285;development;spell check
+1291;development,versions;debug(ger|ging)?(\stools)?,conda
+1296;;
+1306;ux,development;web based|browser,code review
+1308;content_management;search(-and-replace)?|find and|finding
+1314;editor,version_control,language;python,(version|source) (control|management|tracking|history|notebooks),(code )?edit(or|ing)(\scode)?
+1323;file_format;.ipynb
+1324;performance,editor;slow(er)?,(auto|code\s|tab\s)complet(e|ion),key(board|\s?bindings?)|short-?cuts?|hotkeys?
+1325;hosting,development,editor;debug(ger|ging)?(\stools)?,key(board|\s?bindings?)|short-?cuts?|hotkeys?,client-server|server
+1332;development,editor;debug(ger|ging)?(\stools)?,(auto|code\s|tab\s)complet(e|ion)
+1333;version_control;(version|source) (control|management|tracking|history|notebooks)
+1334;versions,version_control;versions,(version|source) (control|management|tracking|history|notebooks)
+1335;ux,hosting,content_management;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,muddle|messy|clutter|clunky,web based|browser,(folders?|director(y|ies))(\smanagement)?
+1337;documentation;doc(s|umentation)?($|\W)
+1342;version_control;(version|source) (control|management|tracking|history|notebooks)
+1343;development,stability;debug(ger|ging)?(\stools)?,brittle|(los(e|ing)|preserve) state|work is lost
+1346;;
+1347;development,versions;debug(ger|ging)?(\stools)?,workspace|ides?($|\W),versionn?ing
+1354;;
+1359;;
+1360;documentation,development;doc(s|umentation)?($|\W),workspace|ides?($|\W)
+1363;ux;accessibility
+1364;;
+1366;ux,content_management;hard to navigate,(long|large) notebooks?
+1368;content_management;(folders?|director(y|ies))(\smanagement)?
+1370;editor;(code )?edit(or|ing)(\scode)?
+1371;;
+1375;development,editor;workspace|ides?($|\W),(auto|code\s|tab\s)complet(e|ion)
+1378;hosting;configur(ing|ation),multi-?user
+1380;content_management;large projects
+1381;versions,dissemination,language,editor;shar(e|ing),(code )?edit(or|ing)(\scode)?,python,vim?($|\W)|sublime|atom|emacs,dependencies|package (updates|management)
+1383;development,language;R($|\W),rstudio|knitr
+1384;development,ux,version_control;css|themes?|fonts?|contrast|icons?,web based|browser,git(hub)?,debug(ger|ging)?(\stools)?,(wasted|screen) space|bloated ui|too much whitespace|margins|width,breakpoints
+1389;ux,dissemination;shar(e|ing),hard to navigate,ui feels like 1993
+1390;editor;(code )?edit(or|ing)(\scode)?,vim?($|\W)|sublime|atom|emacs
+1393;version_control;git(hub)?
+1400;;
+1406;hosting;multi-?user
+1408;content_management;search(-and-replace)?|find and|finding
+1409;hosting;multi-?user
+1415;content_management;(long|large) notebooks?
+1416;stability,version_control;freeze|hang(s|ing)|locks? up|crashes|dying|dies,git(hub)?
+1417;ux;multi(ple)? cells?
+1419;hosting,dissemination;shar(e|ing),client-server|server
+1420;ux;scroll(\s)?bar|scroll(ing)?
+1421;stability,editor;(auto|code\s|tab\s)complet(e|ion),testing
+1425;versions,editor;versionn?ing,(code )?edit(or|ing)(\scode)?
+1427;ux;(manipulating|mov(e|ing)|copy(ing)?) cells|rearranging
+1428;ux,stability;muddle|messy|clutter|clunky,reboot(ing)?|restart(ing)? (notebook|kernel)|kernel restarts
+1431;content_management;(long|large) notebooks?
+1432;dissemination;export(ing)?
+1434;version_control;(version|source) (control|management|tracking|history|notebooks)
+1441;development,versions,dissemination;diff(s|ing)?($|\W),software version,shar(e|ing)
+1446;stability;freeze|hang(s|ing)|locks? up|crashes|dying|dies
+1447;hosting,ux;web based|browser,resource intensive|memory us(e|age)
+1453;version_control;(version|source) (control|management|tracking|history|notebooks)
+1456;content_management,version_control;search(-and-replace)?|find and|finding,(version|source) (control|management|tracking|history|notebooks)
+1458;content_management;(folders?|director(y|ies))(\smanagement)?
+1460;;
+1463;development,file_format;api,notebook format
+1464;;
+1466;version_control;git(hub)?
+1470;performance,ux;slow(er)?,too small,scroll(\s)?bar|scroll(ing)?
+1472;development,ux,collab,version_control;diff(s|ing)?($|\W),muddle|messy|clutter|clunky,git(hub)?,collaborat(e|ion)
+1476;versions,editor;versionn?ing,(code )?edit(or|ing)(\scode)?,vim?($|\W)|sublime|atom|emacs
+1477;ux,hosting,stability,language;freeze|hang(s|ing)|locks? up|crashes|dying|dies,small screens|tablet|mobile,python,client-server|server
+1478;development,stability,language;freeze|hang(s|ing)|locks? up|crashes|dying|dies,workspace|ides?($|\W),languages?
+1479;;
+1480;;
+1484;editor;key(board|\s?bindings?)|short-?cuts?|hotkeys?
+1487;version_control,editor;(code )?edit(or|ing)(\scode)?,(version|source) (control|management|tracking|history|notebooks)
+1490;;
+1493;ux,editor;(auto|code\s|tab\s)complet(e|ion),multi(ple)? cells?,copy(-|&|\sand\s|\/)paste|c&p|and paste
+1494;hosting;virtual(env|\senvironment)
+1495;content_management,development;code re-?use,(file|notebook|content) management
+1498;development,version_control;diff(s|ing)?($|\W),git(hub)?
+1503;;
+1504;development,ux,stability;diff(s|ing)?($|\W),(u|i)ndo,testing
+1512;editor;(code )?edit(or|ing)(\scode)?
+1515;collab;collaborat(e|ion)
+1524;development;portability|hard to port|port analysis
+1525;hosting,editor;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,(code )?edit(or|ing)(\scode)?
+1527;documentation,ux,hosting,content_management,editor;virtual(env|\senvironment),doc(s|umentation)?($|\W),web based|browser,(code )?edit(or|ing)(\scode)?,(folders?|director(y|ies))(\smanagement)?
+1529;dissemination;export(ing)?
+1530;;
+1534;development,hosting;debug(ger|ging)?(\stools)?,install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,workspace|ides?($|\W)
+1541;content_management,version_control;git(hub)?,(long|large) notebooks?
+1551;editor;(code )?edit(or|ing)(\scode)?
+1554;version_control;(version|source) (control|management|tracking|history|notebooks)
+1556;development;workspace|ides?($|\W)
+1557;content_management;(folders?|director(y|ies))(\smanagement)?
+1559;content_management,ux,editor;search(-and-replace)?|find and|finding,(code )?edit(or|ing)(\scode)?,(u|i)ndo
+1562;hosting,collab,editor;collaborat(e|ion),key(board|\s?bindings?)|short-?cuts?|hotkeys?,cloud
+1564;editor;(code )?edit(or|ing)(\scode)?
+1565;;
+1568;performance;slow(er)?
+1573;development,ux;workspace|ides?($|\W),hide
+1575;ux,hosting,version_control;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,muddle|messy|clutter|clunky,(version|source) (control|management|tracking|history|notebooks)
+1583;development,hosting;deploy(ing)?,portability|hard to port|port analysis
+1587;ux,language;web based|browser,python
+1590;hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up
+1594;;
+1595;content_management;search(-and-replace)?|find and|finding
+1598;editor;key(board|\s?bindings?)|short-?cuts?|hotkeys?,vim?($|\W)|sublime|atom|emacs
+1600;hosting,versions;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,dependencies|package (updates|management),jupyter\s?hub
+1601;ux;muddle|messy|clutter|clunky
+1603;hosting,version_control;native,(version|source) (control|management|tracking|history|notebooks)
+1604;ux,hosting;(wasted|screen) space|bloated ui|too much whitespace|margins|width,web based|browser,install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up
+1606;versions;versionn?ing
+1609;development;code re-?use,workspace|ides?($|\W)
+1611;development,ux,dissemination;debug(ger|ging)?(\stools)?,web based|browser,nbconvert
+1622;dissemination,language;R($|\W),python,interactive (widgets|plots)
+1626;hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up
+1630;development,ux;look at all variables,variables,right-click
+1635;;
+1639;editor;vim?($|\W)|sublime|atom|emacs
+1644;dissemination;shar(e|ing)
+1645;development;debug(ger|ging)?(\stools)?,profiling
+1647;ux;scroll(\s)?bar|scroll(ing)?
+1650;ux,content_management;(wasted|screen) space|bloated ui|too much whitespace|margins|width,(long|large) notebooks?
+1657;documentation,editor;doc(s|umentation)?($|\W),(code )?edit(or|ing)(\scode)?
+1661;ux,development,file_format;muddle|messy|clutter|clunky,web based|browser,workspace|ides?($|\W),(json|\.py|ipynb) files,.ipynb
+1662;hosting;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up
+1667;dissemination;distribution
+1668;language;python
+1677;dissemination;export(ing)?
+1681;;
+1683;development,dissemination,collab;diff(s|ing)?($|\W),collaborat(e|ion),document conversion,export(ing)?
+1686;ux;scroll(\s)?bar|scroll(ing)?
+1690;editor;(code )?edit(or|ing)(\scode)?
+1693;ux,development;(manipulating|mov(e|ing)|copy(ing)?) cells|rearranging,code structure
+1695;version_control;(version|source) (control|management|tracking|history|notebooks)
+1700;development,ux,version_control;code re-?use,(version|source) (control|management|tracking|history|notebooks),copy(-|&|\sand\s|\/)paste|c&p|and paste
+1702;hosting,ux;install(ation)?|(spun\s|setting\s|standing\s|(start|set)(\s|-)?)up,muddle|messy|clutter|clunky,web based|browser
+1705;;

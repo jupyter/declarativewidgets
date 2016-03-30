@@ -1,0 +1,581 @@
+;pleasant_aspects_themes;pleasant_aspects_keywords
+1;visualization,ux;keyboard|hotkeys?|short-?cuts?|keybindings?,(ipy)?widgets
+5;language,integrated_content;rich (content|output)|figures?|pictures?|images?|media,all(\s|-)in(\s|-)one|one place,notes|comments,i?python
+6;visualization,dissemination,ecosystem,integrated_content,ux;github,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),plot(ting)?,(ipy)?widgets,combine|(text|code) (and|with)|and (code|text)
+7;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+9;hosting,language,persistence,ux;i?python,web|browser|http,state,docker
+10;ux,integrated_content;rich (content|output)|figures?|pictures?|images?|media,intuitive
+11;interactivity;cells?
+15;dissemination,ux;ux|interface|g?ui($|\W),presentations?
+19;visualization,language,ecosystem,integrated_content;visual|eye candy,embedded,standard,languages?,github
+21;ux,integrated_content;ux|interface|g?ui($|\W),mark(up|down)|HTML
+22;interactivity,ux;modal,workflow,cells?
+23;visualization,hosting,ux;plot(ting)?,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,setup
+26;interactivity,ux;flexib(le|ility),simpl(e|icity)|clean,completion
+28;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media,iterat(e|ion)
+29;visualization,ux;intuitive,graph(s|ic|ing)
+31;hosting,visualization,dissemination,ux;visual|eye candy,simpl(e|icity)|clean,presentations?,portability
+33;integrated_content;rich (content|output)|figures?|pictures?|images?|media,in-?line
+34;ecosystem,ux;web|browser|http,librar(y|ies)
+35;dissemination,integrated_content;litera(te|cy) programming,presentations?,shar(e|ing),combine|(text|code) (and|with)|and (code|text)
+37;interactivity,visualization,language,integrated_content,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,graph(s|ic|ing),languages?,cells?,in-?line
+39;hosting,visualization,ecosystem,ux;platform,community|ecosystem|open source,visual|eye candy,web|browser|http
+40;interactivity,visualization,integrated_content,ux;graph(s|ic|ing),run,in-?line,help,cells?,mark(up|down)|HTML
+42;ux;ux|interface|g?ui($|\W),help
+46;interactivity,persistence,integrated_content;repl,persist(ence|ent)?,combine|(text|code) (and|with)|and (code|text)
+48;hosting,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,install
+49;ecosystem;rpy2,ggplot2?
+51;integrated_content,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,integrated?
+52;hosting,integrated_content,ux;remote,web|browser|http,combine|(text|code) (and|with)|and (code|text)
+53;ux,integrated_content;all(\s|-)in(\s|-)one|one place,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+54;interactivity,visualization,integrated_content,ux;rich (content|output)|figures?|pictures?|images?|media,embedded,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,(ipy)?widgets
+55;ecosystem;librar(y|ies)
+56;visualization,interactivity,integrated_content,ux;doc(s|umentation)?($|\W),navigation,in-?line,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,cells?,mark(up|down)|HTML,plot(ting)?,combine|(text|code) (and|with)|and (code|text)
+59;visualization,dissemination,persistence,integrated_content;graph(s|ic|ing),snapshot,in-?line,render
+61;visualization,dissemination,integrated_content;rich (content|output)|figures?|pictures?|images?|media,visual|eye candy,shar(e|ing),vi(s|z)ualization,combine|(text|code) (and|with)|and (code|text)
+63;dissemination,extensible,ux;custom,shar(e|ing),looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+68;dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,nbviewer
+77;integrated_content;rich (content|output)|figures?|pictures?|images?|media,in-?line
+78;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,flexib(le|ility)
+81;interactivity;workflow
+85;dissemination,cost,ux;free,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing)
+86;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+87;interactivity,integrated_content;rich (content|output)|figures?|pictures?|images?|media,cells?,in-?line
+92;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media
+93;interactivity,visualization;plot(ting)?,explor(e|atory)|experiment|sandbox|prototype
+94;interactivity,ux;ux|interface|g?ui($|\W),web|browser|http,cells?
+95;persistence;history
+96;hosting,interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,portability
+97;dissemination,integrated_content;convert,shar(e|ing),mark(up|down)|HTML
+98;hosting,ecosystem,ux;matplotlib,pandas,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,setup
+99;interactivity,visualization,persistence,integrated_content;vi(s|z)ualization,visual|eye candy,run,state,mark(up|down)|HTML
+101;hosting,visualization;visual|eye candy,remote,vi(s|z)ualization,server
+102;interactivity,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,run,cells?,completion
+103;hosting,integrated_content,ux;server,doc(s|umentation)?($|\W),ux|interface|g?ui($|\W),web|browser|http,combine|(text|code) (and|with)|and (code|text)
+104;visualization;graph(s|ic|ing)
+105;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,all(\s|-)in(\s|-)one|one place,mark(up|down)|HTML,combine|(text|code) (and|with)|and (code|text)
+107;ux,extensible;simpl(e|icity)|clean,kernels|backends|kernel support
+109;interactivity,visualization,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,notes|comments,graph(s|ic|ing)
+110;interactivity,visualization,ecosystem,integrated_content;github,graph(s|ic|ing),cells?,in-?line
+117;visualization,ux;visual|eye candy,simpl(e|icity)|clean
+118;dissemination,ux;doc(s|umentation)?($|\W),collaborat(e|ion|ive|ors),eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+119;visualization;plot(ting)?
+120;integrated_content;notes|comments,integrated?,combine|(text|code) (and|with)|and (code|text)
+126;dissemination,integrated_content,ux;render,keyboard|hotkeys?|short-?cuts?|keybindings?,in-?line,mark(up|down)|HTML
+128;hosting,ux;ux|interface|g?ui($|\W),portability
+129;ecosystem;matplotlib
+131;interactivity,visualization,integrated_content;plot(ting)?,cells?,in-?line
+135;interactivity,ux,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,responsive,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,run,combine|(text|code) (and|with)|and (code|text)
+138;dissemination;teaching
+139;interactivity,hosting,ux;run,web|browser|http,remote
+141;;
+145;ux;simpl(e|icity)|clean,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+146;language,ecosystem,ux;magics?,keyboard|hotkeys?|short-?cuts?|keybindings?,languages?
+148;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,editor
+150;dissemination,integrated_content;contained,repeatable
+151;visualization,integrated_content,ux;plot(ting)?,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,combine|(text|code) (and|with)|and (code|text)
+152;language,ecosystem,integrated_content;tool(ing)?,i?python,litera(te|cy) programming,mark(up|down)|HTML,bash
+153;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+154;interactivity,dissemination,integrated_content;run,presentations?,latex,combine|(text|code) (and|with)|and (code|text)
+155;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+157;ecosystem,ux,integrated_content;matplotlib,ux|interface|g?ui($|\W),web|browser|http,in-?line
+159;interactivity,visualization,ux,integrated_content;graph(s|ic|ing),visual|eye candy,vi(s|z)ualization,in-?line,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,cells?,mark(up|down)|HTML
+160;dissemination,interactivity,ecosystem,visualization,persistence;visual|eye candy,vi(s|z)ualization,github,render,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,(auto)?sav(e|ing),(ipy)?widgets
+163;dissemination,persistence;shar(e|ing),persist(ence|ent)?
+165;integrated_content,extensible,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,notes|comments,expanding
+167;interactivity,language,hosting,ux;portability,web|browser|http,i?python,cells?
+176;interactivity,dissemination,integrated_content;pdf,latex,cells?,mark(up|down)|HTML
+179;interactivity;iterative|feedback|dynamic
+184;hosting,ecosystem;setup,librar(y|ies)
+186;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+198;ux;completion
+201;interactivity;cells?
+204;ux;ux|interface|g?ui($|\W)
+210;hosting,ecosystem,ux;looks (nice|great)|appealing|beautiful|pretty|elegant|appearance,web|browser|http,intuitive,github,docker
+211;persistence,ux;(auto)?sav(e|ing),ux|interface|g?ui($|\W),simpl(e|icity)|clean
+216;interactivity,dissemination;pdf,export,cells?
+219;interactivity,persistence;persist(ence|ent)?,repl
+220;language,ux;web|browser|http,editor,i?python
+221;;
+227;interactivity,ecosystem;pandas,explor(e|atory)|experiment|sandbox|prototype,librar(y|ies)
+229;interactivity,visualization,dissemination;visual|eye candy,shar(e|ing),repl
+231;language,ux,integrated_content;ux|interface|g?ui($|\W),notes|comments,i?python,integrated?
+232;integrated_content;mark(up|down)|HTML
+235;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+237;visualization,dissemination,ecosystem,ux,integrated_content;simpl(e|icity)|clean,in-?line,github,ux|interface|g?ui($|\W),mark(up|down)|HTML,render,plot(ting)?,latex
+238;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,keyboard|hotkeys?|short-?cuts?|keybindings?
+239;ux,integrated_content;ux|interface|g?ui($|\W),mark(up|down)|HTML
+243;dissemination,integrated_content,ux;rich (content|output)|figures?|pictures?|images?|media,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),simpl(e|icity)|clean,in-?line
+246;ecosystem,ux,integrated_content;matplotlib,web|browser|http,combine|(text|code) (and|with)|and (code|text)
+248;dissemination,ux;slides?,web|browser|http
+249;visualization,integrated_content;plot(ting)?,in-?line
+250;dissemination,hosting,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,reproducibility,install
+252;visualization,integrated_content;graph(s|ic|ing),integrated?
+254;persistence,ux,integrated_content;rich (content|output)|figures?|pictures?|images?|media,ux|interface|g?ui($|\W),simpl(e|icity)|clean,persist(ence|ent)?
+258;dissemination,ux;intuitive,shar(e|ing)
+259;visualization,integrated_content,extensible;visual|eye candy,custom,integrated?,vi(s|z)ualization,latex
+261;dissemination,integrated_content;pdf,mark(up|down)|HTML
+262;ux;ux|interface|g?ui($|\W),simpl(e|icity)|clean
+263;dissemination,integrated_content,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),export,mark(up|down)|HTML,combine|(text|code) (and|with)|and (code|text)
+264;visualization,integrated_content,ux;visual|eye candy,ux|interface|g?ui($|\W),in-?line,vi(s|z)ualization
+267;dissemination,ecosystem,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),nbgrader
+268;visualization,ecosystem,ux,integrated_content;matplotlib,plot(ting)?,keyboard|hotkeys?|short-?cuts?|keybindings?,mark(up|down)|HTML
+270;integrated_content;rich (content|output)|figures?|pictures?|images?|media,latex
+271;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media,run
+275;interactivity,integrated_content;workflow,combine|(text|code) (and|with)|and (code|text)
+277;dissemination,integrated_content;mark(up|down)|HTML,rich (content|output)|figures?|pictures?|images?|media,nbconvert,in-?line,mathjax
+278;language,ux;web|browser|http,i?python
+279;visualization,integrated_content;plot(ting)?,in-?line
+282;integrated_content;litera(te|cy) programming,latex
+284;interactivity,visualization,ecosystem,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,plot(ting)?,pandas,in-?line,mark(up|down)|HTML
+286;dissemination,integrated_content;rich (content|output)|figures?|pictures?|images?|media,in-?line,shar(e|ing),nbconvert,collaborat(e|ion|ive|ors)
+290;;
+293;visualization,ux,integrated_content;doc(s|umentation)?($|\W),graph(s|ic|ing),integrated?
+295;visualization,integrated_content;graph(s|ic|ing),in-?line
+298;dissemination;shar(e|ing)
+300;dissemination,integrated_content;rich (content|output)|figures?|pictures?|images?|media,shar(e|ing),nbviewer
+305;hosting,ux,integrated_content;remote,web|browser|http,mark(up|down)|HTML
+309;integrated_content;mark(up|down)|HTML
+310;interactivity,ecosystem,ux;cells?,magics?,completion,tool(ing)?
+311;visualization,ecosystem;visual|eye candy,magics?
+312;interactivity,visualization,language,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,languages?,in-?line,(ipy)?widgets
+314;interactivity;explor(e|atory)|experiment|sandbox|prototype
+316;ux;aesthetic(s|ally),completion
+323;interactivity,persistence;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,persist(ence|ent)?
+324;;
+330;dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,presentations?
+332;interactivity,visualization,integrated_content,ux;completion,plot(ting)?,cells?,in-?line
+333;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+334;stability,ux;simpl(e|icity)|clean,robust
+336;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+338;hosting,integrated_content,extensible;rich (content|output)|figures?|pictures?|images?|media,remote,kernels|backends|kernel support,latex
+340;interactivity;flexib(le|ility),cells?
+341;interactivity,language,integrated_content,ux;i?python,web|browser|http,cells?,mark(up|down)|HTML
+342;language;i?python
+344;integrated_content;rich (content|output)|figures?|pictures?|images?|media
+345;ux;ux|interface|g?ui($|\W),simpl(e|icity)|clean
+346;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+348;interactivity,dissemination;reproducibility,iterative|feedback|dynamic
+350;ux;keyboard|hotkeys?|short-?cuts?|keybindings?,help
+352;visualization,interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,graph(s|ic|ing),in-?line
+353;hosting,visualization,ux;plot(ting)?,setup,simpl(e|icity)|clean
+355;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,ux|interface|g?ui($|\W),simpl(e|icity)|clean
+356;interactivity,language;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,languages?
+358;;
+366;language,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,languages?
+370;visualization,integrated_content,ux;graph(s|ic|ing),simpl(e|icity)|clean,contained,mark(up|down)|HTML,latex,combine|(text|code) (and|with)|and (code|text)
+374;interactivity,visualization,integrated_content;cells?,mark(up|down)|HTML,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,plot(ting)?,latex,combine|(text|code) (and|with)|and (code|text)
+377;integrated_content;mark(up|down)|HTML
+384;interactivity,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,cells?
+385;hosting,ux;setup,ux|interface|g?ui($|\W),simpl(e|icity)|clean
+389;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+393;interactivity;explor(e|atory)|experiment|sandbox|prototype
+394;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,simpl(e|icity)|clean,design
+396;integrated_content;rich (content|output)|figures?|pictures?|images?|media,in-?line
+398;visualization,integrated_content,ux;plot(ting)?,doc(s|umentation)?($|\W),latex,mark(up|down)|HTML
+399;ux;ux|interface|g?ui($|\W),looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+400;organization,hosting,interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,platform,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,folder structure,install
+402;hosting,integrated_content,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,mark(up|down)|HTML,install
+403;interactivity,language,dissemination,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),i?python
+406;dissemination;tell a story
+408;interactivity,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,iterat(e|ion),looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+411;interactivity,language,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,web|browser|http,simpl(e|icity)|clean,i?python,design
+412;visualization,integrated_content;graph(s|ic|ing),in-?line,mark(up|down)|HTML
+413;integrated_content;rich (content|output)|figures?|pictures?|images?|media
+414;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+418;interactivity,ux;simpl(e|icity)|clean,flexib(le|ility)
+421;visualization,ux;visual|eye candy,simpl(e|icity)|clean,graph(s|ic|ing)
+425;interactivity,visualization;visual|eye candy,iterative|feedback|dynamic
+428;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+431;hosting,interactivity;run,server
+433;ux;pleasure to use
+434;visualization;plot(ting)?
+437;integrated_content,ux;rich (content|output)|figures?|pictures?|images?|media,doc(s|umentation)?($|\W),integrated?
+439;dissemination,cost,integrated_content,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,cost,integrated?,shar(e|ing)
+441;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+445;integrated_content,ux;rich (content|output)|figures?|pictures?|images?|media,eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+450;interactivity;run,cells?
+453;visualization,integrated_content;plot(ting)?,combine|(text|code) (and|with)|and (code|text)
+458;interactivity,dissemination,persistence,integrated_content;(auto)?sav(e|ing),workflow,shar(e|ing),mark(up|down)|HTML
+460;integrated_content;rich (content|output)|figures?|pictures?|images?|media,in-?line
+462;;
+463;dissemination,hosting,ux;platform,keyboard|hotkeys?|short-?cuts?|keybindings?,shar(e|ing),nbviewer
+471;integrated_content;rich (content|output)|figures?|pictures?|images?|media
+472;visualization,integrated_content,ux;doc(s|umentation)?($|\W),all(\s|-)in(\s|-)one|one place,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,mark(up|down)|HTML,plot(ting)?,combine|(text|code) (and|with)|and (code|text)
+473;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+474;hosting,integrated_content;rich (content|output)|figures?|pictures?|images?|media,portability
+475;hosting,ux;platform,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,doc(s|umentation)?($|\W)
+480;hosting,language,integrated_content;portability,i?python,mathjax
+482;hosting;install
+483;interactivity,visualization,integrated_content,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,doc(s|umentation)?($|\W),latex,mark(up|down)|HTML,(ipy)?widgets
+486;visualization;visual|eye candy,vi(s|z)ualization
+487;ecosystem;pandas
+488;ux;keyboard|hotkeys?|short-?cuts?|keybindings?
+491;dissemination,language,integrated_content;languages?,mark(up|down)|HTML,export
+492;ecosystem,persistence,ux;matplotlib,magics?,(auto)?sav(e|ing),ux|interface|g?ui($|\W),simpl(e|icity)|clean
+495;language;i?python
+496;interactivity,ux,integrated_content;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,run,mark(up|down)|HTML
+498;;
+499;visualization,ux;plot(ting)?,eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+500;language,integrated_content;latex,mark(up|down)|HTML,i?python
+504;hosting,interactivity,extensible;cloud,workflow,exten(d|sible|sions)
+505;interactivity,dissemination;collaborat(e|ion|ive|ors),iterative|feedback|dynamic,cells?
+509;stability,ux;web|browser|http,stable
+515;ecosystem,integrated_content;community|ecosystem|open source,integrated?,tool(ing)?
+517;hosting,ecosystem;community|ecosystem|open source,cloud
+519;interactivity;cells?
+525;visualization,language,dissemination,ux;visual|eye candy,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),vi(s|z)ualization,i?python
+534;hosting,ecosystem;community|ecosystem|open source,install
+535;visualization,persistence,integrated_content;plot(ting)?,permanent record,in-?line
+536;interactivity;cells?
+541;interactivity,integrated_content,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media,completion
+542;integrated_content;rich (content|output)|figures?|pictures?|images?|media,latex
+549;dissemination,ux;web|browser|http,shar(e|ing)
+551;interactivity;cell execution,cells?
+556;dissemination,ecosystem,ux;teaching,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,tool(ing)?
+559;visualization,interactivity,language,ux;i?python,visual|eye candy,cells?,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+561;visualization,ux;plot(ting)?,ux|interface|g?ui($|\W),web|browser|http,completion
+575;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,doc(s|umentation)?($|\W),simpl(e|icity)|clean
+576;dissemination,language,ecosystem,integrated_content;bash,export,github,pdf,mark(up|down)|HTML,i?python,combine|(text|code) (and|with)|and (code|text)
+578;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+579;language,ux;ux|interface|g?ui($|\W),web|browser|http,languages?
+584;dissemination,ux;keyboard|hotkeys?|short-?cuts?|keybindings?,shar(e|ing)
+587;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media
+592;interactivity,visualization,ux,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,responsive,rich (content|output)|figures?|pictures?|images?|media,plot(ting)?
+594;dissemination,ecosystem,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,others,shar(e|ing),github
+595;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+600;interactivity,ux,integrated_content;run,keyboard|hotkeys?|short-?cuts?|keybindings?,mark(up|down)|HTML,cells?
+605;visualization;visual|eye candy,vi(s|z)ualization
+606;interactivity,ux,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,iterative|feedback|dynamic,ux|interface|g?ui($|\W),mark(up|down)|HTML
+607;ux;looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+612;dissemination,ux,integrated_content;links,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,ux|interface|g?ui($|\W),web|browser|http,export
+616;interactivity,visualization,language,integrated_content;bash,visual|eye candy,vi(s|z)ualization,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,integrated?,i?python
+620;dissemination,persistence;(auto)?sav(e|ing),nbviewer
+623;dissemination,ecosystem,integrated_content;matplotlib,nbconvert,in-?line,mark(up|down)|HTML
+627;interactivity,persistence,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media,state
+630;visualization,interactivity,integrated_content;vi(s|z)ualization,visual|eye candy,cells?,in-?line,combine|(text|code) (and|with)|and (code|text)
+643;hosting,extensible,interactivity,ecosystem,ux,language;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,remote,kernels|backends|kernel support,cells?,matplotlib,i?python
+646;ux,integrated_content;modal,keyboard|hotkeys?|short-?cuts?|keybindings?,latex,completion,mark(up|down)|HTML
+654;interactivity,language,ecosystem,ux;magics?,keyboard|hotkeys?|short-?cuts?|keybindings?,languages?,cells?
+661;ux;keyboard|hotkeys?|short-?cuts?|keybindings?
+662;ux;web|browser|http
+663;hosting,extensible;centralized,plugin
+664;hosting,interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,remote,simpl(e|icity)|clean
+666;organization,language;i?python,organiz(e|ation)
+667;dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,others,shar(e|ing)
+668;dissemination,visualization,ux,integrated_content;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,web|browser|http,export,in-?line,graph(s|ic|ing)
+669;visualization,integrated_content;graph(s|ic|ing),in-?line
+671;interactivity,ecosystem,integrated_content;matplotlib,magics?,cells?,in-?line
+677;interactivity,visualization,ecosystem;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,community|ecosystem|open source,graph(s|ic|ing),librar(y|ies),explor(e|atory)|experiment|sandbox|prototype
+681;hosting,integrated_content,extensible,dissemination,interactivity,ux,visualization;visual|eye candy,web|browser|http,vi(s|z)ualization,remote,shar(e|ing),cells?,modular,combine|(text|code) (and|with)|and (code|text)
+682;cost;cheaper
+689;ecosystem,ux;matplotlib,pandas,doc(s|umentation)?($|\W)
+700;organization,ux;aesthetic(s|ally),organiz(e|ation)
+706;language,ecosystem;i?python,sqlalchemy
+711;dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,others,web|browser|http
+712;visualization,integrated_content;embedded,(ipy)?widgets
+716;language,integrated_content;i?python,combine|(text|code) (and|with)|and (code|text)
+718;interactivity,visualization,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,plot(ting)?,in-?line,combine|(text|code) (and|with)|and (code|text)
+729;stability;full featured,mature
+731;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media
+738;visualization,hosting,integrated_content;visual|eye candy,remote,integrated?,vi(s|z)ualization
+740;ecosystem,integrated_content;matplotlib,embedded
+741;interactivity,persistence,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media,iterative|feedback|dynamic,persist(ence|ent)?
+742;interactivity,integrated_content,ux;doc(s|umentation)?($|\W),ux|interface|g?ui($|\W),cells?,in-?line
+749;visualization,persistence,integrated_content;visual|eye candy,persist(ence|ent)?,vi(s|z)ualization,combine|(text|code) (and|with)|and (code|text)
+750;dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,collaborat(e|ion|ive|ors)
+753;hosting,interactivity;aws,explor(e|atory)|experiment|sandbox|prototype
+755;ecosystem;pandas
+757;interactivity,dissemination,ux,integrated_content;doc(s|umentation)?($|\W),simpl(e|icity)|clean,run,export,cells?,mark(up|down)|HTML
+759;interactivity,dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,web|browser|http,shar(e|ing),cells?
+763;ecosystem,extensible;matplotlib,modular
+764;interactivity,dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,iterative|feedback|dynamic,shar(e|ing)
+765;visualization,integrated_content;plot(ting)?,litera(te|cy) programming,visual|eye candy,in-?line
+766;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,iterat(e|ion),mark(up|down)|HTML,combine|(text|code) (and|with)|and (code|text)
+771;dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,team,shar(e|ing)
+773;visualization,integrated_content,ux;plot(ting)?,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,integrated?
+780;visualization,persistence;plot(ting)?,(auto)?sav(e|ing),state
+781;ux;design
+785;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+786;visualization,interactivity,dissemination,integrated_content;combine|(text|code) (and|with)|and (code|text),run,shar(e|ing),in-?line,(ipy)?widgets
+804;integrated_content;rich (content|output)|figures?|pictures?|images?|media,in-?line
+806;extensible,ux;doc(s|umentation)?($|\W),modular
+808;visualization,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,web|browser|http,(display|see) (data|charts?|plots?)
+814;interactivity,ux;run,web|browser|http,keyboard|hotkeys?|short-?cuts?|keybindings?,cells?
+815;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+816;visualization,interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,plot(ting)?,eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+821;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+823;dissemination,hosting,ux;aesthetic(s|ally),hosting,export
+824;integrated_content;in-?line
+828;dissemination,ux,integrated_content;integrated?,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,export,in-?line,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+829;persistence;state
+830;hosting,ecosystem;platform,community|ecosystem|open source,on-?line
+835;extensible,dissemination,ecosystem,ux,visualization,language;doc(s|umentation)?($|\W),visual|eye candy,others,github,vi(s|z)ualization,kernels|backends|kernel support,shar(e|ing),nbviewer,i?python
+837;dissemination,ecosystem;shar(e|ing),github
+838;visualization,dissemination,ecosystem,ux;simpl(e|icity)|clean,visual|eye candy,magics?,vi(s|z)ualization,tool(ing)?,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing)
+845;interactivity;run,cells?
+846;interactivity,ecosystem;matplotlib,repl
+849;ux;web|browser|http
+859;dissemination,ux,integrated_content;doc(s|umentation)?($|\W),others,in-?line,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),render,keyboard|hotkeys?|short-?cuts?|keybindings?
+863;dissemination,ux;web|browser|http,shar(e|ing)
+869;ux;web|browser|http
+877;visualization,ecosystem,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,graph(s|ic|ing),tool(ing)?
+881;language,ux;web|browser|http,i?python
+884;;
+887;ux;ux|interface|g?ui($|\W)
+889;;
+892;integrated_content;rich (content|output)|figures?|pictures?|images?|media,notes|comments
+894;interactivity,stability,ux;ux|interface|g?ui($|\W),simpl(e|icity)|clean,reliability,cells?
+897;integrated_content;litera(te|cy) programming
+898;;
+905;visualization,integrated_content;plot(ting)?,in-?line,combine|(text|code) (and|with)|and (code|text)
+906;visualization,language,dissemination,integrated_content,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,graph(s|ic|ing),languages?,integrated?,shar(e|ing)
+915;dissemination,language,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,presentations?,i?python
+916;ecosystem;community|ecosystem|open source
+918;visualization,integrated_content;visual|eye candy,integrated?
+919;hosting,ux;web|browser|http,install
+922;interactivity,visualization;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,plot(ting)?,iterative|feedback|dynamic
+926;interactivity,ecosystem;pandas,cells?
+933;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,iterative|feedback|dynamic
+938;language,ecosystem,ux,extensible;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,community|ecosystem|open source,ux|interface|g?ui($|\W),languages?,exten(d|sible|sions)
+940;interactivity,integrated_content,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,editor,mark(up|down)|HTML
+948;visualization,language;graph(s|ic|ing),i?python
+951;dissemination,ecosystem,integrated_content,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),mark(up|down)|HTML,github
+960;interactivity,integrated_content;notes|comments,repl,mark(up|down)|HTML,combine|(text|code) (and|with)|and (code|text)
+966;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+969;interactivity,ecosystem;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,pandas,matplotlib
+971;ux,integrated_content;web|browser|http,in-?line
+972;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+974;language,extensible,ux;custom,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,i?python
+979;integrated_content;rich (content|output)|figures?|pictures?|images?|media,combine|(text|code) (and|with)|and (code|text)
+980;visualization,dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,graph(s|ic|ing),shar(e|ing)
+987;visualization,ecosystem,integrated_content;plot(ting)?,bokeh,in-?line
+996;hosting;portability
+998;visualization,hosting,ux,integrated_content;platform,doc(s|umentation)?($|\W),visual|eye candy,web|browser|http,vi(s|z)ualization,integrated?,combine|(text|code) (and|with)|and (code|text)
+1000;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,iterative|feedback|dynamic,in-?line
+1002;interactivity,ux,integrated_content;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,web|browser|http,cells?,in-?line
+1005;ux;web|browser|http
+1016;dissemination,interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,collaborat(e|ion|ive|ors),completion
+1018;interactivity,integrated_content,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,run,all(\s|-)in(\s|-)one|one place
+1020;visualization,ux;visual|eye candy,eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+1022;dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing)
+1024;persistence,integrated_content;(auto)?sav(e|ing),rich (content|output)|figures?|pictures?|images?|media
+1029;visualization;plot(ting)?
+1031;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,intuitive
+1032;visualization,persistence,ux,integrated_content;visual|eye candy,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,(auto)?sav(e|ing),in-?line,vi(s|z)ualization
+1035;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,keyboard|hotkeys?|short-?cuts?|keybindings?,simpl(e|icity)|clean
+1042;ux,integrated_content;help,keyboard|hotkeys?|short-?cuts?|keybindings?,completion,in-?line
+1047;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+1048;visualization,interactivity,integrated_content,ux;explor(e|atory)|experiment|sandbox|prototype,in-?line,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,ux|interface|g?ui($|\W),interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,plot(ting)?,combine|(text|code) (and|with)|and (code|text)
+1050;visualization,integrated_content,ux;plot(ting)?,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,combine|(text|code) (and|with)|and (code|text)
+1053;hosting,interactivity,dissemination,ux,integrated_content;run,web|browser|http,in-?line,remote,shar(e|ing),server
+1054;interactivity,dissemination;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,render
+1064;;
+1065;interactivity;repl
+1066;ecosystem,persistence,integrated_content;matplotlib,(auto)?sav(e|ing),in-?line
+1074;interactivity;cells?
+1076;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+1083;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,iterative|feedback|dynamic
+1087;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1090;interactivity,ecosystem,integrated_content;integrated?,cells?,tool(ing)?
+1092;interactivity,visualization;visual|eye candy,iterative|feedback|dynamic
+1093;ux;web|browser|http
+1095;visualization,interactivity,integrated_content,ux;doc(s|umentation)?($|\W),visual|eye candy,in-?line,vi(s|z)ualization,mark(up|down)|HTML,cells?
+1104;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+1106;interactivity,integrated_content,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media,ux|interface|g?ui($|\W)
+1107;interactivity,visualization;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,graph(s|ic|ing)
+1112;cost;license
+1116;ux;looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+1122;dissemination,integrated_content;convert,mark(up|down)|HTML
+1124;ux;web|browser|http
+1125;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1129;hosting,integrated_content,dissemination,ecosystem,ux,visualization;contained,tool(ing)?,in-?line,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),install,plot(ting)?
+1133;dissemination;others
+1135;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media
+1139;integrated_content;mark(up|down)|HTML,combine|(text|code) (and|with)|and (code|text)
+1145;;
+1151;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+1157;visualization;plot(ting)?
+1159;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,iterative|feedback|dynamic
+1161;interactivity,ecosystem,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,tool(ing)?,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+1162;visualization,ux,integrated_content;visual|eye candy,simpl(e|icity)|clean,mark(up|down)|HTML,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+1163;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1169;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+1172;ecosystem;magics?
+1178;interactivity,integrated_content,ux;doc(s|umentation)?($|\W),rich (content|output)|figures?|pictures?|images?|media,litera(te|cy) programming,run,iterative|feedback|dynamic,in-?line,mark(up|down)|HTML,cells?,integrated?
+1183;hosting,ux;web|browser|http,server
+1184;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1192;integrated_content,ux;doc(s|umentation)?($|\W),in-?line,mark(up|down)|HTML
+1200;dissemination,persistence,ux;responsive,(auto)?sav(e|ing),others,shar(e|ing)
+1204;ux;ux|interface|g?ui($|\W),simpl(e|icity)|clean
+1212;interactivity,hosting,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,cells?,install
+1220;visualization,integrated_content;graph(s|ic|ing),mark(up|down)|HTML,combine|(text|code) (and|with)|and (code|text)
+1221;visualization,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,graph(s|ic|ing)
+1226;interactivity,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,run,simpl(e|icity)|clean
+1230;hosting,interactivity,persistence,visualization,integrated_content;rich (content|output)|figures?|pictures?|images?|media,litera(te|cy) programming,iterative|feedback|dynamic,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,(auto)?sav(e|ing),plot(ting)?,server
+1233;dissemination,ux,integrated_content;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,simpl(e|icity)|clean,shar(e|ing),mark(up|down)|HTML
+1234;visualization;visual|eye candy,vi(s|z)ualization
+1236;interactivity;cells?
+1239;visualization,hosting,interactivity,integrated_content,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,plot(ting)?,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,remote,in-?line
+1241;;
+1243;interactivity,integrated_content;rich (content|output)|figures?|pictures?|images?|media,latex,cells?
+1249;dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,web|browser|http,shar(e|ing)
+1253;;
+1254;ux;modal,keyboard|hotkeys?|short-?cuts?|keybindings?
+1257;hosting,interactivity,integrated_content,ux;aesthetic(s|ally),run,mark(up|down)|HTML,server
+1258;ecosystem;matplotlib
+1264;interactivity,visualization,integrated_content;rich (content|output)|figures?|pictures?|images?|media,cells?,(ipy)?widgets
+1267;persistence,integrated_content;(auto)?sav(e|ing),mark(up|down)|HTML
+1272;integrated_content,ux;doc(s|umentation)?($|\W),all(\s|-)in(\s|-)one|one place
+1274;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+1277;dissemination,integrated_content,ux;pdf,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,render,mark(up|down)|HTML
+1285;visualization;visual|eye candy
+1287;dissemination,interactivity,integrated_content,ux;looks (nice|great)|appealing|beautiful|pretty|elegant|appearance,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,presentations?,mark(up|down)|HTML,combine|(text|code) (and|with)|and (code|text)
+1291;hosting,visualization,ecosystem,ux;platform,community|ecosystem|open source,visual|eye candy,web|browser|http,vi(s|z)ualization
+1296;interactivity,language;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,i?python
+1297;interactivity,visualization,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,iterative|feedback|dynamic,graph(s|ic|ing),in-?line
+1306;interactivity,visualization;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,visual|eye candy,vi(s|z)ualization
+1308;interactivity,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,run
+1314;visualization,ecosystem,integrated_content;pandas,visual|eye candy,embedded,vi(s|z)ualization,mark(up|down)|HTML
+1323;language,persistence;history,i?python
+1324;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1325;interactivity,language,ecosystem,extensible;community|ecosystem|open source,kernels|backends|kernel support,repl,i?python
+1332;hosting,interactivity,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,setup,workflow
+1333;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,iterative|feedback|dynamic,cells?,combine|(text|code) (and|with)|and (code|text)
+1334;dissemination,integrated_content;teaching,latex
+1335;visualization,integrated_content;graph(s|ic|ing),combine|(text|code) (and|with)|and (code|text)
+1342;interactivity,visualization,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,visual|eye candy,vi(s|z)ualization,help
+1343;interactivity,visualization,ecosystem,dissemination,integrated_content;reproducibility,rich (content|output)|figures?|pictures?|images?|media,visual|eye candy,community|ecosystem|open source,vi(s|z)ualization,tool(ing)?,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1346;hosting,language,integrated_content;aws,languages?,mark(up|down)|HTML
+1347;integrated_content;notes|comments
+1350;dissemination,ux;teaching,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,web|browser|http,shar(e|ing)
+1354;dissemination,persistence;shar(e|ing),log
+1355;ux;keyboard|hotkeys?|short-?cuts?|keybindings?
+1356;interactivity;iterative|feedback|dynamic
+1359;integrated_content;combine|(text|code) (and|with)|and (code|text)
+1363;interactivity,hosting,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,cells?,deployment
+1364;visualization,interactivity,integrated_content;run,graph(s|ic|ing),in-?line
+1366;hosting;remote
+1368;visualization;(display|see) (data|charts?|plots?)
+1370;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,iterative|feedback|dynamic
+1372;visualization,dissemination;visual|eye candy,teaching
+1375;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,ux|interface|g?ui($|\W),explor(e|atory)|experiment|sandbox|prototype
+1378;interactivity,visualization,ecosystem,language,ux;visual|eye candy,community|ecosystem|open source,vi(s|z)ualization,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,i?python
+1380;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1381;visualization,dissemination,integrated_content,ux;visual|eye candy,others,in-?line,vi(s|z)ualization,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),(ipy)?widgets
+1382;integrated_content;all(\s|-)in(\s|-)one|one place
+1383;dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,others,shar(e|ing)
+1384;hosting,ecosystem,ux;matplotlib,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,setup,ux|interface|g?ui($|\W),bokeh
+1389;ux;web|browser|http
+1390;visualization,ecosystem,integrated_content,ux;graph(s|ic|ing),rich (content|output)|figures?|pictures?|images?|media,ux|interface|g?ui($|\W),matplotlib,bokeh,combine|(text|code) (and|with)|and (code|text)
+1393;interactivity,ecosystem,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,matplotlib,iterative|feedback|dynamic,in-?line,mark(up|down)|HTML
+1402;ux;web|browser|http,ux|interface|g?ui($|\W)
+1409;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+1415;visualization,integrated_content;visual|eye candy,mark(up|down)|HTML
+1416;interactivity,ux;intuitive,cells?,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+1417;interactivity,integrated_content;run,cells?,combine|(text|code) (and|with)|and (code|text)
+1419;dissemination,ux,integrated_content;ux|interface|g?ui($|\W),shar(e|ing),mark(up|down)|HTML
+1420;interactivity,language,integrated_content;bash,rich (content|output)|figures?|pictures?|images?|media,iterative|feedback|dynamic,mark(up|down)|HTML,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,latex,i?python
+1421;dissemination,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing)
+1425;visualization,persistence,integrated_content;graph(s|ic|ing),persist(ence|ent)?,in-?line,mark(up|down)|HTML
+1427;;
+1428;organization,visualization,ux;plot(ting)?,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,graph(s|ic|ing),organiz(e|ation)
+1431;interactivity,language,hosting;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,workflow,languages?,i?python,install
+1432;interactivity;cells?
+1434;interactivity,visualization,ux,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,plot(ting)?,completion,in-?line
+1437;visualization,interactivity,dissemination;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,visual|eye candy,tell a story,vi(s|z)ualization
+1438;hosting,interactivity,ux;remote,run,ux|interface|g?ui($|\W),web|browser|http
+1441;language,integrated_content,ux;litera(te|cy) programming,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,latex,mark(up|down)|HTML,languages?
+1448;;
+1450;ux;web|browser|http
+1453;visualization,integrated_content,ux;litera(te|cy) programming,doc(s|umentation)?($|\W),graph(s|ic|ing),combine|(text|code) (and|with)|and (code|text)
+1454;ux,integrated_content;completion,mark(up|down)|HTML
+1456;interactivity,hosting,extensible;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,remote,kernels|backends|kernel support
+1458;integrated_content,extensible,ux;custom,aesthetic(s|ally),mathjax
+1459;integrated_content;all(\s|-)in(\s|-)one|one place
+1460;;
+1463;visualization,persistence;visual|eye candy,log
+1464;visualization,language,interactivity,integrated_content;run,graph(s|ic|ing),integrated?,i?python
+1466;ux,integrated_content;ux|interface|g?ui($|\W),latex,mark(up|down)|HTML
+1468;dissemination;collaborat(e|ion|ive|ors)
+1469;visualization,hosting;plot(ting)?,remote,(ipy)?widgets
+1476;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,doc(s|umentation)?($|\W)
+1477;hosting,ecosystem,integrated_content;docker,rich (content|output)|figures?|pictures?|images?|media,github,remote,aws,server
+1478;visualization,integrated_content;graph(s|ic|ing),mark(up|down)|HTML
+1479;hosting,interactivity,dissemination,language;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,setup,shar(e|ing),i?python,server
+1480;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,repl
+1481;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,iterative|feedback|dynamic
+1487;hosting,ux;ux|interface|g?ui($|\W),web|browser|http,server
+1490;visualization,integrated_content;all(\s|-)in(\s|-)one|one place,graph(s|ic|ing)
+1493;interactivity,integrated_content,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,litera(te|cy) programming,eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+1494;hosting,integrated_content,interactivity,dissemination,ecosystem,ux;in-?line,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,remote,shar(e|ing),interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,matplotlib,server
+1495;;
+1498;integrated_content,ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,mark(up|down)|HTML
+1503;interactivity,visualization,dissemination,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,plot(ting)?,others,in-?line
+1507;visualization,ecosystem,integrated_content;matplotlib,plot(ting)?,in-?line
+1512;visualization,hosting,ecosystem,integrated_content,ux;doc(s|umentation)?($|\W),visual|eye candy,in-?line,vi(s|z)ualization,common,portability
+1515;dissemination,language,ux;ux|interface|g?ui($|\W),web|browser|http,i?python,shar(e|ing)
+1517;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,ux|interface|g?ui($|\W),simpl(e|icity)|clean
+1518;ux,extensible;plugin,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,custom
+1520;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,ux|interface|g?ui($|\W),simpl(e|icity)|clean
+1524;visualization,persistence;visual|eye candy,log
+1525;ux;style
+1529;visualization,ux;plot(ting)?,design
+1530;interactivity,dissemination;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,shar(e|ing)
+1531;interactivity;run
+1534;interactivity,visualization,extensible,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,kernels|backends|kernel support,editor,(ipy)?widgets
+1541;visualization,language,ux;visual|eye candy,languages?,completion,i?python
+1551;ux;ux|interface|g?ui($|\W),web|browser|http
+1554;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1556;interactivity,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?
+1557;visualization,integrated_content,extensible;rich (content|output)|figures?|pictures?|images?|media,kernels|backends|kernel support,in-?line,(ipy)?widgets
+1559;persistence,integrated_content;(auto)?sav(e|ing),latex,mark(up|down)|HTML,combine|(text|code) (and|with)|and (code|text)
+1562;interactivity,visualization,integrated_content;rich (content|output)|figures?|pictures?|images?|media,graph(s|ic|ing),cells?,in-?line
+1563;visualization,integrated_content;plot(ting)?,notes|comments
+1565;visualization,integrated_content;plot(ting)?,integrated?
+1568;visualization;(ipy)?widgets
+1573;interactivity,ux;run,ux|interface|g?ui($|\W)
+1575;ux,integrated_content;ux|interface|g?ui($|\W),simpl(e|icity)|clean,integrated?,web|browser|http
+1583;;
+1587;;
+1590;ux,integrated_content;combine|(text|code) (and|with)|and (code|text),integrated?,latex,mark(up|down)|HTML,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+1593;visualization,language,ux,integrated_content;plot(ting)?,integrated?,i?python,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+1594;interactivity,integrated_content,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media,doc(s|umentation)?($|\W),iterative|feedback|dynamic
+1598;interactivity,visualization,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,run,mark(up|down)|HTML,(ipy)?widgets
+1600;interactivity,ecosystem;magics?,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,cells?
+1601;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1604;interactivity,ecosystem;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,librar(y|ies)
+1606;hosting,interactivity,integrated_content,ux;combine|(text|code) (and|with)|and (code|text),rich (content|output)|figures?|pictures?|images?|media,run,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,remote,server
+1609;visualization,dissemination,ux;visual|eye candy,intuitive,vi(s|z)ualization,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,shar(e|ing),looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+1611;interactivity;run
+1616;interactivity,language,ux,integrated_content;web|browser|http,ux|interface|g?ui($|\W),mark(up|down)|HTML,interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,latex,i?python
+1618;ux;keyboard|hotkeys?|short-?cuts?|keybindings?
+1621;dissemination,integrated_content;export,mark(up|down)|HTML
+1622;language,ux;navigation,keyboard|hotkeys?|short-?cuts?|keybindings?,i?python
+1623;hosting;on-?line
+1626;language;i?python
+1630;interactivity,ux;keyboard|hotkeys?|short-?cuts?|keybindings?,cells?,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+1635;integrated_content,ux;embedded,web|browser|http,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+1638;ux;simpl(e|icity)|clean,design
+1639;interactivity,visualization,integrated_content;plot(ting)?,cells?,mark(up|down)|HTML
+1644;visualization,integrated_content,ux;visual|eye candy,doc(s|umentation)?($|\W),vi(s|z)ualization,combine|(text|code) (and|with)|and (code|text)
+1645;visualization,cost,integrated_content;free,graph(s|ic|ing),in-?line
+1647;ux;completion
+1650;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,cells?
+1654;integrated_content;all(\s|-)in(\s|-)one|one place
+1657;interactivity,dissemination,ecosystem,integrated_content,extensible;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media,exten(d|sible|sions),export,github
+1661;ux;eas(e|y|iness)(\sof|\sto)?(\suse|install)?,doc(s|umentation)?($|\W)
+1662;interactivity,language,ecosystem;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,iterative|feedback|dynamic,librar(y|ies),i?python
+1667;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1668;interactivity,visualization;visual|eye candy,repl,vi(s|z)ualization
+1681;visualization;vi(s|z)ualization
+1683;visualization,ux,extensible;visual|eye candy,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,exten(d|sible|sions)
+1690;ux;responsive,ux|interface|g?ui($|\W)
+1691;;
+1693;interactivity;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed
+1694;stability,ux;aesthetic(s|ally),reliable,stable
+1695;ux;simpl(e|icity)|clean,looks (nice|great)|appealing|beautiful|pretty|elegant|appearance
+1700;interactivity,integrated_content;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,rich (content|output)|figures?|pictures?|images?|media
+1701;interactivity,dissemination,ecosystem,integrated_content,ux;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,eas(e|y|iness)(\sof|\sto)?(\suse|install)?,notes|comments,standard,shar(e|ing)
+1702;ux;completion
+1704;interactivity,language;interact(ive|ivity|ion)|live|immediate|quick|instant|rapid|fast|speed,flexib(le|ility),languages?,i?python
