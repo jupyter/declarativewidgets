@@ -368,16 +368,18 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                             while (selected = this.$$('.selected')) {
                                 selected.classList.remove('selected');
                             }
-                            e.series.values.forEach(function(d) { delete d.selected; });
                         }
 
                         this.$$('.hover').classList.toggle('selected');
 
-                        var selectionInfo = d3.select(this).data();
+                        var selectionInfo = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
 
                         // workaround for type=scatter, which does not have unique data objects bound
                         // to the selected DOM element.  Maintain a flag on the values array instead.
                         if (this.type == 'scatter') {
+                            if (!this.multiSelect) {
+                                e.series.values.forEach(function(d) { delete d.selected; });
+                            }
                             e.point.selected = !e.point.selected;
                             selectionInfo = e.series.values.filter(function(d) { return d.selected; });
                         }
