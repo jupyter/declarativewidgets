@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Extensions for Jupyter / IPython Notebook for interactive widgets using Polymer.",
   "devDependencies": {
-    "bower": "~1.6",
+    "bower": "^1.7.1",
     "gulp": "^3.9.0",
     "gulp-run": "^1.6.10",
     "gulp-watch": "^4.3.4",
