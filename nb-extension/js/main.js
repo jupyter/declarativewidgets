@@ -3,8 +3,9 @@
  * Distributed under the terms of the Modified BSD License.
  */
 define([
+    'module',
     './init/init'
-], function(init) {
+], function(module, init) {
     'use strict';
 
     // Some versions of IE do not have window.console defined. Some versions
@@ -17,6 +18,22 @@ define([
     });
     
     init(IPython ? IPython.notebook.base_url : '/');
+
+    var getModuleBasedComponentRoot = function() {
+        var moduleuri = module.uri;
+        return moduleuri.substring(0, moduleuri.lastIndexOf('/'));
+    }
+
+    var load_css = function (name) {
+        var link = document.createElement("link");
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        link.href = name;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      };
+
+    load_css(getModuleBasedComponentRoot() + '/../css/main.css');
+
     return {
       load_ipython_extension: function() { console.debug('Custom JS loaded'); }
     };
