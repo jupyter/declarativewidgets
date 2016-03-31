@@ -97,6 +97,11 @@ clean-watch-docs:
 	-@kill -9 `pgrep -P $$(cat .watch-docs)`
 	-@rm .watch-docs
 
+dist/urth/widgets/ext/notebook/css: ${shell find nb-extension/css}
+	@echo 'Moving nb-extension/css'
+	@mkdir -p dist/urth/widgets/ext/notebook/css
+	@cp -R nb-extension/css/* dist/urth/widgets/ext/notebook/css/.
+
 dist/urth/widgets/ext/notebook/js: ${shell find nb-extension/js}
 	@echo 'Moving src/nb-extension'
 	@mkdir -p dist/urth/widgets/ext/notebook/js
@@ -113,7 +118,7 @@ dist/urth/widgets/ext/notebook/urth_components: bower_components ${shell find el
 	@mkdir -p dist/urth/widgets/ext/notebook/urth_components
 	@cp -RL bower_components/* dist/urth/widgets/ext/notebook/urth_components/.
 
-dist/urth/widgets/ext/notebook: dist/urth/widgets/ext/notebook/bower.json dist/urth/widgets/ext/notebook/urth_components dist/urth/widgets/ext/notebook/js dist/urth/widgets/ext/notebook/elements
+dist/urth/widgets/ext/notebook: dist/urth/widgets/ext/notebook/bower.json dist/urth/widgets/ext/notebook/urth_components dist/urth/widgets/ext/notebook/js dist/urth/widgets/ext/notebook/elements dist/urth/widgets/ext/notebook/css
 
 dist/urth/widgets/ext: ${shell find nb-extension/python/urth/widgets/ext}
 	@echo 'Moving frontend extension code'

@@ -3,10 +3,12 @@
  * Distributed under the terms of the Modified BSD License.
  */
 define([
+    'module',
     'base/js/namespace',
     'base/js/events',
     './init/init'
-], function(Jupyter, events, init) {
+], function(module, Jupyter, events, init) {
+
     'use strict';
 
     // Some versions of IE do not have window.console defined. Some versions
@@ -22,6 +24,21 @@ define([
         namespace: Jupyter,
         events: events
     });
+
+    var getModuleBasedComponentRoot = function() {
+        var moduleuri = module.uri;
+        return moduleuri.substring(0, moduleuri.lastIndexOf('/'));
+    }
+
+    var load_css = function (name) {
+        var link = document.createElement("link");
+        link.type = "text/css";
+        link.rel = "stylesheet";
+        link.href = name;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      };
+
+    load_css(getModuleBasedComponentRoot() + '/../css/main.css');
 
     return {
         load_ipython_extension: function() { console.debug('Custom JS loaded'); }
