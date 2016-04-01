@@ -79,27 +79,37 @@
         });
 
         describe('select a bar', function() {
+            function sendMouseEvent(node, eventName, bubbles) {
+                // Internet Explorer doesn't support `new MouseEvent()`.
+                if (typeof window.MouseEvent !== 'function') {
+                    var evt = document.createEvent('MouseEvent');
+                    evt.initMouseEvent(eventName, true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                } else {
+                    var evt = new MouseEvent(eventName, {bubbles: bubbles});
+                }
+                node.dispatchEvent(evt);
+            }
             beforeEach(function(done) {
                 chart.async(function() {
                     var bar1 = chart.querySelectorAll('.nv-bar')[2];
                         bar2 = chart.querySelectorAll('.nv-bar')[0];
 
                     chart.async(function(){
-                        bar1.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+                        sendMouseEvent(bar1, 'mouseover', true);
+                        chart.async(function(){
+                            sendMouseEvent(bar1, 'click', true);
+                            chart.async(function(){
+                                sendMouseEvent(bar1, 'mouseout', true);
+                                chart.async(function(){
+                                    sendMouseEvent(bar2, 'mouseover', true);
+                                    chart.async(function(){
+                                        sendMouseEvent(bar2, 'click', true);
+                                        chart.async(done);
+                                    });
+                                });
+                            });
+                        });
                     });
-                    chart.async(function(){
-                        bar1.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-                    });
-                    chart.async(function(){
-                        bar1.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }));
-                    });
-                    chart.async(function(){
-                        bar2.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
-                    });
-                    chart.async(function(){
-                        bar2.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-                    });
-                    chart.async(done);
                 }, 100);
             });
 

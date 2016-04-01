@@ -13,6 +13,14 @@
     <!-- Need the web component polyfill for browsers without native support. -->
     <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
 
+    <script>
+        // Needed for IE10
+        window.console = window.console || {};
+        window.console.log = window.console.log || function() {};
+        ['debug', 'error', 'trace', 'warn'].forEach(function(method) {
+            window.console[method] = window.console[method] || window.console.log;
+        });
+    </script>
     <!-- Load test framework and helpers. -->
     <script src='../../web-component-tester/browser.js'></script>
     <script src='../../test-fixture/test-fixture-mocha.js'></script>

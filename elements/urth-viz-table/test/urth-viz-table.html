@@ -20,6 +20,7 @@
 
     <!-- STEP 2: Import the element to test. -->
     <link rel='import' href='../urth-viz-table.html'>
+    <link rel='import' href='../../urth-viz-col/urth-viz-col.html'>
 </head>
 
 <body>
@@ -34,87 +35,79 @@
     <test-fixture id="colTest1">
         <template>
             <urth-viz-table id="table" datarows='[[1,8,5],[2,2,6],[3,5,7]]' columns='["Index","Series 1","Currency"]'>
-                <urth-viz-col index="2" format="$0,0.00" type="numeric"/>
+                <urth-viz-col index="2" format="$0,0.00" type="numeric"></urth-viz-col>
             </urth-viz-table>
         </template>
     </test-fixture>
     <test-fixture id="colTest2">
         <template>
             <urth-viz-table id="table" datarows='[[1,8,5],[2,2,6],[3,5,7]]' columns='["Index","Series 1","Currency"]'>
-                <urth-viz-col format="$0,0.00" type="numeric"/>
+                <urth-viz-col format="$0,0.00" type="numeric"></urth-viz-col>
             </urth-viz-table>
         </template>
     </test-fixture>
 
     <script>
+    // STEP 4: Define any globals needed by the test suite.
+
+    // STEP 5: Define suite(s) and tests.
+    describe('urth-viz-table', function() {
         var fElmt;
-        // STEP 4: Define any globals needed by the test suite.
         beforeEach(function(done) {
-            var table = fElmt = fixture('basic');
-
-            // first listener responds to the fixture being complete
-            function listener1() {
-                table.removeEventListener('urth-viz-render', listener1);
-
-                fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
-                fElmt.columns = ["Index","Series 1","Series 2"];
-                fElmt.addEventListener('urth-viz-render', listener2);
-            }
-
-            // second listener responds to the attribute changes
-            function listener2() {
-                table.removeEventListener('urth-viz-render', listener2);
-
-                // both renderings are complete. it's safe to proceed with the test
+            function listener() {
+                fElmt.removeEventListener('urth-viz-render', listener);
                 done();
             }
 
-            fElmt.addEventListener('urth-viz-render', listener1);
+            fElmt = fixture('basic');
+            fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
+            fElmt.columns = ['Index','Series 1','Series 2'];
+            fElmt.addEventListener('urth-viz-render', listener);
         });
 
-        afterEach(function() {
-        });
-
-        // STEP 5: Define suite(s) and tests.
-        describe('urth-viz-table', function() {
-            it('should render a tableContainer', function(done) {
-                try {
-                    expect(fElmt.querySelectorAll('.handsontable')).to.have.length.above(0);
-                    done();
-                } catch( e ) {
-                    done( e );
-                }
-            });
+        it('should render a tableContainer', function(done) {
+            try {
+                expect(fElmt.querySelectorAll('.handsontable')).to.have.length.above(0);
+                done();
+            } catch( e ) {
+                done( e );
+            }
         });
 
         describe('_isHeightSet', function() {
             it('should return true if height is 0', function() {
-                fElmt.hot = {
-                    getSettings: function() {
-                        return { height: 0 };
-                    }
-                };
+                var settings = fElmt.hot.getSettings();
+                var stub = sinon.stub(fElmt.hot, 'getSettings', function() {
+                    settings.height = 0;
+                    return settings;
+                });
+
                 var isSet = fElmt._isHeightSet();
+                stub.restore();
                 expect(isSet).to.be.true;
             });
 
             it('should return true if height is 10', function() {
-                fElmt.hot = {
-                    getSettings: function() {
-                        return { height: 10 };
-                    }
-                };
+                var settings = fElmt.hot.getSettings();
+                var stub = sinon.stub(fElmt.hot, 'getSettings', function() {
+                    settings.height = 10;
+                    return settings;
+                });
+
                 var isSet = fElmt._isHeightSet();
+                stub.restore();
                 expect(isSet).to.be.true;
             });
 
             it('should return false if height is undefined', function() {
-                fElmt.hot = {
-                    getSettings: function() {
-                        return { };
-                    }
-                };
+                var settings = fElmt.hot.getSettings();
+                var stub = sinon.stub(fElmt.hot, 'getSettings', function() {
+                    delete settings.height;
+                    return settings;
+                });
+
                 var isSet = fElmt._isHeightSet();
+                stub.restore();
                 expect(isSet).to.be.false;
             });
         });
@@ -137,17 +130,6 @@
         });
 
         describe('_updateColumns', function() {
-            beforeEach(function(done) {
-                function listener() {
-                    fElmt.removeEventListener('urth-viz-render', listener);
-                    // rendering is complete.  proceed with test
-                    done();
-                }
-                fElmt.addEventListener('urth-viz-render', listener);
-                fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
-                fElmt.columns = ["Index","Series 1","Series 2"];
-            });
-
             it('should not update table if new columns are not defined', function() {
                 fElmt._updateColumns();
                 expect(fElmt.hot.countCols()).to.equal(3);
@@ -160,23 +142,12 @@
             });
 
             it('should update table with new columns, not exceding # of cols from datarows', function() {
-                fElmt._updateColumns(["Col1", "Col2", "Col3", "Col4"]);
+                fElmt._updateColumns(['Col1', 'Col2', 'Col3', 'Col4']);
                 expect(fElmt.hot.countCols()).to.equal(3);
             });
         });
 
         describe('_updateDatarows', function() {
-            beforeEach(function(done) {
-                function listener() {
-                    fElmt.removeEventListener('urth-viz-render', listener);
-                    // rendering is complete.  proceed with test
-                    done();
-                }
-                fElmt.addEventListener('urth-viz-render', listener);
-                fElmt.datarows = [[1,8,5],[2,2,6],[3,5,7]];
-                fElmt.columns = ["Index","Series 1","Series 2"];
-            });
-
             it('should not update table if new data is not defined', function() {
                 fElmt._updateDatarows();
                 expect(fElmt.hot.countRows()).to.equal(3);
@@ -192,61 +163,61 @@
                 expect(fElmt.hot.countRows()).to.equal(4);
             });
         });
+    });
 
 
-        /* tests for urth-viz-col */
-
-        describe('urth-viz-col', function() {
-            var table;
-            beforeEach(function(done) {
-                function listener() {
-                    table.removeEventListener('urth-viz-render', listener);
-                    // rendering is complete.  proceed with test
-                    done();
-                }
-                table = fixture('colTest1');
-                table.addEventListener('urth-viz-render', listener);
-            });
-
-            it('should format column to the correct format', function(done) {
-                table.addEventListener('urth-viz-render', function() {
-                    try { //cell should have format of $0,0.00
-                        expect(table.hot.getCell(1,2).innerHTML).to.equal("$6.00");
-                        done();
-                    } catch(e) {
-                        done(e);
-                    }
-                });
-
-                table.datarows = [[1,8,5],[2,2,6],[3,5,7]];
-            });
+    /* tests for urth-viz-col */
+    describe('urth-viz-col', function() {
+        var table;
+        beforeEach(function(done) {
+            function listener() {
+                table.removeEventListener('urth-viz-render', listener);
+                // rendering is complete.  proceed with test
+                done();
+            }
+            table = fixture('colTest1');
+            table.addEventListener('urth-viz-render', listener);
         });
 
-        describe('urth-viz-col2', function() {
-            var table;
-            beforeEach(function(done) {
-                function listener() {
-                    table.removeEventListener('urth-viz-render', listener);
-                    // rendering is complete.  proceed with test
+        it('should format column to the correct format', function(done) {
+            table.addEventListener('urth-viz-render', function() {
+                try { //cell should have format of $0,0.00
+                    expect(table.hot.getCell(1,2).innerHTML).to.equal('$6.00');
                     done();
+                } catch(e) {
+                    done(e);
                 }
-                table = fixture('colTest2');
-                table.addEventListener('urth-viz-render', listener);
             });
 
-            it('should not format column if col index was not given', function(done) {
-                table.addEventListener('urth-viz-render', function() {
-                    try { // cell should not have format of $0,0.00
-                        expect(table.hot.getCell(1,2).innerHTML).to.equal("6");
-                        done();
-                    } catch(e) {
-                        done(e);
-                    }
-                });
-
-                table.datarows = [[1,8,5],[2,2,6],[3,5,7]];
-            });
+            table.datarows = [[1,8,5],[2,2,6],[3,5,7]];
         });
+    });
+
+    describe('urth-viz-col2', function() {
+        var table;
+        beforeEach(function(done) {
+            function listener() {
+                table.removeEventListener('urth-viz-render', listener);
+                // rendering is complete.  proceed with test
+                done();
+            }
+            table = fixture('colTest2');
+            table.addEventListener('urth-viz-render', listener);
+        });
+
+        it('should not format column if col index was not given', function(done) {
+            table.addEventListener('urth-viz-render', function() {
+                try { // cell should not have format of $0,0.00
+                    expect(table.hot.getCell(1,2).innerHTML).to.equal('6');
+                    done();
+                } catch(e) {
+                    done(e);
+                }
+            });
+
+            table.datarows = [[1,8,5],[2,2,6],[3,5,7]];
+        });
+    });
 
     </script>
 </body>
