@@ -1,4 +1,7 @@
 # Changelog
+## 0.4.4 (2016-04-01)
+* Fix regression in selection in charts
+
 ## 0.4.3 (2016-03-24)
 * Ability to inspect the content of an urth-core-channel
 * Improved selection content from urth-viz-chart elements
