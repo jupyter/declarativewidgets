@@ -40,10 +40,10 @@
             chart = fixture('scatter');
             if (!chart.rendered) {
                 function listener() {
-                    chart.removeEventListener('urth-viz-chart-render', listener);
+                    chart.removeEventListener('urth-viz-render', listener);
                     done();
                 }
-                chart.addEventListener('urth-viz-chart-render', listener);
+                chart.addEventListener('urth-viz-render', listener);
             } else {
                 done();
             }

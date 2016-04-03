@@ -2,24 +2,46 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 -->
-<script src="../requirejs/require.js"></script>
+<link rel="import" href="urth-viz-chart-common-behavior.html">
 
-<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-menu/paper-menu.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../urth-viz-col/urth-viz-col.html">
-<link rel="import" href="./urth-viz-chart-common-behavior.html">
-<link rel="import" href="../urth-viz-behaviors/urth-viz-selection-behavior.html">
-<link rel="import" href="../urth-core-behaviors/error-display-behavior.html">
 
-<!-- import the nvd3 stylesheet into the main page as well as the shadow dom
-     because the nvtooltip is a child of BODY -->
-<link rel="stylesheet" type="text/css" href="../nvd3/build/nv.d3.css">
+<dom-module id="urth-viz-chart">
+    <link rel="import" type="css" href="../nvd3/build/nv.d3.css">
+    <link rel="import" type="css" href="../urth-viz-chart/urth-viz-chart.css">
+
+    <template>
+        <link rel="stylesheet" type="text/css" href="../nvd3/build/nv.d3.css">
+        <link rel="stylesheet" type="text/css" href="../urth-viz-chart/urth-viz-chart.css">
+
+        <div id="settings-section">
+          <paper-dropdown-menu label="Category" noink no-animations>
+            <paper-menu class="dropdown-content" selected="{{primary}}">
+              <template is="dom-repeat" items="[[columns]]" as="column">
+                <paper-item>[[column]]</paper-item>
+              </template>
+            </paper-menu>
+          </paper-dropdown-menu>
+          <paper-dropdown-menu label="Value" noink no-animations>
+            <paper-menu class="dropdown-content" selected="{{secondary}}">
+              <template is="dom-repeat" items="[[columns]]" as="column">
+                <paper-item>[[column]]</paper-item>
+              </template>
+            </paper-menu>
+          </paper-dropdown-menu>
+        </div>
+        <div id="chart1">
+            <svg style='height:500px'></svg>
+        </div>
+        <content id="content"></content>
+    </template>
+</dom-module>
 
 <!--
-Helper widget that draws a chart using NVD3, which supports several chart types.
-This widget is not meant to be used directly, but is used by other urth-viz widget implementations.
+Base widget that draws a chart using NVD3, which supports several chart types.
+
 The chart accepts data via attribute `datarows` and column headers via attribute `columns`:
 
 1. `datarows` should be of type Array of Arrays, representing list of rows.
@@ -60,31 +82,14 @@ The chart accepts data via attribute `datarows` and column headers via attribute
     </template>
 
     <script>
-
     'use strict';
-    var requireConfigured;
 
     window.Urth = window.Urth || {};
 
     Polymer({
         is: 'urth-viz-chart',
 
-        /**
-         * Fired on the `urth-viz-chart` element when the chart has rendered.
-         *
-         * @event urth-viz-chart-render
-         */
-
         properties: {
-            /**
-             * A computed Array value based on `datarows`, `columns`,
-             * `primary`, `secondary` and `type` properties.
-             */
-            data: {
-                type: Array,
-                computed: '_transformData(datarows,columns,primary,secondary,type)'
-            },
-
             /**
              * The type of chart (e.g. bar, pie).
              */
@@ -96,18 +101,14 @@ The chart accepts data via attribute `datarows` and column headers via attribute
         },
 
         behaviors: [
-            Polymer.IronResizableBehavior,
-            Urth.VizChartCommonBehavior,
-            Urth.VizSelectionBehavior,
-            Urth.DisplayErrorBehavior
+            Urth.VizChartCommonBehavior
         ],
 
-        listeners: {
-            'iron-resize': '_resizer'
-        },
-
-        _svgSelection: function(d3) {
-            return d3.select(this.$.chart1).select('svg');
+        created: function() {
+            // Set up old event name for back-compat
+            this.addEventListener('urth-viz-render', function() {
+                this.fire('urth-viz-chart-render');
+            }.bind(this));
         },
 
         _typeChanged: function(newValue, oldValue) {
@@ -119,356 +120,6 @@ The chart accepts data via attribute `datarows` and column headers via attribute
                     this._svgSelection(d3).selectAll('*').remove();
                     this._createChart();
                 }.bind(this));
-            }
-        },
-
-        _transformData: function(datarows, columns, primary, secondary) {
-            // Polymer sometimes passes in undefined arguments for computed functions like this
-            datarows = datarows || this.datarows;
-            columns = columns || this.columns;
-            primary = primary || this.primary;
-            secondary = secondary || this.secondary;
-
-            if (this.columns.length && datarows[0] && this.columns.length != datarows[0].length) {
-                console.warn('Warning: arity of columns does not match data');
-            }
-
-            var columnSettings = this.columnSettings;
-            var values = (datarows[0] || []).map(function (topDatum, i) {
-                var t = function (d, i) {
-                    var result = d[i];
-
-                    switch (columnSettings && columnSettings[i] && columnSettings[i].type) {
-                        case 'numeric':
-                            result = +result;
-                            break;
-                        case 'date':
-                            result = new Date(result);
-                            break;
-                        default:
-                    }
-
-                    return result;
-                };
-
-                return datarows.map(function (d) {
-                    return { row: d, x: t(d, primary), y: t(d, i) };
-                });
-            });
-
-            // TODO: make this generic
-            if (this.type == 'pie') {
-                if (secondary == -1) {
-                    secondary = 1;
-                }
-                return values[secondary];
-            }
-
-            return values.map(function (values, i) {
-                return {
-                    key: columns[i],
-                    values: values
-                };
-            }).filter(secondary == -1 ? function (values, i) {
-                return i != primary;
-            } : function (values, i) {
-                return i == secondary;
-            });
-        },
-
-        _parseColumns: function() {
-            var columnSettings = this.columnSettings = [];
-            this.queryAllEffectiveChildren('urth-viz-col').forEach(function (col) {
-                if (col.hasAttribute('index')) {
-                    var index = col.getAttribute('index');
-                    var set = columnSettings[index] = {};
-                    ["type", "format"].forEach(function(prop) {
-                        set[prop] = col.getAttribute(prop);
-                    });
-                }
-            });
-
-            if (this.chart) {
-                this._formatAxes();
-            }
-
-            // force an update to transform data in required format
-            this.datarows = [].concat(this.datarows);
-        },
-
-        _formatAxes: function() {
-            // Format axis tick marks according to type and format,
-            // if supplied by urth-viz-col
-            var formatTicks = function(axis, dataIndex) {
-                if (axis && this.columnSettings) {
-                    var axisSettings = this.columnSettings[dataIndex] || [];
-                    switch (axisSettings.type) {
-                        case 'numeric':
-                            axis.tickFormat(axisSettings.format ? d3.format(axisSettings.format) : function(d) { return d; });
-                            break;
-
-                        case 'date':
-//                            Cannot use time scale for discrete values (e.g. bar)  Need to explicitly convert to Date
-//                              chart[dataIndex == this.primary ? 'xScale' : 'yScale'](d3.time.scale());
-                            axis.tickFormat(axisSettings.format ?
-                                function(d) { return d3.time.format(axisSettings.format)(new Date(d)); }
-                                : function(d) { return new Date(d).toLocaleDateString(); });
-                            break;
-
-                        default:
-                            axis.tickFormat(function(d) {return d;});
-                    }
-                }
-            }.bind(this);
-
-            formatTicks(this.chart.xAxis, this.primary);
-            formatTicks(this.chart.yAxis, this.secondary == -1 ? 1 : this.secondary);
-        },
-
-        _update: function() {
-            require(['d3'], function(d3) {
-                this._svgSelection(d3).datum(this.data);
-                if (this.chart) {
-                    this._formatAxes();
-
-                    if (this.xlabel) {
-                        this.chart.xAxis.axisLabel(this.xlabel);
-                    }
-
-                    if (this.ylabel) {
-                        this.chart.yAxis.axisLabel(this.ylabel);
-                    }
-
-                    this._fireWhenReady();
-                    this.chart.update();
-                }
-            }.bind(this));
-        },
-
-        _createChart: function(callback) {
-            require(['d3', 'nvd3'], function(d3, nv) {
-                var model, modelProp, config;
-                switch(this.type) {
-                    case 'bar':
-                        model = nv.models.multiBarChart;
-                        config = function(chart) {
-                            chart
-                                .reduceXTicks(false)   //If 'false', every single x-axis tick label will be rendered.
-                                .showControls(true)   //Allow user to switch between 'Grouped' and 'Stacked' mode.
-                                .groupSpacing(0.1);    //Distance between each group of bars.
-                        };
-                        modelProp = 'multibar';
-                        break;
-                    case 'line':
-                        model = nv.models.lineChart;
-                        modelProp = 'lines';
-                        config = function(chart) {
-                            chart.pointRange([200, 200]);
-                        };
-                        break;
-                    case 'area':
-                        model = nv.models.stackedAreaChart;
-                        modelProp = 'stacked';
-                        config = function(chart) {
-                            chart.pointRange([200, 200]);
-                        };
-                        break;
-                    case 'scatter':
-                        model = nv.models.scatterChart;
-                        modelProp = 'scatter';
-                        config = function(chart) {
-                            chart.pointRange([200, 200]);
-                        };
-                        break;
-                    case 'pie':
-                        model = nv.models.pieChart;
-                        modelProp = 'pie';
-                        config = function(chart) {
-                            chart
-                                .showLabels(true)
-                                .labelThreshold(.05);
-                        };
-                        break;
-                    default:
-                        throw new Error("urth-viz-chart: Unrecognized type: " + this.type);
-                }
-
-                nv.addGraph(function() {
-                    var chart = this.chart = model();
-                    if (config) {
-                        config(chart);
-                    }
-
-                    this._formatAxes();
-
-                    if (this.height) {
-                        chart.height(this.height);
-                        this._svgSelection(d3).style('height', this.height);
-                    }
-
-                    if (this.width) {
-                        chart.width(this.width);
-                        this._svgSelection(d3).style('width', this.width);
-                    }
-
-                    if (this.margin) {
-                        chart.margin(this.margin);
-                    }
-
-                    if (this.rotatelabels) {
-                        chart.xAxis.rotateLabels(this.rotatelabels);      //Angle to rotate x-axis labels.
-                    }
-
-                    if (this.xbounds) {
-                        chart.forceX(this.xbounds);
-                    }
-
-                    if (this.ybounds) {
-                        chart.forceY(this.ybounds);
-                    }
-
-                    if (this.xlabel) {
-                        chart.xAxis.axisLabel(this.xlabel);
-                    }
-
-                    if (this.ylabel) {
-                        chart.yAxis.axisLabel(this.ylabel);
-                    }
-
-                    if (this.staggerlabels) {
-                        chart.xAxis.staggerLabels(this.staggerlabels)
-                    }
-
-                    if (this.palette) {
-                        chart.color(this.palette);
-                    }
-
-                    this._fireWhenReady();
-
-                    // On page reload, this.data computed fails to run, so call it directly
-                    this._svgSelection(d3)
-                        .datum(this.data || this._transformData(this.datarows, this.columns) || [])
-                        .transition().duration(500)
-                        .call(chart);
-
-                    this.chart[modelProp].dispatch.on('elementMouseover.urth', function(e) {
-                        if (e.point) {
-                            var data = this.chart.tooltip.data();
-                            var series = data && data.series;
-                            if (series) {
-                                if (series.length) {
-                                    series = series[0];
-                                }
-                                series.row = e.point.row;
-                            }
-                        }
-                    }.bind(this));
-
-                    this.chart[modelProp].dispatch.on('elementClick.urth', function(e) {
-                        if (!this.multiSelect) {
-                            var selected;
-                            while (selected = this.$$('.selected')) {
-                                selected.classList.remove('selected');
-                            }
-                        }
-
-                        this.$$('.hover').classList.toggle('selected');
-
-                        var selectionInfo = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
-
-                        // workaround for type=scatter, which does not have unique data objects bound
-                        // to the selected DOM element.  Maintain a flag on the values array instead.
-                        if (this.type == 'scatter') {
-                            if (!this.multiSelect) {
-                                e.series.values.forEach(function(d) { delete d.selected; });
-                            }
-                            e.point.selected = !e.point.selected;
-                            selectionInfo = e.series.values.filter(function(d) { return d.selected; });
-                        }
-
-                        this._setSelectionInfo(selectionInfo);
-
-                        var selection = this.selectionInfo.map(function(d) {
-                            if (d.data) {
-                               // event shape for type='pie'
-                               d = d.data;
-                            }
-                            return d.length ? d[0].row : d.row;
-                        });
-
-                        if (this.selectionAsObject) {
-                            selection = selection.map(function(row) {
-                                var obj = {};
-                                this.columns.forEach(function(col, i) {
-                                    obj[col.replace(' ', '_')] = row[i];
-                                });
-                                return obj;
-                            }.bind(this));
-                        }
-
-                        this._setSelection(selection);
-                    }.bind(this));
-
-                    return chart;
-                }.bind(this), callback);
-            }.bind(this));
-        },
-
-        _fireWhenReady: function() {
-            if (this.chart && this.datarows && this.columns) {
-                this.chart.dispatch.on('renderEnd.urth', function() {
-                    this.rendered = true;
-                    this.fire('urth-viz-chart-render');
-                }.bind(this));
-            }
-        },
-
-        created: function() {
-            // Need the relative paths for d3 and nvd3 based on the
-            // location of this Polymer element. This has to be done
-            // inside the element to get the proper path. Calling
-            // resolveUrl outside of the element's methods returns
-            // the incorrect path. Only want to do this once and not
-            // for each instance so a global is used to track.
-            if (!requireConfigured) {
-                requirejs.config({
-                    paths: {
-                        d3: this.resolveUrl('../d3/d3'),
-                        nvd3: this.resolveUrl('../nvd3/build/nv.d3')
-                    },
-                    shim: {
-                        nvd3: {
-                            exports: 'nv',
-                            deps: ['d3.global']
-                        }
-                    }
-                });
-
-                // workaround for nvd3 using global d3
-                define('d3.global', ['d3'], function(d3Global) {
-                    d3 = d3Global;
-                });
-                requireConfigured = true;
-            }
-        },
-
-        ready: function() {
-            Polymer.dom(this.$.content).observeNodes(this._parseColumns.bind(this));
-
-            this.async(function(){
-                var display = window.getComputedStyle(this).display;
-                if (display === 'none' || document.readyState !== 'complete') {
-                    this.async(this.ready, 200);
-                } else {
-                    this._createChart();
-//                    this._parseColumns();
-                }
-            });
-        },
-
-        _resizer: function() {
-            if (this.chart) {
-                this.chart.update();
             }
         }
     });
