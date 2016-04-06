@@ -49,7 +49,7 @@
                  */
                 datarows: {
                     type: Array,
-                    value: function() { return [[]]; },
+                    value: function() { return []; },
                     notify: true,
                     observer: '_update'
                 },
@@ -189,6 +189,10 @@
             columns = columns || this.columns;
             primary = primary || this.primary;
             secondary = secondary || this.secondary;
+
+            if (!Array.isArray(datarows)) {
+                datarows = [datarows];
+            }
 
             if (this.columns.length && datarows[0] && this.columns.length != datarows[0].length) {
                 console.warn('Warning: arity of columns does not match data');
@@ -452,9 +456,9 @@
                             selectionInfo = e.series.values.filter(function(d) { return d.selected; });
                         }
 
-                        this._setSelectionInfo(selectionInfo);
+                        this._setSelectionInfo(this.multiSelect ? selectionInfo : selectionInfo[0]);
 
-                        var selection = this.selectionInfo.map(function(d) {
+                        var selection = selectionInfo.map(function(d) {
                             if (d.data) {
                                // event shape for type='pie'
                                d = d.data;
@@ -472,7 +476,7 @@
                             }.bind(this));
                         }
 
-                        this._setSelection(selection);
+                        this._setSelection(this.multiSelect ? selection : selection[0]);
                     }.bind(this));
 
                     return chart;

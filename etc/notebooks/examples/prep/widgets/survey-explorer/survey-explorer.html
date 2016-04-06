@@ -35,11 +35,11 @@ Example:
                 <urth-viz-col index="1" type="numeric" format="%"></urth-viz-col>
             </template>
         </urth-viz-bar>
-        <urth-core-function ref="getSample" arg-keyword="[[sel.0.x]]" arg-groupby="[[group_by]]" arg-sample_size="10" result="{{sampleData}}" arg-groupby_key="[[sel.0.key]]" arg-series="{{seriesByLabel(selectedLabel)}}" arg-sample_source="{{sampleSource}}" auto></urth-core-function>
+        <urth-core-function ref="getSample" arg-keyword="[[sel.x]]" arg-groupby="[[group_by]]" arg-sample_size="10" result="{{sampleData}}" arg-groupby_key="[[sel.key]]" arg-series="{{seriesByLabel(selectedLabel)}}" arg-sample_source="{{sampleSource}}" auto></urth-core-function>
         <div style="background-color: #ddd; padding: 10px;">
             <em>Select a bar above.</em>
             <template is="dom-if" if="{{sel.length}}">
-                <span>Showing a random sample of up to 10 responses for "[[sel.0.x]]" in the "[[sel.0.key]]" group.</span>
+                <span>Showing a random sample of up to 10 responses for "[[sel.x]]" in the "[[sel.key]]" group.</span>
             </template>
         </div>
         <div style="max-height:300px; min-height:300px; overflow:auto; background-color: #eee; border: 1px solid #ccc;">
