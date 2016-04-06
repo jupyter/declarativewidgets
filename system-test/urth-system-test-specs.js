@@ -87,8 +87,8 @@ describe('Widgets Python System Test', function() {
     });
 });
 
-describe('Widgets Scala System Test', function() {
-    boilerplate.setup(this.title, '/notebooks/tests/Walkthrough-Scala.ipynb', 8);
+process.env.PYTHON != "python2" && describe('Widgets Scala System Test', function() {
+    boilerplate.setup(this.title, '/notebooks/tests/Walkthrough-Scala.ipynb', 9);
 
     var timeout = 30000;
 
@@ -133,6 +133,7 @@ describe('Widgets Scala System Test', function() {
 
     it('should watch for changes in a watched variable', function(done) {
         boilerplate.browser
+            .elementByXPath('//button[text()="initChannelWatch"]').click()
             .elementsByCssSelector('div.code_cell').nth(8)
             .elementByCssSelector('>', 'input')
             .type('watched message')

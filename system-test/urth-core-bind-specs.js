@@ -7,7 +7,7 @@ var boilerplate = new Boilerplate();
 
 describe('Urth Core Bind', function() {
 
-    boilerplate.setup(this.title, '/notebooks/tests/urth-core-bind.ipynb');
+    boilerplate.setup(this.title, '/notebooks/tests/urth-core-bind.ipynb', 3);
 
     it('should wait for dependency to load', function(done) {
         // Using a random number to protect against the possibility of a previous

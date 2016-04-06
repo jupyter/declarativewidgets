@@ -6,7 +6,7 @@ var Boilerplate = require('./utils/boilerplate');
 var boilerplate = new Boilerplate();
 
 process.env.PYTHON != "python2" && describe('Widgets R System Test', function() {
-    boilerplate.setup(this.title, '/notebooks/tests/urth-r-widgets.ipynb');
+    boilerplate.setup(this.title, '/notebooks/tests/urth-r-widgets.ipynb', 7);
 
     it('should print the result of a Function Widget invocation', function(done) {
         boilerplate.browser

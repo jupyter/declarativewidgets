@@ -80,8 +80,9 @@ Boilerplate.prototype.setup = function(testName, startingURL, outputCount){
   var outputAsserter = new wd.Asserter(
     function(target) { // browser or el
       return target
-        .elementsByCss('div.output_area').then(function(nodes) {
-            nodes.should.have.length(outputCount);
+        .elementsByCssSelector('div.output_area').then(function(nodes) {
+            console.log(nodes.length+"/"+outputCount)
+            nodes.should.have.length.above(outputCount-1);
             return target; // this will be returned by waitFor
             // and ignored by waitForElement.
         })
