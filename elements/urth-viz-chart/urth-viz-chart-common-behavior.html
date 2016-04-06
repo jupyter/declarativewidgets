@@ -476,6 +476,11 @@
                             }.bind(this));
                         }
 
+                        if (this.multiSelect) {
+                            // eliminate duplicate rows selected from different series
+                            selection = selection.filter(function(v, i, a) { return a.indexOf(v) === i; });
+                        }
+
                         this._setSelection(this.multiSelect ? selection : selection[0]);
                     }.bind(this));
 
