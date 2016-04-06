@@ -17,7 +17,8 @@
     "colors": "latest",
     "minimist": "latest",
     "selenium-standalone": "latest",
-    "web-component-tester": "^4"
+    "web-component-tester": "^4",
+    "vulcanize": "1.14.8"
   },
   "config": {},
   "scripts": {
