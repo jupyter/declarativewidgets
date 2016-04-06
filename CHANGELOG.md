@@ -1,4 +1,7 @@
 # Changelog
+## 0.4.5 (2016-04-06)
+* Progress indications on templates while dependencies load
+
 ## 0.4.4 (2016-04-01)
 * Fix regression in selection in charts
 
