@@ -3,6 +3,7 @@
 import errno
 import os.path
 import sys
+import subprocess
 
 from jupyter_core.paths import jupyter_config_dir
 from notebook.services.config import ConfigManager
@@ -31,6 +32,15 @@ def makedirs(path):
             pass
         else:
             raise
+
+class ExtensionInstallRApp(InstallNBExtensionApp):
+    '''Subclass that installs this particular extension.'''
+    name = u'jupyter-declarativewidgets-extension-installr'
+    description = u'Install the jupyter_declarativewidgets installr extension'
+
+    def start(self):
+        self.log.info("installing r widget extensions")
+        subprocess.call("R CMD INSTALL /src/dist/urth/widgets/ext/notebook/urth-widgets.tgz", shell=True)
 
 class ExtensionInstallApp(InstallNBExtensionApp):
     '''Subclass that installs this particular extension.'''
@@ -166,6 +176,10 @@ class ExtensionApp(Application):
         deactivate=(
             ExtensionDeactivateApp,
             "Deactivate the extension."
+        ),
+        installr=(
+            ExtensionInstallRApp,
+            "Install the R extension"
         )
     )
 

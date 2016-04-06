@@ -1,0 +1,23 @@
+Package: declarativewidgets
+Title: Jupyter DeclarativeWidgets
+Description: Support for jupyter_declarativewidgets for the IRkernel
+Version: 0.1
+Authors@R: c(person("Michael", "Poplavski", role = c("aut", "cre"),
+    email = "mpoplavs@us.ibm.com"),
+    person("Gino", "Bustelo", role = c("aut"),
+    email = "lbustelo@us.ibm.com@us.ibm.com"))
+Maintainer: Jupyter Development Team <jupyter@googlegroups.com>
+Depends:
+    R (>= 3.0.1)
+License: MIT + file LICENSE
+LazyData: true
+Encoding: UTF-8
+Imports:
+    IRkernel
+Collate:
+    'widget.r'
+    'widget_function.r'
+    'widget_channels.r'
+    'widget_dataframe.r'
+    'serializer.r'
+    'serializers.r'

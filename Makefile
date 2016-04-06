@@ -52,12 +52,14 @@ bower_components: node_modules/bower bower.json
 dev_image:
 	@-docker rm -f bower-build
 	@docker run -it --user root --name bower-build \
+		-v `pwd`/etc/r/install.r:/src-kernel-r/install.r \
 		$(ROOT_REPO) bash -c 'apt-get update && \
 		apt-get install --yes curl && \
 		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
 		apt-get install --yes nodejs npm && \
 		ln -s /usr/bin/nodejs /usr/bin/node && \
-		npm install -g bower'
+		npm install -g bower && \
+		R CMD BATCH /src-kernel-r/install.r'
 	@docker commit bower-build $(REPO)
 	@-docker rm -f bower-build
 
@@ -149,6 +151,20 @@ dist/urth/widgets/ext/notebook/bower.json: bower.json
 	@mkdir -p dist/urth/widgets/ext/notebook
 	@cp bower.json dist/urth/widgets/ext/notebook/bower.json
 
+dist/urth/widgets/ext/notebook/urth-widgets.tgz: ${shell find kernel-r/declarativewidgets}
+ifeq ($(NOR), true)
+	@echo 'Skipping R code'
+else
+	@echo 'Building R code'
+	@mkdir -p dist/urth/widgets/ext/notebook
+	@docker run -it --rm \
+		-v `pwd`:/src \
+		$(REPO) bash -c 'cp -r /src/kernel-r/declarativewidgets /tmp/src && \
+			cd /tmp/src && \
+			R CMD INSTALL --build . && \
+			cp declarativewidgets_0.1_R_x86_64-pc-linux-gnu.tar.gz /src/dist/urth/widgets/ext/notebook/urth-widgets.tgz'
+endif
+
 dist/docs: dist/docs/bower_components dist/docs/site dist/docs/site/generated_docs.json
 
 dist/docs/bower_components: node_modules etc/docs/bower.json
@@ -178,7 +194,7 @@ dist/VERSION:
 	@mkdir -p dist
 	@echo "$(COMMIT)" > dist/VERSION
 
-dist: dist/urth dist/urth/widgets/ext/notebook/urth-widgets.jar dist/scripts dist/VERSION
+dist: dist/urth dist/urth/widgets/ext/notebook/urth-widgets.jar dist/urth/widgets/ext/notebook/urth-widgets.tgz dist/scripts dist/VERSION
 
 sdist: dist
 	@cp -R MANIFEST.in dist/.
@@ -269,10 +285,11 @@ _run:
 		$(REPO) bash -c '$(SETUP_CMD) \
 			pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && \
 			jupyter declarativewidgets install --user && \
+			jupyter declarativewidgets installr && \
 			jupyter declarativewidgets activate && \
 			$(CMD)'
 
-dev: CMD?=sh -c "python --version; ipython notebook --no-browser --port 8888 --ip='*'"
+dev: CMD?=sh -c "R CMD INSTALL /src-kernel-r/declarativewidgets; python --version; ipython notebook --no-browser --port 8888 --ip='*'"
 dev: .watch dist
 	-@CMD='$(CMD)' $(MAKE) _dev-$(PYTHON)
 	@$(MAKE) clean-watch
@@ -296,6 +313,7 @@ _dev:
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/.jupyter/nbconfig/notebook.json \
 		-v `pwd`/etc/jupyter_notebook_config.py:$(NB_HOME)/.jupyter/jupyter_notebook_config.py \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
+		-v `pwd`/kernel-r/declarativewidgets:/src-kernel-r/declarativewidgets \
 		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'
 
 start-selenium:
