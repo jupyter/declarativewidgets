@@ -1,4 +1,8 @@
 # Changelog
+## 0.5.0 (2016-xx-xx)
+* `selection` property on charts references row data. Chart-specific selection data available as `selectionInfo`
+* `selection` property on charts references a single row rather than Array of length==1, continues to return Array of rows when `multiSelect` is used.
+
 ## 0.4.0 (2016-02-12)
 * Upgrade to use Apache Toree for scala kernel
 * Upgrade to Polymer 1.2.4+
@@ -8,7 +12,7 @@
 * Modified install process to rely on `jupyter activate/deactivate`
 * New element `urth-core-channel` and javascript API to channel variables
 * New element `urth-core-watch`
-* Fixes to sizing of 'urth-viz-table'
+* Fixes to sizing of `urth-viz-table`
 * Serialization support for Pandas.Series
 
 ## 0.2.0 (2015-12-01)
