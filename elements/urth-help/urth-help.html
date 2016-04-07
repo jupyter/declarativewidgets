@@ -1,0 +1,38 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+Creates a Polymer element that displays urth elements documentation page.
+-->
+<dom-module id="urth-help">
+
+    <template>
+        <a href="{{docURL}}" target="doc">Open in new tab</a>
+        <iframe src="{{docURL}}" style="width:100%; height: 300px;">
+          <p>This browser does not support iframes, cannot load docs.</p>
+        </iframe>
+        <content></content>
+    </template>
+    <script>
+    (function () {
+        'use strict';
+
+        Polymer({
+            is: 'urth-help',
+            properties: {
+                docURL: {
+                    type: String,
+                    computed: 'getDocUrl(_baseURL)'
+                }
+            },
+            behaviors: [Urth.JupyterNotebookEnv],
+            getDocUrl: function() {
+                return this._baseURL + "nbextensions/urth_widgets/docs/docs.html";
+            }
+        });
+    })();
+    </script>
+</dom-module>

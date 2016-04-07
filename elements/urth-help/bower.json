@@ -1,0 +1,26 @@
+{
+  "name": "urth-help",
+  "version": "0.0.1",
+  "authors": [
+    "Jupyter Community"
+  ],
+  "description": "Represents a widget that displays urth element's documentation.",
+  "main": "urth-help.html",
+  "keywords": [
+    "urth",
+    "area",
+    "chart",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.4"
+  },
+  "private": true
+}
