@@ -442,18 +442,30 @@
                             }
                         }
 
+                        // Use selected class on DOM to maintain selected state
                         this.$$('.hover').classList.toggle('selected');
 
                         var selectionInfo = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
 
                         // workaround for type=scatter, which does not have unique data objects bound
-                        // to the selected DOM element.  Maintain a flag on the values array instead.
+                        // to the selected DOM element.  Maintain a flag within the data object instead.
                         if (this.type == 'scatter') {
-                            if (!this.multiSelect) {
-                                e.series.values.forEach(function(d) { delete d.selected; });
+                            // flatten 'values' from all series
+                            if (selectionInfo.length) {
+                                selectionInfo = selectionInfo[0].map(function(a) { return a.values; })
+                                    .reduce(function(a,b) { return a.concat(b); });
                             }
+
+                            // if single select, remove all selections
+                            if (!this.multiSelect) {
+                                selectionInfo.forEach(function(d) { delete d.selected; });
+                            }
+
+                            // flip selected bit in data (not DOM) for this point
                             e.point.selected = !e.point.selected;
-                            selectionInfo = e.series.values.filter(function(d) { return d.selected; });
+
+                            // return selected points
+                            selectionInfo = selectionInfo.filter(function(d) { return d.selected; });
                         }
 
                         this._setSelectionInfo(this.multiSelect ? selectionInfo : selectionInfo[0]);
