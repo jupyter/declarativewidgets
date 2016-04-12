@@ -47,6 +47,9 @@ jupyter declarativewidgets install --user --symlink --overwrite
 # enable the JS and server extensions in your ~/.jupyter
 jupyter declarativewidgets activate
 
+# installing R support
+jupyter declarativewidgets installr --library path/to/r/libs
+
 # deactivate it later with
 jupyter declarativewidgets deactivate
 ``` 

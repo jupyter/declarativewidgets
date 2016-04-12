@@ -23,8 +23,8 @@ help:
 	@echo '             all - run all necessary streps to produce and validate a build'
 
 
-ROOT_REPO:=jupyter/all-spark-notebook:8021f892543c
-REPO:=jupyter/all-spark-notebook-bower:8021f892543c
+ROOT_REPO:=jupyter/all-spark-notebook:258e25c03cba
+REPO:=jupyter/all-spark-notebook-bower:258e25c03cba
 SCALA_BUILD_REPO:=jupyter/sbt-toree-image:0.1.0
 
 PYTHON?=python3
@@ -67,7 +67,7 @@ scala_build_image:
 	@-docker rm -f scala-build
 	@docker run -it --user root --name scala-build \
 		cloudet/sbt-sparkkernel-image:1.5.1 bash -c '\
-		curl --location https://pypi.python.org/packages/source/t/toree/toree-0.1.0.dev3.tar.gz >> /opt/toree.tar.gz && \
+		curl --location https://pypi.python.org/packages/source/t/toree/toree-0.1.0.dev4.tar.gz >> /opt/toree.tar.gz && \
 		cd /opt; tar -xf toree.tar.gz; mv toree-* toree'
 	@docker commit scala-build $(SCALA_BUILD_REPO)
 	@-docker rm -f scala-build
@@ -202,7 +202,7 @@ sdist: dist
 	@docker run -it --rm \
 		-v `pwd`/dist:/src \
 		$(EXTRA_OPTIONS) \
-		$(REPO) bash -c '$(SETUP_CMD) cp -r /src /tmp/src && \
+		$(REPO) bash -c '$(PRE_SDIST) cp -r /src /tmp/src && \
 			cd /tmp/src && \
 			python setup.py sdist $(POST_SDIST) && \
 			cp -r dist/*.tar.gz /src/.'
@@ -228,7 +228,7 @@ test-py: dist/urth
 
 _test-py-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
 _test-py-python2: CMD=python --version; python -m unittest discover $(EXTENSION_DIR) "test*[!_py3].py"
-_test-py-python2: SETUP_CMD=source activate python2; pip install -U mock;
+_test-py-python2: PYTHON_ENV_CMD=source activate python2; pip install -U mock;
 _test-py-python2: _test-py
 
 _test-py-python3: EXTENSION_DIR=/usr/local/lib/python3.4/dist-packages/urth
@@ -238,7 +238,7 @@ _test-py-python3: _test-py
 _test-py:
 	@docker run -it --rm \
 		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
-		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'
+		$(REPO) bash -c '$(PYTHON_SETUP_CMD) $(CMD)'
 
 test-scala:
 ifeq ($(NOSCALA), true)
@@ -262,7 +262,7 @@ install: SERVER_NAME?=urth_widgets_install_validation
 install: OPTIONS?=-it --rm
 install: _run-$(PYTHON)
 
-server: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
+server: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
 server: SERVER_NAME?=urth_widgets_server
 server: OPTIONS?=-it --rm
 server: PORT_MAP?=-p 9500:8888
@@ -271,7 +271,7 @@ server: _run-$(PYTHON)
 
 _run-python3: _run
 
-_run-python2: SETUP_CMD=source activate python2; pip install futures==3.0.3;
+_run-python2: PYTHON_SETUP_CMD=source activate python2; pip install futures==3.0.3;
 _run-python2: _run
 
 _run:
@@ -281,31 +281,31 @@ _run:
 		-e SPARK_OPTS="--master=local[4]" \
 		-e USE_HTTP=1 \
 		-v `pwd`:/src \
+		--user jovyan \
 		$(VOL_MAP) \
-		$(REPO) bash -c '$(SETUP_CMD) \
+		$(REPO) bash -c '$(PYTHON_SETUP_CMD) \
 			pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && \
 			jupyter declarativewidgets install --user && \
-			jupyter declarativewidgets installr && \
+			jupyter declarativewidgets installr --library=/opt/conda/lib/R/library&& \
 			jupyter declarativewidgets activate && \
 			$(CMD)'
 
-dev: CMD?=sh -c "R CMD INSTALL /src-kernel-r/declarativewidgets; python --version; ipython notebook --no-browser --port 8888 --ip='*'"
-dev: .watch dist
-	-@CMD='$(CMD)' $(MAKE) _dev-$(PYTHON)
-	@$(MAKE) clean-watch
+dev: CMD?=sh -c "python --version; jupyter notebook --no-browser --port 8888 --ip='*'"
+dev: _dev-$(PYTHON)
 
 _dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
-_dev-python2: SETUP_CMD=source activate python2; pip install futures==3.0.3;
+_dev-python2: PYTHON_SETUP_CMD=source activate python2; pip install futures==3.0.3;
 _dev-python2: _dev
 
-_dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.4/site-packages/urth
+_dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.5/site-packages/urth
 _dev-python3: _dev
 
-_dev: NB_HOME?=/root
-_dev:
+_dev: NB_HOME?=/home/jovyan
+_dev: .watch dist
 	@docker run -it --rm \
 		-p 8888:8888 \
 		-p 4040:4040 \
+		--user jovyan \
 		-e SPARK_OPTS="--master=local[4] --driver-java-options=-Dlog4j.logLevel=trace" \
 		-v `pwd`/dist/urth/widgets/ext/notebook:$(NB_HOME)/.local/share/jupyter/nbextensions/urth_widgets \
 		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
@@ -314,7 +314,8 @@ _dev:
 		-v `pwd`/etc/jupyter_notebook_config.py:$(NB_HOME)/.jupyter/jupyter_notebook_config.py \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
 		-v `pwd`/kernel-r/declarativewidgets:/src-kernel-r/declarativewidgets \
-		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'
+		$(REPO) bash -c 'R CMD INSTALL -l /opt/conda/lib/R/library /src-kernel-r/declarativewidgets; $(PYTHON_SETUP_CMD) $(CMD)'
+	@$(MAKE) clean-watch
 
 start-selenium:
 	@echo "Installing and starting Selenium Server..."
@@ -369,6 +370,6 @@ all: init
 	$(MAKE) dist/docs
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
-release: SETUP_CMD=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;
+release: PRE_SDIST=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;
 release: POST_SDIST=register upload
 release: sdist
