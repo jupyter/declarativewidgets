@@ -7,8 +7,8 @@ import subprocess
 
 from jupyter_core.paths import jupyter_config_dir
 from notebook.services.config import ConfigManager
-from notebook.nbextensions import (InstallNBExtensionApp, EnableNBExtensionApp, 
-    DisableNBExtensionApp, flags, aliases)
+from notebook.nbextensions import (InstallNBExtensionApp, EnableNBExtensionApp,
+                                   DisableNBExtensionApp, flags, aliases)
 from traitlets import Unicode
 from traitlets.config.application import catch_config_error
 from traitlets.config.application import Application
@@ -20,6 +20,7 @@ INSTALL_FLAGS.update(flags)
 INSTALL_ALIASES = {}
 INSTALL_ALIASES.update(aliases)
 del INSTALL_ALIASES['destination']
+
 
 def makedirs(path):
     '''
@@ -33,14 +34,35 @@ def makedirs(path):
         else:
             raise
 
+
 class ExtensionInstallRApp(InstallNBExtensionApp):
     '''Subclass that installs this particular extension.'''
     name = u'jupyter-declarativewidgets-extension-installr'
     description = u'Install the jupyter_declarativewidgets installr extension'
 
+    aliases = {
+        'library': 'ExtensionInstallRApp.library'
+    }
+
+    examples = """
+        jupyter declarativewidgets installr
+        jupyter declarativewidgets installr --library=/path/to/lib
+    """
+
+    library = Unicode('', config=True,
+                      help='''Specify where to install the R package (see -l at https://stat.ethz.ch/R-manual/R-devel/library/utils/html/INSTALL.html).''')
+
     def start(self):
-        self.log.info("installing r widget extensions")
-        subprocess.call("R CMD INSTALL /src/dist/urth/widgets/ext/notebook/urth-widgets.tgz", shell=True)
+        self.log.info("Installing r widget extensions")
+        extra_r_options = ''
+        if self.library is not '':
+            self.log.info("Installing R package into {}".format(self.library))
+            extra_r_options = "-l {}".format(self.library)
+
+        here = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+        extension_path = os.path.join(here, '../notebook')
+        subprocess.call("R CMD INSTALL {0} {1}/urth-widgets.tgz".format(extra_r_options, extension_path), shell=True)
+
 
 class ExtensionInstallApp(InstallNBExtensionApp):
     '''Subclass that installs this particular extension.'''
@@ -67,7 +89,7 @@ class ExtensionInstallApp(InstallNBExtensionApp):
 
         self.log.info("Installing jupyter_declarativewidgets notebook extensions")
         self.extra_args = [os.path.join(here, '../notebook')]
-        self.destination = 'urth_widgets'  #TODO: must change to jupyter_declarativewidgets
+        self.destination = 'urth_widgets'  # TODO: must change to jupyter_declarativewidgets
         self.install_extensions()
 
 
@@ -89,13 +111,13 @@ class ExtensionActivateApp(EnableNBExtensionApp):
     def enable_server_extension(self, extension):
         '''Enables the server side extension in the user config.'''
         server_cm = ConfigManager(config_dir=jupyter_config_dir())
-        
+
         makedirs(server_cm.config_dir)
 
         cfg = server_cm.get('jupyter_notebook_config')
         server_extensions = (
             cfg.setdefault('NotebookApp', {})
-            .setdefault('server_extensions', [])
+                .setdefault('server_extensions', [])
         )
         if extension not in server_extensions:
             cfg['NotebookApp']['server_extensions'] += [extension]
@@ -110,6 +132,7 @@ class ExtensionActivateApp(EnableNBExtensionApp):
         self.enable_nbextension("urth_widgets/js/main")
 
         self.log.info("Done. You may need to restart the Jupyter notebook server for changes to take effect.")
+
 
 class ExtensionDeactivateApp(DisableNBExtensionApp):
     '''Subclass that deactivates this particular extension.'''
@@ -129,20 +152,20 @@ class ExtensionDeactivateApp(DisableNBExtensionApp):
     def disable_server_extension(self, extension):
         '''Disables the server side extension in the user config.'''
         server_cm = ConfigManager(config_dir=jupyter_config_dir())
-        
+
         makedirs(server_cm.config_dir)
 
         cfg = server_cm.get('jupyter_notebook_config')
         if ('NotebookApp' in cfg and
-            'server_extensions' in cfg['NotebookApp'] and
-            extension in cfg['NotebookApp']['server_extensions']):
+                    'server_extensions' in cfg['NotebookApp'] and
+                    extension in cfg['NotebookApp']['server_extensions']):
             cfg['NotebookApp']['server_extensions'].remove(extension)
 
         server_cm.update('jupyter_notebook_config', cfg)
 
         server_extensions = (
             cfg.setdefault('NotebookApp', {})
-            .setdefault('server_extensions', [])
+                .setdefault('server_extensions', [])
         )
         if extension in server_extensions:
             cfg['NotebookApp']['server_extensions'].remove(extension)
@@ -157,6 +180,7 @@ class ExtensionDeactivateApp(DisableNBExtensionApp):
         self.disable_nbextension("urth_widgets/js/main")
 
         self.log.info("Done. You may need to restart the Jupyter notebook server for changes to take effect.")
+
 
 class ExtensionApp(Application):
     '''CLI for extension management.'''
@@ -203,6 +227,7 @@ class ExtensionApp(Application):
 
         # This starts subapps
         super(ExtensionApp, self).start()
+
 
 def main():
     ExtensionApp.launch_instance()

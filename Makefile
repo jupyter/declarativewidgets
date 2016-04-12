@@ -262,7 +262,7 @@ install: SERVER_NAME?=urth_widgets_install_validation
 install: OPTIONS?=-it --rm
 install: _run-$(PYTHON)
 
-server: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
+server: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
 server: SERVER_NAME?=urth_widgets_server
 server: OPTIONS?=-it --rm
 server: PORT_MAP?=-p 9500:8888
@@ -286,7 +286,7 @@ _run:
 		$(REPO) bash -c '$(PYTHON_SETUP_CMD) \
 			pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && \
 			jupyter declarativewidgets install --user && \
-			jupyter declarativewidgets installr && \
+			jupyter declarativewidgets installr --library=/opt/conda/lib/R/library&& \
 			jupyter declarativewidgets activate && \
 			$(CMD)'
 
