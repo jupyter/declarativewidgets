@@ -1,0 +1,21 @@
+{
+  "name": "urth-viz-behaviors",
+  "version": "0.0.1",
+  "authors": [
+    "Jupyter Community"
+  ],
+  "description": "Provides a set of behaviors for the urth-viz elements.",
+  "keywords": [
+    "urth",
+    "web-components",
+    "jupyter"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "private": true
+}

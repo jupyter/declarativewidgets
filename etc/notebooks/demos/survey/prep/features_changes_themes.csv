@@ -1,0 +1,548 @@
+;features_changes_themes;features_changes_keywords
+1;editor,cli,version_control;command line,git(hub)?,diffs?($|\W)
+5;dissemination,ide,visualization,cli,integration;graphics,variables,matplotlib,workspace|ide($|\W)|rstudio,terminal,interact(ion|ive|ity)
+6;hosting,dissemination,documentation;slides(how)?,download,PDF($|\W),nbconvert,doc(s|umentation)?($|\W),slides?,jupyter(\s)?hub
+7;dissemination;knitr,report(ing)?,dashboards?
+9;;
+10;hosting,dissemination,ux;multi(ple|-)?\s?user,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),nbconvert
+11;ux;(window|pane|sidebar|screen|width|height)
+17;content_management,ux;paste,sections,collaps(e|ing|ible),(toc|table of contents)
+19;dissemination,visualization,integration;integrat(e|ion),widgets,(apache\s)?spark,dashboards?
+21;collab;collaborat(ion|ive|ing)
+22;ux;click(ing)?
+23;ide,content_management;debug,variable (explorer|viewer),refactor(ing)?
+26;ide,ux;breakpoints?,collaps(e|ing|ible)
+28;content_management,ux;spell(\s|-)?check(er|ing)?,(toc|table of contents)
+31;hosting,content_management,ux;file(\s)?system,install,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),(window|pane|sidebar|screen|width|height)
+33;;
+35;dissemination,ide,integration,ux;slides?,integrat(e|ion),slides(how)?,debug,navigat(e|ion|ing)
+37;editor;vim?($|\W)|sublime|atom|emacs,(tab|code|auto)-?\s?complet(e|ion)
+39;dissemination,visualization,documentation,ux;undo,publish(ing)?,widgets,doc(s|umentation)?($|\W)
+40;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+41;language,integration,version_control;integrat(e|ion),packages,git(hub)?,python
+42;ide;variables
+46;ux,language;(multiple|groups of|individual) cells,language
+48;;
+49;ux;(window|pane|sidebar|screen|width|height)
+51;hosting,dissemination,integration;matplotlib,integrat(e|ion),install,PDF($|\W)
+52;collab;collaborat(ion|ive|ing)
+53;content_management;file(\s)?system
+54;editor,ide,integration,version_control;integrat(e|ion),git(hub)?,debug,variable (explorer|viewer),diffs?($|\W)
+56;version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?
+59;hosting,ux;paste,sections,docker,collaps(e|ing|ible)
+60;editor,content_management,ux;vim?($|\W)|sublime|atom|emacs,(folders?|director(y|ies)),fold(ing)?(.*cells)?,navigat(e|ion|ing)
+61;editor,integration,ux,version_control;integrat(e|ion),keyboard|short-?cuts?,git(hub)?,(menus?|icons?|buttons?|tooltips?)
+66;editor,version_control;version(ing)?(\snotebooks)?,((version|editing) history)|revisions,git(hub)?,diffs?($|\W)
+68;dissemination,ide,integration,ux;packages,spell(\s|-)?check(er|ing)?,workspace|ide($|\W)|rstudio,slides?
+69;editor,version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?,keyboard|short-?cuts?
+78;;
+79;dissemination;presentations?
+81;hosting,dissemination,ide,documentation,ux;inspector,install,(menus?|icons?|buttons?|tooltips?),interact(ion|ive|ity),doc(s|umentation)?($|\W),how(\s|-)?tos?,click(ing)?,(window|pane|sidebar|screen|width|height)
+85;editor,content_management;keyboard|short-?cuts?,find\s?(\/|and\s)replace
+87;editor,dissemination,visualization;plotting,vim?($|\W)|sublime|atom|emacs,(hot)?key(\s|-)?(mappings|bindings),interact(ion|ive|ity)
+89;integration,ux,version_control;integrat(e|ion),git(hub)?,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+92;;
+93;dissemination;deployment,interact(ion|ive|ity)
+94;dissemination,integration,cli;integrat(e|ion),slides(how)?,terminal,slides?
+95;version_control;git(hub)?
+96;;
+97;editor,integration,version_control;vim?($|\W)|sublime|atom|emacs,integrat(e|ion),git(hub)?
+98;hosting,dissemination,visualization;export,plotting,S3,PDF($|\W)
+99;content_management,ux;(folders?|director(y|ies)),(menus?|icons?|buttons?|tooltips?)
+101;editor,integration,version_control;vim?($|\W)|sublime|atom|emacs,integrat(e|ion),git(hub)?,(hot)?key(\s|-)?(mappings|bindings)
+102;integration,language;integrat(e|ion),R($|\W)
+103;cli,content_management,integration,ux,version_control;g?ui($|\W),integrat(e|ion),terminal,git(hub)?,file(\s)?system
+104;integration,ux,version_control;(source|version) (control|tracking|management),integrat(e|ion),pyflakes,version(ing)?(\snotebooks)?,g?ui($|\W)
+105;hosting,editor,version_control;vim?($|\W)|sublime|atom|emacs,install,version(ing)?(\snotebooks)?,git(hub)?
+107;;
+110;content_management,integration;import,packages
+118;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+119;editor;(text|code) edit(or|ing),(tab|code|auto)-?\s?complet(e|ion)
+120;dissemination,ux;dialog,slides?
+123;;
+126;dissemination,ide,ux;drag,export,drop,debug
+129;content_management,cli;console,file (manager|browser),find\s?(\/|and\s)replace
+131;visualization,integration;matplotlib,widgets
+135;editor,ux;(menus?|icons?|buttons?|tooltips?),g?ui($|\W),keyboard|short-?cuts?,multi(ple\s|-)cursor,(window|pane|sidebar|screen|width|height)
+139;content_management;import,import(able)? (from)? notebooks?
+141;dissemination;slides(how)?,PDF($|\W),slides?
+143;dissemination,documentation,version_control;sharing,version(ing)?(\snotebooks)?,doc(s|umentation)?($|\W)
+145;ide,ux;drop,variables
+146;integration,collab,version_control;integrat(e|ion),git(hub)?,collaborat(ion|ive|ing)
+148;ux;g?ui($|\W)
+151;hosting;install
+152;visualization,integration,language;d3,integrat(e|ion),python
+154;version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?
+155;ux;(multiple|groups of|individual) cells,hid(e|ing|den),(window|pane|sidebar|screen|width|height)
+157;visualization,documentation,integration;instructions?,integrat(e|ion),widgets
+159;editor,ux,language;vim?($|\W)|sublime|atom|emacs,keyboard|short-?cuts?,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),language
+160;hosting,integration,ux,language;cloud,integrat(e|ion),(menus?|icons?|buttons?|tooltips?),R($|\W)
+163;documentation;doc(s|umentation)?($|\W)
+167;language,dissemination,visualization,version_control;deployment,git(hub)?,python,interact(ion|ive|ity),widgets
+173;;
+176;ux;copy/paste,navigat(e|ion|ing),paste,sections,(window|pane|sidebar|screen|width|height)
+179;version_control;git(hub)?
+184;editor;keyboard|short-?cuts?
+186;ux,version_control;git(hub)?,undo
+198;ide,content_management,cli,language;console,import,python,variables
+204;;
+211;editor,ide,visualization;(text|code) edit(or|ing),vim?($|\W)|sublime|atom|emacs,(tab|code|auto)-?\s?complet(e|ion),widgets,debug
+216;dissemination,version_control;git(hub)?,dashboards?
+220;hosting,dissemination,integration,version_control;integrat(e|ion),users,git(hub)?,interact(ion|ive|ity)
+221;ux;spell(\s|-)?check(er|ing)?
+229;editor,version_control;version(ing)?(\snotebooks)?,diffs?($|\W)
+232;ux;(window|pane|sidebar|screen|width|height)
+235;ux;progress bar
+237;dissemination,ide,integration;download,packages,PDF($|\W),debug
+238;ide,integration;integrat(e|ion),debug
+240;;
+246;editor,integration;matplotlib,keyboard|short-?cuts?,pandoc
+249;dissemination;report(ing)?
+250;visualization,integration,language;integrat(e|ion),graphics,(apache\s)?spark,R($|\W)
+252;integration,version_control;integrat(e|ion),version(ing)?(\snotebooks)?,git(hub)?
+254;editor,visualization,ux;vim?($|\W)|sublime|atom|emacs,visualization,(window|pane|sidebar|screen|width|height)
+258;dissemination;export
+259;;
+262;editor;(text|code) edit(or|ing)
+263;editor,ide,integration,ux;diffs?($|\W),integrat(e|ion),(menus?|icons?|buttons?|tooltips?),variables
+264;ide,cli,integration;console,integrat(e|ion),matplotlib,profil(er|ing)
+267;hosting,dissemination,documentation,ux;dashboards?,paste,install,doc(s|umentation)?($|\W),copy/paste
+268;ux;paste
+270;editor,dissemination,integration;vim?($|\W)|sublime|atom|emacs,integrat(e|ion),(hot)?key(\s|-)?(mappings|bindings),interact(ion|ive|ity)
+271;editor;(text|code) edit(or|ing)
+273;content_management,ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),hierarchy
+275;editor;vim?($|\W)|sublime|atom|emacs,(hot)?key(\s|-)?(mappings|bindings)
+277;editor,content_management;vim?($|\W)|sublime|atom|emacs,import
+278;content_management,ux;file(\s)?system,sections,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+284;content_management,ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),(toc|table of contents)
+286;dissemination,content_management,version_control;slides(how)?,PDF($|\W),nbconvert,git(hub)?,slides?,(folders?|director(y|ies))
+290;language,ide,ux,version_control;version(ing)?(\snotebooks)?,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),python,variables
+293;hosting,visualization;hosting,graphics,cluster
+298;cli,ux,language;terminal,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),python
+300;editor;lint(ing|er)s?
+303;ux;fold(ing)?(.*cells)?
+305;editor,integration,collab;integrat(e|ion),packages,collaborat(ion|ive|ing),diffs?($|\W)
+309;editor;vim?($|\W)|sublime|atom|emacs
+310;dissemination,integration;integrat(e|ion),interact(ion|ive|ity)
+311;documentation;doc(s|umentation)?($|\W)
+312;documentation,compatibility;communication of changes,doc(s|umentation)?($|\W)
+314;dissemination;PDF($|\W),nbconvert
+316;content_management;search
+324;editor,content_management;(text|code) edit(or|ing),vim?($|\W)|sublime|atom|emacs,tagging
+332;editor,documentation,version_control;(text|code) edit(or|ing),git(hub)?,doc(s|umentation)?($|\W)
+333;editor,ide,integration;integrat(e|ion),debug,diffs?($|\W)
+336;ide,visualization,ux;drag,graphics,drop,variables
+338;hosting,ide;install,debug
+340;dissemination,visualization;graphics,interact(ion|ive|ity)
+341;ide;variables
+342;content_management,ux,version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?,fold(ing)?(.*cells)?,(toc|table of contents)
+344;dissemination,editor,documentation,version_control;(source|version) (control|tracking|management),PDF($|\W),version(ing)?(\snotebooks)?,how(\s|-)?tos?,doc(s|umentation)?($|\W),keyboard|short-?cuts?
+346;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+348;editor,ide,ux;(tab|code|auto)-?\s?complet(e|ion),(multiple|groups of|individual) cells,undo,profil(er|ing)
+350;dissemination,visualization,editor,ux;graphics,sections,interact(ion|ive|ity),keyboard|short-?cuts?,navigat(e|ion|ing)
+352;dissemination,ux;drag,slides(how)?,undo,drop,slides?
+353;ux,version_control;version(ing)?(\snotebooks)?,fold(ing)?(.*cells)?
+355;hosting,integration,collab,version_control;integrat(e|ion),users,git(hub)?,collaborat(ion|ive|ing)
+356;dissemination,integration,collab,version_control;(source|version) (control|tracking|management),integrat(e|ion),version(ing)?(\snotebooks)?,collaborat(ion|ive|ing),interact(ion|ive|ity)
+358;ide;debug
+365;editor;vim?($|\W)|sublime|atom|emacs
+366;hosting,ux;jupyter(\s)?hub,(window|pane|sidebar|screen|width|height)
+368;editor;vim?($|\W)|sublime|atom|emacs
+370;integration,version_control;integrat(e|ion),git(hub)?
+374;dissemination,visualization;d3,interact(ion|ive|ity),slides?
+377;ide,ux;sections,collaps(e|ing|ible),variable (explorer|viewer)
+384;editor,collab,integration,version_control;matplotlib,collaborat(ion|ive|ing),git(hub)?,diffs?($|\W)
+385;editor,integration;integrat(e|ion),diffs?($|\W)
+394;hosting,ux;install,(menus?|icons?|buttons?|tooltips?)
+396;integration,version_control;integrat(e|ion),git(hub)?
+399;ide,language;workspace|ide($|\W)|rstudio,language
+400;dissemination,ux,version_control;(source|version) (control|tracking|management),sharing,g?ui($|\W),version(ing)?(\snotebooks)?
+403;hosting,integration,language;R($|\W),integrat(e|ion),desktop
+406;hosting,dissemination,ide,ux;hid(e|ing) (code|cells|input),hid(e|ing|den),workspace|ide($|\W)|rstudio,variable (explorer|viewer),desktop,presentations?
+408;dissemination,ide,integration,ux;integrat(e|ion),hid(e|ing) (code|cells|input),slides(how)?,hid(e|ing|den),PDF($|\W),workspace|ide($|\W)|rstudio,slides?,(window|pane|sidebar|screen|width|height)
+411;dissemination,ide,collab,ux;presentations?,collaborat(ion|ive|ing),spell(\s|-)?check(er|ing)?,workspace|ide($|\W)|rstudio,slides?
+413;editor;(better|powerful|external) edit(or|ing)
+414;content_management,integration,ux,language;matplotlib,import,python,(menus?|icons?|buttons?|tooltips?)
+418;ide,integration,version_control;integrat(e|ion),git(hub)?,debug
+419;editor,integration,version_control;(text|code) edit(or|ing),integrat(e|ion),git(hub)?
+421;hosting,ux;g?ui($|\W),users,(window|pane|sidebar|screen|width|height)
+425;hosting,version_control;multi(ple|-)?\s?user,((version|editing) history)|revisions
+426;hosting;hosting
+431;ide,content_management,integration,version_control;integrat(e|ion),git(hub)?,workspace|ide($|\W)|rstudio,search
+434;editor,ux;syntax,(tab|code|auto)-?\s?complet(e|ion),click(ing)?
+437;visualization;widgets
+439;editor,ide,content_management,integration;integrat(e|ion),keyboard|short-?cuts?,debug,search
+441;content_management,ux;(folders?|director(y|ies)),fold(ing)?(.*cells)?
+445;;
+448;editor,language;syntax,vim?($|\W)|sublime|atom|emacs,python,R($|\W)
+450;editor,language;(better|powerful|external) edit(or|ing),C\/C
+452;ux;(window|pane|sidebar|screen|width|height)
+453;ux;drag,drag(/|&)drop,drop
+456;visualization,version_control;visualization,git(hub)?
+458;dissemination,version_control;git(hub)?,nbconvert
+460;editor,integration,ux;integrat(e|ion),(tab|code|auto)-?\s?complet(e|ion),(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+462;ux;hid(e|ing|den)
+463;editor,ux,language;vim?($|\W)|sublime|atom|emacs,(multiple|groups of|individual) cells,python
+471;ux;paste
+472;integration,version_control;integrat(e|ion),git(hub)?
+473;editor;(text|code) edit(or|ing)
+475;visualization,content_management,ux;(folders?|director(y|ies)),widgets,fold(ing)?(.*cells)?
+480;dissemination;presentations?,interact(ion|ive|ity)
+482;hosting;cloud
+483;ux;click(ing)?
+486;dissemination,visualization,integration,ux;export,d3,integrat(e|ion),PDF($|\W),mobile
+487;dissemination;slides(how)?,slides?
+491;editor;curser
+493;ide,ux;workspace|ide($|\W)|rstudio,hid(e|ing|den)
+495;ide,ux;fold(ing)?(.*cells)?,debug,workspace|ide($|\W)|rstudio,inspector
+496;cranky,ide;dial down the hype,debug
+498;hosting,integration;integrat(e|ion),desktop
+499;editor;syntax,(tab|code|auto)-?\s?complet(e|ion)
+500;;
+504;hosting;multi(ple|-)?\s?user
+505;hosting,documentation;how(\s|-)?tos?,jupyter(\s)?hub,doc(s|umentation)?($|\W)
+509;editor,visualization,ux;(text|code) edit(or|ing),visualization,(menus?|icons?|buttons?|tooltips?),(window|pane|sidebar|screen|width|height)
+515;;
+517;ux,version_control;(source|version) (control|tracking|management),g?ui($|\W),version(ing)?(\snotebooks)?
+534;editor,ide;vim?($|\W)|sublime|atom|emacs,(text|code) edit(or|ing),workspace|ide($|\W)|rstudio
+535;ide,ux;(window|pane|sidebar|screen|width|height),inspector,variables
+540;performance,version_control;(source|version) (control|tracking|management),cach(e|ing),version(ing)?(\snotebooks)?
+541;language;python
+542;dissemination,ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),publish(ing)?,spell(\s|-)?check(er|ing)?
+549;hosting,language;cloud,fortran,language
+551;compatibility,ux;package updates,sections
+556;;
+559;dissemination,ide,documentation,integration;how(\s|-)?tos?,packages,report(ing)?,workspace|ide($|\W)|rstudio,doc(s|umentation)?($|\W)
+561;content_management,integration,ux,language;file(\s)?system,(apache\s)?spark,click(ing)?,clojure,navigat(e|ion|ing)
+575;language;language
+576;editor,dissemination,integration,ux;matplotlib,(better|powerful|external) edit(or|ing),fold(ing)?(.*cells)?,interact(ion|ive|ity)
+578;content_management,ux;paste,hierarchy
+579;version_control;git(hub)?
+580;ide,language;workspace|ide($|\W)|rstudio,R($|\W)
+584;ide,ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),debug
+587;integration,ux,version_control;integrat(e|ion),undo,git(hub)?
+592;visualization;widgets
+594;editor,ux;keyboard|short-?cuts?,(menus?|icons?|buttons?|tooltips?)
+595;visualization,language;d3,language
+600;dissemination;export
+605;;
+606;editor,integration,ux;vim?($|\W)|sublime|atom|emacs,integrat(e|ion),(moving|reordering) cells
+610;;
+612;hosting;backup
+613;content_management;(folders?|director(y|ies))
+616;hosting,content_management;install,search
+617;visualization;widgets
+620;;
+627;ux;(menus?|icons?|buttons?|tooltips?)
+630;ide,ux;paste,breakpoints?,copy/paste
+641;;
+643;editor;vim?($|\W)|sublime|atom|emacs,(better|powerful|external) edit(or|ing)
+646;ide,ux,version_control;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),workspace|ide($|\W)|rstudio,hid(e|ing|den),git(hub)?
+651;ux;fold(ing)?(.*cells)?
+654;editor,visualization,language;d3,(better|powerful|external) edit(or|ing),keyboard|short-?cuts?,language
+661;ide,ux,language;R($|\W),(window|pane|sidebar|screen|width|height),variables
+663;documentation,integration;integrat(e|ion),doc(s|umentation)?($|\W)
+664;ux;scrol(ling)?,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+666;content_management;(folders?|director(y|ies))
+668;editor,documentation;lint(ing|er)s?,doc(s|umentation)?($|\W)
+669;ide,cli;console,workspace|ide($|\W)|rstudio
+671;ide;pdb
+672;visualization;graphics
+677;editor,collab,version_control;keyboard|short-?cuts?,git(hub)?,collaborat(ion|ive|ing),diffs?($|\W)
+681;;
+689;visualization,documentation,language;javascript,widgets,doc(s|umentation)?($|\W)
+700;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+706;hosting,dissemination,ide,language;R($|\W),docker,workspace|ide($|\W)|rstudio,dashboards?
+710;;
+711;;
+712;hosting,documentation,ux,version_control;doc(s|umentation)?($|\W),install,jupyter(\s)?hub,git(hub)?,(window|pane|sidebar|screen|width|height)
+716;ide,ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),workspace|ide($|\W)|rstudio,hid(e|ing|den)
+718;hosting,editor;vim?($|\W)|sublime|atom|emacs,keyboard|short-?cuts?,multi(ple\s|-)cursor,desktop
+738;editor,integration;integrat(e|ion),pydb,(better|powerful|external) edit(or|ing)
+742;hosting,ux;cloud,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+749;performance,content_management;cach(e|ing),refactor(ing)?
+753;ux,language;drag,drag(/|&)drop,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),drop,language
+755;language;python
+756;content_management,ux;scrol(ling)?,(folders?|director(y|ies)),fold(ing)?(.*cells)?
+759;integration;matplotlib
+765;ux;(menus?|icons?|buttons?|tooltips?)
+766;editor,cli,ux,language;console,vim?($|\W)|sublime|atom|emacs,python,(hot)?key(\s|-)?(mappings|bindings),(window|pane|sidebar|screen|width|height)
+773;editor,cli,ux;g?ui($|\W),keyboard|short-?cuts?,terminal
+780;editor,ux;(better|powerful|external) edit(or|ing),fold(ing)?(.*cells)?
+781;dissemination,performance;reus(e|able),performance
+785;ide;variables
+786;editor,visualization,performance,language;(tab|code|auto)-?\s?complet(e|ion),more speed,widgets,python
+800;dissemination,visualization;widgets,interact(ion|ive|ity)
+803;dissemination;report(ing)?
+806;hosting,ux;paste,cluster
+808;ux;(multiple|groups of|individual) cells,all cells
+815;ux;(window|pane|sidebar|screen|width|height)
+816;content_management;tagging,search
+823;editor;vim?($|\W)|sublime|atom|emacs,(hot)?key(\s|-)?(mappings|bindings)
+824;integration,version_control;integrat(e|ion),git(hub)?
+828;editor;(better|powerful|external) edit(or|ing)
+829;ux;sections,(multiple|groups of|individual) cells,fold(ing)?(.*cells)?
+830;dissemination,content_management,ux;export,import,(multiple|groups of|individual) cells
+835;hosting,editor,integration;integrat(e|ion),vim?($|\W)|sublime|atom|emacs,users
+838;editor,integration,ux;(text|code) edit(or|ing),integrat(e|ion),fold(ing)?(.*cells)?
+839;dissemination,version_control;sharing,git(hub)?
+845;ux;(window|pane|sidebar|screen|width|height)
+846;documentation;doc(s|umentation)?($|\W)
+849;hosting,dissemination;sharing,users
+859;;
+863;;
+864;editor,language;(text|code) edit(or|ing),language
+865;dissemination;export,PDF($|\W)
+869;dissemination;interact(ion|ive|ity)
+872;editor,ide,ux;hid(e|ing|den),drag,workspace|ide($|\W)|rstudio,keyboard|short-?cuts?,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),drop
+873;ux,language;paste,python
+877;integration,version_control;(source|version) (control|tracking|management),integrat(e|ion),version(ing)?(\snotebooks)?,git(hub)?
+881;version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?
+884;ide;variables
+887;dissemination,ide,visualization;plotting,workspace|ide($|\W)|rstudio,interact(ion|ive|ity)
+889;integration,language;integrat(e|ion),python
+890;ux;toggle
+892;ux;undo,mobile
+894;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),progress bar
+897;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+898;editor;(tab|code|auto)-?\s?complet(e|ion)
+902;editor,ux,language;vim?($|\W)|sublime|atom|emacs,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),language
+904;dissemination,ux;knitr,hid(e|ing|den)
+906;language;language
+915;dissemination;interact(ion|ive|ity)
+916;integration;third-party
+918;ide,ux;breakpoints?,undo
+919;editor,ux;keyboard|short-?cuts?,(window|pane|sidebar|screen|width|height)
+922;ux;paste,(menus?|icons?|buttons?|tooltips?)
+926;editor;vim?($|\W)|sublime|atom|emacs,keyboard|short-?cuts?
+931;ide,documentation;workspace|ide($|\W)|rstudio,doc(s|umentation)?($|\W)
+940;visualization,integration;integrat(e|ion),d3,visualization
+947;editor;(tab|code|auto)-?\s?complet(e|ion)
+960;content_management,ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),(toc|table of contents)
+966;ide,content_management;import,workspace|ide($|\W)|rstudio,variables
+969;content_management;import
+970;editor;vim?($|\W)|sublime|atom|emacs,(hot)?key(\s|-)?(mappings|bindings)
+972;;
+974;dissemination;interact(ion|ive|ity)
+979;hosting,integration,version_control;integrat(e|ion),multi(ple|-)?\s?user,git(hub)?
+987;ux;(window|pane|sidebar|screen|width|height)
+994;ux;dialog,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+996;;
+998;ux,version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?,(multiple|groups of|individual) cells
+1002;editor,integration;integrat(e|ion),(tab|code|auto)-?\s?complet(e|ion),(hot)?key(\s|-)?(mappings|bindings)
+1016;ide,integration;integrat(e|ion),debug
+1018;dissemination,ide,content_management,ux,editor,visualization,integration;integrat(e|ion),hid(e|ing) (code|cells|input),graphics,hid(e|ing|den),import,workspace|ide($|\W)|rstudio,keyboard|short-?cuts?
+1020;integration;integrat(e|ion)
+1022;integration;integrat(e|ion),django
+1024;editor;keyboard|short-?cuts?
+1026;integration,version_control;integrat(e|ion),git(hub)?
+1029;ide,language;workspace|ide($|\W)|rstudio,python
+1031;visualization,ux,version_control;plotting,g?ui($|\W),git(hub)?
+1032;ide;workspace|ide($|\W)|rstudio
+1035;;
+1042;ux;collaps(e|ing|ible)
+1047;ide,integration;integrat(e|ion),workspace|ide($|\W)|rstudio
+1048;hosting,integration,ux,version_control;(source|version) (control|tracking|management),g?ui($|\W),integrat(e|ion),version(ing)?(\snotebooks)?,install
+1050;dissemination,content_management;slides?,interact(ion|ive|ity),(toc|table of contents)
+1053;dissemination,documentation,ux;export,doc(s|umentation)?($|\W),(window|pane|sidebar|screen|width|height)
+1054;collab,integration,version_control;(source|version) (control|tracking|management),integrat(e|ion),version(ing)?(\snotebooks)?,collaborat(ion|ive|ing)
+1064;hosting;install
+1065;editor,content_management,ux;(toc|table of contents),vim?($|\W)|sublime|atom|emacs,collaps(e|ing|ible),navigat(e|ion|ing)
+1074;ux;fold(ing)?(.*cells)?
+1076;;
+1083;dissemination,ux;sharing,(window|pane|sidebar|screen|width|height),dashboards?
+1087;version_control;git(hub)?
+1090;version_control;version(ing)?(\snotebooks)?,control version
+1092;hosting,collab;multi(ple|-)?\s?user,collaborat(ion|ive|ing)
+1093;ux;hid(e|ing|den)
+1095;ide,visualization,integration;d3,integrat(e|ion),variables
+1100;ide,integration;integrat(e|ion),workspace|ide($|\W)|rstudio
+1102;dissemination,cli;command line,report(ing)?
+1104;documentation,integration,ux;(window|pane|sidebar|screen|width|height),integrat(e|ion),matplotlib,doc(s|umentation)?($|\W)
+1107;ux;collaps(e|ing|ible)
+1116;version_control;git(hub)?
+1122;;
+1124;language;python
+1125;language;R($|\W)
+1129;collab,ux;(window|pane|sidebar|screen|width|height),collaborat(ion|ive|ing),navigat(e|ion|ing)
+1131;dissemination,visualization;export,slides(how)?,widgets,publish(ing)?,slides?
+1133;;
+1139;documentation;doc(s|umentation)?($|\W)
+1145;ide,content_management,cli,ux;workspace|ide($|\W)|rstudio,fold(ing)?(.*cells)?,terminal,(folders?|director(y|ies)),(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),click(ing)?,(window|pane|sidebar|screen|width|height)
+1151;dissemination,version_control;sharing,change track(er|ing),version(ing)?(\snotebooks)?
+1157;ux;g?ui($|\W)
+1159;editor,ux;g?ui($|\W),(menus?|icons?|buttons?|tooltips?),navigat(e|ion|ing),scrol(ling)?,keyboard|short-?cuts?,drop,collaps(e|ing|ible),(window|pane|sidebar|screen|width|height)
+1161;;
+1162;content_management;find\s?(\/|and\s)replace
+1164;integration,ux,version_control;(source|version) (control|tracking|management),integrat(e|ion),version(ing)?(\snotebooks)?,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+1166;ide;workspace|ide($|\W)|rstudio,variables
+1169;editor,dissemination;export,(text|code) edit(or|ing),nbconvert
+1172;editor;parenthes(e|i)s,(text|code) edit(or|ing)
+1176;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+1178;visualization,ide,integration,ux,version_control;scrol(ling)?,integrat(e|ion),visualization,git(hub)?,workspace|ide($|\W)|rstudio
+1182;hosting,ide;multi(ple|-)?\s?user,workspace|ide($|\W)|rstudio,debug
+1184;content_management;import
+1186;dissemination,content_management,cli,ux,visualization,language;export,console,python,import,PDF($|\W),(menus?|icons?|buttons?|tooltips?),widgets
+1188;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+1192;integration;integrat(e|ion)
+1204;;
+1212;ux;undo,(window|pane|sidebar|screen|width|height)
+1214;dissemination,content_management,ux;(toc|table of contents),dashboards?,export,navigat(e|ion|ing)
+1218;ide,cli;command line,workspace|ide($|\W)|rstudio,variables
+1221;;
+1226;ux;(window|pane|sidebar|screen|width|height),(menus?|icons?|buttons?|tooltips?),navigat(e|ion|ing)
+1230;ide,integration,version_control;(source|version) (control|tracking|management),integrat(e|ion),version(ing)?(\snotebooks)?,inspector
+1233;editor;vim?($|\W)|sublime|atom|emacs
+1234;hosting,integration;cloud,integrat(e|ion)
+1236;ide;variable (explorer|viewer)
+1239;dissemination,visualization,integration,ux;matplotlib,widgets,interact(ion|ive|ity),hid(e|ing|den)
+1242;ide;breakpoints?,debug,variables
+1243;integration,version_control;matplotlib,change track(er|ing)
+1247;editor,cli;(text|code) edit(or|ing),terminal
+1253;visualization,integration;d3,integrat(e|ion),visualization
+1254;ide,ux;paste,workspace|ide($|\W)|rstudio,copy/paste
+1255;;
+1257;editor,ux;vim?($|\W)|sublime|atom|emacs,fold(ing)?(.*cells)?,mobile,collaps(e|ing|ible)
+1258;;
+1264;documentation,visualization;widgets,doc(s|umentation)?($|\W)
+1267;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+1268;ide;inspector
+1270;collab,ux,version_control;version(ing)?(\snotebooks)?,(multiple|groups of|individual) cells,collaborat(ion|ive|ing)
+1272;dissemination,ide,documentation;report(ing)?,debug,doc(s|umentation)?($|\W)
+1274;;
+1282;content_management;file (manager|browser),(folders?|director(y|ies))
+1285;ux;spell(\s|-)?check(er|ing)?
+1287;integration,version_control;integrat(e|ion),git(hub)?
+1291;dissemination,ide,ux;slides(how)?,hid(e|ing|den),(multiple|groups of|individual) cells,workspace|ide($|\W)|rstudio,slides?,presentations?
+1306;version_control;((version|editing) history)|revisions,version(ing)?(\snotebooks)?,revisions/code
+1308;content_management;find\s?(\/|and\s)replace
+1314;ux,version_control;sections,git(hub)?,(multiple|groups of|individual) cells,fold(ing)?(.*cells)?
+1317;ide,language;python,variables
+1325;;
+1332;editor;(tab|code|auto)-?\s?complet(e|ion),lint(ing|er)s?
+1333;integration,version_control;(source|version) (control|tracking|management),integrat(e|ion),version(ing)?(\snotebooks)?,pandoc
+1334;language,compatibility,integration,version_control;(source|version) (control|tracking|management),integrat(e|ion),version(ing)?(\snotebooks)?,compatib(ility|le),python
+1335;editor;keyboard|short-?cuts?
+1342;version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?
+1343;dissemination,ide,ux,language;language,presentations?,workspace|ide($|\W)|rstudio,navigat(e|ion|ing)
+1347;ux;(window|pane|sidebar|screen|width|height),navigat(e|ion|ing)
+1354;;
+1355;integration,ux;integrat(e|ion),(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+1356;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+1359;editor;keyboard|short-?cuts?
+1360;ux;collaps(e|ing|ible)
+1363;ux;g?ui($|\W),(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+1364;;
+1366;ux,language;collaps(e|ing|ible),language
+1368;content_management,ux;file(\s)?system,(folders?|director(y|ies)),fold(ing)?(.*cells)?
+1369;cli;console
+1375;editor,dissemination;export,(tab|code|auto)-?\s?complet(e|ion),PDF($|\W)
+1378;hosting,dissemination,editor,ux;multi(ple|-)?\s?user,vim?($|\W)|sublime|atom|emacs,keyboard|short-?cuts?,undo,interact(ion|ive|ity)
+1379;editor,content_management,ux;(text|code) edit(or|ing),collaps(e|ing|ible),search
+1381;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+1382;hosting;multi(ple|-)?\s?user
+1384;language,dissemination,ide,integration,version_control;integrat(e|ion),knitr,git(hub)?,workspace|ide($|\W)|rstudio,R($|\W)
+1389;visualization,ux;g?ui($|\W),visualization
+1390;dissemination,version_control;reus(e|able),git(hub)?
+1393;collab,version_control;git(hub)?,collaborat(ion|ive|ing)
+1400;integration;integrat(e|ion)
+1408;ux;(moving|reordering) cells
+1409;hosting;multi(ple|-)?\s?user
+1415;;
+1417;integration,language;integrat(e|ion),R($|\W)
+1419;version_control,dissemination,documentation,language;language,download,git(hub)?,doc(s|umentation)?($|\W)
+1420;editor,ide,ux;keyboard|short-?cuts?,workspace|ide($|\W)|rstudio,click(ing)?,hid(e|ing|den)
+1425;;
+1426;ide,ux;workspace|ide($|\W)|rstudio,hid(e|ing|den),navigat(e|ion|ing)
+1427;ide,ux;progress bar,variables
+1428;dissemination,ux;drag,hid(e|ing) (code|cells|input),drop,hid(e|ing|den)
+1431;hosting,ux;multi(ple|-)?\s?user,sections
+1432;dissemination,ide,ux;export,toggle,workspace|ide($|\W)|rstudio,hid(e|ing|den)
+1434;collab,version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?,collaborat(ion|ive|ing)
+1441;editor,integration,version_control;integrat(e|ion),git(hub)?,diffs?($|\W)
+1450;language,content_management,ide,integration,version_control;(source|version) (control|tracking|management),python,packages,version(ing)?(\snotebooks)?,debug,search
+1453;collab,version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?,collaborat(ion|ive|ing)
+1454;dissemination;dashboards?
+1456;content_management,integration;integrat(e|ion),search
+1458;integration,ux;matplotlib,(menus?|icons?|buttons?|tooltips?),navigat(e|ion|ing)
+1460;;
+1463;ide;workspace|ide($|\W)|rstudio
+1464;ide,performance,ux;g?ui($|\W),performance,workspace|ide($|\W)|rstudio
+1466;version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?
+1468;;
+1469;ux;sections,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+1470;integration,ux;matplotlib,(window|pane|sidebar|screen|width|height)
+1472;hosting,language;users,language
+1476;editor,version_control;(better|powerful|external) edit(or|ing),version(ing)?(\snotebooks)?
+1477;dissemination,content_management,language;javascript,import,nbconvert
+1478;hosting;multi(ple|-)?\s?user
+1479;;
+1480;hosting,visualization,integration;multi(ple|-)?\s?user,d3,integrat(e|ion),jupyter(\s)?hub
+1481;documentation,content_management,language;language,file(\s)?system,doc(s|umentation)?($|\W)
+1484;editor;keyboard|short-?cuts?
+1487;hosting,editor,integration,version_control;multi(ple|-)?\s?user,integrat(e|ion),(text|code) edit(or|ing),git(hub)?
+1490;version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?
+1493;cli,ux,language;copy/paste,python,(multiple|groups of|individual) cells,command line,R($|\W),paste,language
+1494;;
+1503;dissemination,ux;sections,publish(ing)?,hid(e|ing|den)
+1504;dissemination,ide,ux;hid(e|ing) (code|cells|input),undo,workspace|ide($|\W)|rstudio,hid(e|ing|den),(menus?|icons?|buttons?|tooltips?)
+1507;editor;vim?($|\W)|sublime|atom|emacs
+1512;cli;cli($|\W)
+1515;hosting,dissemination,documentation,collab;deployment,jupyter(\s)?hub,collaborat(ion|ive|ing),doc(s|umentation)?($|\W)
+1517;editor,cli;(text|code) edit(or|ing),terminal
+1518;compatibility,version_control;compatib(ility|le),git(hub)?
+1520;;
+1524;hosting,dissemination;cloud,report(ing)?
+1525;;
+1527;;
+1530;dissemination,content_management,ide,ux;hid(e|ing) (code|cells|input),presentations?,workspace|ide($|\W)|rstudio,hid(e|ing|den),(toc|table of contents)
+1534;documentation,compatibility,ux,version_control;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),git(hub)?,compatib(ility|le),doc(s|umentation)?($|\W)
+1541;integration,collab,version_control;integrat(e|ion),git(hub)?,collaborat(ion|ive|ing)
+1551;content_management,ux;g?ui($|\W),import,dialog
+1556;ux;todo
+1557;content_management,collab,language;file (manager|browser),collaborat(ion|ive|ing),language
+1559;editor,ux,version_control;(text|code) edit(or|ing),paste,version(ing)?(\snotebooks)?
+1562;editor,integration,ux;integrat(e|ion),keyboard|short-?cuts?,mobile
+1563;;
+1564;editor,ux;(better|powerful|external) edit(or|ing),navigat(e|ion|ing)
+1573;ux;hid(e|ing|den),collaps(e|ing|ible),all cells
+1575;cli,integration,ux,version_control;(source|version) (control|tracking|management),integrat(e|ion),wordpress,version(ing)?(\snotebooks)?,git(hub)?,terminal,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),(window|pane|sidebar|screen|width|height)
+1583;integration,version_control;integrat(e|ion),git(hub)?
+1587;dissemination,ux;export,presentations?,navigat(e|ion|ing)
+1590;dissemination,ux,version_control,hosting,documentation,integration;instructions?,integrat(e|ion),install,git(hub)?,click(ing)?,nbviewer
+1594;visualization,ux;drag,widgets,drop
+1595;content_management;search
+1598;version_control;git(hub)?
+1600;hosting,dissemination,visualization,integration,ux;g?ui($|\W),integrat(e|ion),deployment,jupyter(\s)?hub,visualization,click(ing)?
+1601;editor;(text|code) edit(or|ing)
+1603;dissemination;slides(how)?,slides?
+1604;hosting,documentation,visualization,ux;tmpnb,tutorials?,scrol(ling)?,jupyter(\s)?hub,visualization,(window|pane|sidebar|screen|width|height)
+1606;editor,ide;vim?($|\W)|sublime|atom|emacs,workspace|ide($|\W)|rstudio
+1609;dissemination,ide,ux;hid(e|ing) (code|cells|input),workspace|ide($|\W)|rstudio,hid(e|ing|den),dashboards?
+1611;hosting,dissemination;multi(ple|-)?\s?user,deployment,users
+1616;hosting,dissemination,ux,version_control;(menus?|icons?|buttons?|tooltips?),cloud,git(hub)?,sharing,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),click(ing)?
+1618;collab;collaborat(ion|ive|ing)
+1622;ux;(multiple|groups of|individual) cells
+1623;dissemination,content_management,ux;g?ui($|\W),file (manager|browser),dashboards?
+1626;;
+1630;ide,ux;click(ing)?,variable (explorer|viewer),(menus?|icons?|buttons?|tooltips?)
+1637;;
+1639;editor,ux;parenthes(e|i)s,(multiple|groups of|individual) cells
+1644;dissemination,ide,ux;g?ui($|\W),hid(e|ing) (code|cells|input),workspace|ide($|\W)|rstudio,hid(e|ing|den),debug
+1645;dissemination,ide,cli,ux;console,profil(er|ing),interact(ion|ive|ity),debug,(window|pane|sidebar|screen|width|height)
+1650;ux,version_control;version(ing)?(\snotebooks)?,(window|pane|sidebar|screen|width|height)
+1654;;
+1657;editor,integration;matplotlib,(text|code) edit(or|ing),vim?($|\W)|sublime|atom|emacs,keyboard|short-?cuts?
+1661;content_management;file(\s)?system
+1662;hosting,dissemination,visualization,content_management,integration;integrat(e|ion),(apache\s)?spark,import,cluster,interact(ion|ive|ity),visualization
+1668;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),(menus?|icons?|buttons?|tooltips?)
+1681;dissemination,ide,integration,ux;integrat(e|ion),hid(e|ing) (code|cells|input),(apache\s)?spark,workspace|ide($|\W)|rstudio,hid(e|ing|den)
+1683;hosting,dissemination;export,multi(ple|-)?\s?user
+1686;editor,ux;syntax,collaps(e|ing|ible)
+1690;editor;(text|code) edit(or|ing)
+1691;documentation,collab,ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),collaborat(ion|ive|ing),doc(s|umentation)?($|\W)
+1693;ux;fold(ing)?(.*cells)?
+1694;ux;(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r),collaps(e|ing|ible)
+1695;ide,version_control;(source|version) (control|tracking|management),version(ing)?(\snotebooks)?,git(hub)?,variable (explorer|viewer)
+1700;editor,ux,version_control;(source|version) (control|tracking|management),g?ui($|\W),version(ing)?(\snotebooks)?,keyboard|short-?cuts?,(styles?|stylesheets?|CSS|theme|skin|font|colo(u)?r)
+1702;ux;(menus?|icons?|buttons?|tooltips?)

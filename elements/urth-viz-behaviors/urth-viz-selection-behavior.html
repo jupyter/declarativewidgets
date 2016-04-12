@@ -1,0 +1,41 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<script>
+    'use strict';
+    (function() {
+        window.Urth = window.Urth || {};
+
+        /**
+         * Behavior that encapsulates some of the properties and functions
+         * needed by visualization elements.
+         *
+         * @group Urth Viz
+         * @polymerBehavior Urth.VizSelectionBehavior
+         */
+        Urth.VizSelectionBehavior = {
+            properties: {
+                /**
+                 * The data row corresponding to the currently selected row.  Array of rows where 'multiSelect' is enabled
+                */
+                selection: {
+                    type: Array,
+                    value: function () { return []; },
+                    readOnly: true,
+                    notify: true
+                },
+
+                /**
+                 * False by default to return 'selection' as an array of values.
+                 * If true, will return 'selection' as an object with key-value pairs (with column names as keys).
+                 */
+                selectionAsObject: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                }
+            }
+        };
+    })();
+</script>

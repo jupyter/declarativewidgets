@@ -1,0 +1,326 @@
+;first_experience_enhancements_themes;first_experience_enhancements_keywords
+1;documentation,visualization;doc(s|umentation)?($|\W),widgets?
+6;hosting,ux,content_management;file (brows(er|ing)|explorer|navigator),(folders?|director(y|ies)),(multi-|multiple\s)cells?,cloud,server
+7;language,installation;set(ting)?(\s)?up,julia,python,(multi-?)?language,R($|\W)
+9;documentation;introduction
+17;installation,integration;(ana)?conda,set(ting)?(\s)?up
+19;editor;(tab|code|auto)-?\s?complet(e|ion)
+21;ux;(auto)?-?sav(e|ing)|checkpoints?
+22;documentation;help
+26;ux,dissemination;(multi-|multiple\s)cells?,(nb)?convert
+28;documentation,editor,ux;(menu|buttons?|toolbar|tooltips?|logo|icons?),introduction,doc(s|umentation)?($|\W),(tab|code|auto)-?\s?complet(e|ion)
+29;documentation;doc(s|umentation)?($|\W)
+31;ux;interface
+35;dissemination,installation,development;install(ation)?,slides(hows?),debug(ging|er)?
+37;installation;install(ation)?
+39;hosting,editor,ux;(menu|buttons?|toolbar|tooltips?|logo|icons?),mybinder.org,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+48;hosting,documentation;start,doc(s|umentation)?($|\W),tutorial(s?)
+49;language;R($|\W)
+54;hosting,dissemination,content_management;navigat(e|ion|ing),(folders?|director(y|ies)),export(ing)?,server
+56;dissemination,language,ux;python,export(ing)?,(auto)?-?sav(e|ing)|checkpoints?
+59;;
+61;documentation;doc(s|umentation)?($|\W)
+63;documentation,ux,installation,language;python,(screen|width),install(ation)?,tour,guides?,set(ting)?(\s)?up
+68;hosting,ux;virtual(env|\senvironment),start,spell(\s|-)?check(er|ing)?
+81;documentation;help,doc(s|umentation)?($|\W)
+93;dissemination;export(ing)?
+94;editor,dissemination,other;(text|code\s)?edit(or|ing),terminal,slides(hows?)
+95;editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+97;ux;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?)
+98;hosting,installation;server,set(ting)?(\s)?up
+102;hosting,documentation;start,instructions
+103;compatibility,installation;install(ation)?,versions
+107;documentation;examples?,introduction
+109;hosting,documentation;examples?,start,doc(s|umentation)?($|\W)
+123;;
+126;hosting,editor,development;namespaces?,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,launch(ing)?
+129;visualization;widgets?
+131;visualization;widgets?
+135;hosting,integration;as service,(ana)?conda
+139;dissemination;export(ing)?
+141;;
+143;;
+146;documentation;help,tour
+148;documentation;tutorial(s?)
+150;ux,installation,content_management,extensions;install(ation)?,(screen|width),toc|table of contents,extensions?
+154;content_management,extensions;file (brows(er|ing)|explorer|navigator),extensions?
+159;documentation,ux,editor;stab(le|ility)|crash(es)?,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,doc(s|umentation)?($|\W)
+163;documentation;doc(s|umentation)?($|\W)
+167;version_control,language,visualization;python,git(hub)?,visualization
+176;documentation,ux;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),doc(s|umentation)?($|\W)
+186;ux,installation,content_management,extensions;plugins?,search,(multi-|multiple\s)cells?,(search|find)(/|&|\sand\s)replace
+194;;
+211;documentation,installation;install(ation)?,doc(s|umentation)?($|\W),tutorial(s?)
+219;installation;install(ation)?
+220;documentation;doc(s|umentation)?($|\W)
+221;editor,ux;(menu|buttons?|toolbar|tooltips?|logo|icons?),(text|code\s)?edit(or|ing)
+232;documentation;tutorial(s?)
+235;other,hosting,installation,integration;install(ation)?,terminal,launch(ing)?,(ana)?conda
+237;dissemination,ux;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),shar(e|ing)
+238;hosting,documentation,integration;start,guides?,%?matplotlib
+246;;
+254;documentation;tutorial(s?)
+259;;
+262;documentation;tour,tutorial(s?)
+264;;
+267;language,other;terminal,(more|different) kernels
+268;;
+270;documentation;doc(s|umentation)?($|\W)
+271;ux;(multi-|multiple\s)cells?,(clear|run) all
+277;hosting,ux,other;start,interface,forg(e|o)t
+279;hosting,ux,language,dissemination;python,start,(double(\s|-))?click(ing)?,notebook to
+286;hosting,integration;start,%?matplotlib
+290;ux,content_management;(folders?|director(y|ies)),(auto)?-?sav(e|ing)|checkpoints?
+293;documentation,editor,integration;pylab,tour,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,guides?
+298;documentation;walk(-|\s)through,help
+303;ux,content_management;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),(search|find)(/|&|\sand\s)replace
+305;documentation,ux,extensions;(menu|buttons?|toolbar|tooltips?|logo|icons?),hid(e|den|ing),introduction,extensions?
+309;editor;vim?($|\W)|emacs
+310;editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+311;ux,language;python,(better|modern) (UI|interface),interface
+312;documentation,visualization;examples?,tutorial(s?),widgets?
+314;dissemination,visualization;(nb)?convert,widgets?
+316;;
+333;ux,language;(better|modern) (UI|interface),(several|multiple) kernels,interface,rendering
+340;visualization;graphics
+341;visualization;widgets?
+344;editor,documentation,language,integration;python,pandas,%?matplotlib,sympy,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,tutorial(s?)
+345;other;remember
+350;ux,content_management;navigat(e|ion|ing),hid(e|den|ing)
+352;;
+353;;
+356;other;remember
+370;integration;%?matplotlib
+374;;
+384;version_control,hosting,ux,installation,extensions;install(ation)?,plugins?,git(hub)?,(auto)?-?sav(e|ing)|checkpoints?,server
+385;editor,ux;stab(le|ility)|crash(es)?,(text|code\s)?edit(or|ing)
+389;documentation;examples?
+394;documentation,ux;(menu|buttons?|toolbar|tooltips?|logo|icons?),tutorial(s?)
+396;editor,ux;hid(e|den|ing),(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,(auto)?-?sav(e|ing)|checkpoints?,vim?($|\W)|emacs
+399;;
+400;version_control,hosting,dissemination;shar(e|ing),multi(ple|-)?\s?user,version control
+403;hosting,ux;(menu|buttons?|toolbar|tooltips?|logo|icons?),start
+408;documentation,language,installation;install(ation)?,julia,examples?
+411;documentation;hints
+413;ux;hid(e|den|ing)
+414;integration;%?matplotlib
+418;integration;(ana)?conda
+421;dissemination,ux,installation,integration;pandas,(clear|run) all,search,slides(hows?)
+431;documentation;doc(s|umentation)?($|\W)
+437;documentation,installation,extensions;install(ation)?,doc(s|umentation)?($|\W),extensions?
+439;language;(several|multiple) kernels
+441;development;namespaces?
+445;installation;install(ation)?
+458;hosting,documentation,ux;launch(ing)?,tutorial(s?),interface
+460;;
+463;editor,ux;(double(\s|-))?click(ing)?,vim?($|\W)|emacs
+473;language;python,(more|different) kernels
+474;documentation;use(\s|-)case,demos?
+475;;
+483;visualization;widgets?
+486;editor,installation,integration;install(ation)?,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,(apache\s)?spark
+491;language;(multi-?)?language
+492;documentation;tutorial(s?)
+495;ux;(double(\s|-))?click(ing)?
+496;;
+517;documentation,ux;(screen|width),welcome,tutorial(s?)
+524;documentation,language;(multi-?)?language,tutorial(s?)
+525;editor,ux,language,content_management,other;(menu|buttons?|toolbar|tooltips?|logo|icons?),python,file (brows(er|ing)|explorer|navigator),(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,confusing
+534;installation,language;install(ation)?,julia
+535;ux;(double(\s|-))?click(ing)?
+540;hosting;server
+541;documentation,editor;help,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+549;documentation;tutorial(s?)
+556;language;(multi-?)?language,R($|\W)
+561;hosting;multi(ple|-)?\s?user
+563;installation;install(ation)?
+579;content_management,other;toc|table of contents,confusing
+587;ux;undo
+592;language;python
+594;integration;%?matplotlib
+595;language;python
+600;installation;set(ting)?(\s)?up
+605;;
+610;editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+612;editor,ux,documentation;(text|code\s)?edit(or|ing),hid(e|den|ing),examples?,collaborat(e|ive|ing)
+616;documentation,editor;walk(-|\s)through,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+627;documentation;tutorial(s?)
+630;ux,installation;(menu|buttons?|toolbar|tooltips?|logo|icons?),install(ation)?,(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),(double(\s|-))?click(ing)?
+646;editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+654;documentation;tutorial(s?)
+661;editor,installation,integration;install(ation)?,(tab|code|auto)-?\s?complet(e|ion),(ana)?conda
+663;documentation;doc(s|umentation)?($|\W)
+668;hosting;virtual(env|\senvironment)
+671;documentation,language;examples?,(more|different) kernels
+682;ux,installation,content_management;install(ation)?,drag,(folders?|director(y|ies))
+700;editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+706;hosting,integration;docker,ggplot2
+712;version_control,documentation,ux;introduction,git(hub)?,doc(s|umentation)?($|\W),(menu|buttons?|toolbar|tooltips?|logo|icons?),tutorial(s?),(auto)?-?sav(e|ing)|checkpoints?
+716;ux;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?)
+718;editor,other;terminal,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+719;ux;undo,(auto)?-?sav(e|ing)|checkpoints?
+740;installation;install(ation)?
+755;integration;pandas
+765;ux;(menu|buttons?|toolbar|tooltips?|logo|icons?),(clear|run) all
+766;installation;install(ation)?
+773;;
+780;;
+781;editor,ux;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,interface
+785;integration;sympy
+803;content_management;navigat(e|ion|ing),(folders?|director(y|ies))
+808;documentation,integration;pandas,help
+816;;
+823;language;(multi-?)?language
+824;hosting,documentation;start,guides?
+828;documentation,dissemination,editor,extensions;roadmap,plugins?,export(ing)?,vim?($|\W)|emacs
+835;other;forg(e|o)t
+838;;
+841;hosting,installation;install(ation)?,launch(ing)?
+859;documentation,content_management;toc|table of contents,doc(s|umentation)?($|\W)
+863;hosting,language;python,launch(ing)?
+865;installation;install(ation)?
+869;installation,integration;install(ation)?,(apache\s)?spark
+877;hosting,documentation;start,tutorial(s?)
+890;editor,ux;toggle,(text|code\s)?edit(or|ing),vim?($|\W)|emacs
+892;language;python,(multi-?)?language
+894;documentation,ux;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),stab(le|ility)|crash(es)?,doc(s|umentation)?($|\W)
+897;ux,installation;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),set(ting)?(\s)?up
+906;installation;install(ation)?,configur(e|ation|ing)
+915;other;remember
+918;documentation,visualization;doc(s|umentation)?($|\W),widgets?
+919;editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+926;editor;(text|code\s)?edit(or|ing),vim?($|\W)|emacs
+940;integration;%?matplotlib
+960;other,hosting,documentation,language,integration;python,start,welcome,%?matplotlib,forg(e|o)t
+966;editor,dissemination;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,vim?($|\W)|emacs,(nb)?convert
+970;editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+974;ux,language;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),(multi-?)?language
+994;documentation,ux,installation;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),doc(s|umentation)?($|\W),configur(e|ation|ing)
+996;editor;(text|code\s)?edit(or|ing)
+998;installation,integration;install(ation)?,(ana)?conda
+1018;installation;install(ation)?
+1020;ux,integration;(menu|buttons?|toolbar|tooltips?|logo|icons?),%?matplotlib
+1026;version_control;git(hub)?
+1029;installation,integration;install(ation)?,pylab
+1031;editor;(tab|code|auto)-?\s?complet(e|ion)
+1050;other;confusing
+1053;;
+1054;dissemination;notebook to
+1064;;
+1065;installation;install(ation)?
+1066;integration;%?matplotlib
+1083;documentation;help
+1093;visualization;widgets?
+1095;editor,installation;install(ation)?,(tab|code|auto)-?\s?complet(e|ion)
+1114;dissemination;(nb)?convert
+1122;documentation;doc(s|umentation)?($|\W)
+1124;ux,installation,content_management,language;install(ation)?,python,(folders?|director(y|ies)),(double(\s|-))?click(ing)?
+1125;language;(more|different) kernels,R($|\W)
+1129;integration;(ana)?conda
+1133;;
+1145;editor,ux;(screen|width),(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+1159;documentation;tutorial(s?)
+1161;ux;(menu|buttons?|toolbar|tooltips?|logo|icons?)
+1166;editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+1172;documentation,editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,tutorial(s?)
+1178;editor,extensions;plugins?,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+1179;content_management;upload(\sfiles|notebooks)?
+1184;documentation,ux;(better|modern) (UI|interface),hints
+1200;installation;set(ting)?(\s)?up
+1204;other;don't know
+1212;hosting,installation;install(ation)?,docker
+1218;editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+1230;;
+1239;editor,ux;(text|code\s)?edit(or|ing),(reorder|move|select) cells
+1258;ux,language;(multi-?)?language,(better|modern) (UI|interface)
+1264;documentation;doc(s|umentation)?($|\W)
+1267;documentation;examples?
+1268;ux;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?)
+1272;documentation,content_management;navigat(e|ion|ing),doc(s|umentation)?($|\W)
+1285;ux;spell(\s|-)?check(er|ing)?
+1287;documentation;tutorial(s?)
+1291;installation,extensions;install(ation)?,extensions?
+1306;visualization,content_management;(folders?|director(y|ies)),widgets?
+1308;content_management;(search|find)(/|&|\sand\s)replace
+1323;;
+1325;hosting,documentation,installation;install(ation)?,start,demos?,hints
+1333;ux,content_management;(menu|buttons?|toolbar|tooltips?|logo|icons?),file (brows(er|ing)|explorer|navigator)
+1334;compatibility,version_control,editor;compatib(le|ility),(text|code\s)?edit(or|ing),versions,version control
+1343;hosting,development;start,debug(ging|er)?
+1354;documentation;introduction
+1355;editor,ux;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,(better|modern) (UI|interface)
+1360;other;remember
+1363;hosting;server
+1366;content_management;navigat(e|ion|ing)
+1368;editor,ux;(screen|width),(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+1369;ux;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),(screen|width)
+1378;ux,visualization;(better|modern) (UI|interface),visualization
+1381;documentation,ux;guides?,interface
+1384;other,ux,installation,content_management,integration;install(ation)?,(folders?|director(y|ies)),(double(\s|-))?click(ing)?,(ana)?conda,confusing
+1400;documentation;doc(s|umentation)?($|\W)
+1408;ux,content_management;tagging,upload(\sfiles|notebooks)?,drag,drag(/|&)drop,(project|file|notebook) management
+1415;visualization,integration;pylab,visualization
+1417;;
+1420;documentation,editor,ux;(menu|buttons?|toolbar|tooltips?|logo|icons?),(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,tutorial(s?)
+1421;editor,documentation,content_management;replace all,help,(tab|code|auto)-?\s?complet(e|ion)
+1427;;
+1428;content_management;navigat(e|ion|ing)
+1431;compatibility,ux,language,installation,other;set(ting)?(\s)?up,python,(screen|width),versions,confusing
+1444;ux;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),(screen|width)
+1450;hosting,documentation,integration;pylab,start,doc(s|umentation)?($|\W),tutorial(s?)
+1451;documentation;doc(s|umentation)?($|\W)
+1453;version_control,editor;(text|code\s)?edit(or|ing),version control
+1458;documentation,extensions;doc(s|umentation)?($|\W),extensions?
+1460;;
+1464;hosting,installation,integration;server,%?matplotlib,configur(e|ation|ing),set(ting)?(\s)?up
+1468;ux;(auto)?-?sav(e|ing)|checkpoints?
+1470;;
+1476;editor;(text|code\s)?edit(or|ing)
+1477;hosting,documentation,editor,ux;vim?($|\W)|emacs,server,stab(le|ility)|crash(es)?,start,tutorial(s?),(auto)?-?sav(e|ing)|checkpoints?
+1478;hosting,ux,content_management;navigat(e|ion|ing),(folders?|director(y|ies)),launch(ing)?,(multi-|multiple\s)cells?
+1480;documentation;doc(s|umentation)?($|\W)
+1484;editor;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+1493;documentation,editor,ux,integration;pandas,examples?,(clear|run) all,(tab|code|auto)-?\s?complet(e|ion),(auto)?-?sav(e|ing)|checkpoints?
+1494;documentation;doc(s|umentation)?($|\W)
+1495;other;confusing
+1503;documentation,extensions;tutorial(s?),extensions?
+1515;documentation;doc(s|umentation)?($|\W)
+1517;content_management,extensions;plugins?,toc|table of contents
+1524;documentation;examples?
+1525;hosting,editor,ux;(text|code\s)?edit(or|ing),start,(double(\s|-))?click(ing)?
+1529;installation;configur(e|ation|ing)
+1534;version_control,documentation,content_management;examples?,(folders?|director(y|ies)),git(hub)?
+1541;installation,other;search,don't know
+1551;hosting,ux,other;(style(s|sheets?)?|styling|CSS|themes?|skin|fonts?|colo(u)?rs?),confusing,server
+1556;ux;interface
+1557;hosting,editor,visualization;(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,start,widgets?
+1559;documentation;doc(s|umentation)?($|\W)
+1562;hosting,editor,ux,content_management;(folders?|director(y|ies)),launch(ing)?,(better|modern) (UI|interface),interface,(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard
+1575;documentation;doc(s|umentation)?($|\W),tutorial(s?)
+1590;documentation;instructions
+1594;ux;(reorder|move|select) cells
+1595;installation;install(ation)?
+1598;documentation;help,doc(s|umentation)?($|\W)
+1600;documentation;tutorial(s?)
+1604;documentation,ux,editor;(menu|buttons?|toolbar|tooltips?|logo|icons?),(hot)?key(\s|-)?(mappings|bindings|strokes)|short-?cuts|keyboard,hints
+1606;documentation;doc(s|umentation)?($|\W)
+1616;ux;interface
+1621;ux;responsive
+1622;hosting,documentation,installation;install(ation)?,tutorial(s?),server
+1623;documentation;examples?,doc(s|umentation)?($|\W)
+1624;documentation;doc(s|umentation)?($|\W)
+1626;installation,extensions;install(ation)?,extensions?
+1627;ux,content_management,extensions;(multi-|multiple\s)cells?,toc|table of contents,extensions?
+1638;ux;(menu|buttons?|toolbar|tooltips?|logo|icons?)
+1639;editor;(text|code\s)?edit(or|ing)
+1650;version_control;git(hub)?
+1657;editor,extensions;(text|code\s)?edit(or|ing),extensions?
+1661;;
+1662;installation;set(ting)?(\s)?up
+1667;hosting,ux;(menu|buttons?|toolbar|tooltips?|logo|icons?),launch(ing)?
+1668;visualization;widgets?
+1691;installation;install(ation)?
+1694;installation,integration;install(ation)?,(ana)?conda
+1695;version_control;version control
+1700;ux;(menu|buttons?|toolbar|tooltips?|logo|icons?)
+1701;language;python

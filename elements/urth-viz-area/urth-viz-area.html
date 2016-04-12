@@ -2,8 +2,22 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 -->
-<link rel="import" href="../urth-viz-chart/urth-viz-chart.html">
 <link rel="import" href="../urth-viz-chart/urth-viz-chart-common-behavior.html">
+
+<dom-module id="urth-viz-area">
+    <link rel="import" type="css" href="../nvd3/build/nv.d3.css">
+    <link rel="import" type="css" href="../urth-viz-chart/urth-viz-chart.css">
+
+    <template>
+        <link rel="stylesheet" type="text/css" href="../nvd3/build/nv.d3.css">
+        <link rel="stylesheet" type="text/css" href="../urth-viz-chart/urth-viz-chart.css">
+
+        <div id="chart1">
+            <svg style='height:500px'></svg>
+        </div>
+        <content id="content"></content>
+    </template>
+</dom-module>
 
 <!--
 Represents a widget that draws a area chart.
@@ -17,23 +31,22 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 @element urth-viz-area
 -->
 
-<dom-module id="urth-viz-area">
+<script>
+'use strict';
 
-    <template>
-        <urth-viz-chart id="chart" type="area" datarows="[[datarows]]" columns="[[columns]]" height="[[height]]" width="[[width]]" margin="[[margin]]" palette="[[palette]]" xbounds="[[xbounds]]" ybounds="[[ybounds]]" xlabel="[[xlabel]]" ylabel="[[ylabel]]" selection="{{selection}}" selection-info="{{selectionInfo}}" selection-as-object="{{selectionAsObject}}" primary="{{primary}}" secondary="{{secondary}}" rotatelabels="[[rotatelabels]]" staggerlabels="[[staggerlabels]]">
-            <content></content>
-        </urth-viz-chart>
-    </template>
+Polymer({
+    is: 'urth-viz-area',
 
-    <script>
-    'use strict';
+    properties: {
+        type: {
+            type: String,
+            value: 'area',
+            readOnly: true
+        }
+    },
 
-    Polymer({
-        is: 'urth-viz-area',
-
-        behaviors: [
-            Urth.VizChartCommonBehavior
-        ]
-    });
-    </script>
-</dom-module>
+    behaviors: [
+        Urth.VizChartCommonBehavior
+    ]
+});
+</script>

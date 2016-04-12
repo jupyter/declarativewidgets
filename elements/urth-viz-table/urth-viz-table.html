@@ -6,6 +6,7 @@
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
+<link rel="import" href="../urth-viz-behaviors/urth-viz-selection-behavior.html">
 <link rel="import" href="../urth-core-behaviors/error-display-behavior.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
@@ -14,7 +15,7 @@ Creates a Polymer element that displays a table with specified data and column h
 
 The table accepts data via attribute `datarows` and column headers via attribute `columns`:
 
-1. `datarows` should be of type Array of Arrays, representing list of rows.
+1. `datarows` should be of type Array of Arrays, representing list of rows.  Will accept a single row as an Array.
 
 2. 'columns' should also be of type Array of strings, representing column headers. If undefined, table will not have column headers.
 
@@ -82,15 +83,6 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 },
 
                 /**
-                 * The data based on the currently selected row.
-                 */
-                selection: {
-                    type: Array,
-                    readOnly: true,
-                    notify: true
-                },
-
-                /**
                  * Number of rows user wants visible at a time,
                  * (the rest is hidden in scrollable area)
                  * If table is shorter in height this number, the shorter height
@@ -98,17 +90,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                  */
                 rowsVisible: {
                     type: Number,
-                    value: function () {return 15;},
-                    reflectToAttribute: true
-                },
-
-                /**
-                 * False by default to return 'selection' as an array of values.
-                 * If true, will return 'selection' as an object with key-value pairs (with column names as keys).
-                 */
-                selectionAsObject: {
-                    type: Boolean,
-                    value: function() { return false; },
+                    value: 15,
                     reflectToAttribute: true
                 }
             },
@@ -117,6 +99,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 // Handsontable resizes itself based on document.onResize, but
                 // the dashboard also uses iron-resize events when changing layout
                 Polymer.IronResizableBehavior,
+                Urth.VizSelectionBehavior,
                 Urth.DisplayErrorBehavior
             ],
 
@@ -149,6 +132,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
 
             _updateDatarows: function (newDataRows) {
                 if(!newDataRows) { return; }
+                if (!Array.isArray(newDataRows[0]) && newDataRows.length) {
+                    newDataRows = [newDataRows];
+                }
 
                 // if data will not fit, we need to add a height to table to add scrollbar
                 if(!this._willDataFit(newDataRows)) {
@@ -242,8 +228,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
             _parseColumns: function() {
                 // parse columns using data's first row
                 // in case user provides missing column headers
-                console.assert(this.datarows);
-                var firstRow = this.datarows[0];
+                var datarows = this.datarows;
+                console.assert(datarows);
+                var firstRow = Array.isArray(datarows[0]) ? datarows[0] : datarows;
 
                 if(firstRow && firstRow.length > 0) {
                     var columnSettings = firstRow.map(function (col) {
@@ -277,6 +264,10 @@ The table accepts data via attribute `datarows` and column headers via attribute
             _createTable: function (datarows) {
                 require(['handsontable'], function(Handsontable) {
                     console.assert(datarows);
+
+                    if (!Array.isArray(datarows[0]) && datarows.length) {
+                        datarows = [datarows];
+                    }
 
                     var tableContainer = this.$.tableContainer;
                     tableContainer.innerHTML = '';

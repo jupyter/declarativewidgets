@@ -2,8 +2,42 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 -->
-<link rel="import" href="../urth-viz-chart/urth-viz-chart.html">
 <link rel="import" href="../urth-viz-chart/urth-viz-chart-common-behavior.html">
+
+<link rel="import" href="../paper-menu/paper-menu.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+
+<dom-module id="urth-viz-pie">
+    <link rel="import" type="css" href="../nvd3/build/nv.d3.css">
+    <link rel="import" type="css" href="../urth-viz-chart/urth-viz-chart.css">
+
+    <template>
+        <link rel="stylesheet" type="text/css" href="../nvd3/build/nv.d3.css">
+        <link rel="stylesheet" type="text/css" href="../urth-viz-chart/urth-viz-chart.css">
+
+        <div id="settings-section">
+          <paper-dropdown-menu label="Category" noink no-animations>
+            <paper-menu class="dropdown-content" selected="{{primary}}">
+              <template is="dom-repeat" items="[[columns]]" as="column">
+                <paper-item>[[column]]</paper-item>
+              </template>
+            </paper-menu>
+          </paper-dropdown-menu>
+          <paper-dropdown-menu label="Value" noink no-animations>
+            <paper-menu class="dropdown-content" selected="{{secondary}}">
+              <template is="dom-repeat" items="[[columns]]" as="column">
+                <paper-item>[[column]]</paper-item>
+              </template>
+            </paper-menu>
+          </paper-dropdown-menu>
+        </div>
+        <div id="chart1">
+            <svg style='height:500px'></svg>
+        </div>
+        <content id="content"></content>
+    </template>
+</dom-module>
 
 <!--
 Represents a widget that draws a pie chart.
@@ -17,23 +51,22 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 @element urth-viz-pie
 -->
 
-<dom-module id="urth-viz-pie">
+<script>
+'use strict';
 
-    <template>
-        <urth-viz-chart id="chart" type="pie" datarows="[[datarows]]" columns="[[columns]]" height="[[height]]" width="[[width]]" margin="[[margin]]" palette="[[palette]]" selection="{{selection}}" selection-info="{{selectionInfo}}" selection-as-object="{{selectionAsObject}}" primary="{{primary}}" secondary="{{secondary}}" multi-select="[[multiSelect]]">
-            <content></content>
-        </urth-viz-chart>
-    </template>
+Polymer({
+    is: 'urth-viz-pie',
 
-    <script>
-    'use strict';
+    properties: {
+        type: {
+            type: String,
+            value: 'pie',
+            readOnly: true
+        }
+    },
 
-    Polymer({
-        is: 'urth-viz-pie',
-
-        behaviors: [
-            Urth.VizChartCommonBehavior
-        ]
-    });
-    </script>
-</dom-module>
+    behaviors: [
+        Urth.VizChartCommonBehavior
+    ]
+});
+</script>

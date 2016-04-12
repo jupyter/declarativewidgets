@@ -1,0 +1,109 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+
+<!--
+Represents a widget that lets the user choose between a set of visualizations for a given survey.
+Example:
+    <survey-explorer data-frame="aDataFrame" series="roles_roles"></survey-explorer>
+@element survey-explorer
+-->
+<dom-module id="survey-explorer">
+    <template is="dom-bind">
+        <paper-dropdown-menu label="Choose a series" noink no-animations selected-item-label="{{selectedLabel}}">
+            <paper-menu class="dropdown-content" selected="0">
+                <template is="dom-repeat" items="[[labelSlice(labels,series)]]">
+                    <paper-item>{{item}}</paper-item>
+                </template>
+            </paper-menu>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu label="Group by" noink no-animations>
+            <paper-menu class="dropdown-content" attr-for-selected="name" selected="{{group_by}}">
+                <paper-item name="no_grouping">-- No grouping --</paper-item>
+                <paper-item name="how_often">How often do you use Jupyter Notebook?</paper-item>
+                <paper-item name="how_long_used">Roughly how long have you been using Jupyter Notebook?</paper-item>
+                <paper-item name="years_in_role">How many years have you been in this job role?</paper-item>
+                <paper-item name="audience_size">How many people typically see and/or interact with the results of your work in Jupyter Notebook?</paper-item>
+                <paper-item name="roles_primary">What is your primary role when using Jupyter Notebook?</paper-item>
+            </paper-menu>
+        </paper-dropdown-menu>
+        <paper-toggle-button checked="{{percentages}}">Use percentages</paper-toggle-button>
+        <urth-core-function ref="exploreDataFrame" arg-series="{{seriesByLabel(selectedLabel)}}" arg-group_by="{{group_by}}" arg-percentages="{{percentages}}" result="{{df}}" auto></urth-core-function>
+        <urth-viz-bar datarows="{{df.data}}" columns="{{df.columns}}" xlabel="{{xlabel}}" ylabel="{{ylabel}}"  margin='{"bottom":100, "right":50}' rotatelabels="25" selection-info="{{sel}}">
+            <template is="dom-if" if="{{percentages}}" restamp="true">
+                <urth-viz-col index="1" type="numeric" format="%"></urth-viz-col>
+            </template>
+        </urth-viz-bar>
+        <urth-core-function ref="getSample" arg-keyword="[[sel.x]]" arg-groupby="[[group_by]]" arg-sample_size="10" result="{{sampleData}}" arg-groupby_key="[[sel.key]]" arg-series="{{seriesByLabel(selectedLabel)}}" arg-sample_source="{{sampleSource}}" auto></urth-core-function>
+        <div style="background-color: #ddd; padding: 10px;">
+            <em>Select a bar above.</em>
+            <template is="dom-if" if="{{sel.length}}">
+                <span>Showing a random sample of up to 10 responses for "[[sel.x]]" in the "[[sel.key]]" group.</span>
+            </template>
+        </div>
+        <div style="max-height:300px; min-height:300px; overflow:auto; background-color: #eee; border: 1px solid #ccc;">
+           <template is="dom-repeat" items="[[sampleData.data]]">
+               <template is="dom-repeat" items="[[item]]">
+                   <template is="dom-if" if="[[item]]">
+                       <div style="padding: 15px; background-color: white;">[[item]]</div>
+                   </template>
+               </template>
+               <hr style="padding: 0; margin: 0;"/>
+           </template>
+        </div>
+        <content></content>
+    </template>
+</dom-module>
+<script>
+    'use strict';
+    Polymer({
+        is: 'survey-explorer',
+        properties: {
+            series: Array,
+            group_by: {
+                type: String,
+                value: 'no_grouping',
+                observer: 'resetSelection'
+            },
+            labels: {
+                type: Array,
+                value: function () { return ['Keyword patterns', 'Annotator themes']; }
+            },
+            selectedLabel: {
+                type: String,
+                observer: 'resetSelection'
+            },
+            percentages: Boolean,
+            xlabel: {
+                type: String,
+                computed: 'xlabelText(selectedLabel)'
+            },
+            ylabel: {
+                type: String,
+                computed: 'ylabelText(percentages, group_by)'
+            },
+            sampleSource: Array
+        },
+        labelSlice: function(labels, series) {
+            return series ? labels.slice(0, series.length) : [];
+        },
+        resetSelection: function() {
+            this.sel = [];
+        },
+        seriesByLabel: function(label) {
+            var index = this.labels.indexOf(label);
+            return this.series[index];
+        },
+        xlabelText: function(selectedLabel) {
+            return 'Top ' +  selectedLabel + ' (15 max)';    
+        },
+        ylabelText: function(percentages, group_by) {
+            var text = percentages ? 'Percentage of respondents' : 'Respondents';
+            if (group_by && group_by != 'no_grouping') {
+                text += ' grouped by ' + group_by;
+            }
+            return text;
+        }
+    });
+</script>
