@@ -59,7 +59,7 @@ dev_image:
 		apt-get install --yes nodejs npm && \
 		ln -s /usr/bin/nodejs /usr/bin/node && \
 		npm install -g bower && \
-		R CMD BATCH /src-kernel-r/install.r'
+		Rscript /src-kernel-r/install.r'
 	@docker commit bower-build $(REPO)
 	@-docker rm -f bower-build
 
