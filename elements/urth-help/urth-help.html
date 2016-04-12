@@ -1,0 +1,63 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+
+<!--
+Creates a Polymer element that displays urth elements documentation page.
+
+@group Urth Viz
+@element urth-help
+-->
+<dom-module id="urth-help">
+
+    <template>
+        <style>
+            .doc-iframe {
+                width:100%;
+                height: 500px;
+                border: 1px solid #cfcfcf;
+            }
+            .new-tab-link {
+                position: absolute;
+                bottom: 10px;
+                right: 20px;
+            }
+            .new-tab-link .icon {
+                color: #808080;
+            }
+            .new-tab-link .icon:hover {
+                color: black;
+            }
+        </style>
+        <iframe src="{{docURL}}" class="doc-iframe">
+          <p>This browser does not support iframes, cannot load docs.</p>
+        </iframe>
+        <a href="{{docURL}}" tabindex="-1" target="doc" class="new-tab-link" title="Open in new window">
+            <paper-icon-button icon="open-in-new" class="icon"></paper-icon-button>
+        </a>
+        <content></content>
+    </template>
+    <script>
+    (function () {
+        'use strict';
+
+        Polymer({
+            is: 'urth-help',
+            properties: {
+                docURL: {
+                    type: String,
+                    computed: 'getDocUrl(_baseURL)'
+                }
+            },
+            behaviors: [Urth.JupyterNotebookEnv],
+            getDocUrl: function() {
+                return this._baseURL + "nbextensions/urth_widgets/docs/docs.html";
+            }
+        });
+    })();
+    </script>
+</dom-module>

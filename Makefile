@@ -120,6 +120,11 @@ dist/urth/widgets/ext/notebook/urth_components: bower_components ${shell find el
 	@mkdir -p dist/urth/widgets/ext/notebook/urth_components
 	@cp -RL bower_components/* dist/urth/widgets/ext/notebook/urth_components/.
 
+dist/urth/widgets/ext/notebook/docs: dist/docs
+	@echo 'Copying dist/docs/site'
+	@mkdir -p dist/urth/widgets/ext/notebook/docs
+	@cp -R dist/docs/site/* dist/urth/widgets/ext/notebook/docs/.
+
 dist/urth/widgets/ext/notebook: dist/urth/widgets/ext/notebook/bower.json dist/urth/widgets/ext/notebook/urth_components dist/urth/widgets/ext/notebook/js dist/urth/widgets/ext/notebook/elements dist/urth/widgets/ext/notebook/css
 
 dist/urth/widgets/ext: ${shell find nb-extension/python/urth/widgets/ext}
@@ -194,7 +199,7 @@ dist/VERSION:
 	@mkdir -p dist
 	@echo "$(COMMIT)" > dist/VERSION
 
-dist: dist/urth dist/urth/widgets/ext/notebook/urth-widgets.jar dist/urth/widgets/ext/notebook/urth-widgets.tgz dist/scripts dist/VERSION
+dist: dist/urth dist/urth/widgets/ext/notebook/urth-widgets.jar dist/urth/widgets/ext/notebook/urth-widgets.tgz dist/scripts dist/VERSION dist/urth/widgets/ext/notebook/docs
 
 sdist: dist
 	@cp -R MANIFEST.in dist/.
