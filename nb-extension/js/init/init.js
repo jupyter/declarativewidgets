@@ -41,7 +41,8 @@ define([
             { href: components_root + '/urth-core-dataframe/urth-core-dataframe.html' },
             { href: components_root + '/urth-core-function/urth-core-function.html' },
             { href: components_root + '/urth-core-storage/urth-core-storage.html' },
-            { href: components_root + '/urth-core-watch/urth-core-watch.html' }
+            { href: components_root + '/urth-core-watch/urth-core-watch.html' },
+            { href: components_root + '/urth-help/urth-help.html' }
         ];
 
         links = defaultLinks.concat( links || [] );
