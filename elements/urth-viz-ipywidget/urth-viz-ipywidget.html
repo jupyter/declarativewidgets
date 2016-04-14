@@ -1,0 +1,374 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../urth-core-behaviors/jupyter-widget-behavior.html">
+<link rel='import' href='../urth-core-behaviors/dynamic-properties-behavior.html'>
+<link rel="import" href="../urth-core-behaviors/execution-complete-behavior.html">
+
+<!--
+Allows displaying and binding with ipywidgets. This element only works against a Python
+kernel that has ipywidgets 4.x installed.
+
+To use this element, first create an instance of an ipywidget and assign it to a
+variable name.
+
+```
+slider = IntSlider()
+```
+
+Then use this element to display and interact with the ipywidget by setting the `ref`
+property to the variable name
+
+```
+<urth-viz-ipywidgets ref='slider' trait-value='{{aVal}}'></urth-viz-ipywidgets>
+```
+
+Traits for the ipywidgets are made available through the element as bind-able properties. The
+names for these properties have the form `trait-<name of trait>`.
+
+@group Urth Viz
+@element urth-viz-ipywidgets
+-->
+<script>
+    (function(){
+    'use strict';
+
+        var ParamAttrPattern = /^trait-(.+)/;
+        var ParamPropPathPattern = /^traits\.([^\.\n]+)\.?/;
+
+        window.Urth = window.Urth || {};
+
+        window.Urth['urth-viz-ipywidget'] = Polymer({
+            is: 'urth-viz-ipywidget',
+            properties: {
+
+                /**
+                 * Name of the widget to proxy. Must be a widget that is
+                 * defined in the kernel.
+                 */
+                ref: {
+                    type: String,
+                    value: ''
+                },
+
+                /**
+                 * The id of the ipywidget model.
+                 */
+                modelId: {
+                    type: String,
+                    readOnly: true
+                },
+
+                /**
+                 * Object reflecting the current values of the traits of the
+                 * widget. This property can be used for binding.
+                 */
+                traits: {
+                    type: Object,
+                    notify: true
+                }
+            },
+
+            behaviors: [
+                Urth.JupyterWidgetBehavior,
+                Urth.ExecutionCompleteBehavior,
+                Urth.DynamicPropertiesBehavior
+            ],
+
+            observers: [
+                '_onArgsPropertyChanged(traits.*)'
+            ],
+
+            created: function(){
+                console.debug('urth-viz-ipywidget created', arguments);
+
+                //only operate if the kernel is python
+                Urth.kernel.get_info(function(info){
+
+                    if(info.name.indexOf('python') == 0 ) {
+                        this.createModel('urth.widgets.widget_ipw_proxy.IpywProxy');
+                    }
+                    else{
+                        //not supported on any other kernels
+                        this.displayErrorMessage('Unsupported kernel. This element only supports Python.');
+                    }
+                }.bind(this))
+
+            },
+
+            ready: function() {
+                console.debug('urth-viz-ipywidget ready');
+
+                if( !this.traits ){
+                    //sync with the attributes
+                    this.traits = this._paramsFromAttributes();
+                }
+            },
+
+            /*
+             * onModelReady is invoked when have created the model portion of the widget
+             */
+            onModelReady: function(){
+                console.debug('urth-viz-ipywidget onModelReady');
+
+                var syncData = {
+                    widget_name: this.ref
+                }
+                console.debug('urth-viz-ipywidget sending initial sync', syncData);
+                this.sync(syncData);
+            },
+
+
+            onModelIdChange: function(newVal){
+                console.debug('urth-viz-ipywidget onModelIdChange', newVal);
+                console.debug('urth-viz-ipywidget rendering view');
+
+                //get the actual ipywidget model and render it
+                this.model.widget_manager.get_model(newVal).then(function(m){
+                    this._setModelId(newVal);
+
+                    //hook listener to model changes
+                    m.on('change', function(options){
+                        var changes = options.changed;
+                        Object.keys(changes).forEach(function(change){
+                            this.set( "traits."+change, changes[change]);
+                        }.bind(this));
+                    }.bind(this));
+
+
+                    //get the traits to expose them as properties
+                    var traits = {};
+                    Object.keys(m.attributes).filter(function(attribute){
+                        return attribute.indexOf("_") != 0;
+                    }).forEach(function(attribute){
+                        traits[attribute] = m.attributes[attribute];
+                    })
+
+                    this._onSpecChange(traits);
+
+                    //create the view
+                    this.model.widget_manager.create_view(m).then( function(v){
+                        console.log( "Created ipywidget view", v);
+                        Polymer.dom(this.root).innerHTML = '';
+                        Polymer.dom(this.root).appendChild(v.el);
+                    }.bind(this))
+                }.bind(this));
+            },
+
+            _onArgsPropertyChanged: function(rec){
+                if(this._syncing)
+                    return;
+
+                console.debug('urth-viz-ipywidget _onArgsChanged', rec);
+                if( rec.path === 'traits' ){
+                    //entire parameter map changed
+                    this._syncParamAttributes(rec.value);
+                    this._onParameterChange(rec.path, rec.value);
+                }
+                else if (ParamPropPathPattern.test(rec.path)){
+                    //a single parameter changed
+                    var matches = ParamPropPathPattern.exec(rec.path)
+                    var param =  matches.length === 2 ? matches[1] : undefined;
+
+                    if( param ){
+                        console.debug('urth-viz-ipywidget got change for param', param);
+                        //reflect on the attibutes
+                        var params = {};
+                        var newVal = rec.base[param];
+                        params[param] = newVal;
+                        this._syncParamAttributes(params);
+                        this._onParameterChange(param, newVal);
+
+                    }
+                }
+            },
+
+            _onExecutionComplete: function(){
+                this.refresh();
+            },
+
+            _syncParamAttributes: function( params ){
+                params = !params ? {} : params;
+                this._syncing = true;
+                try {
+                    Object.keys(params).forEach(function (param) {
+                        var argPropName = this._toParamPropertyName(param);
+
+                        if( this.hasOwnProperty(argPropName) ){
+                            this[argPropName] = params[param];
+                        }
+
+                    }.bind(this))
+                }
+                finally {
+                    delete this._syncing;
+                }
+            },
+
+            /**
+             * Builds the `args` section of the 'invoke' message by serializing each
+             * param as necessary.
+             */
+            _serializeParamsForSend: function(){
+                var serArgs = {};
+                Object.keys(this.args).filter(function(arg){
+                    //remove args that contain the default value.
+                    return this.spec[arg] && this.args[arg] !== this.spec[arg].value;
+                }.bind(this)).forEach(function(arg){
+                    var value = this.args[arg];
+                    serArgs[arg] = (typeof value == 'boolean') ? value : this.serialize(value);
+                }.bind(this));
+
+                return serArgs;
+            },
+
+            _isParameterAttribute: function(attr /*attribute or string*/){
+                var attrName =  typeof attr === 'string' ? attr : attr.name;
+                return ParamAttrPattern.test(attrName);
+            },
+
+            /**
+             * Returns false if paramValue is undefined, null and NaN.
+             *
+             * @method _isParameterUnset
+             * @param {*} paramValue Any value sent to test
+             * @return {boolean} true if considered unset
+             */
+            _isParameterUnset: function(paramValue){
+                /*
+                 * Testing undefined, null and NaN.
+                 * From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN#Testing_against_NaN
+                 * a valid test for NaN is to test inequality to itself.
+                 */
+                return paramValue === undefined || paramValue == null || (paramValue !== paramValue);
+            },
+
+            _toParamName: function(attr /*attribute or string*/){
+                var attrName =  typeof attr === 'string' ? attr : attr.name;
+
+                var matches = ParamAttrPattern.exec(attrName)
+                return matches && matches.length === 2 ? matches[1] : undefined;
+            },
+
+            _toParamPropertyName: function(paramName){
+                return 'trait' + paramName[0].toUpperCase() + paramName.substring(1);
+            },
+
+            _toParamPropertyObserverName: function(paramName){
+                var paramPropName = this._toParamPropertyName(paramName);
+                return '_on'+paramPropName[0].toUpperCase() + paramPropName.substring(1)+'Change'
+            },
+
+            _paramsFromAttributes: function(){
+                var attrs = this.attributes,
+                        params = {};
+
+                for (var i = 0; i < attrs.length; i++) {
+                    var attr = attrs[i];
+                    if (this._isParameterAttribute(attr)) {
+                        params[this._toParamName(attr)] = attr.nodeValue;
+                    }
+                }
+
+                return params;
+            },
+
+            _onParameterChange: function( argName, argValue ){
+                console.debug("urth-viz-ipywidget _onParameterChange", argName, argValue);
+
+                if( this.isConnected() ){
+                    this.model.widget_manager.get_model(this.modelId).then(function(m){
+                        m.set(argName, argValue);
+                        m.save_changes();
+                    }.bind(this));
+                }
+            },
+
+            /**
+             * This method handles changes to the spec of the widget. It will create a new property based on
+             * the name of the traits. These new properties will allow data binding and will be kept in sync with
+             * the contents of the `traits` property.
+             *
+             */
+            _onSpecChange: function(sig){
+                console.debug('urth-viz-ipywidget _onSignatureChange got new signature', sig);
+                this._clearErrorMessages();
+                this.resetDynamicProperties();
+
+                var paramNames = Object.keys(sig);
+                if( paramNames.length > 0 ){
+
+                    //create new properties based on signature
+                    var paramProperties = {}
+                    paramNames.forEach(function(param){
+                        var argPropName = this._toParamPropertyName(param);
+                        var argPropObserverName = this._toParamPropertyObserverName(param);
+
+                        //create an observer
+                        this[argPropObserverName] = this._createArgChangeHandler(param);
+
+                        paramProperties[argPropName] = {
+                            notify: true,
+                            reflectToAttribute: true,
+                            observer: argPropObserverName,
+                            value: this[argPropName] !== undefined ? this[argPropName] : sig[param]
+                        }
+
+                    }.bind(this));
+
+                    this.setDynamicProperties(paramProperties);
+
+                    //set the defaults values and sync if necessary
+                    var paramsToSync = {};
+
+                    paramNames.forEach(function(param){
+                        if(this._isParameterUnset(this.traits[param])){
+                            var propValue = paramProperties[this._toParamPropertyName(param)].value
+                            if( propValue !== undefined ) {
+                                this.set('traits.' + param, propValue);
+                            }
+                        }
+                        else{
+                            paramsToSync[param] = this.traits[param];
+                        }
+                    }.bind(this));
+
+                    this._syncParamAttributes(paramsToSync);
+                }
+            },
+
+            /**
+             * Update the `spec` held by this element with
+             * the spec of the widget currently in the kernel.
+             *
+             * @method refresh
+             */
+            refresh: function() {
+                console.debug("urth-viz-ipywidget sending sync message...");
+                this.send({ "event": "sync" });
+            },
+
+            _createArgChangeHandler: function(param){
+
+                return function(newVal){
+                    console.log('urth-viz-ipywidget handling change to', param);
+
+                    if(this._syncing)
+                        return;
+
+                    this._syncing = true;
+                    try {
+                        this.set("traits." + param, newVal); //keep the property updated
+                        this._onParameterChange(param, newVal);
+                    }
+                    finally {
+                        delete this._syncing;
+                    }
+                }
+            }
+    });
+})();
+
+</script>
