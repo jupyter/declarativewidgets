@@ -11,6 +11,16 @@ define([
 
     'use strict';
 
+    //create a mapping for declarativewidgets
+    requirejs.config({
+        map: {
+            '*': {
+                'jupyter-decl-widgets': 'nbextensions/urth_widgets/js/widgets'
+            }
+        }
+    });
+
+
     // Some versions of IE do not have window.console defined. Some versions
     // do not define the debug and other methods. This is a minimal workaround
     // based on what declarative widgets code is using.
