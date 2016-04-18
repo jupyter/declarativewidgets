@@ -8,37 +8,6 @@
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 
-<dom-module id="urth-viz-chart">
-    <link rel="import" type="css" href="../nvd3/build/nv.d3.css">
-    <link rel="import" type="css" href="../urth-viz-chart/urth-viz-chart.css">
-
-    <template>
-        <link rel="stylesheet" type="text/css" href="../nvd3/build/nv.d3.css">
-        <link rel="stylesheet" type="text/css" href="../urth-viz-chart/urth-viz-chart.css">
-
-        <div id="settings-section">
-          <paper-dropdown-menu label="Category" noink no-animations>
-            <paper-menu class="dropdown-content" selected="{{primary}}">
-              <template is="dom-repeat" items="[[columns]]" as="column">
-                <paper-item>[[column]]</paper-item>
-              </template>
-            </paper-menu>
-          </paper-dropdown-menu>
-          <paper-dropdown-menu label="Value" noink no-animations>
-            <paper-menu class="dropdown-content" selected="{{secondary}}">
-              <template is="dom-repeat" items="[[columns]]" as="column">
-                <paper-item>[[column]]</paper-item>
-              </template>
-            </paper-menu>
-          </paper-dropdown-menu>
-        </div>
-        <div id="chart1">
-            <svg style='height:500px'></svg>
-        </div>
-        <content id="content"></content>
-    </template>
-</dom-module>
-
 <!--
 Base widget that draws a chart using NVD3, which supports several chart types.
 
@@ -46,7 +15,7 @@ The chart accepts data via attribute `datarows` and column headers via attribute
 
 1. `datarows` should be of type Array of Arrays, representing list of rows.
 
-2. 'columns' should also be of type Array of strings, representing column headers.
+2. `columns` should also be of type Array of strings, representing column headers.
 
 @group Urth Viz
 @element urth-viz-chart
