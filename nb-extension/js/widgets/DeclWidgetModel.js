@@ -1,15 +1,15 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-define(["nbextensions/widgets/widgets/js/widget"], function(Widget) {
+define(["jupyter-js-widgets"], function(widgets) {
     "use strict";
 
     /**
      * Collection of patches on top of ipywidgets.WidgetModel
      */
-    var DeclWidgetModel = Widget.WidgetModel.extend({
+    var DeclWidgetModel = widgets.WidgetModel.extend({
         constructor: function() {
-            Widget.WidgetModel.apply(this, arguments);
+            widgets.WidgetModel.apply(this, arguments);
             // WidgetModel expects widgets' state to be set from kernel and won't
             // set `_first_state` to false until that happens. But DeclWidgets
             // are different: we do initial setup on client and then notify kernel.
