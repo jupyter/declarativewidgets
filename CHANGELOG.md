@@ -1,18 +1,51 @@
 # Changelog
 ## 0.5.0 (2016-xx-xx)
+* Support for R language through IRkernel
 * `selection` property on charts references row data. Chart-specific selection data available as `selectionInfo`
 * `selection` property on charts references a single row rather than Array of length==1, continues to return Array of rows when `multiSelect` is used.
+* New element <urth-help> to display help documentation inline
+* Better support for dependency injection when starting up declarativewidgets
+
+## 0.4.5 (2016-04-06)
+* Progress indications on templates while dependencies load
+
+## 0.4.4 (2016-04-01)
+* Fix regression in selection in charts
+
+## 0.4.3 (2016-03-24)
+* Ability to inspect the content of an urth-core-channel
+* Improved selection content from urth-viz-chart elements
+* Misc bug fixes on urth-viz-chart
+* Ability to peg Polymer version at runtime [1.2.4-1.4.0)
+* Fixes to urth-core-function to better support complex parameters
+* Serialization fixes for Toree/Scala
+
+## 0.4.2 (2016-03-03)
+* Make selection in urth-viz-table available as an object
+* Allow height, width, and margin adjustment to urth-viz-chart's
+
+## 0.4.1 (2016-02-23)
+* Support for Polymer 1.3
+* Fixes to complex object changes across templates
+* Delay template rendering until imports completed
 
 ## 0.4.0 (2016-02-12)
 * Upgrade to use Apache Toree for scala kernel
 * Upgrade to Polymer 1.2.4+
+
+## 0.3.2 (2016-03-22)
+* Ability to peg Polymer version at runtime `[1.2.4-1.4.0)`
+
+## 0.3.1 (2016-02-08)
+
+* Support for Polymer 1.2.4+
 
 ## 0.3.0 (2016-01-20)
 
 * Modified install process to rely on `jupyter activate/deactivate`
 * New element `urth-core-channel` and javascript API to channel variables
 * New element `urth-core-watch`
-* Fixes to sizing of `urth-viz-table`
+* Fixes to sizing of 'urth-viz-table'
 * Serialization support for Pandas.Series
 
 ## 0.2.0 (2015-12-01)
@@ -21,6 +54,16 @@
 * Several fixes to `urth-viz-table` around selection
 * Support for `display_data` type messages sent when a function is invoked through `urth-core-function`
 * Added support to label axis on `urth-viz-chart` elements
+
+## 0.1.4 (2016-03-22)
+* Ability to peg Polymer version at runtime
+
+## 0.1.3 (2016-02-16)
+* Upgrade to Polymer 1.2.4
+* Allow graceful degradation when server extensions are not available
+
+## 0.1.2 (2016-01-18)
+* Backport fixes from master
 
 ## 0.1.1 (2015-12-01)
 
