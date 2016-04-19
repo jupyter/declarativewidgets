@@ -25,6 +25,7 @@ help:
 
 ROOT_REPO:=jupyter/all-spark-notebook:258e25c03cba
 REPO:=jupyter/all-spark-notebook-bower:258e25c03cba
+REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:258e25c03cba
 SCALA_BUILD_REPO:=jupyter/sbt-toree-image:0.1.0
 
 PYTHON?=python3
@@ -39,7 +40,7 @@ $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 	@$(foreach dir, $(URTH_SRC_DIRS), cd $(abspath $(dir)) && $(NPM_BIN_DIR)/bower link;)
 	@$(foreach name, $(URTH_DIRS), $(NPM_BIN_DIR)/bower link $(name);)
 
-init: node_modules dev_image scala_build_image
+init: node_modules dev_image scala_build_image dev_image_4.2
 
 node_modules: package.json
 	@npm install
@@ -64,6 +65,18 @@ dev_image:
 		chown -R jovyan:users /home/jovyan/.local/share/jupyter/nbextensions'
 	@docker commit bower-build $(REPO)
 	@-docker rm -f bower-build
+
+dev_image_4.2:
+	@-docker rm -f 4.2-build
+	@docker run -it --user root --name 4.2-build \
+		$(REPO) bash -c 'pip uninstall ipywidgets && \
+    pip install --upgrade notebook && \
+    pip install --pre ipywidgets && \
+    pip install widgetsnbextension && \
+    jupyter nbextension install --system --py widgetsnbextension && \
+    jupyter nbextension enable widgetsnbextension --system --py'
+	@docker commit 4.2-build $(REPO4.2)
+	@-docker rm -f 4.2-build
 
 scala_build_image:
 	@-docker rm -f scala-build
@@ -275,11 +288,21 @@ install: OPTIONS?=-it --rm
 install: _run-$(PYTHON)
 
 server: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
+server: INSTALL_DECLWID_CMD?=pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets install --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library && jupyter declarativewidgets activate;
 server: SERVER_NAME?=urth_widgets_server
 server: OPTIONS?=-it --rm
 server: PORT_MAP?=-p 9500:8888
 server: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server: _run-$(PYTHON)
+
+server_4.2: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
+server_4.2: INSTALL_DECLWID_CMD?=pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter nbextension install --py declarativewidgets --user && jupyter nbextension enable --py declarativewidgets --user && jupyter serverextension enable --py declarativewidgets --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
+server_4.2: SERVER_NAME?=urth_widgets_server
+server_4.2: OPTIONS?=-it --rm
+server_4.2: PORT_MAP?=-p 9500:8888
+server_4.2: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
+server_4.2: REPO=$(REPO4.2)
+server_4.2: _run-$(PYTHON)
 
 _run-python3: _run
 
@@ -295,12 +318,7 @@ _run:
 		-v `pwd`:/src \
 		--user jovyan \
 		$(VOL_MAP) \
-		$(REPO) bash -c '$(PYTHON_SETUP_CMD) \
-			pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && \
-			jupyter declarativewidgets install --user && \
-			jupyter declarativewidgets installr --library=/opt/conda/lib/R/library&& \
-			jupyter declarativewidgets activate && \
-			$(CMD)'
+		$(REPO) bash -c '$(PYTHON_SETUP_CMD) $(INSTALL_DECLWID_CMD) $(CMD)'
 
 dev: CMD?=sh -c "python --version; jupyter notebook --no-browser --port 8888 --ip='*'"
 dev: _dev-$(PYTHON)
@@ -338,7 +356,7 @@ run-test: SERVER_NAME?=urth_widgets_integration_test_server
 run-test: BROWSER_LIST?=chrome
 run-test:
 	-@docker rm -f $(SERVER_NAME)
-	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server
+	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server$(JUPYTER)
 	@echo 'Waiting for server to start...'
 	@LIMIT=60; while [ $$LIMIT -gt 0 ] && ! docker logs $(SERVER_NAME) 2>&1 | grep 'Notebook is running'; do echo waiting $$LIMIT...; sleep 1; LIMIT=$$(expr $$LIMIT - 1); done
 	@$(foreach browser, $(BROWSER_LIST), echo 'Running system integration tests on $(browser)...'; npm run system-test -- --baseurl $(BASEURL) --test-type $(TEST_TYPE) --browser $(browser);)
@@ -379,6 +397,7 @@ all: init
 	PYTHON=python2 $(MAKE) install
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" $(MAKE) system-test
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" PYTHON=python2 $(MAKE) system-test
+	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_4.2 $(MAKE) system-test
 	$(MAKE) dist/docs
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
