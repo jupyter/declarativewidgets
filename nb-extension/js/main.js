@@ -11,6 +11,25 @@ define([
 
     'use strict';
 
+    //create a mapping for declarativewidgets and its dependencies
+    requirejs.config({
+        map: {
+            '*': {
+                'jupyter-decl-widgets': 'nbextensions/urth_widgets/js/widgets'
+            },
+            'nbextensions/urth_widgets/js/widgets': {
+                'jupyter-js-widgets': 'ipywidgets4-or-jupyter-js-widgets'
+            }
+        },
+        paths: {
+            'ipywidgets4-or-jupyter-js-widgets': [
+                'does/not/exist',  //HACK: fallbacks was acting strange with 2 items
+                Jupyter.notebook.base_url+'nbextensions/widgets/widgets/js/widget',
+                Jupyter.notebook.base_url+'nbextensions/jupyter-js-widgets/extension',
+            ]
+        }
+    });
+
     // Some versions of IE do not have window.console defined. Some versions
     // do not define the debug and other methods. This is a minimal workaround
     // based on what declarative widgets code is using.
@@ -41,6 +60,6 @@ define([
     load_css(getModuleBasedComponentRoot() + '/../css/main.css');
 
     return {
-        load_ipython_extension: function() { console.debug('Custom JS loaded'); }
+        load_ipython_extension: function() { console.debug('loaded declarativewidgets'); }
     };
 });
