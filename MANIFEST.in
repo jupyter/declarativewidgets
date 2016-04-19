@@ -1,2 +1,2 @@
-recursive-include urth/widgets/ext/notebook *.html *.js *.css *.jar *.json *.tgz
+recursive-include declarativewidgets/static *.html *.js *.css *.jar *.json *.tgz
 include VERSION

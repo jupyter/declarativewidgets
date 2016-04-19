@@ -60,7 +60,7 @@ class ExtensionInstallRApp(InstallNBExtensionApp):
             extra_r_options = "-l {}".format(self.library)
 
         here = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-        extension_path = os.path.join(here, '../urth/widgets/ext/notebook')
+        extension_path = os.path.join(here, 'static')
         subprocess.call("R CMD INSTALL {0} {1}/urth-widgets.tgz".format(extra_r_options, extension_path), shell=True)
 
 
@@ -88,7 +88,7 @@ class ExtensionInstallApp(InstallNBExtensionApp):
         here = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
         self.log.info("Installing jupyter_declarativewidgets notebook extensions")
-        self.extra_args = [os.path.join(here, '../urth/widgets/ext/notebook')]
+        self.extra_args = [os.path.join(here, 'static')]
         self.destination = 'urth_widgets'  # TODO: must change to jupyter_declarativewidgets
         self.install_extensions()
 

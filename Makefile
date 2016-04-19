@@ -114,80 +114,81 @@ clean-watch-docs:
 	-@kill -9 `pgrep -P $$(cat .watch-docs)`
 	-@rm .watch-docs
 
-dist/urth/widgets/ext/notebook/css: ${shell find nb-extension/css}
-	@echo 'Moving nb-extension/css'
-	@mkdir -p dist/urth/widgets/ext/notebook/css
-	@cp -R nb-extension/css/* dist/urth/widgets/ext/notebook/css/.
-
-dist/urth/widgets/ext/notebook/js: ${shell find nb-extension/js}
-	@echo 'Moving src/nb-extension'
-	@mkdir -p dist/urth/widgets/ext/notebook/js
-	@cp -R nb-extension/js/* dist/urth/widgets/ext/notebook/js/.
-
-dist/urth/widgets/ext/notebook/elements: ${shell find elements}
-	@echo 'Moving elements'
-	@mkdir -p dist/urth/widgets/ext/notebook/elements
-	@cp -R elements/* dist/urth/widgets/ext/notebook/elements/.
-	@touch dist/urth/widgets/ext/notebook/elements
-
-dist/urth/widgets/ext/notebook/urth_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
-	@echo 'Moving bower_components'
-	@mkdir -p dist/urth/widgets/ext/notebook/urth_components
-	@cp -RL bower_components/* dist/urth/widgets/ext/notebook/urth_components/.
-
-dist/urth/widgets/ext/notebook/docs: dist/docs
-	@echo 'Copying dist/docs/site'
-	@mkdir -p dist/urth/widgets/ext/notebook/docs
-	@cp -R dist/docs/site/* dist/urth/widgets/ext/notebook/docs/.
-
-dist/urth/widgets/ext/notebook: dist/urth/widgets/ext/notebook/bower.json dist/urth/widgets/ext/notebook/urth_components dist/urth/widgets/ext/notebook/js dist/urth/widgets/ext/notebook/elements dist/urth/widgets/ext/notebook/css
-
 dist/urth/widgets/ext: ${shell find nb-extension/python/urth/widgets/ext}
 	@echo 'Moving frontend extension code'
 	@mkdir -p dist/urth/widgets/ext
 	@cp -R nb-extension/python/urth/widgets/ext/* dist/urth/widgets/ext/.
 
-dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/ext dist/urth/widgets/ext/notebook
+dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/ext
 	@echo 'Moving python code'
 	@mkdir -p dist/urth
 	@cp -R kernel-python/urth/* dist/urth/.
 
-dist/declarativewidgets: ${shell find kernel-python/declarativewidgets} ${shell find nb-extension/python/declarativewidgets}
-	@echo 'Building declarativewidgets python module'
+dist/declarativewidgets: dist/declarativewidgets/static ${shell find nb-extension/python/declarativewidgets}
 	@mkdir -p dist/declarativewidgets
+	@echo 'Building declarativewidgets python module'
 	@cp -R nb-extension/python/declarativewidgets/* dist/declarativewidgets/.
 
-dist/urth/widgets/ext/notebook/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
+dist/declarativewidgets/static: bower.json dist/declarativewidgets/static/css dist/declarativewidgets/static/docs dist/declarativewidgets/static/elements dist/declarativewidgets/static/js dist/declarativewidgets/static/urth_components dist/declarativewidgets/static/urth-widgets.jar dist/declarativewidgets/static/urth-widgets.tgz
+	@cp bower.json dist/declarativewidgets/static/bower.json
+	@touch dist/declarativewidgets/static
+
+dist/declarativewidgets/static/css: ${shell find nb-extension/css}
+	@echo 'Building declarativewidgets/static/css'
+	@mkdir -p dist/declarativewidgets/static/css
+	@cp -R nb-extension/css/* dist/declarativewidgets/static/css/.
+
+dist/declarativewidgets/static/docs: dist/docs
+	@echo 'Building declarativewidgets/static/docs'
+	@mkdir -p dist/declarativewidgets/static/docs
+	@cp -R dist/docs/site/* dist/declarativewidgets/static/docs/.
+
+dist/declarativewidgets/static/elements: ${shell find elements}
+	@echo 'Building declarativewidgets/static/elements'
+	@mkdir -p dist/declarativewidgets/static/elements
+	@cp -R elements/* dist/declarativewidgets/static/elements/.
+	@touch dist/declarativewidgets/static/elements
+
+dist/declarativewidgets/static/js: ${shell find nb-extension/js}
+	@echo 'Building declarativewidgets/static/js'
+	@mkdir -p dist/declarativewidgets/static/js
+	@cp -R nb-extension/js/* dist/declarativewidgets/static/js/.
+
+dist/declarativewidgets/static/urth_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
+	@echo 'Building declarativewidgets/static/urth_components'
+	@mkdir -p dist/declarativewidgets/static/urth_components
+	@cp -RL bower_components/* dist/declarativewidgets/static/urth_components/.
+	@touch dist/declarativewidgets/static/urth_components
+
+dist/declarativewidgets/static/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala code'
 else
 	@echo 'Building scala code'
-	@mkdir -p dist/urth/widgets/ext/notebook
+	@echo 'Building declarativewidgets/static/urth-widgets.jar'
+	@mkdir -p dist/declarativewidgets/static
 	@docker run -it --rm \
 		-v `pwd`:/src \
 		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/kernel-scala /tmp/src && \
 			cd /tmp/src && \
 			mkdir -p /tmp/src/lib && cp /opt/toree/toree/lib/*.jar /tmp/src/lib/. && \
 			sbt package && \
-			cp target/scala-2.10/urth-widgets*.jar /src/dist/urth/widgets/ext/notebook/urth-widgets.jar'
+			cp target/scala-2.10/urth-widgets*.jar /src/dist/declarativewidgets/static/urth-widgets.jar'
 endif
 
-dist/urth/widgets/ext/notebook/bower.json: bower.json
-	@mkdir -p dist/urth/widgets/ext/notebook
-	@cp bower.json dist/urth/widgets/ext/notebook/bower.json
-
-dist/urth/widgets/ext/notebook/urth-widgets.tgz: ${shell find kernel-r/declarativewidgets}
+dist/declarativewidgets/static/urth-widgets.tgz: ${shell find kernel-r/declarativewidgets}
 ifeq ($(NOR), true)
 	@echo 'Skipping R code'
 else
 	@echo 'Building R code'
-	@mkdir -p dist/urth/widgets/ext/notebook
+	@echo 'Building declarativewidgets/static/urth-widgets.tgz'
+	@mkdir -p dist/declarativewidgets/static
 	@docker run -it --rm \
 		-v `pwd`:/src \
 		$(REPO) bash -c 'cp -r /src/kernel-r/declarativewidgets /tmp/src && \
 			cd /tmp/src && \
 			R CMD INSTALL --build . && \
-			cp declarativewidgets_0.1_R_x86_64-pc-linux-gnu.tar.gz /src/dist/urth/widgets/ext/notebook/urth-widgets.tgz'
+			cp declarativewidgets_0.1_R_x86_64-pc-linux-gnu.tar.gz /src/dist/declarativewidgets/static/urth-widgets.tgz'
 endif
 
 dist/docs: dist/docs/bower_components dist/docs/site dist/docs/site/generated_docs.json
@@ -219,7 +220,7 @@ dist/VERSION:
 	@mkdir -p dist
 	@echo "$(COMMIT)" > dist/VERSION
 
-dist: dist/urth dist/declarativewidgets dist/urth/widgets/ext/notebook/urth-widgets.jar dist/urth/widgets/ext/notebook/urth-widgets.tgz dist/scripts dist/VERSION dist/urth/widgets/ext/notebook/docs
+dist: dist/urth dist/declarativewidgets dist/scripts dist/VERSION
 
 sdist: dist
 	@cp -R MANIFEST.in dist/.

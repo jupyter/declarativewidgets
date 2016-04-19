@@ -5,7 +5,7 @@ def _jupyter_nbextension_paths():
     '''API for JS extension installation on notebook 4.2'''
     return [{
         'section': 'notebook',
-        'src': '../urth/widgets/ext/notebook',
+        'src': 'static',
         'dest': 'urth_widgets',
         'require': 'urth_widgets/js/main'
     }]
