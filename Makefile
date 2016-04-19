@@ -139,6 +139,11 @@ dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/ext dist/urth/widg
 	@mkdir -p dist/urth
 	@cp -R kernel-python/urth/* dist/urth/.
 
+dist/declarativewidgets: ${shell find kernel-python/declarativewidgets} ${shell find nb-extension/python/declarativewidgets}
+	@echo 'Building declarativewidgets python module'
+	@mkdir -p dist/declarativewidgets
+	@cp -R nb-extension/python/declarativewidgets/* dist/declarativewidgets/.
+
 dist/urth/widgets/ext/notebook/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala code'
@@ -201,7 +206,7 @@ dist/VERSION:
 	@mkdir -p dist
 	@echo "$(COMMIT)" > dist/VERSION
 
-dist: dist/urth dist/urth/widgets/ext/notebook/urth-widgets.jar dist/urth/widgets/ext/notebook/urth-widgets.tgz dist/scripts dist/VERSION dist/urth/widgets/ext/notebook/docs
+dist: dist/urth dist/declarativewidgets dist/urth/widgets/ext/notebook/urth-widgets.jar dist/urth/widgets/ext/notebook/urth-widgets.tgz dist/scripts dist/VERSION dist/urth/widgets/ext/notebook/docs
 
 sdist: dist
 	@cp -R MANIFEST.in dist/.
