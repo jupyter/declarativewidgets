@@ -1,5 +1,5 @@
 {
   "load_extensions": {
-    "urth_widgets/js/main": true
+    "declarativewidgets/js/main": true
   }
 }

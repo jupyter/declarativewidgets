@@ -338,7 +338,7 @@ _dev: .watch dist
 		-p 4040:4040 \
 		--user jovyan \
 		-e SPARK_OPTS="--master=local[4] --driver-java-options=-Dlog4j.logLevel=trace" \
-		-v `pwd`/dist/urth/widgets/ext/notebook:$(NB_HOME)/.local/share/jupyter/nbextensions/urth_widgets \
+		-v `pwd`/dist/declarativewidgets/static:$(NB_HOME)/.local/share/jupyter/nbextensions/declarativewidgets \
 		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
 		-v `pwd`/etc:$(NB_HOME)/nbconfig \
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/.jupyter/nbconfig/notebook.json \

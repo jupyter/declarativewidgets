@@ -87,7 +87,7 @@ def load_jupyter_server_extension(nb_app):
     for path in web_app.settings['nbextensions_path']:
         if ipython_dir in path:
             nbext = path
-    widgets_dir = os.path.join(nbext, 'urth_widgets/')
+    widgets_dir = os.path.join(nbext, 'declarativewidgets/')
 
     # Write out a .bowerrc file to configure bower installs to
     # not be interactive and not to prompt for analytics

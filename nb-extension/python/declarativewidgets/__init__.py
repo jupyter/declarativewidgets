@@ -6,8 +6,8 @@ def _jupyter_nbextension_paths():
     return [{
         'section': 'notebook',
         'src': 'static',
-        'dest': 'urth_widgets',
-        'require': 'urth_widgets/js/main'
+        'dest': 'declarativewidgets',
+        'require': 'declarativewidgets/js/main'
     }]
 
 def _jupyter_server_extension_paths():

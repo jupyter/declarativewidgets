@@ -89,7 +89,7 @@ class ExtensionInstallApp(InstallNBExtensionApp):
 
         self.log.info("Installing jupyter_declarativewidgets notebook extensions")
         self.extra_args = [os.path.join(here, 'static')]
-        self.destination = 'urth_widgets'  # TODO: must change to jupyter_declarativewidgets
+        self.destination = 'declarativewidgets'
         self.install_extensions()
 
 
@@ -129,7 +129,7 @@ class ExtensionActivateApp(EnableNBExtensionApp):
 
         self.log.info("Activating jupyter_declarativewidgets JS notebook extensions")
         self.section = "notebook"
-        self.enable_nbextension("urth_widgets/js/main")
+        self.enable_nbextension("declarativewidgets/js/main")
 
         self.log.info("Done. You may need to restart the Jupyter notebook server for changes to take effect.")
 
@@ -177,7 +177,7 @@ class ExtensionDeactivateApp(DisableNBExtensionApp):
 
         self.log.info("Deactivating jupyter_declarativewidgets JS notebook extensions")
         self.section = "notebook"
-        self.disable_nbextension("urth_widgets/js/main")
+        self.disable_nbextension("declarativewidgets/js/main")
 
         self.log.info("Done. You may need to restart the Jupyter notebook server for changes to take effect.")
 
