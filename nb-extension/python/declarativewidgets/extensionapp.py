@@ -5,13 +5,23 @@ import os.path
 import sys
 import subprocess
 
+from urth.widgets.ext._version import __version__
+
 from jupyter_core.paths import jupyter_config_dir
+from jupyter_core.application import JupyterApp
 from notebook.services.config import ConfigManager
 from notebook.nbextensions import (InstallNBExtensionApp, EnableNBExtensionApp,
                                    DisableNBExtensionApp, flags, aliases)
 from traitlets import Unicode
 from traitlets.config.application import catch_config_error
 from traitlets.config.application import Application
+
+try:
+    from notebook.nbextensions import BaseNBExtensionApp
+    _new_extensions = True
+except ImportError:
+    BaseNBExtensionApp = object
+    _new_extensions = False
 
 # Make copies to reuse flags and aliases
 INSTALL_FLAGS = {}
@@ -35,7 +45,7 @@ def makedirs(path):
             raise
 
 
-class ExtensionInstallRApp(InstallNBExtensionApp):
+class ExtensionInstallRApp(JupyterApp):
     '''Subclass that installs this particular extension.'''
     name = u'jupyter-declarativewidgets-extension-installr'
     description = u'Install the jupyter_declarativewidgets installr extension'
@@ -182,30 +192,85 @@ class ExtensionDeactivateApp(DisableNBExtensionApp):
         self.log.info("Done. You may need to restart the Jupyter notebook server for changes to take effect.")
 
 
+class ExtensionQuickSetupApp(BaseNBExtensionApp):
+    """Installs and enables all parts of this extension"""
+    name = "jupyter declarativewidgets quick-setup"
+    version = __version__
+    description = "Installs and enables all features of the jupyter_declarativewidgets extension"
+
+    def start(self):
+        self.argv.extend(['--py', 'declarativewidgets'])
+
+        from notebook import serverextensions
+        install = serverextensions.EnableServerExtensionApp()
+        install.initialize(self.argv)
+        install.start()
+        from notebook import nbextensions
+        install = nbextensions.InstallNBExtensionApp()
+        install.initialize(self.argv)
+        install.start()
+        enable = nbextensions.EnableNBExtensionApp()
+        enable.initialize(self.argv)
+        enable.start()
+
+class ExtensionQuickRemovalApp(BaseNBExtensionApp):
+    """Disables and uninstalls all parts of this extension"""
+    name = "jupyter declarativewidgets quick-remove"
+    version = __version__
+    description = "Disables and removes all features of the jupyter_declarativewidgets extension"
+
+    def start(self):
+        self.argv.extend(['--py', 'declarativewidgets'])
+
+        from notebook import nbextensions
+        enable = nbextensions.DisableNBExtensionApp()
+        enable.initialize(self.argv)
+        enable.start()
+        install = nbextensions.UninstallNBExtensionApp()
+        install.initialize(self.argv)
+        install.start()
+        from notebook import serverextensions
+        install = serverextensions.DisableServerExtensionApp()
+        install.initialize(self.argv)
+        install.start()
+
 class ExtensionApp(Application):
     '''CLI for extension management.'''
     name = u'jupyter_declarativewidgets extension'
     description = u'Utilities for managing the jupyter_declarativewidgets extension'
     examples = ""
 
-    subcommands = dict(
-        install=(
-            ExtensionInstallApp,
-            "Install the extension."
-        ),
-        activate=(
-            ExtensionActivateApp,
-            "Activate the extension."
-        ),
-        deactivate=(
-            ExtensionDeactivateApp,
-            "Deactivate the extension."
-        ),
-        installr=(
-            ExtensionInstallRApp,
-            "Install the R extension"
-        )
-    )
+    subcommands = dict(installr=(
+        ExtensionInstallRApp,
+        "Install the R extension"
+    ))
+
+    if _new_extensions:
+        subcommands.update({
+            "quick-setup": (
+                ExtensionQuickSetupApp,
+                "Install and enable everything in the package"
+            ),
+            "quick-remove": (
+                ExtensionQuickRemovalApp,
+                "Disable and uninstall everything in the package"
+            )
+        })
+    else:
+        subcommands.update(dict(
+            install=(
+                ExtensionInstallApp,
+                "Install the extension."
+            ),
+            activate=(
+                ExtensionActivateApp,
+                "Activate the extension."
+            ),
+            deactivate=(
+                ExtensionDeactivateApp,
+                "Deactivate the extension."
+            )
+        ))
 
     def _classes_default(self):
         classes = super(ExtensionApp, self)._classes_default()
