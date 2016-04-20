@@ -297,7 +297,7 @@ server: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server: _run-$(PYTHON)
 
 server_4.2: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
-server_4.2: INSTALL_DECLWID_CMD?=pip install --pre --upgrade toree && jupyter toree install --user; pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter nbextension install --py declarativewidgets --user && jupyter nbextension enable --py declarativewidgets --user && jupyter serverextension enable --py declarativewidgets --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
+server_4.2: INSTALL_DECLWID_CMD?=pip install --pre --upgrade toree && jupyter toree install --user; pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter nbextension install --py declarativewidgets --sys-prefix && jupyter nbextension enable --py declarativewidgets --sys-prefix && jupyter serverextension enable --py declarativewidgets --sys-prefix && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
 server_4.2: SERVER_NAME?=urth_widgets_server
 server_4.2: OPTIONS?=-it --rm
 server_4.2: PORT_MAP?=-p 9500:8888
