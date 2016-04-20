@@ -260,7 +260,7 @@ names for these properties have the form `trait-<name of trait>`.
              *
              */
             _onWidgetModelChange: function(){
-                console.debug('urth-viz-ipywidget _setupTraits got new signature', traits);
+                console.debug('urth-viz-ipywidget _onWidgetModelChange');
                 this._clearErrorMessages();
 
                 //hook listener to model changes
@@ -277,6 +277,7 @@ names for these properties have the form `trait-<name of trait>`.
             },
 
             _setupTraitProperties: function(widgetTraits){
+                console.debug('urth-viz-ipywidget _setupTraitProperties', widgetTraits);
                 this.resetDynamicProperties();
 
                 //get the traits to expose them as properties
