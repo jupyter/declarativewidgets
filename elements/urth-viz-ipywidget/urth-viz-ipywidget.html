@@ -6,10 +6,12 @@
 <link rel="import" href="../urth-core-behaviors/jupyter-widget-behavior.html">
 <link rel='import' href='../urth-core-behaviors/dynamic-properties-behavior.html'>
 <link rel="import" href="../urth-core-behaviors/execution-complete-behavior.html">
+<link rel="import" href="../urth-core-behaviors/jupyter-kernel-observer.html">
 
 <!--
-Allows displaying and binding with ipywidgets. This element only works against a Python
-kernel that has ipywidgets 4.x installed.
+This elements finds an ipywidget instance in the kernel that is referred to by the name specified in the `ref`
+property. It displays the ipywidget in its Local DOM and exposes the ipywidget's traits as properties available
+for template binding. This element only works against a Python kernel that has ipywidgets installed.
 
 To use this element, first create an instance of an ipywidget and assign it to a
 variable name.
@@ -45,7 +47,7 @@ names for these properties have the form `trait-<name of trait>`.
             properties: {
 
                 /**
-                 * Name of the widget to proxy. Must be a widget that is
+                 * Name of the variable that references the widget to proxy. Must be a widget that is
                  * defined in the kernel.
                  */
                 ref: {
@@ -54,21 +56,24 @@ names for these properties have the form `trait-<name of trait>`.
                 },
 
                 /**
-                 * The id of the ipywidget model.
+                 * The id of the ipywidget model. This is set through communication with the kernel.
                  */
                 modelId: {
                     type: String,
                     readOnly: true
                 },
 
+                /**
+                 * The WidgetModel instance for the ipywidget. This is set once the `modelId` is known.
+                 */
                 widgetModel: {
                     type: Object,
                     readOnly: true
                 },
 
                 /**
-                 * Object reflecting the current values of the traits of the
-                 * widget. This property can be used for binding.
+                 * Object reflecting the current values of all the traits define in the
+                 * ipywidget. This property can be used for binding.
                  */
                 traits: {
                     type: Object,
@@ -79,7 +84,8 @@ names for these properties have the form `trait-<name of trait>`.
             behaviors: [
                 Urth.JupyterWidgetBehavior,
                 Urth.ExecutionCompleteBehavior,
-                Urth.DynamicPropertiesBehavior
+                Urth.DynamicPropertiesBehavior,
+                Urth.JupyterKernelObserver
             ],
 
             observers: [
@@ -88,21 +94,21 @@ names for these properties have the form `trait-<name of trait>`.
                 '_onWidgetModelChange(widgetModel)'
             ],
 
-            created: function(){
-                console.debug('urth-viz-ipywidget created', arguments);
+            onKernelReady: function(kernel){
+                console.debug('urth-viz-ipywidget onKernelReady', arguments);
 
-                //only operate if the kernel is python
-                Urth.kernel.get_info(function(info){
+                //Need to know the kernel language to continue creation
+                kernel.get_info(this._onKernelInfo.bind(this))
+            },
 
-                    if(info.name.indexOf('python') == 0 ) {
-                        this.createModel('urth.widgets.widget_ipw_proxy.IpywProxy');
-                    }
-                    else{
-                        //not supported on any other kernels
-                        this.displayErrorMessage('Unsupported kernel. This element only supports Python.');
-                    }
-                }.bind(this))
-
+            _onKernelInfo: function(info){
+                if(info.name.indexOf('python') == 0 ) {
+                    this.createModel('urth.widgets.widget_ipw_proxy.IpywProxy');
+                }
+                else{
+                    //not supported on any other kernels
+                    this.displayErrorMessage('Unsupported kernel. This element only supports Python.');
+                }
             },
 
             ready: function() {
@@ -131,12 +137,7 @@ names for these properties have the form `trait-<name of trait>`.
 
             onModelIdChange: function(modelid){
                 console.debug('urth-viz-ipywidget onModelIdChange', modelid);
-                console.debug('urth-viz-ipywidget rendering view');
-
                 this._setModelId(modelid);
-
-                //set the widgetModel
-
             },
 
             /*
@@ -156,7 +157,7 @@ names for these properties have the form `trait-<name of trait>`.
                 console.debug('urth-viz-ipywidget _onTraitPropertyChanged', rec);
                 if( rec.path === 'traits' ){
                     //entire parameter map changed
-                    this._syncTraitAttributes(rec.value);
+                    this._syncTraitProperty(rec.value);
                     this._onTraitChange(rec.path, rec.value);
                 }
                 else if (TraitPropPathPattern.test(rec.path)){
@@ -170,7 +171,7 @@ names for these properties have the form `trait-<name of trait>`.
                         var traits = {};
                         var newVal = rec.base[trait];
                         traits[trait] = newVal;
-                        this._syncTraitAttributes(traits);
+                        this._syncTraitProperty(traits);
                         this._onTraitChange(trait, newVal);
 
                     }
@@ -181,7 +182,7 @@ names for these properties have the form `trait-<name of trait>`.
                 this.refresh();
             },
 
-            _syncTraitAttributes: function( traits ){
+            _syncTraitProperty: function( traits ){
                 traits = !traits ? {} : traits;
                 this._syncing = true;
                 try {
@@ -261,7 +262,6 @@ names for these properties have the form `trait-<name of trait>`.
             _onWidgetModelChange: function(){
                 console.debug('urth-viz-ipywidget _setupTraits got new signature', traits);
                 this._clearErrorMessages();
-                this.resetDynamicProperties();
 
                 //hook listener to model changes
                 this.widgetModel.on('change', function(options){
@@ -271,13 +271,20 @@ names for these properties have the form `trait-<name of trait>`.
                     }.bind(this));
                 }.bind(this));
 
+                this._setupTraitProperties(this.widgetModel.attributes)
+
+                this._createWidgetView();
+            },
+
+            _setupTraitProperties: function(widgetTraits){
+                this.resetDynamicProperties();
 
                 //get the traits to expose them as properties
                 var traits = {};
-                Object.keys(this.widgetModel.attributes).filter(function(attribute){
+                Object.keys(widgetTraits).filter(function(attribute){
                     return attribute.indexOf("_") != 0;
                 }).forEach(function(attribute){
-                    traits[attribute] = this.widgetModel.attributes[attribute];
+                    traits[attribute] = widgetTraits[attribute];
                 }.bind(this));
 
                 var paramNames = Object.keys(traits);
@@ -318,15 +325,12 @@ names for these properties have the form `trait-<name of trait>`.
                         }
                     }.bind(this));
 
-                    this._syncTraitAttributes(paramsToSync);
+                    this._syncTraitProperty(paramsToSync);
 
                     //update the widgetmodel with what was set on init
                     Object.keys(paramsToSync).forEach(function (trait) {
                         this._onTraitChange(trait, paramsToSync[trait]);
                     }.bind(this))
-
-                    //create the view
-                    this._createWidgetView();
 
                 }
             },
@@ -340,8 +344,8 @@ names for these properties have the form `trait-<name of trait>`.
             },
 
             /**
-             * Update the `spec` held by this element with
-             * the spec of the widget currently in the kernel.
+             * Sends a sync message to the kernel side. This is intended to make sure this element is bound to the
+             * latest object referenced by `ref`.
              *
              * @method refresh
              */

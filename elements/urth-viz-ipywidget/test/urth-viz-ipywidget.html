@@ -1,0 +1,329 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-core-function tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../urth-viz-ipywidget.html'>
+
+</head>
+
+<body>
+
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id='basic'>
+        <template>
+            <urth-viz-ipywidget ref="someWidget"></urth-viz-ipywidget>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='attributes'>
+        <template>
+            <urth-viz-ipywidget ref="someWidget" trait-x="a" trait-y="b" trait-z="5" someotherattr="foo"></urth-viz-ipywidget>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='properties'>
+        <template>
+            <urth-viz-ipywidget ref="someWidget" traits='{"x":"a","y":"b","z":5}' someotherattr="foo"></urth-viz-ipywidget>
+        </template>
+    </test-fixture>
+
+    <script>
+        var createModel;
+
+        // STEP 4: Define any globals needed by the test suite.
+        before(function() {
+            /*
+             * Non-lifecycle methods must be mocked on the prototype.
+             * Lifecycle methods(e.g. detached, ready) remain in the behavior, so they
+             * must be mocked there.
+             */
+            createModel = sinon.stub(Urth["urth-viz-ipywidget"].prototype, "createModel");
+            sinon.stub(Urth["urth-viz-ipywidget"].prototype, "displayErrorMessage");
+            sinon.stub(Urth.ExecutionCompleteBehavior, "ready");
+            sinon.stub(Urth.ExecutionCompleteBehavior, "detached");
+            sinon.stub(Urth["urth-viz-ipywidget"].prototype, "onKernelReady");
+        });
+
+        beforeEach(function(){
+            createModel.reset();
+        });
+
+        // STEP 5: Define suite(s) and tests.
+        describe('_onKernelInfo', function() {
+
+            it('should create model for python kernels', function () {
+                var fElmt = fixture('basic');
+
+                fElmt._onKernelInfo({ name: 'python_some_version'});
+
+                //another attribute set.
+                expect(createModel).to.have.been.calledOnce;
+            });
+
+            it('should not create model for non-python kernels', function () {
+                var fElmt = fixture('basic');
+
+                fElmt._onKernelInfo({ name: 'some_other_kernel'});
+
+                //another attribute set.
+                expect(createModel).to.have.not.been.called;
+            });
+        });
+
+        describe('_traitsFromAttributes', function() {
+            it('should return an object with traits based on attributes', function() {
+                var fElmt = fixture('attributes');
+                expect(fElmt._traitsFromAttributes()).to.eql({x:"a", y:"b", z:"5"});
+            });
+        });
+
+        describe('_syncTraitProperty', function() {
+            it('should update trait- properties', function() {
+                var fElmt = fixture('basic');
+
+                fElmt._setupTraitProperties({
+                    x: 0,
+                    y: 0,
+                    z: 0
+                });
+                fElmt._syncTraitProperty({x:1, y:"2", z:"3"});
+
+                expect(fElmt['traitX']).to.equal(1);
+                expect(fElmt['traitY']).to.equal("2");
+                expect(fElmt['traitZ']).to.equal("3");
+            });
+
+            it('should update only the trait- properties that exist in the signature', function() {
+                var fElmt = fixture('basic');
+
+                fElmt._setupTraitProperties({
+                    y: 0,
+                    z: 0
+                });
+                fElmt._syncTraitProperty({x:"1", y:"2", z:"3"});
+
+                expect(fElmt['traitX']).to.not.exist;
+                expect(fElmt['traitY']).to.equal("2");
+                expect(fElmt['traitZ']).to.equal("3");
+            });
+        });
+
+        describe('_isTraitAttribute', function() {
+            it('should return true if string starts with trait prefix', function() {
+                var fElmt = fixture('basic');
+                expect(fElmt._isTraitAttribute( "trait-x")).to.be.true;
+            });
+            it('should return false if string does not starts with trait prefix', function() {
+                var fElmt = fixture('basic');
+
+                expect(fElmt._isTraitAttribute( "trait-")).to.be.false;
+                expect(fElmt._isTraitAttribute( "another_property")).to.be.false;
+                expect(fElmt._isTraitAttribute( "anothertrait-")).to.be.false;
+                expect(fElmt._isTraitAttribute( "anothertraits-asdfa")).to.be.false;
+            });
+
+        });
+
+        describe('_setupTraitProperties', function() {
+            it('should set values to trait property', function() {
+                var fElmt = fixture('basic');
+
+                fElmt._setupTraitProperties({
+                    x: 1,
+                    y: 2,
+                    z: 'some val'
+                });
+
+                expect(fElmt.traits).to.eql({
+                    x: 1,
+                    y: 2,
+                    z: 'some val'
+                })
+
+                expect(fElmt.hasOwnProperty('traitX')).to.be.true;
+                expect(fElmt.hasOwnProperty('traitY')).to.be.true;
+                expect(fElmt.hasOwnProperty('traitZ')).to.be.true;
+
+                expect(fElmt.traitX).to.equal(1);
+                expect(fElmt.traitY).to.equal(2);
+                expect(fElmt.traitZ).to.equal('some val');
+            });
+
+            it('should not set default values to args property if empty signature', function() {
+                var fElmt = fixture('basic');
+
+                fElmt._setupTraitProperties({});
+
+                expect(fElmt.traits).to.eql({});
+
+                expect(fElmt.hasOwnProperty('traitsX')).to.be.false;
+                expect(fElmt.hasOwnProperty('traitsY')).to.be.false;
+                expect(fElmt.hasOwnProperty('traitsZ')).to.be.false;
+
+            });
+
+            it('should not set values to tratis property if the property already contains a value', function() {
+                var fElmt = fixture('properties');
+
+                fElmt._setupTraitProperties({
+                    x: 'another a',
+                    y: 'another b',
+                    z: 'another 5'
+                });
+
+                expect(fElmt.traits).to.eql({
+                    x: 'a',
+                    y: 'b',
+                    z: 5
+                })
+
+                expect(fElmt.hasOwnProperty('traitX')).to.be.true;
+                expect(fElmt.hasOwnProperty('traitY')).to.be.true;
+                expect(fElmt.hasOwnProperty('traitZ')).to.be.true;
+
+                expect(fElmt.traitX).to.equal('a');
+                expect(fElmt.traitY).to.equal('b');
+                expect(fElmt.traitZ).to.equal(5);
+            });
+
+
+            it('should set value of argName property if it is set in the args property from attributes at init', function() {
+                var fElmt = fixture('attributes');
+                fElmt._setupTraitProperties({
+                    x: 'another a',
+                    y: 'another b',
+                    z: 'another 5'
+                });
+
+                expect(fElmt.traits).to.eql({
+                    x: 'a',
+                    y: 'b',
+                    z: '5'
+                })
+
+                expect(fElmt.hasOwnProperty('traitX')).to.be.true;
+                expect(fElmt.hasOwnProperty('traitY')).to.be.true;
+                expect(fElmt.hasOwnProperty('traitZ')).to.be.true;
+
+                expect(fElmt.traitX).to.equal('a');
+                expect(fElmt.traitY).to.equal('b');
+                expect(fElmt.traitZ).to.equal('5');
+            });
+
+            it('should set values already present on the element\'s proto to traits property', function() {
+                var fElmt = fixture('basic');
+
+                fElmt.traitX = "pre existing value";
+
+                fElmt._setupTraitProperties({
+                    x: "some other value",
+                    y: 5,
+                    z: 'some val'
+                });
+
+                expect(fElmt.traits).to.eql({
+                    x: "pre existing value",
+                    y: 5,
+                    z: 'some val'
+                })
+
+                expect(fElmt.hasOwnProperty('traitX')).to.be.true;
+                expect(fElmt.hasOwnProperty('traitY')).to.be.true;
+                expect(fElmt.hasOwnProperty('traitZ')).to.be.true;
+
+                expect(fElmt.traitX).to.equal("pre existing value")
+                expect(fElmt.traitY).to.equal(5);
+                expect(fElmt.traitZ).to.equal('some val');
+            });
+
+            it('should set values to traits property if it is set to NaN', function() {
+                var fElmt = fixture('basic');
+
+                fElmt.traits.x = NaN;
+
+                fElmt._setupTraitProperties({
+                    x: 5
+                });
+
+                expect(fElmt.traits).to.eql({
+                    x: 5
+                })
+
+                expect(fElmt.hasOwnProperty('traitX')).to.be.true;
+
+                expect(fElmt.traitX).to.equal(5);
+            });
+
+            it('should set to values on property when they are either 0 or false', function() {
+                var fElmt = fixture('basic');
+
+                fElmt.traitX = 0;
+                fElmt.traitY = false;
+
+                fElmt._setupTraitProperties({
+                    x: 1,
+                    y: true
+                });
+
+                expect(fElmt.traits).to.eql({x: 0, y: false});
+
+                expect(fElmt.hasOwnProperty('traitX')).to.be.true;
+                expect(fElmt.hasOwnProperty('traitY')).to.be.true;
+
+                expect(fElmt.traitX).to.equal(0);
+                expect(fElmt.traitY).to.be.false;
+            });
+
+            it('should add new trait properties in the new call', function() {
+                var fElmt = fixture('basic');
+
+                fElmt._setupTraitProperties({
+                    x: 1
+                });
+
+                fElmt._setupTraitProperties({
+                    x: 1,
+                    y: 2
+                });
+
+                expect(fElmt.hasOwnProperty('traitX')).to.be.true;
+                expect(fElmt.hasOwnProperty('traitY')).to.be.true;
+            });
+
+            it('should remove an argument property if it is not in the new call', function(){
+                var fElmt = fixture('basic');
+
+                fElmt._setupTraitProperties({
+                    x: 1,
+                    y: 2
+                });
+
+                fElmt._setupTraitProperties({
+                    x: 1
+                });
+
+                expect(fElmt.hasOwnProperty('traitY')).to.be.false;
+            });
+
+        });
+    </script>
+</body>
+</html>
