@@ -156,11 +156,12 @@
                 },
 
                 /**
-                 * UI information based on the current selection
+                 * Object containing UI information based on the current selection.
+                 * Returns an Array of Objects where `multiSelect` is enabled.
                  */
                 selectionInfo: {
                     type: Array,
-                    value: function () { return []; },
+                    value: function () { return this.multiSelect ? [] : null; },
                     readOnly: true,
                     notify: true
                 },
