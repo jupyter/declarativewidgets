@@ -11,22 +11,22 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 * A base extension that enable the use of [Web Components](http://webcomponents.org) and [Polymer](https://www.polymer-project.org/1.0/) elements
 * A set of core elements facilitate interacting with code running on the kernel
 * Extensions to data binding support and installing of 3rd party elements.
-* Implementations for Python Kernel and Scala using [Apache Toree](https://github.com/apache/incubator-toree)
+* Implementations for Python, R (using [IRkernel](https://github.com/IRkernel/IRkernel)) and Scala (using [Apache Toree](https://github.com/apache/incubator-toree))
 
 ## What It Lacks
 
-* Support for state persistance and downstream tools (nbviewer)
+* Support for disconnected (no kernel) environments (i.e. nbviewer)
 * Interactions with DataFrames. Currently read-only.
 
 ## Runtime Requirements
 
-* Jupyter Notebook 4.0.x running on Python 3.x or Python 2.7.x (see the [0.1.x branch](https://github.com/jupyter-incubator/declarativewidgets/tree/0.1.x) for IPython Notebook 3.2.x compatibility)
-* [IPywidgets](https://github.com/ipython/ipywidgets) 4.1.x
+* Jupyter Notebook 4.0.x, 4.1.x, or 4.2.x running on Python 3.x or Python 2.7.x (see the [0.1.x branch](https://github.com/jupyter-incubator/declarativewidgets/tree/0.1.x) for IPython Notebook 3.2.x compatibility)
+* [IPywidgets](https://github.com/ipython/ipywidgets) 4.1.x and 5.0.x
 * Bower - Necessary for installing 3rd party elements straight out of notebook
-* Apache Toree for access to Spark using Scala
-* [R Kernel](https://github.com/IRkernel/IRkernel) for R language 
 
-Note: These are satisfied automatically when you follow the setup instructions below.
+##### Optional Requirements based on language support
+* Apache Toree for access to Spark using Scala
+* [IRkernel](https://github.com/IRkernel/IRkernel) for R language
 
 ##### Additional requirements for Python 2.7
 * `pip install futures==3.0.3`
@@ -37,6 +37,24 @@ We're running a tmpnb instance at [http://jupyter.cloudet.xyz](http://jupyter.cl
 
 ## Install It
 
+##### In Jupyter 4.2.x
+
+```bash
+# install the python package
+pip install jupyter_declarativewidgets
+
+# Install all parts of the extension to the active conda / venv / python env
+# and enable all parts of it in the jupyter profile in that environment
+# See jupyter declarativewidgets quick-setup --help for other options (e.g., --user)
+jupyter declarativewidgets quick-setup --sys-prefix
+# The above command is equivalent to this sequence of commands:
+# jupyter serverextension enable --py declarativewidgets --sys-prefix
+# jupyter nbextension install --py declarativewidgets --sys-prefix
+# jupyter nbextension enable --py declarativewidgets --sys-prefix
+```
+
+##### In Jupyter 4.0.x and 4.1.x
+
 ```bash
 # install the python package
 pip install jupyter_declarativewidgets
@@ -46,25 +64,57 @@ pip install jupyter_declarativewidgets
 jupyter declarativewidgets install --user --symlink --overwrite
 # enable the JS and server extensions in your ~/.jupyter
 jupyter declarativewidgets activate
+```
 
+##### Optional install of R support (all Jupyter versions)
+
+```bash
 # installing R support
 jupyter declarativewidgets installr --library path/to/r/libs
-
-# deactivate it later with
-jupyter declarativewidgets deactivate
 ``` 
 
-Restart your notebook server
+##### Note
+On all Jupyter versions, you will need to restart your notebook server if it was running during the enable/activate step. Also, note that you can run jupyter --paths to get a sense of where the extension files will be installed.
 
 ## Uninstall It
 
+##### In Jupyter 4.2.x
+
 ```bash
-jupyter declarativewidgets deactivate
+# Remove all parts of the extension from the active conda / venv / python env
+# See jupyter declarativewidgets quick-remove --help for other options (e.g., --user)
+jupyter declarativewidgets quick-remove --sys-prefix
+# The above command is equivalent to this sequence of commands:
+# jupyter bundler disable --py declarativewidgets --sys-prefix
+# jupyter nbextension disable --py declarativewidgets --sys-prefix
+# jupyter nbextension uninstall --py declarativewidgets --sys-prefix
+# jupyter serverextension disable --py declarativewidgets --sys-prefix
+
+# Remove the python package
 pip uninstall jupyter_declarativewidgets
 ```
 
-Note that there is no Jupyter method for removing the installed JavaScript extension assets. You will need to clean them up manually from your chosen install location.
- 
+##### In Jupyter 4.0.x and 4.1.x
+
+```bash
+# Disable extensions, but no way to remove frontend assets in this version
+jupyter declarativewidgets deactivate
+
+# Remove the python package
+pip uninstall jupyter_declarativewidgets
+```
+
+## Documentation
+
+The latest documentation can be found [here](http://jupyter-incubator.github.io/declarativewidgets/docs.html).
+
+Documentation is also available from within the notebook. To see the documentation add a cell with
+
+```html
+%%HTML
+<urth-help/>
+```
+
 ## Develop
 
 This repository is setup for a Dockerized development environment. On a Mac, do this one-time setup if you don't have a local Docker environment yet.
@@ -120,11 +170,11 @@ You can run a development environment against python 2.7 by adding an environmen
 PYTHON=python2 make dev
 ```
 
-## Build & Package
+### Build & Package
 
 Run `make sdist` to create a `pip` installable archive file in the `dist` directory. To test the package, run 'make server'. This command will run a docker container and pip install the package. It is useful to validate the packaging and installation. You should be able to install that tarball using pip anywhere you please with one caveat: the setup.py assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at pip install time.
 
-## Test
+### Test
 
 On a Mac, `make test` will execute the browser, python and scala tests.
 
@@ -188,9 +238,7 @@ You can run a tests against python 2.7 by adding an environment variable to your
 PYTHON=python2 make test
 ```
 
-## Documentation
-
-The latest documentatio can be found [here](http://jupyter-incubator.github.io/declarativewidgets/docs.html).
+### Element Documentation
 
 Public elements and API are documented using [Polymer suggested guidelines](http://polymerelements.github.io/style-guide/).
 Documentation can be run locally with the `make docs` target:
@@ -206,6 +254,7 @@ Serving docs at http://127.0.0.1:4001
 
 Load the specified url in your browser to explore the documentation.
 
+## Other Topics
 ### Including a Web Component in a Notebook
 
 The Urth widgets framework provides a mechanism to easily install and import a web component into
