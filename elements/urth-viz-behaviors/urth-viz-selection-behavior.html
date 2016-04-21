@@ -28,6 +28,16 @@
                 },
 
                 /**
+                 * The index of the selected data row or rows, an Array of rows where 'multiSelect' is enabled
+                 */
+                selectionIndex: {
+                    type: Array,
+                    value: function () { return this.multiSelect ? [] : null; },
+                    observer: '_selectionIndexChanged',
+                    notify: true
+                },
+
+                /**
                  * False by default to return `selection` as an array of values.
                  * If true, will return `selection` as an object with key-value pairs (with column names as keys).
                  */
