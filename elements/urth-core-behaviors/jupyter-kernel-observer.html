@@ -25,13 +25,15 @@ This behavior is used to implement handlers to kernel events
                 }
                 console.debug("Registering onKernelReady for Kernel Ready messages.")
 
-                this.__kernelReadyCallback = this.onKernelReady.bind(this);
+                this.__kernelReadyCallback = function(){
+                    this.onKernelReady(Urth.kernel);
+                }.bind(this);
                 Urth.events.on(
                     'kernel_ready.Kernel', this.__kernelReadyCallback
                 );
 
                 if (Urth.kernel && Urth.kernel.is_connected()) {
-                  this.onKernelReady();
+                  this.onKernelReady(Urth.kernel);
                 }
             },
 
@@ -50,8 +52,10 @@ This behavior is used to implement handlers to kernel events
              * `onLoad` of the page if there is already a ready kernel.
              *
              * @method onKerneReady
+             * @param kernel - the kernel object
              */
-            onKernelReady: function(){}
+            onKernelReady: function(kernel){}
+
 
         };
     })();

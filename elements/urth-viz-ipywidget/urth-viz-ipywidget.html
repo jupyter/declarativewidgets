@@ -1,0 +1,379 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../urth-core-behaviors/jupyter-widget-behavior.html">
+<link rel='import' href='../urth-core-behaviors/dynamic-properties-behavior.html'>
+<link rel="import" href="../urth-core-behaviors/execution-complete-behavior.html">
+<link rel="import" href="../urth-core-behaviors/jupyter-kernel-observer.html">
+
+<!--
+This elements finds an ipywidget instance in the kernel that is referred to by the name specified in the `ref`
+property. It displays the ipywidget in its Local DOM and exposes the ipywidget's traits as properties available
+for template binding. This element only works against a Python kernel that has ipywidgets installed.
+
+To use this element, first create an instance of an ipywidget and assign it to a
+variable name.
+
+```
+slider = IntSlider()
+```
+
+Then use this element to display and interact with the ipywidget by setting the `ref`
+property to the variable name
+
+```
+<urth-viz-ipywidgets ref='slider' trait-value='{{aVal}}'></urth-viz-ipywidgets>
+```
+
+Traits for the ipywidgets are made available through the element as bind-able properties. The
+names for these properties have the form `trait-<name of trait>`.
+
+@group Urth Viz
+@element urth-viz-ipywidgets
+-->
+<script>
+    (function(){
+    'use strict';
+
+        var TraitAttrPattern = /^trait-(.+)/;
+        var TraitPropPathPattern = /^traits\.([^\.\n]+)\.?/;
+
+        window.Urth = window.Urth || {};
+
+        window.Urth['urth-viz-ipywidget'] = Polymer({
+            is: 'urth-viz-ipywidget',
+            properties: {
+
+                /**
+                 * Name of the variable that references the widget to proxy. Must be a widget that is
+                 * defined in the kernel.
+                 */
+                ref: {
+                    type: String,
+                    value: ''
+                },
+
+                /**
+                 * The id of the ipywidget model. This is set through communication with the kernel.
+                 */
+                modelId: {
+                    type: String,
+                    readOnly: true
+                },
+
+                /**
+                 * The WidgetModel instance for the ipywidget. This is set once the `modelId` is known.
+                 */
+                widgetModel: {
+                    type: Object,
+                    readOnly: true
+                },
+
+                /**
+                 * Object reflecting the current values of all the traits define in the
+                 * ipywidget. This property can be used for binding.
+                 */
+                traits: {
+                    type: Object,
+                    notify: true
+                }
+            },
+
+            behaviors: [
+                Urth.JupyterWidgetBehavior,
+                Urth.ExecutionCompleteBehavior,
+                Urth.DynamicPropertiesBehavior,
+                Urth.JupyterKernelObserver
+            ],
+
+            observers: [
+                '_onTraitPropertyChanged(traits.*)',
+                '__setWidgetModel(modelId)',
+                '_onWidgetModelChange(widgetModel)'
+            ],
+
+            onKernelReady: function(kernel){
+                console.debug('urth-viz-ipywidget onKernelReady', arguments);
+
+                //Need to know the kernel language to continue creation
+                kernel.get_info(this._onKernelInfo.bind(this))
+            },
+
+            _onKernelInfo: function(info){
+                if(info.name.indexOf('python') == 0 ) {
+                    this.createModel('urth.widgets.widget_ipw_proxy.IpywProxy');
+                }
+                else{
+                    //not supported on any other kernels
+                    this.displayErrorMessage('Unsupported kernel. This element only supports Python.');
+                }
+            },
+
+            ready: function() {
+                console.debug('urth-viz-ipywidget ready');
+
+                if( !this.traits ){
+                    //sync with the attributes
+                    this.traits = this._traitsFromAttributes();
+                }
+            },
+
+            /*
+             * onModelReady is invoked when have created the model portion of the widget. Sending the
+             * kernel side the value of `ref`.
+             */
+            onModelReady: function(){
+                console.debug('urth-viz-ipywidget onModelReady');
+
+                var syncData = {
+                    widget_name: this.ref
+                }
+                console.debug('urth-viz-ipywidget sending initial sync', syncData);
+                this.sync(syncData);
+            },
+
+
+            onModelIdChange: function(modelid){
+                console.debug('urth-viz-ipywidget onModelIdChange', modelid);
+                this._setModelId(modelid);
+            },
+
+            /*
+             * This method is acting as a computed property method, but since there are Promises involve, we need
+             * to set it up using observers.
+             */
+            __setWidgetModel: function(modelid){
+                this.model.widget_manager.get_model(modelid).then(function(widgetmodel){
+                    this._setWidgetModel(widgetmodel);
+                }.bind(this));
+            },
+
+            _onTraitPropertyChanged: function(rec){
+                if(this._syncing)
+                    return;
+
+                console.debug('urth-viz-ipywidget _onTraitPropertyChanged', rec);
+                if( rec.path === 'traits' ){
+                    //entire parameter map changed
+                    this._syncTraitProperty(rec.value);
+                    this._onTraitChange(rec.path, rec.value);
+                }
+                else if (TraitPropPathPattern.test(rec.path)){
+                    //a single parameter changed
+                    var matches = TraitPropPathPattern.exec(rec.path)
+                    var trait =  matches.length === 2 ? matches[1] : undefined;
+
+                    if( trait ){
+                        console.debug('urth-viz-ipywidget got change for trait', trait);
+                        //reflect on the attibutes
+                        var traits = {};
+                        var newVal = rec.base[trait];
+                        traits[trait] = newVal;
+                        this._syncTraitProperty(traits);
+                        this._onTraitChange(trait, newVal);
+
+                    }
+                }
+            },
+
+            _onExecutionComplete: function(){
+                this.refresh();
+            },
+
+            _syncTraitProperty: function( traits ){
+                traits = !traits ? {} : traits;
+                this._syncing = true;
+                try {
+                    Object.keys(traits).forEach(function (trait) {
+                        var traitPropName = this._toTraitPropertyName(trait);
+
+                        if( this.hasOwnProperty(traitPropName) ){
+                            this[traitPropName] = traits[trait];
+                        }
+
+                    }.bind(this))
+                }
+                finally {
+                    delete this._syncing;
+                }
+            },
+
+            _isTraitAttribute: function(attr /*attribute or string*/){
+                var attrName =  typeof attr === 'string' ? attr : attr.name;
+                return TraitAttrPattern.test(attrName);
+            },
+
+            _isUnset: function(value){
+                /*
+                 * Testing undefined, null and NaN.
+                 * From https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN#Testing_against_NaN
+                 * a valid test for NaN is to test inequality to itself.
+                 */
+                return value === undefined || value == null || (value !== value);
+            },
+
+            _toTraitName: function(attr /*attribute or string*/){
+                var attrName =  typeof attr === 'string' ? attr : attr.name;
+
+                var matches = TraitAttrPattern.exec(attrName)
+                return matches && matches.length === 2 ? matches[1] : undefined;
+            },
+
+            _toTraitPropertyName: function(traitName){
+                return 'trait' + traitName[0].toUpperCase() + traitName.substring(1);
+            },
+
+            _toTraitPropertyObserverName: function(traitName){
+                var traitPropName = this._toTraitPropertyName(traitName);
+                return '_on'+traitPropName[0].toUpperCase() + traitPropName.substring(1)+'Change'
+            },
+
+            _traitsFromAttributes: function(){
+                var attrs = this.attributes,
+                        params = {};
+
+                for (var i = 0; i < attrs.length; i++) {
+                    var attr = attrs[i];
+                    if (this._isTraitAttribute(attr)) {
+                        params[this._toTraitName(attr)] = attr.nodeValue;
+                    }
+                }
+
+                return params;
+            },
+
+            _onTraitChange: function( argName, argValue ){
+                console.debug("urth-viz-ipywidget _onTraitChange", argName, argValue);
+
+                if( this.isConnected() ){
+                    this.widgetModel.set(argName, argValue);
+                    this.widgetModel.save_changes();
+                }
+            },
+
+            /**
+             * This method handles setup for the new ipywidget WidgetModel. It will create a new property based on
+             * the name of the traits. These new properties will allow data binding and will be kept in sync with
+             * the contents of the `traits` property.
+             *
+             */
+            _onWidgetModelChange: function(){
+                console.debug('urth-viz-ipywidget _onWidgetModelChange');
+                this._clearErrorMessages();
+
+                //hook listener to model changes
+                this.widgetModel.on('change', function(options){
+                    var changes = options.changed;
+                    Object.keys(changes).forEach(function(change){
+                        this.set( "traits."+change, changes[change]);
+                    }.bind(this));
+                }.bind(this));
+
+                this._setupTraitProperties(this.widgetModel.attributes)
+
+                this._createWidgetView();
+            },
+
+            _setupTraitProperties: function(widgetTraits){
+                console.debug('urth-viz-ipywidget _setupTraitProperties', widgetTraits);
+                this.resetDynamicProperties();
+
+                //get the traits to expose them as properties
+                var traits = {};
+                Object.keys(widgetTraits).filter(function(attribute){
+                    return attribute.indexOf("_") != 0;
+                }).forEach(function(attribute){
+                    traits[attribute] = widgetTraits[attribute];
+                }.bind(this));
+
+                var paramNames = Object.keys(traits);
+                if( paramNames.length > 0 ){
+
+                    //create new properties based on signature
+                    var paramProperties = {}
+                    paramNames.forEach(function(param){
+                        var argPropName = this._toTraitPropertyName(param);
+                        var argPropObserverName = this._toTraitPropertyObserverName(param);
+
+                        //create an observer
+                        this[argPropObserverName] = this._createTraitChangeHandler(param);
+
+                        paramProperties[argPropName] = {
+                            notify: true,
+                            reflectToAttribute: true,
+                            observer: argPropObserverName,
+                            value: this[argPropName] !== undefined ? this[argPropName] : traits[param]
+                        }
+
+                    }.bind(this));
+
+                    this.setDynamicProperties(paramProperties);
+
+                    //set the defaults values and sync if necessary
+                    var paramsToSync = {};
+
+                    paramNames.forEach(function(param){
+                        if(this._isUnset(this.traits[param])){
+                            var propValue = paramProperties[this._toTraitPropertyName(param)].value
+                            if( propValue !== undefined ) {
+                                this.set('traits.' + param, propValue);
+                            }
+                        }
+                        else{
+                            paramsToSync[param] = this.traits[param];
+                        }
+                    }.bind(this));
+
+                    this._syncTraitProperty(paramsToSync);
+
+                    //update the widgetmodel with what was set on init
+                    Object.keys(paramsToSync).forEach(function (trait) {
+                        this._onTraitChange(trait, paramsToSync[trait]);
+                    }.bind(this))
+
+                }
+            },
+
+            _createWidgetView: function(){
+                this.model.widget_manager.create_view(this.widgetModel).then( function(v){
+                    console.log( "Created ipywidget view", v);
+                    Polymer.dom(this.root).innerHTML = ''; //clearing area first
+                    Polymer.dom(this.root).appendChild(v.el);
+                }.bind(this))
+            },
+
+            /**
+             * Sends a sync message to the kernel side. This is intended to make sure this element is bound to the
+             * latest object referenced by `ref`.
+             *
+             * @method refresh
+             */
+            refresh: function() {
+                console.debug("urth-viz-ipywidget sending sync message...");
+                this.send({ "event": "sync" });
+            },
+
+            _createTraitChangeHandler: function(param){
+
+                return function(newVal){
+                    console.log('urth-viz-ipywidget handling change to', param);
+
+                    if(this._syncing)
+                        return;
+
+                    this._syncing = true;
+                    try {
+                        this.set("traits." + param, newVal); //keep the property updated
+                        this._onTraitChange(param, newVal);
+                    }
+                    finally {
+                        delete this._syncing;
+                    }
+                }
+            }
+    });
+})();
+
+</script>

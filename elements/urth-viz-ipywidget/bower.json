@@ -1,0 +1,26 @@
+{
+  "name": "urth-viz-ipywidget",
+  "version": "0.0.1",
+  "authors": [
+    "Jupyter Community"
+  ],
+  "description": "Client side interface to IPywidgets.",
+  "main": "urth-viz-ipywidget.html",
+  "keywords": [
+    "urth",
+    "web-components",
+    "jupyter",
+    "ipywidgets"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.4"
+  },
+  "private": true
+}

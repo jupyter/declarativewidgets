@@ -68,4 +68,13 @@ describe('Widgets System Test', function() {
             .waitForElementByClassName('test5', wd.asserters.textInclude('Jane Doe'), 10000)
             .nodeify(done);
     });
+
+    it('should render ipywidget when using urth-viz-ipywidget', function(done) {
+
+        var ipySlider = '#ipywid .widget-slider';
+
+        boilerplate.browser
+            .waitForElementsByCssSelector(ipySlider, wd.asserters.isDisplayed, 10000)
+            .nodeify(done);
+    });
 });

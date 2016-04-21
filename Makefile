@@ -59,7 +59,9 @@ dev_image:
 		apt-get install --yes nodejs npm && \
 		ln -s /usr/bin/nodejs /usr/bin/node && \
 		npm install -g bower && \
-		Rscript /src-kernel-r/install.r'
+		Rscript /src-kernel-r/install.r && \
+		mkdir -p /home/jovyan/.local/share/jupyter/nbextensions && \
+		chown -R jovyan:users /home/jovyan/.local/share/jupyter/nbextensions'
 	@docker commit bower-build $(REPO)
 	@-docker rm -f bower-build
 
