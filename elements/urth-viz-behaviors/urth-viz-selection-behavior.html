@@ -17,18 +17,19 @@
         Urth.VizSelectionBehavior = {
             properties: {
                 /**
-                 * The data row corresponding to the currently selected row.  Array of rows where 'multiSelect' is enabled
-                */
+                 * The data row corresponding to the currently selected row.
+                 * Returns an Array of rows where `multiSelect` is enabled
+                 */
                 selection: {
                     type: Array,
-                    value: function () { return []; },
+                    value: function () { return this.multiSelect ? [] : null; },
                     readOnly: true,
                     notify: true
                 },
 
                 /**
-                 * False by default to return 'selection' as an array of values.
-                 * If true, will return 'selection' as an object with key-value pairs (with column names as keys).
+                 * False by default to return `selection` as an array of values.
+                 * If true, will return `selection` as an object with key-value pairs (with column names as keys).
                  */
                 selectionAsObject: {
                     type: Boolean,

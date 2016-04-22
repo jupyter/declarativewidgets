@@ -11,6 +11,23 @@ Example:
 -->
 <dom-module id="survey-explorer">
     <template is="dom-bind">
+        <style>
+        .select-bar {
+          background-color: #ddd; padding: 10px;
+        }
+
+        .item-list {
+          max-height: 300px; min-height: 300px; overflow: auto; background-color: #eee; border: 1px solid #ccc;
+        }
+
+        .item-list hr {
+          padding: 0; margin: 0;
+        }
+
+        .item {
+          padding: 15px; background-color: white;
+        }
+        </style>
         <paper-dropdown-menu label="Choose a series" noink no-animations selected-item-label="{{selectedLabel}}">
             <paper-menu class="dropdown-content" selected="0">
                 <template is="dom-repeat" items="[[labelSlice(labels,series)]]">
@@ -36,20 +53,20 @@ Example:
             </template>
         </urth-viz-bar>
         <urth-core-function ref="getSample" arg-keyword="[[sel.x]]" arg-groupby="[[group_by]]" arg-sample_size="10" result="{{sampleData}}" arg-groupby_key="[[sel.key]]" arg-series="{{seriesByLabel(selectedLabel)}}" arg-sample_source="{{sampleSource}}" auto></urth-core-function>
-        <div style="background-color: #ddd; padding: 10px;">
+        <div class="select-bar">
             <em>Select a bar above.</em>
-            <template is="dom-if" if="{{sel.length}}">
+            <template is="dom-if" if="{{sel}}">
                 <span>Showing a random sample of up to 10 responses for "[[sel.x]]" in the "[[sel.key]]" group.</span>
             </template>
         </div>
-        <div style="max-height:300px; min-height:300px; overflow:auto; background-color: #eee; border: 1px solid #ccc;">
+        <div class="item-list">
            <template is="dom-repeat" items="[[sampleData.data]]">
                <template is="dom-repeat" items="[[item]]">
                    <template is="dom-if" if="[[item]]">
-                       <div style="padding: 15px; background-color: white;">[[item]]</div>
+                       <div class="item">[[item]]</div>
                    </template>
                </template>
-               <hr style="padding: 0; margin: 0;"/>
+               <hr/>
            </template>
         </div>
         <content></content>
@@ -89,7 +106,7 @@ Example:
             return series ? labels.slice(0, series.length) : [];
         },
         resetSelection: function() {
-            this.sel = [];
+            this.sel = null;
         },
         seriesByLabel: function(label) {
             var index = this.labels.indexOf(label);

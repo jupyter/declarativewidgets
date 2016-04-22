@@ -156,11 +156,12 @@
                 },
 
                 /**
-                 * UI information based on the current selection
+                 * Object containing UI information based on the current selection.
+                 * Returns an Array of Objects where `multiSelect` is enabled.
                  */
                 selectionInfo: {
                     type: Array,
-                    value: function () { return []; },
+                    value: function () { return this.multiSelect ? [] : null; },
                     readOnly: true,
                     notify: true
                 },
@@ -364,7 +365,9 @@
                 }
 
                 nv.addGraph(function() {
-                    var chart = this.chart = model();
+                    var chart = this.chart = model(),
+                        svg = this._svgSelection(d3);
+
                     if (config) {
                         config(chart);
                     }
@@ -373,12 +376,12 @@
 
                     if (this.height) {
                         chart.height(this.height);
-                        this._svgSelection(d3).style('height', this.height);
+                        svg.style('height', this.height);
                     }
 
                     if (this.width) {
                         chart.width(this.width);
-                        this._svgSelection(d3).style('width', this.width);
+                        svg.style('width', this.width);
                     }
 
                     if (this.margin) {
@@ -416,8 +419,7 @@
                     this._fireWhenReady();
 
                     // On page reload, this.data computed fails to run, so call it directly
-                    this._svgSelection(d3)
-                        .datum(this.data || this._transformData(this.datarows, this.columns) || [])
+                    svg.datum(this.data || this._transformData(this.datarows, this.columns) || [])
                         .transition().duration(500)
                         .call(chart);
 
@@ -436,16 +438,13 @@
 
                     this.chart[modelProp].dispatch.on('elementClick.urth', function(e) {
                         if (!this.multiSelect) {
-                            var selected;
-                            while (selected = this.$$('.selected')) {
-                                selected.classList.remove('selected');
-                            }
+                            svg.selectAll('.nvd3 .selected:not(.hover)').classed('selected', false);
                         }
 
                         // Use selected class on DOM to maintain selected state
-                        this.$$('.hover').classList.toggle('selected');
+                        this.$$('.nvd3 .hover').classList.toggle('selected');
 
-                        var selectionInfo = this._svgSelection(d3).selectAll('.nvd3 .selected').data();
+                        var selectionInfo = svg.selectAll('.nvd3 .selected').data();
 
                         // workaround for type=scatter, which does not have unique data objects bound
                         // to the selected DOM element.  Maintain a flag within the data object instead.
