@@ -52,6 +52,13 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                         widget_class: this.kernelClass
                     }
                 ).then(function(model) {
+                        //This check is to protect against a timing in ipywidgets where the comm can be close
+                        //by the time it gets to resolve this promise
+                        if(!model.comm.kernel.comm_manager.comms[model.comm.comm_id]){
+                            this._handleCommDisconnect();
+                            return;
+                        }
+
                         console.log('Model creation successful!', model);
                         this.__modelChangeCallback = this._onModelChange.bind(this);
                         this.__commCloseCallback = this._handleCommDisconnect.bind(this);
