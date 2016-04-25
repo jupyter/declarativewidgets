@@ -28,8 +28,13 @@ wd.configureHttp({
 
 //  The browser capabilities we would like setup by selenium
 var desired = {browserName: 'chrome', platform: 'OS X 10.10'};
-desired.platform = args.platform || desired.platform;
+if (args.browser && args.browser === 'InternetExplorer') {
+    args.browser = 'internet explorer';
+}
 desired.browserName = args.browser || desired.browserName;
+desired.platform = args.platform ||
+    (desired.browserName === 'internet explorer' || desired.browserName === 'MicrosoftEdge') ?
+        'Windows 10': desired.platform;
 desired.tags = ['widgets', 'system-test', desired.browserName];
 // If there is a build number, include it in the desired attributes for sauce labs
 if (process.env.TRAVIS_JOB_NUMBER) {
@@ -55,6 +60,7 @@ console.log('Sauce access key is defined? ', !!process.env.SAUCE_ACCESS_KEY);
 var Boilerplate = function(){
   this.browser = wd.promiseChainRemote(testServer);
   this.allPassed = true;
+  this.SPECIAL_KEYS = wd.SPECIAL_KEYS;
 };
 
 /**

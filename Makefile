@@ -28,6 +28,8 @@ REPO:=jupyter/all-spark-notebook-bower:258e25c03cba
 REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:258e25c03cba
 SCALA_BUILD_REPO:=1science/sbt
 
+PORT_MAP?=-p 9500:8888
+
 PYTHON?=python3
 DOCKER_OPTS?=--log-level warn
 PIP_OPTS?=--quiet
@@ -284,7 +286,6 @@ server: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
 server: INSTALL_DECLWID_CMD?=pip install $(PIP_OPTS) --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets install --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library && jupyter declarativewidgets activate;
 server: SERVER_NAME?=urth_widgets_server
 server: OPTIONS?=-it --rm
-server: PORT_MAP?=-p 9500:8888
 server: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server: _run-$(PYTHON)
 
@@ -292,7 +293,6 @@ server_4.2: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
 server_4.2: INSTALL_DECLWID_CMD?=pip install $(PIP_OPTS) --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
 server_4.2: SERVER_NAME?=urth_widgets_server
 server_4.2: OPTIONS?=-it --rm
-server_4.2: PORT_MAP?=-p 9500:8888
 server_4.2: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server_4.2: REPO=$(REPO4.2)
 server_4.2: _run-$(PYTHON)
@@ -367,7 +367,11 @@ else
 	$(MAKE) start-selenium
 	$(MAKE) sdist
 	@echo 'Starting system integration tests locally...'
+ifdef TRAVIS
+	BASEURL=$(BASEURL) BROWSER_LIST="chrome" TEST_TYPE=local SPECS="$(SPECS)" $(MAKE) run-test || (docker $(DOCKER_OPTS) rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
+else
 	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=local SPECS="$(SPECS)" $(MAKE) run-test || (docker $(DOCKER_OPTS) rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
+endif
 	-@kill `cat SELENIUM_PID`
 	-@rm SELENIUM_PID
 endif
@@ -383,6 +387,9 @@ docs: .watch-docs dist/docs
 all: BASEURL?=http://192.168.99.100:9500
 all: BROWSER_LIST?=chrome
 all: JUPYTER_VERSION?=4.2
+all: ALT_BROWSER_LIST?=chrome
+all: PYTHON2_SPECS?=system-test/urth-system-test-specs.js
+all: ALT_JUPYTER_SPECS?=system-test/urth-system-test-specs.js system-test/urth-r-widgets-specs.js
 all: init
 	$(MAKE) test-js-remote
 	$(MAKE) test-py
@@ -394,9 +401,9 @@ all: init
 	@echo 'Starting system tests for Python 3'
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" $(MAKE) system-test
 	@echo 'Starting system tests for Python 2'
-	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" PYTHON=python2 $(MAKE) system-test
+	@BASEURL=$(BASEURL) BROWSER_LIST="$(ALT_BROWSER_LIST)" PYTHON=python2 SPECS="$(PYTHON2_SPECS)" $(MAKE) system-test
 	@echo 'Starting system tests on Jupyter $(JUPYTER_VERSION)'
-	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_$(JUPYTER_VERSION) $(MAKE) system-test
+	@BASEURL=$(BASEURL) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=_$(JUPYTER_VERSION) SPECS="$(ALT_JUPYTER_SPECS)" $(MAKE) system-test
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
 release: PRE_SDIST=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;

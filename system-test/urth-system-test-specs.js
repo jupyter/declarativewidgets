@@ -30,6 +30,8 @@ describe('Widgets System Test', function() {
         boilerplate.browser
             .elementsByCssSelector('div.output_area').nth(4)
             .elementByCssSelector('>', 'input')
+            .click()
+            .type(boilerplate.SPECIAL_KEYS.Enter) // Needed for IE
             .type('B')
             .waitForElementById('test3', wd.asserters.textInclude('B'), 10000)
             .nodeify(done);
@@ -39,6 +41,8 @@ describe('Widgets System Test', function() {
         boilerplate.browser
             .elementsByCssSelector('div.output_area').nth(3)
             .elementByCssSelector('>', 'input')
+            .click()
+            .type(boilerplate.SPECIAL_KEYS.Enter) // Needed for IE
             .type('2')
             .elementByCssSelector('#test2')
             .text().should.eventually.include('A2')
@@ -51,6 +55,8 @@ describe('Widgets System Test', function() {
         boilerplate.browser
             .elementsByCssSelector('div.output_area').nth(5)
             .elementByCssSelector('>', 'input')
+            .click()
+            .type(boilerplate.SPECIAL_KEYS.Enter) // Needed for IE
             .type('watched message')
             .waitForElementById('test4', wd.asserters.textInclude('watched message'), 10000)
             .nodeify(done);

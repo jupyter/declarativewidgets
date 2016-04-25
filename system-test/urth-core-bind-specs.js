@@ -18,7 +18,7 @@ describe('Urth Core Bind', function() {
             .waitForElementById('titleInput', wd.asserters.isDisplayed, 10000)
             .elementById('titleInput')
             .click()
-            .keys(inputString)
+            .type(inputString)
             .elementById('titleSpan')
             .text().should.eventually.include(inputString)
             .nodeify(done);
@@ -32,6 +32,8 @@ describe('Urth Core Bind', function() {
         boilerplate.browser
             .waitForElementById('t2Person', wd.asserters.isDisplayed, 10000)
             .elementById('t2Person')
+            .click()
+            .type(boilerplate.SPECIAL_KEYS.Enter) // Needed for IE
             .type(inputString)
             .elementById('t3Person')
             .text().should.eventually.include(inputString)
