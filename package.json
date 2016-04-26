@@ -18,7 +18,8 @@
     "minimist": "latest",
     "selenium-standalone": "latest",
     "web-component-tester": "^4",
-    "vulcanize": "1.14.8"
+    "vulcanize": "1.14.8",
+    "bluebird" : "3.3.5"
   },
   "config": {},
   "scripts": {
