@@ -69,7 +69,7 @@ dev_image:
 dev_image_4.2:
 	@-docker rm -f 4.2-build
 	@docker run -it --user root --name 4.2-build \
-		$(REPO) bash -c 'pip uninstall ipywidgets && \
+		$(REPO) bash -c 'pip uninstall --yes ipywidgets && \
     pip install --upgrade notebook && \
     pip install --pre ipywidgets && \
     pip install widgetsnbextension && \
@@ -297,7 +297,7 @@ server: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server: _run-$(PYTHON)
 
 server_4.2: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
-server_4.2: INSTALL_DECLWID_CMD?=pip install --pre --upgrade toree && jupyter toree install --user; pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --sys-prefix && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
+server_4.2: INSTALL_DECLWID_CMD?=pip install --pre --upgrade toree && jupyter toree install --user; pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
 server_4.2: SERVER_NAME?=urth_widgets_server
 server_4.2: OPTIONS?=-it --rm
 server_4.2: PORT_MAP?=-p 9500:8888
@@ -355,25 +355,27 @@ start-selenium:
 
 run-test: SERVER_NAME?=urth_widgets_integration_test_server
 run-test: BROWSER_LIST?=chrome
+run-test: SPECS?=system-test/*-specs.js
 run-test:
 	-@docker rm -f $(SERVER_NAME)
 	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server$(JUPYTER)
 	@echo 'Waiting for server to start...'
 	@LIMIT=60; while [ $$LIMIT -gt 0 ] && ! docker logs $(SERVER_NAME) 2>&1 | grep 'Notebook is running'; do echo waiting $$LIMIT...; sleep 1; LIMIT=$$(expr $$LIMIT - 1); done
-	@$(foreach browser, $(BROWSER_LIST), echo 'Running system integration tests on $(browser)...'; npm run system-test -- --baseurl $(BASEURL) --test-type $(TEST_TYPE) --browser $(browser);)
+	@$(foreach browser, $(BROWSER_LIST), echo 'Running system integration tests on $(browser)...'; npm run system-test -- $(SPECS) --baseurl $(BASEURL) --test-type $(TEST_TYPE) --browser $(browser);)
 
 system-test: BASEURL?=http://192.168.99.100:9500
 system-test: SERVER_NAME?=urth_widgets_integration_test_server
 system-test: BROWSER_LIST?=chrome
+system-test: SPECS?=system-test/*-specs.js
 system-test:
 ifdef SAUCE_USER_NAME
 	@echo 'Running system tests on Sauce Labs...'
-	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=remote $(MAKE) run-test
+	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=remote SPECS="$(SPECS)" $(MAKE) run-test
 else
 	$(MAKE) start-selenium
 	$(MAKE) sdist
 	@echo 'Starting system integration tests locally...'
-	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=local $(MAKE) run-test || (docker rm -f $(SERVER_NAME); -kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
+	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=local SPECS="$(SPECS)" $(MAKE) run-test || (docker rm -f $(SERVER_NAME); -kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
 	-@kill `cat SELENIUM_PID`
 	-@rm SELENIUM_PID
 endif
@@ -398,7 +400,7 @@ all: init
 	PYTHON=python2 $(MAKE) install
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" $(MAKE) system-test
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" PYTHON=python2 $(MAKE) system-test
-	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_4.2 $(MAKE) system-test
+	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_4.2 SPECS="${shell find system-test/ -name '*specs.js' -maxdepth 1 | grep -v  'urth-r'}"  $(MAKE) system-test
 	$(MAKE) dist/docs
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
