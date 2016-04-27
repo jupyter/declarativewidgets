@@ -21,7 +21,14 @@ The elements allows setting parameters in 2 ways:
 
 Both examples are equivalent to invoking `aFunction(x=5, y=4)`
 
-`urth-core-function` also provides an `invoke` method. This method can be used to force an invocation of the function.
+`urth-core-function` will invoke in the following ways:
+
+ 1. By calling the `invoke` method using Javascript
+ 2. By setting the `auto` property and it automatically invokes when parameters set
+ 3. By handling the `click` event of a child element. For example, just placing a `button` inside this element.
+
+
+Note that when using the 'click' event approach described above in #3, a click on any child will trigger an invocation.
 
 @group Urth Core
 @element urth-core-function
@@ -133,7 +140,8 @@ Both examples are equivalent to invoking `aFunction(x=5, y=4)`
             ],
 
             listeners: {
-                'watch_notify': 'invoke'
+                'watch_notify': 'invoke',
+                'click': '_tryInvoke'
             },
 
             created: function(){
