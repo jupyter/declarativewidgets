@@ -104,51 +104,25 @@ Boilerplate.prototype.setup = function(testName, startingURL, outputCount){
     desired.name = testName ? 'Urth Widgets System Test - ' + testName
         : 'Urth Widgets System Test';
 
-    var kernelStartTimeout = 200000;
-    var defaultTimeout = 10000;
-    var runAllCompletionTimeout = 50000;
-
-    function clickTheElement(element) {
-        return new Promise(function(resolve) {
-            var newElement = element.click()
-                      .elementByLinkText("<", "Cell")
-                      .click()
-                      .waitForElementByLinkText("Run Cells", wd.asserters.isDisplayed, 10000)
-                      .elementByLinkText("Run Cells")
-                      .click()
-                      .sleep(5000);
-            resolve(newElement);
-        });
-    }
-
-    function runAllCells(elements, idx) {
-        if (idx > elements.length - 1) {
-            return;
-        }
-
-        var element = elements[idx];
-        clickTheElement(element).then(function(elem) {
-            console.log("running cell: ", idx);
-            runAllCells(elements, idx+1);
-        })
-    }
-
     this.browser.init(desired)
         .get(startingURL || '/')
-        .waitForElementByCssSelector("#kernel_indicator_icon.kernel_idle_icon", wd.asserters.isDisplayed, kernelStartTimeout)
+        .waitForElementByCssSelector('#kernel_indicator_icon.kernel_idle_icon', wd.asserters.isDisplayed, 80000)
+        .waitForElementByLinkText('Cell', wd.asserters.isDisplayed, 10000)
         .safeExecute('localStorage.clear()')
-        .waitForElementByCssSelector('div.output_area', wd.asserters.isDisplayed, defaultTimeout)
-        .setAsyncScriptTimeout(15000)
-        .waitForConditionInBrowser('window.Urth && Urth.kernel && Urth.kernel.is_connected()', defaultTimeout)
-        .waitForElementByCssSelector('#kernel_indicator_icon.kernel_idle_icon', wd.asserters.isDisplayed, kernelStartTimeout)
-        .waitForConditionInBrowser('typeof Urth.whenReady === "function"', kernelStartTimeout)
-        .elementsByCssSelector('div.input').then(function (elements) {
-            runAllCells(elements, 0);
-        })
-        .waitFor(outputAsserter, runAllCompletionTimeout*5, defaultTimeout)
-        .eval("!!document.body.createShadowRoot", function(err, value) {
+        .elementByLinkText('Cell')
+        .click()
+        .waitForElementByLinkText('Run All', wd.asserters.isDisplayed, 10000)
+        .elementByLinkText('Run All')
+        .click()
+        .eval('!!document.body.createShadowRoot', function(err, value) {
             this.browserSupportsShadowDOM = value;
         }.bind(this))
+        .waitForElementByCssSelector('div.output_area', wd.asserters.isDisplayed, 10000)
+        .setAsyncScriptTimeout(15000)
+        .waitForConditionInBrowser('window.Urth && Urth.kernel && Urth.kernel.is_connected()', 10000)
+        .waitForElementByCssSelector('#kernel_indicator_icon.kernel_idle_icon', wd.asserters.isDisplayed, 20000)
+        .waitForConditionInBrowser('typeof Urth.whenReady === "function"', 10000)
+        .waitFor(outputAsserter, 250000, 1000)
         .nodeify(done);
   }.bind(this));
 

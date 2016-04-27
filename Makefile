@@ -41,9 +41,11 @@ BROWSER_LIST?=chrome
 ALT_BROWSER_LIST?=chrome
 BASEURL?=http://192.168.99.100:9500
 TEST_TYPE?=local
-SPECS?=system-test/*-specs.js
+SPECS?=system-test/urth-system-test-specs.js system-test/urth-core-bind-specs.js system-test/urth-viz-table-specs.js
 PYTHON2_SPECS?=system-test/urth-system-test-specs.js
-ALT_JUPYTER_SPECS?=system-test/urth-system-test-specs.js system-test/urth-r-widgets-specs.js
+ALT_JUPYTER_SPECS?=system-test/urth-system-test-specs.js
+R_SPECS?=system-test/urth-r-widgets-specs.js
+SCALA_SPECS?=system-test/urth-scala-widgets-specs.js
 ALT_JUPYTER_VERSION?=4.2
 PYTHON?=python3
 TEST_MSG?="Starting system tests"
@@ -394,7 +396,17 @@ system-test-alt-jupyter: TEST_MSG="Starting system tests for Jupyter $(ALT_JUPYT
 system-test-alt-jupyter:
 	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
 
-system-test-all: system-test-python3 system-test-python2 system-test-alt-jupyter
+system-test-scala: SPECS:=$(SCALA_SPECS)
+system-test-scala: TEST_MSG="Starting system tests for Scala"
+system-test-scala:
+	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
+
+system-test-r: SPECS:=$(R_SPECS)
+system-test-r: TEST_MSG="Starting system tests for R"
+system-test-r:
+	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
+
+system-test-all: system-test-python3 system-test-python2 system-test-alt-jupyter system-test-scala system-test-r
 
 start-selenium: node_modules stop-selenium
 	@echo "Installing and starting Selenium Server..."
