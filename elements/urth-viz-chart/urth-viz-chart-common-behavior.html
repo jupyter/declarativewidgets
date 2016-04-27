@@ -441,8 +441,11 @@
                             svg.selectAll('.nvd3 .selected:not(.hover)').classed('selected', false);
                         }
 
-                        // Use selected class on DOM to maintain selected state
-                        this.$$('.nvd3 .hover').classList.toggle('selected');
+                        // Use selected class on DOM to maintain selected state.
+                        // IE does not support classList on SVG elements so using
+                        // d3 api to toggle the class.
+                        var hovered = d3.select(this.$$('.nvd3 .hover'));
+                        hovered.classed('selected', !hovered.classed('selected'));
 
                         var selectionInfo = svg.selectAll('.nvd3 .selected').data();
 

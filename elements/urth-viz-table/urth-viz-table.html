@@ -160,7 +160,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     this.cancelDebouncer(jName);
                 }
                 this.debounce(jName, function () {
-                    if (!datarows || !columns) { 
+                    if (!datarows || !columns) {
                         this.displayErrorMessage("urth-viz-table: invalid datarows or columns");
                         return;
                     }
@@ -302,7 +302,17 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         tableSettings.rowHeights = this.ROW_HEIGHT;
                     }
 
-                    this.hot = new Handsontable(tableContainer, tableSettings);
+                    if (this.hot) {
+                        this.hot.destroy();
+                        this.hot = null;
+                    }
+
+                    // Creation of the table and initialization based on settings
+                    // is separated because on Internet explorer the
+                    // `urth-viz-render` event fired by `afterRender` was
+                    // getting handled before `this.hot` was initialized.
+                    this.hot = new Handsontable(tableContainer, {})
+                    this.hot.updateSettings(tableSettings);
                 }.bind(this));
             },
 
@@ -328,6 +338,13 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 }
             },
 
+            detached: function() {
+                if (this.hot) {
+                    this.hot.destroy();
+                    this.hot = null;
+                }
+            },
+
             ready: function() {
                 this.async(function(){
                     var display = window.getComputedStyle(this).display;
@@ -341,7 +358,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                             this.displayErrorMessage("urth-viz-table: invalid datarows");
                         }
                     }
-                });
+                }.bind(this));
             }
         });
     })();

@@ -29,7 +29,7 @@ Example:
           }
         </style>
         <div id="container">
-          <svg style="height: 500px"></svg>
+          <svg id="svgCloud" style="height: 500px"></svg>
         </div>
         <content></content>
     </template>
@@ -65,7 +65,7 @@ Example:
                 }
 
                 if (this.layout) {
-                    this.$.container.children[0].innerHTML = "";
+                    Polymer.dom(this.$.svgCloud).innerHTML = '';
                     this.layout.words(words);
                     this.layout.start();
                 }
@@ -73,7 +73,7 @@ Example:
 
             _resize: function() {
                 if (this.layout) {
-                    this.$.container.children[0].innerHTML = "";
+                    Polymer.dom(this.$.svgCloud).innerHTML = '';
                     var computedStyle = getComputedStyle(this.$.container);
                     this.layout.size([parseInt(computedStyle.width), parseInt(computedStyle.height)]);
                     this.layout.start();
