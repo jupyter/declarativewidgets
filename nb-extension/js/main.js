@@ -15,9 +15,9 @@ define([
     requirejs.config({
         map: {
             '*': {
-                'jupyter-decl-widgets': 'nbextensions/urth_widgets/js/widgets'
+                'jupyter-decl-widgets': 'nbextensions/declarativewidgets/js/widgets'
             },
-            'nbextensions/urth_widgets/js/widgets': {
+            'nbextensions/declarativewidgets/js/widgets': {
                 'jupyter-js-widgets': 'ipywidgets4-or-jupyter-js-widgets'
             }
         },

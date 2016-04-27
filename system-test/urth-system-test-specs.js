@@ -71,7 +71,7 @@ describe('Widgets System Test', function() {
 
     it('should render ipywidget when using urth-viz-ipywidget', function(done) {
 
-        var ipySlider = '#ipywid .widget-slider';
+        var ipySlider = '#ipywid .widget-hslider';
 
         boilerplate.browser
             .waitForElementsByCssSelector(ipySlider, wd.asserters.isDisplayed, 10000)

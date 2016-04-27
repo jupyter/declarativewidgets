@@ -108,5 +108,10 @@ initWidgets <- function() {
     }
     library(IRkernel)
     comm_manager <- get("comm_manager", envir = as.environment("package:IRkernel"))()
+
+    # Support for ipywidgets 4.x client
     comm_manager$register_target("ipython.widget", target_handler)
+
+    # Support for ipywidgets 5.x client
+    comm_manager$register_target("jupyter.widget", target_handler)
 }

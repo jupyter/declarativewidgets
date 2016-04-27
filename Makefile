@@ -25,6 +25,7 @@ help:
 
 ROOT_REPO:=jupyter/all-spark-notebook:258e25c03cba
 REPO:=jupyter/all-spark-notebook-bower:258e25c03cba
+REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:258e25c03cba
 SCALA_BUILD_REPO:=jupyter/sbt-toree-image:0.1.0
 
 PYTHON?=python3
@@ -39,7 +40,7 @@ $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 	@$(foreach dir, $(URTH_SRC_DIRS), cd $(abspath $(dir)) && $(NPM_BIN_DIR)/bower link;)
 	@$(foreach name, $(URTH_DIRS), $(NPM_BIN_DIR)/bower link $(name);)
 
-init: node_modules dev_image scala_build_image
+init: node_modules dev_image scala_build_image dev_image_4.2
 
 node_modules: package.json
 	@npm install
@@ -64,6 +65,18 @@ dev_image:
 		chown -R jovyan:users /home/jovyan/.local/share/jupyter/nbextensions'
 	@docker commit bower-build $(REPO)
 	@-docker rm -f bower-build
+
+dev_image_4.2:
+	@-docker rm -f 4.2-build
+	@docker run -it --user root --name 4.2-build \
+		$(REPO) bash -c 'pip uninstall --yes ipywidgets && \
+    pip install --upgrade notebook && \
+    pip install --pre ipywidgets && \
+    pip install widgetsnbextension && \
+    jupyter nbextension install --system --py widgetsnbextension && \
+    jupyter nbextension enable widgetsnbextension --system --py'
+	@docker commit 4.2-build $(REPO4.2)
+	@-docker rm -f 4.2-build
 
 scala_build_image:
 	@-docker rm -f scala-build
@@ -101,75 +114,81 @@ clean-watch-docs:
 	-@kill -9 `pgrep -P $$(cat .watch-docs)`
 	-@rm .watch-docs
 
-dist/urth/widgets/ext/notebook/css: ${shell find nb-extension/css}
-	@echo 'Moving nb-extension/css'
-	@mkdir -p dist/urth/widgets/ext/notebook/css
-	@cp -R nb-extension/css/* dist/urth/widgets/ext/notebook/css/.
-
-dist/urth/widgets/ext/notebook/js: ${shell find nb-extension/js}
-	@echo 'Moving src/nb-extension'
-	@mkdir -p dist/urth/widgets/ext/notebook/js
-	@cp -R nb-extension/js/* dist/urth/widgets/ext/notebook/js/.
-
-dist/urth/widgets/ext/notebook/elements: ${shell find elements}
-	@echo 'Moving elements'
-	@mkdir -p dist/urth/widgets/ext/notebook/elements
-	@cp -R elements/* dist/urth/widgets/ext/notebook/elements/.
-	@touch dist/urth/widgets/ext/notebook/elements
-
-dist/urth/widgets/ext/notebook/urth_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
-	@echo 'Moving bower_components'
-	@mkdir -p dist/urth/widgets/ext/notebook/urth_components
-	@cp -RL bower_components/* dist/urth/widgets/ext/notebook/urth_components/.
-
-dist/urth/widgets/ext/notebook/docs: dist/docs
-	@echo 'Copying dist/docs/site'
-	@mkdir -p dist/urth/widgets/ext/notebook/docs
-	@cp -R dist/docs/site/* dist/urth/widgets/ext/notebook/docs/.
-
-dist/urth/widgets/ext/notebook: dist/urth/widgets/ext/notebook/bower.json dist/urth/widgets/ext/notebook/urth_components dist/urth/widgets/ext/notebook/js dist/urth/widgets/ext/notebook/elements dist/urth/widgets/ext/notebook/css
-
 dist/urth/widgets/ext: ${shell find nb-extension/python/urth/widgets/ext}
 	@echo 'Moving frontend extension code'
 	@mkdir -p dist/urth/widgets/ext
 	@cp -R nb-extension/python/urth/widgets/ext/* dist/urth/widgets/ext/.
 
-dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/ext dist/urth/widgets/ext/notebook
+dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/ext
 	@echo 'Moving python code'
 	@mkdir -p dist/urth
 	@cp -R kernel-python/urth/* dist/urth/.
 
-dist/urth/widgets/ext/notebook/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
+dist/declarativewidgets: dist/declarativewidgets/static ${shell find nb-extension/python/declarativewidgets}
+	@mkdir -p dist/declarativewidgets
+	@echo 'Building declarativewidgets python module'
+	@cp -R nb-extension/python/declarativewidgets/* dist/declarativewidgets/.
+
+dist/declarativewidgets/static: bower.json dist/declarativewidgets/static/css dist/declarativewidgets/static/docs dist/declarativewidgets/static/elements dist/declarativewidgets/static/js dist/declarativewidgets/static/urth_components dist/declarativewidgets/static/urth-widgets.jar dist/declarativewidgets/static/urth-widgets.tgz
+	@cp bower.json dist/declarativewidgets/static/bower.json
+	@touch dist/declarativewidgets/static
+
+dist/declarativewidgets/static/css: ${shell find nb-extension/css}
+	@echo 'Building declarativewidgets/static/css'
+	@mkdir -p dist/declarativewidgets/static/css
+	@cp -R nb-extension/css/* dist/declarativewidgets/static/css/.
+
+dist/declarativewidgets/static/docs: dist/docs
+	@echo 'Building declarativewidgets/static/docs'
+	@mkdir -p dist/declarativewidgets/static/docs
+	@cp -R dist/docs/site/* dist/declarativewidgets/static/docs/.
+
+dist/declarativewidgets/static/elements: ${shell find elements}
+	@echo 'Building declarativewidgets/static/elements'
+	@mkdir -p dist/declarativewidgets/static/elements
+	@cp -R elements/* dist/declarativewidgets/static/elements/.
+	@touch dist/declarativewidgets/static/elements
+
+dist/declarativewidgets/static/js: ${shell find nb-extension/js}
+	@echo 'Building declarativewidgets/static/js'
+	@mkdir -p dist/declarativewidgets/static/js
+	@cp -R nb-extension/js/* dist/declarativewidgets/static/js/.
+
+dist/declarativewidgets/static/urth_components: bower_components ${shell find elements} | $(URTH_COMP_LINKS)
+	@echo 'Building declarativewidgets/static/urth_components'
+	@mkdir -p dist/declarativewidgets/static/urth_components
+	@cp -RL bower_components/* dist/declarativewidgets/static/urth_components/.
+	@touch dist/declarativewidgets/static/urth_components
+
+dist/declarativewidgets/static/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala code'
 else
 	@echo 'Building scala code'
-	@mkdir -p dist/urth/widgets/ext/notebook
+	@echo 'Building declarativewidgets/static/urth-widgets.jar'
+	@mkdir -p dist/declarativewidgets/static
 	@docker run -it --rm \
 		-v `pwd`:/src \
 		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/kernel-scala /tmp/src && \
 			cd /tmp/src && \
 			mkdir -p /tmp/src/lib && cp /opt/toree/toree/lib/*.jar /tmp/src/lib/. && \
 			sbt package && \
-			cp target/scala-2.10/urth-widgets*.jar /src/dist/urth/widgets/ext/notebook/urth-widgets.jar'
+			cp target/scala-2.10/urth-widgets*.jar /src/dist/declarativewidgets/static/urth-widgets.jar'
 endif
 
-dist/urth/widgets/ext/notebook/bower.json: bower.json
-	@mkdir -p dist/urth/widgets/ext/notebook
-	@cp bower.json dist/urth/widgets/ext/notebook/bower.json
-
-dist/urth/widgets/ext/notebook/urth-widgets.tgz: ${shell find kernel-r/declarativewidgets}
+dist/declarativewidgets/static/urth-widgets.tgz: ${shell find kernel-r/declarativewidgets}
 ifeq ($(NOR), true)
 	@echo 'Skipping R code'
 else
 	@echo 'Building R code'
-	@mkdir -p dist/urth/widgets/ext/notebook
+	@echo 'Building declarativewidgets/static/urth-widgets.tgz'
+	@mkdir -p dist/declarativewidgets/static
 	@docker run -it --rm \
 		-v `pwd`:/src \
 		$(REPO) bash -c 'cp -r /src/kernel-r/declarativewidgets /tmp/src && \
 			cd /tmp/src && \
 			R CMD INSTALL --build . && \
-			cp declarativewidgets_0.1_R_x86_64-pc-linux-gnu.tar.gz /src/dist/urth/widgets/ext/notebook/urth-widgets.tgz'
+			cp declarativewidgets_0.1_R_x86_64-pc-linux-gnu.tar.gz /src/dist/declarativewidgets/static/urth-widgets.tgz'
 endif
 
 dist/docs: dist/docs/bower_components dist/docs/site dist/docs/site/generated_docs.json
@@ -201,7 +220,7 @@ dist/VERSION:
 	@mkdir -p dist
 	@echo "$(COMMIT)" > dist/VERSION
 
-dist: dist/urth dist/urth/widgets/ext/notebook/urth-widgets.jar dist/urth/widgets/ext/notebook/urth-widgets.tgz dist/scripts dist/VERSION dist/urth/widgets/ext/notebook/docs
+dist: dist/urth dist/declarativewidgets dist/scripts dist/VERSION
 
 sdist: dist
 	@cp -R MANIFEST.in dist/.
@@ -270,11 +289,21 @@ install: OPTIONS?=-it --rm
 install: _run-$(PYTHON)
 
 server: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
+server: INSTALL_DECLWID_CMD?=pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets install --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library && jupyter declarativewidgets activate;
 server: SERVER_NAME?=urth_widgets_server
 server: OPTIONS?=-it --rm
 server: PORT_MAP?=-p 9500:8888
 server: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server: _run-$(PYTHON)
+
+server_4.2: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
+server_4.2: INSTALL_DECLWID_CMD?=pip install --pre --upgrade toree && jupyter toree install --user; pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
+server_4.2: SERVER_NAME?=urth_widgets_server
+server_4.2: OPTIONS?=-it --rm
+server_4.2: PORT_MAP?=-p 9500:8888
+server_4.2: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
+server_4.2: REPO=$(REPO4.2)
+server_4.2: _run-$(PYTHON)
 
 _run-python3: _run
 
@@ -290,12 +319,7 @@ _run:
 		-v `pwd`:/src \
 		--user jovyan \
 		$(VOL_MAP) \
-		$(REPO) bash -c '$(PYTHON_SETUP_CMD) \
-			pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && \
-			jupyter declarativewidgets install --user && \
-			jupyter declarativewidgets installr --library=/opt/conda/lib/R/library&& \
-			jupyter declarativewidgets activate && \
-			$(CMD)'
+		$(REPO) bash -c '$(PYTHON_SETUP_CMD) $(INSTALL_DECLWID_CMD) $(CMD)'
 
 dev: CMD?=sh -c "python --version; jupyter notebook --no-browser --port 8888 --ip='*'"
 dev: _dev-$(PYTHON)
@@ -314,7 +338,7 @@ _dev: .watch dist
 		-p 4040:4040 \
 		--user jovyan \
 		-e SPARK_OPTS="--master=local[4] --driver-java-options=-Dlog4j.logLevel=trace" \
-		-v `pwd`/dist/urth/widgets/ext/notebook:$(NB_HOME)/.local/share/jupyter/nbextensions/urth_widgets \
+		-v `pwd`/dist/declarativewidgets/static:$(NB_HOME)/.local/share/jupyter/nbextensions/declarativewidgets \
 		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
 		-v `pwd`/etc:$(NB_HOME)/nbconfig \
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/.jupyter/nbconfig/notebook.json \
@@ -331,25 +355,27 @@ start-selenium:
 
 run-test: SERVER_NAME?=urth_widgets_integration_test_server
 run-test: BROWSER_LIST?=chrome
+run-test: SPECS?=system-test/*-specs.js
 run-test:
 	-@docker rm -f $(SERVER_NAME)
-	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server
+	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server$(JUPYTER)
 	@echo 'Waiting for server to start...'
 	@LIMIT=60; while [ $$LIMIT -gt 0 ] && ! docker logs $(SERVER_NAME) 2>&1 | grep 'Notebook is running'; do echo waiting $$LIMIT...; sleep 1; LIMIT=$$(expr $$LIMIT - 1); done
-	@$(foreach browser, $(BROWSER_LIST), echo 'Running system integration tests on $(browser)...'; npm run system-test -- --baseurl $(BASEURL) --test-type $(TEST_TYPE) --browser $(browser);)
+	@$(foreach browser, $(BROWSER_LIST), echo 'Running system integration tests on $(browser)...'; npm run system-test -- $(SPECS) --baseurl $(BASEURL) --test-type $(TEST_TYPE) --browser $(browser);)
 
 system-test: BASEURL?=http://192.168.99.100:9500
 system-test: SERVER_NAME?=urth_widgets_integration_test_server
 system-test: BROWSER_LIST?=chrome
+system-test: SPECS?=system-test/*-specs.js
 system-test:
 ifdef SAUCE_USER_NAME
 	@echo 'Running system tests on Sauce Labs...'
-	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=remote $(MAKE) run-test
+	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=remote SPECS="$(SPECS)" $(MAKE) run-test
 else
 	$(MAKE) start-selenium
 	$(MAKE) sdist
 	@echo 'Starting system integration tests locally...'
-	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=local $(MAKE) run-test || (docker rm -f $(SERVER_NAME); -kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
+	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=local SPECS="$(SPECS)" $(MAKE) run-test || (docker rm -f $(SERVER_NAME); -kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
 	-@kill `cat SELENIUM_PID`
 	-@rm SELENIUM_PID
 endif
@@ -374,6 +400,7 @@ all: init
 	PYTHON=python2 $(MAKE) install
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" $(MAKE) system-test
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" PYTHON=python2 $(MAKE) system-test
+	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_4.2 SPECS="${shell find system-test/ -name '*specs.js' -maxdepth 1 | grep -v  'urth-r'}"  $(MAKE) system-test
 	$(MAKE) dist/docs
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)

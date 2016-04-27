@@ -47,7 +47,7 @@ if 'setuptools' in sys.modules:
     # setupstools turns entrypoint scripts into executables on windows
     setup_args['entry_points'] = {
         'console_scripts': [
-            'jupyter-declarativewidgets = urth.widgets.ext.install.extensionapp:main'
+            'jupyter-declarativewidgets = declarativewidgets.extensionapp:main'
         ]
     }
     # Don't bother installing the .py scripts if if we're using entrypoints

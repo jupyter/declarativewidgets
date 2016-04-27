@@ -80,10 +80,20 @@ package object widgets {
   private var _the_kernel: Kernel = _
 
   def initWidgets(implicit kernel: Kernel): Unit = {
-      val registrar = kernel.comm.register("ipython.widget")
-      registrar.addOpenHandler(Widget.openCallback)
-      registrar.addMsgHandler(Widget.msgCallback)
-      _the_kernel = kernel
+    /*
+     * Support for ipywidget 4.x Client
+     */
+    kernel.comm.register("ipython.widget")
+      .addOpenHandler(Widget.openCallback)
+      .addMsgHandler(Widget.msgCallback)
+
+    /*
+     * Support for ipywidget 5.x Client
+     */
+    kernel.comm.register("jupyter.widget")
+      .addOpenHandler(Widget.openCallback)
+      .addMsgHandler(Widget.msgCallback)
+    _the_kernel = kernel
   }
 
   def getKernel: Kernel = {

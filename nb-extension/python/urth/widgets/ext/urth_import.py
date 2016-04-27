@@ -8,7 +8,7 @@ import subprocess
 
 from notebook.utils import url_path_join
 from notebook.base.handlers import FileFindHandler
-from jupyter_core.paths import jupyter_data_dir
+from jupyter_core.paths import jupyter_path
 from tornado.web import HTTPError, RequestHandler
 from concurrent.futures import ThreadPoolExecutor
 
@@ -81,13 +81,8 @@ def load_jupyter_server_extension(nb_app):
     logger = nb_app.log
     logger.info('Loading urth_import server extension.')
 
-    # Determine the nbextensions directory and urth_widgets path
-    ipython_dir = jupyter_data_dir()
     web_app = nb_app.web_app
-    for path in web_app.settings['nbextensions_path']:
-        if ipython_dir in path:
-            nbext = path
-    widgets_dir = os.path.join(nbext, 'urth_widgets/')
+    widgets_dir = get_nbextension_path()
 
     # Write out a .bowerrc file to configure bower installs to
     # not be interactive and not to prompt for analytics
@@ -114,3 +109,9 @@ def load_jupyter_server_extension(nb_app):
         (import_route_pattern, UrthImportHandler, dict(executor=ThreadPoolExecutor(max_workers=1))),
         (components_route_pattern, FileFindHandler, {'path': [components_path]})
     ])
+
+def get_nbextension_path():
+    """Find the path to the declarativewidgets nbextension"""
+    for abspath in jupyter_path('nbextensions', 'declarativewidgets'):
+        if os.path.exists(abspath):
+            return abspath
