@@ -74,7 +74,9 @@ dev_image_4.2:
     pip install --pre ipywidgets && \
     pip install widgetsnbextension && \
     jupyter nbextension install --system --py widgetsnbextension && \
-    jupyter nbextension enable widgetsnbextension --system --py'
+    jupyter nbextension enable widgetsnbextension --system --py && \
+    pip install --pre --upgrade toree && \
+    jupyter toree install'
 	@docker commit 4.2-build $(REPO4.2)
 	@-docker rm -f 4.2-build
 
@@ -297,7 +299,7 @@ server: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server: _run-$(PYTHON)
 
 server_4.2: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
-server_4.2: INSTALL_DECLWID_CMD?=pip install --pre --upgrade toree && jupyter toree install --user; pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
+server_4.2: INSTALL_DECLWID_CMD?=pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
 server_4.2: SERVER_NAME?=urth_widgets_server
 server_4.2: OPTIONS?=-it --rm
 server_4.2: PORT_MAP?=-p 9500:8888
