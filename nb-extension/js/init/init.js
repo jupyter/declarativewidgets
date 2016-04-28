@@ -154,6 +154,8 @@ define([
             // optional `config` as second arg
             baseURL = config;
             config = arguments[1] || {};
+            // try to get namespace again from the correct argument
+            Jupyter = config.namespace;
         } else {
             baseURL = Jupyter ? Jupyter.notebook.base_url : '/';
         }
