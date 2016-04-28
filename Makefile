@@ -29,6 +29,9 @@ REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:258e25c03cba
 SCALA_BUILD_REPO:=jupyter/sbt-toree-image:0.1.0
 
 PYTHON?=python3
+DOCKER_OPTS?=--log-level warn
+PIP_OPTS?=--quiet
+BOWER_OPTS?=--quiet
 
 URTH_BOWER_FILES:=$(shell find elements -name bower.json)
 URTH_SRC_DIRS:=$(foreach dir, $(URTH_BOWER_FILES), $(shell dirname $(dir)))
@@ -37,55 +40,55 @@ URTH_COMP_LINKS:=$(foreach dir, $(URTH_DIRS), $(shell echo "bower_components/$(d
 NPM_BIN_DIR:=$(shell npm bin)
 $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 	@echo 'Linking local Urth elements'
-	@$(foreach dir, $(URTH_SRC_DIRS), cd $(abspath $(dir)) && $(NPM_BIN_DIR)/bower link;)
-	@$(foreach name, $(URTH_DIRS), $(NPM_BIN_DIR)/bower link $(name);)
+	@$(foreach dir, $(URTH_SRC_DIRS), cd $(abspath $(dir)) && $(NPM_BIN_DIR)/bower link $(BOWER_OPTS);)
+	@$(foreach name, $(URTH_DIRS), $(NPM_BIN_DIR)/bower link $(name) $(BOWER_OPTS);)
 
 init: node_modules dev_image scala_build_image dev_image_4.2
 
 node_modules: package.json
-	@npm install
+	@npm install --quiet
 
 node_modules/bower: node_modules
 
 bower_components: node_modules/bower bower.json
-	@npm run bower -- install
+	@npm run bower -- install $(BOWER_OPTS)
 
 dev_image:
-	@-docker rm -f bower-build
-	@docker run -it --user root --name bower-build \
+	@-docker $(DOCKER_OPTS) rm -f bower-build
+	@docker $(DOCKER_OPTS) run -it --user root --name bower-build \
 		-v `pwd`/etc/r/install.r:/src-kernel-r/install.r \
-		$(ROOT_REPO) bash -c 'apt-get update && \
-		apt-get install --yes curl && \
+		$(ROOT_REPO) bash -c 'apt-get -qq update && \
+		apt-get -qq install --yes curl && \
 		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
-		apt-get install --yes nodejs npm && \
+		apt-get -qq install --yes nodejs npm && \
 		ln -s /usr/bin/nodejs /usr/bin/node && \
 		npm install -g bower && \
 		Rscript /src-kernel-r/install.r && \
 		mkdir -p /home/jovyan/.local/share/jupyter/nbextensions && \
 		chown -R jovyan:users /home/jovyan/.local/share/jupyter/nbextensions'
-	@docker commit bower-build $(REPO)
-	@-docker rm -f bower-build
+	@docker $(DOCKER_OPTS) commit bower-build $(REPO)
+	@-docker $(DOCKER_OPTS) rm -f bower-build
 
 dev_image_4.2:
-	@-docker rm -f 4.2-build
-	@docker run -it --user root --name 4.2-build \
+	@-docker $(DOCKER_OPTS) rm -f 4.2-build
+	@docker $(DOCKER_OPTS) run -it --user root --name 4.2-build \
 		$(REPO) bash -c 'pip uninstall --yes ipywidgets && \
-    pip install --upgrade notebook==4.2.0 && \
-    pip install ipywidgets==5.1.1 && \
+    pip install --upgrade notebook==4.2.0 $(PIP_OPTS) && \
+    pip install ipywidgets==5.1.1 $(PIP_OPTS) && \
     jupyter nbextension enable --system --py widgetsnbextension && \
-    pip install --pre --upgrade toree && \
+    pip install --pre --upgrade toree $(PIP_OPTS) && \
     jupyter toree install'
-	@docker commit 4.2-build $(REPO4.2)
-	@-docker rm -f 4.2-build
+	@docker $(DOCKER_OPTS) commit 4.2-build $(REPO4.2)
+	@-docker $(DOCKER_OPTS) rm -f 4.2-build
 
 scala_build_image:
-	@-docker rm -f scala-build
-	@docker run -it --user root --name scala-build \
+	@-docker $(DOCKER_OPTS) rm -f scala-build
+	@docker $(DOCKER_OPTS) run -it --user root --name scala-build \
 		cloudet/sbt-sparkkernel-image:1.5.1 bash -c '\
-		curl --location https://pypi.python.org/packages/source/t/toree/toree-0.1.0.dev4.tar.gz >> /opt/toree.tar.gz && \
+		curl --silent --location https://pypi.python.org/packages/source/t/toree/toree-0.1.0.dev4.tar.gz >> /opt/toree.tar.gz && \
 		cd /opt; tar -xf toree.tar.gz; mv toree-* toree'
-	@docker commit scala-build $(SCALA_BUILD_REPO)
-	@-docker rm -f scala-build
+	@docker $(DOCKER_OPTS) commit scala-build $(SCALA_BUILD_REPO)
+	@-docker $(DOCKER_OPTS) rm -f scala-build
 
 clean: clean-dist
 	@-rm -rf *.egg-info
@@ -167,12 +170,12 @@ else
 	@echo 'Building scala code'
 	@echo 'Building declarativewidgets/static/urth-widgets.jar'
 	@mkdir -p dist/declarativewidgets/static
-	@docker run -it --rm \
+	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`:/src \
 		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/kernel-scala /tmp/src && \
 			cd /tmp/src && \
 			mkdir -p /tmp/src/lib && cp /opt/toree/toree/lib/*.jar /tmp/src/lib/. && \
-			sbt package && \
+			sbt --warn package && \
 			cp target/scala-2.10/urth-widgets*.jar /src/dist/declarativewidgets/static/urth-widgets.jar'
 endif
 
@@ -183,11 +186,11 @@ else
 	@echo 'Building R code'
 	@echo 'Building declarativewidgets/static/urth-widgets.tgz'
 	@mkdir -p dist/declarativewidgets/static
-	@docker run -it --rm \
+	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`:/src \
 		$(REPO) bash -c 'cp -r /src/kernel-r/declarativewidgets /tmp/src && \
 			cd /tmp/src && \
-			R CMD INSTALL --build . && \
+			R --quiet CMD INSTALL --build . && \
 			cp declarativewidgets_0.1_R_x86_64-pc-linux-gnu.tar.gz /src/dist/declarativewidgets/static/urth-widgets.tgz'
 endif
 
@@ -197,7 +200,7 @@ dist/docs/bower_components: node_modules etc/docs/bower.json
 	@echo 'Installing documentation dependencies'
 	@mkdir -p dist/docs
 	@cp etc/docs/bower.json dist/docs/bower.json
-	@npm run docsbower -- install
+	@npm run docsbower -- install $(BOWER_OPTS)
 
 dist/docs/site: node_modules ${shell find etc/docs/site}
 	@echo 'Moving static doc site content'
@@ -225,12 +228,12 @@ dist: dist/urth dist/declarativewidgets dist/scripts dist/VERSION
 sdist: dist
 	@cp -R MANIFEST.in dist/.
 	@cp -R setup.py dist/.
-	@docker run -it --rm \
+	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`/dist:/src \
 		$(EXTRA_OPTIONS) \
 		$(REPO) bash -c '$(PRE_SDIST) cp -r /src /tmp/src && \
 			cd /tmp/src && \
-			python setup.py sdist $(POST_SDIST) && \
+			python setup.py -q sdist $(POST_SDIST) && \
 			cp -r dist/*.tar.gz /src/.'
 
 test: test-js test-py test-scala
@@ -254,7 +257,7 @@ test-py: dist/urth
 
 _test-py-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
 _test-py-python2: CMD=python --version; python -m unittest discover $(EXTENSION_DIR) "test*[!_py3].py"
-_test-py-python2: PYTHON_ENV_CMD=source activate python2; pip install -U mock;
+_test-py-python2: PYTHON_ENV_CMD=source activate python2; pip install -U mock $(PIP_OPTS);
 _test-py-python2: _test-py
 
 _test-py-python3: EXTENSION_DIR=/usr/local/lib/python3.4/dist-packages/urth
@@ -262,7 +265,7 @@ _test-py-python3: CMD=python --version; python -m unittest discover $(EXTENSION_
 _test-py-python3: _test-py
 
 _test-py:
-	@docker run -it --rm \
+	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
 		$(REPO) bash -c '$(PYTHON_SETUP_CMD) $(CMD)'
 
@@ -271,12 +274,12 @@ ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala tests...'
 else
 	@echo 'Running scala tests...'
-	@docker run -it --rm \
+	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`/kernel-scala:/src \
 		$(SCALA_BUILD_REPO) bash -c 'cp -r /src /tmp/src && \
 			cd /tmp/src && \
 			mkdir -p /tmp/src/lib && cp /opt/toree/toree/lib/*.jar /tmp/src/lib/. && \
-			sbt test'
+			sbt --warn test'
 endif
 
 testdev:BROWSER?=chrome
@@ -289,7 +292,7 @@ install: OPTIONS?=-it --rm
 install: _run-$(PYTHON)
 
 server: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
-server: INSTALL_DECLWID_CMD?=pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets install --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library && jupyter declarativewidgets activate;
+server: INSTALL_DECLWID_CMD?=pip install $(PIP_OPTS) --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets install --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library && jupyter declarativewidgets activate;
 server: SERVER_NAME?=urth_widgets_server
 server: OPTIONS?=-it --rm
 server: PORT_MAP?=-p 9500:8888
@@ -297,7 +300,7 @@ server: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server: _run-$(PYTHON)
 
 server_4.2: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
-server_4.2: INSTALL_DECLWID_CMD?=pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
+server_4.2: INSTALL_DECLWID_CMD?=pip install $(PIP_OPTS) --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
 server_4.2: SERVER_NAME?=urth_widgets_server
 server_4.2: OPTIONS?=-it --rm
 server_4.2: PORT_MAP?=-p 9500:8888
@@ -307,12 +310,12 @@ server_4.2: _run-$(PYTHON)
 
 _run-python3: _run
 
-_run-python2: PYTHON_SETUP_CMD=source activate python2; pip install futures==3.0.3;
+_run-python2: PYTHON_SETUP_CMD=source activate python2; pip install $(PIP_OPTS) futures==3.0.3;
 _run-python2: _run
 
 _run:
 	@echo 'Running container named $(SERVER_NAME) in $(PYTHON)'
-	@docker run $(OPTIONS) --name $(SERVER_NAME) \
+	@docker $(DOCKER_OPTS) run $(OPTIONS) --name $(SERVER_NAME) \
 		$(PORT_MAP) \
 		-e SPARK_OPTS="--master=local[4]" \
 		-e USE_HTTP=1 \
@@ -325,7 +328,7 @@ dev: CMD?=sh -c "python --version; jupyter notebook --no-browser --port 8888 --i
 dev: _dev-$(PYTHON)
 
 _dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
-_dev-python2: PYTHON_SETUP_CMD=source activate python2; pip install futures==3.0.3;
+_dev-python2: PYTHON_SETUP_CMD=source activate python2; pip install $(PIP_OPTS) futures==3.0.3;
 _dev-python2: _dev
 
 _dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.5/site-packages/urth
@@ -333,7 +336,7 @@ _dev-python3: _dev
 
 _dev: NB_HOME?=/home/jovyan
 _dev: .watch dist
-	@docker run -it --rm \
+	@docker $(DOCKER_OPTS) run -it --rm \
 		-p 8888:8888 \
 		-p 4040:4040 \
 		--user jovyan \
@@ -351,17 +354,17 @@ _dev: .watch dist
 start-selenium:
 	@echo "Installing and starting Selenium Server..."
 	@node_modules/selenium-standalone/bin/selenium-standalone install
-	@node_modules/selenium-standalone/bin/selenium-standalone start & echo $$! > SELENIUM_PID
+	@node_modules/selenium-standalone/bin/selenium-standalone start 2>/dev/null & echo $$! > SELENIUM_PID
 
 run-test: SERVER_NAME?=urth_widgets_integration_test_server
 run-test: BROWSER_LIST?=chrome
 run-test: SPECS?=system-test/*-specs.js
 run-test:
-	-@docker rm -f $(SERVER_NAME)
+	-@docker $(DOCKER_OPTS) rm -f $(SERVER_NAME)
 	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server$(JUPYTER)
 	@echo 'Waiting for server to start...'
 	@LIMIT=60; while [ $$LIMIT -gt 0 ] && ! docker logs $(SERVER_NAME) 2>&1 | grep 'Notebook is running'; do echo waiting $$LIMIT...; sleep 1; LIMIT=$$(expr $$LIMIT - 1); done
-	@$(foreach browser, $(BROWSER_LIST), echo 'Running system integration tests on $(browser)...'; npm run system-test -- $(SPECS) --baseurl $(BASEURL) --test-type $(TEST_TYPE) --browser $(browser);)
+	@$(foreach browser, $(BROWSER_LIST), echo 'Running system integration tests on $(browser)...'; npm run system-test -- $(SPECS) --baseurl $(BASEURL) --test-type $(TEST_TYPE) --browser $(browser) || exit)
 
 system-test: BASEURL?=http://192.168.99.100:9500
 system-test: SERVER_NAME?=urth_widgets_integration_test_server
@@ -375,12 +378,12 @@ else
 	$(MAKE) start-selenium
 	$(MAKE) sdist
 	@echo 'Starting system integration tests locally...'
-	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=local SPECS="$(SPECS)" $(MAKE) run-test || (docker rm -f $(SERVER_NAME); -kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
+	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=local SPECS="$(SPECS)" $(MAKE) run-test || (docker $(DOCKER_OPTS) rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
 	-@kill `cat SELENIUM_PID`
 	-@rm SELENIUM_PID
 endif
 	@echo 'System integration tests complete.'
-	-@docker rm -f $(SERVER_NAME)
+	-@docker $(DOCKER_OPTS) rm -f $(SERVER_NAME)
 
 docs: DOC_PORT?=4001
 docs: BASEURL?=http://127.0.0.1
@@ -390,6 +393,7 @@ docs: .watch-docs dist/docs
 
 all: BASEURL?=http://192.168.99.100:9500
 all: BROWSER_LIST?=chrome
+all: JUPYTER_VERSION?=4.2
 all: init
 	$(MAKE) test-js-remote
 	$(MAKE) test-py
@@ -398,10 +402,12 @@ all: init
 	$(MAKE) sdist
 	$(MAKE) install
 	PYTHON=python2 $(MAKE) install
+	@echo 'Starting system tests for Python 3'
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" $(MAKE) system-test
+	@echo 'Starting system tests for Python 2'
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" PYTHON=python2 $(MAKE) system-test
-	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_4.2 $(MAKE) system-test
-	$(MAKE) dist/docs
+	@echo 'Starting system tests on Jupyter $(JUPYTER_VERSION)'
+	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_$(JUPYTER_VERSION) $(MAKE) system-test
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
 release: PRE_SDIST=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;
