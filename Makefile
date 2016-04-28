@@ -400,7 +400,7 @@ all: init
 	PYTHON=python2 $(MAKE) install
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" $(MAKE) system-test
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" PYTHON=python2 $(MAKE) system-test
-	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_4.2 SPECS="${shell find system-test/ -name '*specs.js' -maxdepth 1 | grep -v  'urth-r'}"  $(MAKE) system-test
+	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_4.2 $(MAKE) system-test
 	$(MAKE) dist/docs
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
