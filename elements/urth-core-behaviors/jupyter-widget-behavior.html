@@ -54,7 +54,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                 ).then(function(model) {
                         //This check is to protect against a timing in ipywidgets where the comm can be close
                         //by the time it gets to resolve this promise
-                        if(!model.comm.kernel.comm_manager.comms[model.comm.comm_id]){
+                        if (this._isCommDisposed(model.comm)) {
                             this._handleCommDisconnect();
                             return;
                         }
@@ -74,6 +74,18 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                         console.error(error);
                     }
                 );
+            },
+
+            /**
+             * Determine if the comm object is disposed (closed). This function works with both
+             * legacy and jupyter-js-services' comm objects.
+             * @param  {IComm|Comm} comm
+             * @return {boolean}
+             */
+            _isCommDisposed: function(comm) {
+                return typeof comm.isDisposed === 'boolean' ? comm.isDisposed :         // IComm
+                        comm.jsServicesComm ? comm.jsServicesComm.isDisposed :          // shim
+                        comm.kernel && !comm.kernel.comm_manager.comms[comm.comm_id];   // legacy
             },
 
             _retryCreateModel: function(){
