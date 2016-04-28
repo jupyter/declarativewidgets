@@ -21,7 +21,7 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 ## Runtime Requirements
 
 * Jupyter Notebook 4.0.x, 4.1.x, or 4.2.x running on Python 3.x or Python 2.7.x (see the [0.1.x branch](https://github.com/jupyter-incubator/declarativewidgets/tree/0.1.x) for IPython Notebook 3.2.x compatibility)
-* [IPywidgets](https://github.com/ipython/ipywidgets) 4.1.x and 5.0.1+ (R and Scala support not available for 5.0.0)
+* [IPywidgets](https://github.com/ipython/ipywidgets) 4.1.x and 5.1.1+ (R and Scala support not available for 5.0.0 nor 5.1.0)
 * Bower - Necessary for installing 3rd party elements straight out of notebook
 
 ##### Optional Requirements based on language support
