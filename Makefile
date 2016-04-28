@@ -70,11 +70,9 @@ dev_image_4.2:
 	@-docker rm -f 4.2-build
 	@docker run -it --user root --name 4.2-build \
 		$(REPO) bash -c 'pip uninstall --yes ipywidgets && \
-    pip install --upgrade notebook && \
-    pip install --pre ipywidgets && \
-    pip install widgetsnbextension && \
-    jupyter nbextension install --system --py widgetsnbextension && \
-    jupyter nbextension enable widgetsnbextension --system --py'
+    pip install --upgrade notebook==4.2.0 && \
+    pip install ipywidgets==5.1.1 && \
+    jupyter nbextension enable --system --py widgetsnbextension'
 	@docker commit 4.2-build $(REPO4.2)
 	@-docker rm -f 4.2-build
 
