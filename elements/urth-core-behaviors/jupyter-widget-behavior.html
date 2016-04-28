@@ -54,7 +54,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                 ).then(function(model) {
                         //This check is to protect against a timing in ipywidgets where the comm can be close
                         //by the time it gets to resolve this promise
-                        if(!model.comm.kernel.comm_manager.comms[model.comm.comm_id]){
+                        if(model.comm && !model.comm.kernel.comm_manager.comms[model.comm.comm_id]){
                             this._handleCommDisconnect();
                             return;
                         }
