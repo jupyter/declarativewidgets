@@ -70,11 +70,11 @@ dev_image_4.2:
 	@-docker rm -f 4.2-build
 	@docker run -it --user root --name 4.2-build \
 		$(REPO) bash -c 'pip uninstall --yes ipywidgets && \
-    pip install --upgrade notebook && \
-    pip install --pre ipywidgets && \
-    pip install widgetsnbextension && \
-    jupyter nbextension install --system --py widgetsnbextension && \
-    jupyter nbextension enable widgetsnbextension --system --py'
+    pip install --upgrade notebook==4.2.0 && \
+    pip install ipywidgets==5.1.1 && \
+    jupyter nbextension enable --system --py widgetsnbextension && \
+    pip install --pre --upgrade toree && \
+    jupyter toree install'
 	@docker commit 4.2-build $(REPO4.2)
 	@-docker rm -f 4.2-build
 
@@ -297,7 +297,7 @@ server: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server: _run-$(PYTHON)
 
 server_4.2: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
-server_4.2: INSTALL_DECLWID_CMD?=pip install --pre --upgrade toree && jupyter toree install --user; pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
+server_4.2: INSTALL_DECLWID_CMD?=pip install --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
 server_4.2: SERVER_NAME?=urth_widgets_server
 server_4.2: OPTIONS?=-it --rm
 server_4.2: PORT_MAP?=-p 9500:8888
@@ -400,7 +400,7 @@ all: init
 	PYTHON=python2 $(MAKE) install
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" $(MAKE) system-test
 	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" PYTHON=python2 $(MAKE) system-test
-	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_4.2 SPECS="${shell find system-test/ -name '*specs.js' -maxdepth 1 | grep -v  'urth-r'}"  $(MAKE) system-test
+	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=_4.2 $(MAKE) system-test
 	$(MAKE) dist/docs
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
