@@ -7,8 +7,10 @@ Serializer <- R6Class(
         serializer_list = list(),
         serialize = function(obj) {
             #if serializer for the class is registered use it else just return the object
+            ref_klass <- class(obj)
+            klass_name <- if (!is.na(ref_klass[2]) && ref_klass[2] == "R6") ref_klass[1] else ref_klass
             for(klass in names(self$serializer_list)) {
-                if(class(obj) == klass) {
+                if(klass_name == klass) {
                     return (self$serializer_list[[klass]](obj))
                 }
             }
