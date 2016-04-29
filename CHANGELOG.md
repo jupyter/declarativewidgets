@@ -1,4 +1,8 @@
 # Changelog
+## 0.5.1 (2016-29-16)
+* Support for ipywidgets 5.1.1+
+* Fixes to support alternate non-notebook runtimes
+
 ## 0.5.0 (2016-27-16)
 * Support for Jupyter 4.2 and ipywidgets 5.0
 * Support for R language through IRkernel
