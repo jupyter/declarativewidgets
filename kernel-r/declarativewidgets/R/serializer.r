@@ -24,6 +24,7 @@ Serializer <- R6Class(
         },
         initialize = function() {
             self$load_serializers()
+            assign("register_serializer", self$register_serializer, envir = .GlobalEnv)
         }
     )
 )
