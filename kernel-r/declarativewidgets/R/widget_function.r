@@ -151,9 +151,9 @@ Widget_Function <- R6Class(
             })
             return (names)
         },
-        initialize = function(comm) {
+        initialize = function(comm, serializer) {
             super$initialize(comm)
-            self$serializer <- Serializer$new()
+            self$serializer <- serializer
         }
     )
 )
