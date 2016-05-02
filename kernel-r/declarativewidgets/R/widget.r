@@ -1,4 +1,4 @@
-#' @include widget_channels.r widget_function.r widget_dataframe.r
+#' @include widget_channels.r widget_function.r widget_dataframe.r serializer.r
 NULL
 
 setClassUnion('CommOrNULL', members = c('Comm', 'NULL'))
@@ -86,12 +86,12 @@ Widget <- R6Class("Widget",
     )
 )
 
-create_widget_instance <- function(class_name, comm) {
+create_widget_instance <- function(class_name, comm, serializer) {
     switch(
         class_name,
-        urth.widgets.widget_function.Function      = return (Widget_Function$new(comm = comm)),
-        urth.widgets.widget_channels.Channels      = return (Widget_Channels$new(comm = comm)),
-        urth.widgets.widget_dataframe.DataFrame    = return (Widget_Dataframe$new(comm = comm)),
+        urth.widgets.widget_function.Function      = return (Widget_Function$new(comm = comm, serializer = serializer)),
+        urth.widgets.widget_channels.Channels      = return (Widget_Channels$new(comm = comm, serializer = serializer)),
+        urth.widgets.widget_dataframe.DataFrame    = return (Widget_Dataframe$new(comm = comm, serializer = serializer)),
         print(c('Got unhandled class_name:', class_name))
     )
 }
@@ -100,11 +100,12 @@ create_widget_instance <- function(class_name, comm) {
 #'
 #' @export
 initWidgets <- function() {
+    serializer <- Serializer$new()
     target_handler <- function(comm, msg_data) {
         #get widget_class
         widget_class <- msg_data$widget_class
         #create the widget instance
-        widget <- create_widget_instance(widget_class, comm)
+        widget <- create_widget_instance(widget_class, comm, serializer)
     }
     library(IRkernel)
     comm_manager <- get("comm_manager", envir = as.environment("package:IRkernel"))()
