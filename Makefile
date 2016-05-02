@@ -26,7 +26,7 @@ help:
 ROOT_REPO:=jupyter/all-spark-notebook:258e25c03cba
 REPO:=jupyter/all-spark-notebook-bower:258e25c03cba
 REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:258e25c03cba
-SCALA_BUILD_REPO:=jupyter/sbt-toree-image:0.1.0
+SCALA_BUILD_REPO:=1science/sbt
 
 PYTHON?=python3
 DOCKER_OPTS?=--log-level warn
@@ -43,7 +43,7 @@ $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 	@$(foreach dir, $(URTH_SRC_DIRS), cd $(abspath $(dir)) && $(NPM_BIN_DIR)/bower link $(BOWER_OPTS);)
 	@$(foreach name, $(URTH_DIRS), $(NPM_BIN_DIR)/bower link $(name) $(BOWER_OPTS);)
 
-init: node_modules dev_image scala_build_image dev_image_4.2
+init: node_modules dev_image dev_image_4.2
 
 node_modules: package.json
 	@npm install --quiet
@@ -80,15 +80,6 @@ dev_image_4.2:
     jupyter toree install'
 	@docker $(DOCKER_OPTS) commit 4.2-build $(REPO4.2)
 	@-docker $(DOCKER_OPTS) rm -f 4.2-build
-
-scala_build_image:
-	@-docker $(DOCKER_OPTS) rm -f scala-build
-	@docker $(DOCKER_OPTS) run -it --user root --name scala-build \
-		cloudet/sbt-sparkkernel-image:1.5.1 bash -c '\
-		curl --silent --location https://pypi.python.org/packages/source/t/toree/toree-0.1.0.dev4.tar.gz >> /opt/toree.tar.gz && \
-		cd /opt; tar -xf toree.tar.gz; mv toree-* toree'
-	@docker $(DOCKER_OPTS) commit scala-build $(SCALA_BUILD_REPO)
-	@-docker $(DOCKER_OPTS) rm -f scala-build
 
 clean: clean-dist
 	@-rm -rf *.egg-info
@@ -172,9 +163,8 @@ else
 	@mkdir -p dist/declarativewidgets/static
 	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`:/src \
-		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/kernel-scala /tmp/src && \
-			cd /tmp/src && \
-			mkdir -p /tmp/src/lib && cp /opt/toree/toree/lib/*.jar /tmp/src/lib/. && \
+		-v `pwd`/etc/ivy:/root/.ivy2 \
+		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/kernel-scala/* /app/. && \
 			sbt --warn package && \
 			cp target/scala-2.10/urth-widgets*.jar /src/dist/declarativewidgets/static/urth-widgets.jar'
 endif
@@ -276,9 +266,8 @@ else
 	@echo 'Running scala tests...'
 	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`/kernel-scala:/src \
-		$(SCALA_BUILD_REPO) bash -c 'cp -r /src /tmp/src && \
-			cd /tmp/src && \
-			mkdir -p /tmp/src/lib && cp /opt/toree/toree/lib/*.jar /tmp/src/lib/. && \
+		-v `pwd`/etc/ivy:/root/.ivy2 \
+		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/* /app/. && \
 			sbt --warn test'
 endif
 
