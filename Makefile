@@ -325,7 +325,7 @@ _dev-python3: _dev
 
 _dev: NB_HOME?=/home/jovyan
 _dev: .watch dist
-	@docker $(DOCKER_OPTS) run -it --rm \
+	-@docker $(DOCKER_OPTS) run -it --rm \
 		-p 8888:8888 \
 		-p 4040:4040 \
 		--user jovyan \
