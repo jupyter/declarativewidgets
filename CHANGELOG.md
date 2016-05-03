@@ -1,9 +1,13 @@
 # Changelog
-## 0.5.1 (2016-29-16)
+## 0.5.2 (2016-05-03)
+* Support for selectionIndex in urth-viz-*
+* Custom serializers in R
+
+## 0.5.1 (2016-04-29)
 * Support for ipywidgets 5.1.1+
 * Fixes to support alternate non-notebook runtimes
 
-## 0.5.0 (2016-27-16)
+## 0.5.0 (2016-04-27)
 * Support for Jupyter 4.2 and ipywidgets 5.0
 * Support for R language through IRkernel
 * `selection` property on charts references row data. Chart-specific selection data available as `selectionInfo`
