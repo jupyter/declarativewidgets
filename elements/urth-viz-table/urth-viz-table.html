@@ -191,6 +191,12 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 coords.col = -1; //force row selection
             },
 
+            _selectionIndexChanged: function(newIndex, oldIndex) {
+                if (oldIndex != newIndex) {
+                    this.hot && this.hot.selectCell(newIndex, 0, newIndex, this.columns.length - 1, true);
+                }
+            },
+
             /*
              * Handle when selection has finished taking place on handson
              */
@@ -199,10 +205,11 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 // since rowStart is only the logical index of the table view
                 var physicalIndex = this.hot.sortIndex.length > 0 ?
                                         this.hot.sortIndex[rowStart][0] : rowStart;
+                this.selectionIndex = physicalIndex;
                 if(this.selectionAsObject) {
                     var sel = {};
                     var row = this.datarows[physicalIndex];
-                    this.columns.map(function(col, i) {
+                    this.columns.forEach(function(col, i) {
                         col = col.replace(" ", "_");
                         sel[col] = row[i];
                     });

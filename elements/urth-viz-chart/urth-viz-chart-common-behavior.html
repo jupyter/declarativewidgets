@@ -217,8 +217,8 @@
                     return result;
                 };
 
-                return datarows.map(function (d) {
-                    return { row: d, x: t(d, primary), y: t(d, i) };
+                return datarows.map(function (d, j) {
+                    return { row: d, rowIndex: j, x: t(d, primary), y: t(d, i) };
                 });
             });
 
@@ -291,6 +291,107 @@
             formatTicks(this.chart.yAxis, this.secondary == -1 ? 1 : this.secondary);
         },
 
+        _selectionIndexChanged: function(newIndex, oldIndex) {
+            if (!this.chart || this._isUpdatingSelectionIndex) {
+                return;
+            }
+
+            require(['d3'], function(d3) {
+                // clear any existing selection
+                var svg = this._svgSelection(d3);
+                svg.selectAll('.nvd3 .selected').classed('selected', false);
+
+                if (!Array.isArray(newIndex)) {
+                    newIndex = [newIndex];
+                }
+
+                // select elements and dispatch click events to select
+                newIndex.forEach(function(index) {
+                    return svg.selectAll('.nvd3 .' + this.nodeClass)
+                        .filter(function(d) {
+                            if (d.data) {
+                                // event shape for type='pie'
+                                d = d.data;
+                            }
+                            if (d.length) { d = d[0]; }
+                            return d.rowIndex === index;
+                        })
+                        .classed('selected', true);
+                }, this);
+
+                var selected = svg.selectAll('.nvd3 .selected'),
+                    selectionInfo = selected.data();
+
+                if (this.type == 'scatter' && selected.empty()) {
+                    var selectionInfo = svg.selectAll('.nvd3 .nv-point').data().filter(function(d) { return d.values; });
+
+                    // flatten 'values' from all series
+                    if (selectionInfo.length) {
+                        selectionInfo = selectionInfo[0].map(function(a) { return a.values; })
+                            .reduce(function(a,b) { return a.concat(b); });
+                    }
+
+                    // clear selection
+                    selectionInfo.forEach(function(d) { delete d.selected; });
+
+                    // toggle matching rows by index
+                    selectionInfo = selectionInfo.filter(function(d) {
+                        if (newIndex.indexOf(d.rowIndex) != -1) {
+                            return (d.selected = true);
+                        }
+                    });
+                }
+
+                this._updateSelection(selectionInfo);
+            }.bind(this));
+        },
+
+        _updateSelection: function(selectionInfo) {
+            selectionInfo.sort(function(a,b) { return a.rowIndex - b.rowIndex; });
+
+            this._setSelectionInfo(this.multiSelect ? selectionInfo : selectionInfo[0]);
+
+            var selection = selectionInfo.map(function(d) {
+                if (d.data) {
+                   // event shape for type='pie'
+                   d = d.data;
+                }
+                return d.length ? d[0].row : d.row;
+            });
+
+            if (this.selectionAsObject) {
+                selection = selection.map(function(row) {
+                    var obj = {};
+                    this.columns.forEach(function(col, i) {
+                        obj[col.replace(' ', '_')] = row[i];
+                    });
+                    return obj;
+                }.bind(this));
+            }
+
+            var selectionIndex = selectionInfo.map(function(d) {
+                if (d.data) {
+                    d = d.data;
+                }
+
+                if (d.length) { d = d[0]; }
+
+                return d.rowIndex;
+            });
+
+            if (this.multiSelect) {
+                // eliminate duplicate rows selected from different series
+                selectionIndex = selectionIndex.filter(function(v, i, a) { return selection.indexOf(selection[i]) === i; });
+                selection = selection.filter(function(v, i, a) { return a.indexOf(v) === i; });
+            }
+
+            this._setSelection(this.multiSelect ? selection : selection[0]);
+
+            this._isUpdatingSelectionIndex = true;
+            this.selectionIndex = this.multiSelect ? selectionIndex : selectionIndex[0];
+            delete this._isUpdatingSelectionIndex;
+        },
+
         _update: function() {
             require(['d3'], function(d3) {
                 this._svgSelection(d3).datum(this.data);
@@ -316,6 +417,7 @@
                 var model, modelProp, config;
                 switch(this.type) {
                     case 'bar':
+                        this.nodeClass = 'nv-bar';
                         model = nv.models.multiBarChart;
                         config = function(chart) {
                             chart
@@ -326,6 +428,7 @@
                         modelProp = 'multibar';
                         break;
                     case 'line':
+                        this.nodeClass = 'nv-point';
                         model = nv.models.lineChart;
                         modelProp = 'lines';
                         config = function(chart) {
@@ -333,6 +436,7 @@
                         };
                         break;
                     case 'area':
+                        this.nodeClass = 'nv-area';
                         model = nv.models.stackedAreaChart;
                         modelProp = 'stacked';
                         config = function(chart) {
@@ -340,6 +444,7 @@
                         };
                         break;
                     case 'scatter':
+                        this.nodeClass = 'nv-point';
                         model = nv.models.scatterChart;
                         modelProp = 'scatter';
                         config = function(chart) {
@@ -347,6 +452,7 @@
                         };
                         break;
                     case 'pie':
+                        this.nodeClass = 'nv-slice';
                         model = nv.models.pieChart;
                         modelProp = 'pie';
                         config = function(chart) {
@@ -452,6 +558,8 @@
                         // workaround for type=scatter, which does not have unique data objects bound
                         // to the selected DOM element.  Maintain a flag within the data object instead.
                         if (this.type == 'scatter') {
+                            selectionInfo = selectionInfo.filter(function(d) { return d[0].values; });
+
                             // flatten 'values' from all series
                             if (selectionInfo.length) {
                                 selectionInfo = selectionInfo[0].map(function(a) { return a.values; })
@@ -470,32 +578,7 @@
                             selectionInfo = selectionInfo.filter(function(d) { return d.selected; });
                         }
 
-                        this._setSelectionInfo(this.multiSelect ? selectionInfo : selectionInfo[0]);
-
-                        var selection = selectionInfo.map(function(d) {
-                            if (d.data) {
-                               // event shape for type='pie'
-                               d = d.data;
-                            }
-                            return d.length ? d[0].row : d.row;
-                        });
-
-                        if (this.selectionAsObject) {
-                            selection = selection.map(function(row) {
-                                var obj = {};
-                                this.columns.forEach(function(col, i) {
-                                    obj[col.replace(' ', '_')] = row[i];
-                                });
-                                return obj;
-                            }.bind(this));
-                        }
-
-                        if (this.multiSelect) {
-                            // eliminate duplicate rows selected from different series
-                            selection = selection.filter(function(v, i, a) { return a.indexOf(v) === i; });
-                        }
-
-                        this._setSelection(this.multiSelect ? selection : selection[0]);
+                        this._updateSelection(selectionInfo);
                     }.bind(this));
 
                     return chart;
