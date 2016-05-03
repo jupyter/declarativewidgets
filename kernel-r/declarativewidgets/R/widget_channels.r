@@ -80,13 +80,13 @@ Widget_Channels <- R6Class(
                 self$handle_change(msg$data)
             }
         },
-        initialize = function(comm) {
+        initialize = function(comm, serializer) {
             #expose channel to global env
             assign("the_channels", self, envir = .GlobalEnv)
             assign("channel", the_channel, envir = .GlobalEnv)
             #initialize super class Widget
             super$initialize(comm)
-            self$serializer <- Serializer$new()
+            self$serializer <- serializer
         }
     )
 )

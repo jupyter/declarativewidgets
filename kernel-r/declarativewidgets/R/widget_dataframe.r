@@ -61,10 +61,10 @@ Widget_Dataframe <- R6Class(
         register_limit = function(limit) {
             self$limit <- limit
         },
-        initialize = function(comm) {
+        initialize = function(comm, serializer) {
             #initialize super class Widget and serializer
             super$initialize(comm)
-            self$serializer <- Serializer$new()
+            self$serializer <- serializer
         }
     )
 )
