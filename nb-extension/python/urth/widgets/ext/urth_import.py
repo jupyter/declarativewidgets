@@ -65,8 +65,8 @@ class UrthImportHandler(RequestHandler):
 def do_install(package_name):
     logger.info('Installing {0}'.format(package_name))
     try:
-        subprocess.check_call(['bower', 'install', '--allow-root',
-                '--config.interactive=false', '--production', package_name],
+        subprocess.check_call(['bower', 'install', package_name, '--allow-root',
+                '--config.interactive=false', '--production', '--quiet'],
                 cwd=widgets_dir)
     except subprocess.CalledProcessError as e:
         return -1

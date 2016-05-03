@@ -11,7 +11,8 @@ describe('Widgets System Test', function() {
     it('should print the correct variable that is used for urth-core-function', function(done) {
         boilerplate.browser
             .elementsByCssSelector('div.output_area').nth(2)
-            .elementByXPath('//button[text()="invoke"]').click()
+            .waitForElementById('invokeButton', wd.asserters.isDisplayed, 10000)
+            .elementById('invokeButton').click()
             .waitForElementById('test1', wd.asserters.textInclude('world'), 10000)
             .nodeify(done);
     });

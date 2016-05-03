@@ -92,6 +92,7 @@ Boilerplate.prototype.setup = function(testName, startingURL){
         }.bind(this))
         .waitForElementByCssSelector('div.output_area', wd.asserters.isDisplayed, 10000)
         .sleep(5000)
+        .waitForElementByCssSelector('#kernel_indicator_icon.kernel_idle_icon', wd.asserters.isDisplayed, 10000)
         .nodeify(done);
   }.bind(this));
 
