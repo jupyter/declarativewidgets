@@ -5,6 +5,8 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-core-behaviors/jupyter-widget-behavior.html">
 <link rel="import" href="../urth-core-behaviors/execution-complete-behavior.html">
+<link rel="import" href="urth-core-query-filter.html">
+<link rel="import" href="urth-core-query-group.html">
 
 <!--
 This element represents a DataFrame. The `ref` property points to an instance of a DataFrame in the
@@ -37,8 +39,16 @@ Example:
 @group Urth Core
 @element urth-core-dataframe
 -->
-<script>
+<dom-module id="urth-core-dataframe">
+    <style>
+        :host {
+            display: none;
+        }
+    </style>
+    <template><content id="queries" select="urth-core-query-filter,urth-core-query-group"></content></template>
+</dom-module>
 
+<script>
 (function(){
     'use strict';
 
@@ -119,6 +129,15 @@ Example:
               value: 100,
               reflectToAttribute: true,
               observer: '_onLimitChange'
+            },
+
+            /**
+             * An Array with JSON structures that define queries to perform on the DataFrame.
+             */
+            query: {
+                type: Array,
+                value: function(){return [];},
+                observer: '_onQueryChange'
             }
         },
 
@@ -138,6 +157,8 @@ Example:
 
         ready: function() {
             this._debug("urth-core-dataframe ready");
+            this.$.queries.addEventListener("query-changed", this._handleQueryContentChanged.bind(this), true);
+            this._handleQueryContentChanged();
         },
 
         /*
@@ -233,6 +254,20 @@ Example:
         _onLimitChange: function(){
             this._debug('urth-core-dataframe sending new limit value', this.limit);
             this.sync({limit: this.limit});
+            this.refresh();
+        },
+
+        _handleQueryContentChanged: function(){
+            //get all the query children and compose an array with all the queries
+            var queries = Array.prototype.slice.call(
+                    Polymer.dom(this.$.queries).getDistributedNodes());
+
+            this.query = queries.map(function(qElt){return qElt.query}).filter(function(q){return !!q});
+        },
+
+        _onQueryChange: function(){
+            console.debug('urth-core-dataframe sending new query value', this.query);
+            this.sync({query: JSON.stringify(this.query)});
             this.refresh();
         }
 

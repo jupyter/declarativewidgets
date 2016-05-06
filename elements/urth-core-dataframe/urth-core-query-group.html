@@ -1,0 +1,116 @@
+!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="urth-core-query-agg.html">
+
+<!--
+Example:
+
+
+@group Urth Core
+@element urth-core-query-group
+-->
+<dom-module id="urth-core-query-group">
+    <style>
+        :host {
+            display: none;
+        }
+    </style>
+    <template><content id="aggs" select="urth-core-query-agg"></content></template>
+</dom-module>
+<script>
+
+    (function() {
+        'use strict';
+
+        window.Urth = window.Urth || {};
+
+        window.Urth['urth-core-query-group'] = Polymer({
+            is: 'urth-core-query-group',
+
+            properties: {
+                by: {
+                    type: String
+                },
+
+                aggregates: {
+                    type: Object
+                },
+
+                query: {
+                    type: Object,
+                    computed: '_buildQuery(by,aggregates, valid)',
+                    notify: true
+                },
+
+                valid: {
+                    type: Boolean,
+                    computed: 'isValid(by,aggregates)',
+                    notify: true
+                }
+            },
+
+            attached: function(){
+                this._contentObserver = new MutationObserver( this._contentChanged.bind(this));
+                this._contentObserver.observe( this, {
+                    childList: true
+                });
+
+                this._contentChanged();
+            },
+
+            detached: function(){
+                this._contentObserver.disconnect();
+            },
+
+            isValid: function(){
+                return !!this.by && Object.keys(this.aggregates).length > 0
+            },
+
+            _buildQuery: function(){
+                if( !this.valid ){
+                    return undefined;
+                }
+
+                return {
+                    type: "group",
+                    expr: {
+                        by: this.by.split(',').map(function(col){return col.trim();}),
+                        agg: this.aggregates
+                    }
+                }
+            },
+
+            /**
+             * Builds a structure based on pandas agg function
+             *
+             * {
+             *    "col1":["sum","mean"]
+             *    "col2":["mean"]
+             * }
+             * @private
+             */
+            _contentChanged: function(){
+                var aggElts = Array.prototype.slice.call(
+                        Polymer.dom(this.$.aggs).getDistributedNodes())
+
+                var aggregates = {};
+                aggElts.filter(function(aggElt){
+                            return aggElt.valid;
+                        })
+                       .forEach(function(aggElt){
+                            if( aggregates[aggElt.col] ){
+                                aggregates[aggElt.col].push(aggElt.op);
+                            }
+                            else{
+                                aggregates[aggElt.col] = [aggElt.op];
+                            }
+                       });
+
+                this.aggregates = aggregates;
+            }
+        });
+    })();
+</script>
