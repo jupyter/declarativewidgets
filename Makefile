@@ -30,9 +30,9 @@ help:
 	@echo '             all - run all necessary streps to produce and validate a build'
 
 # Docker images and repos
-ROOT_REPO:=jupyter/all-spark-notebook:258e25c03cba
-REPO:=jupyter/all-spark-notebook-bower:258e25c03cba
-REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:258e25c03cba
+ROOT_REPO:=jupyter/all-spark-notebook:2d878db5cbff
+REPO:=jupyter/all-spark-notebook-bower:2d878db5cbff
+REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:2d878db5cbff
 SCALA_BUILD_REPO:=1science/sbt
 
 # Global environment defaults
