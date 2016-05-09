@@ -1,7 +1,14 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: help clean clean-dist sdist dist dev docs test test-js test-py test-scala init dev_image server install dev-build system-test clean-watch clean-watch-docs
+.PHONY: help init clean clean-dist clean-watch clean-watch-docs dist sdist docs
+.PHONY: dev dev_image dev_image_4.2 _dev _dev-python2 _dev-python3
+.PHONY: server server_4.2 remove-server install install-all all release
+.PHONY: start-selenium stop-selenium _run _run-python3 _run-python2 run-test
+.PHONY: test testdev test-js test-js-remote test-py test-py-all _test-py
+.PHONY: _test-py-python2 _test-py-python3 test-scala
+.PHONY: system-test system-test-all system-test-all-local system-test-all-remote
+.PHONY: system-test-python3 system-test-python2 system-test-alt-jupyter
 .SUFFIXES:
 MAKEFLAGS=-r
 
@@ -22,15 +29,26 @@ help:
 	@echo '      test-scala - run scala units'
 	@echo '             all - run all necessary streps to produce and validate a build'
 
-
+# Docker images and repos
 ROOT_REPO:=jupyter/all-spark-notebook:258e25c03cba
 REPO:=jupyter/all-spark-notebook-bower:258e25c03cba
 REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:258e25c03cba
 SCALA_BUILD_REPO:=1science/sbt
 
+# Global environment defaults
 PORT_MAP?=-p 9500:8888
-
+BROWSER_LIST?=chrome
+ALT_BROWSER_LIST?=chrome
+BASEURL?=http://192.168.99.100:9500
+TEST_TYPE?=local
+SPECS?=system-test/*-specs.js
+PYTHON2_SPECS?=system-test/urth-system-test-specs.js
+ALT_JUPYTER_SPECS?=system-test/urth-system-test-specs.js system-test/urth-r-widgets-specs.js
+ALT_JUPYTER_VERSION?=4.2
 PYTHON?=python3
+TEST_MSG?="Starting system tests"
+
+# Logging levels
 DOCKER_OPTS?=--log-level warn
 PIP_OPTS?=--quiet
 BOWER_OPTS?=--quiet
@@ -230,7 +248,7 @@ sdist: dist
 
 test: test-js test-py test-scala
 
-test-js:BROWSER?=chrome
+test-js: BROWSER?=chrome
 test-js: | $(URTH_COMP_LINKS)
 	@echo 'Running web component tests...'
 	@npm run test -- --local $(BROWSER)
@@ -249,7 +267,7 @@ test-py: dist/urth
 
 _test-py-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
 _test-py-python2: CMD=python --version; python -m unittest discover $(EXTENSION_DIR) "test*[!_py3].py"
-_test-py-python2: PYTHON_ENV_CMD=source activate python2; pip install -U mock $(PIP_OPTS);
+_test-py-python2: PYTHON_SETUP_CMD=source activate python2; pip install -U mock $(PIP_OPTS);
 _test-py-python2: _test-py
 
 _test-py-python3: EXTENSION_DIR=/usr/local/lib/python3.4/dist-packages/urth
@@ -260,6 +278,10 @@ _test-py:
 	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
 		$(REPO) bash -c '$(PYTHON_SETUP_CMD) $(CMD)'
+
+test-py-all:
+	@$(MAKE) test-py
+	@PYTHON="python2" $(MAKE) test-py
 
 test-scala:
 ifeq ($(NOSCALA), true)
@@ -273,7 +295,7 @@ else
 			sbt --warn test'
 endif
 
-testdev:BROWSER?=chrome
+testdev: BROWSER?=chrome
 testdev: | $(URTH_COMP_LINKS)
 	@npm run test -- -p --local $(BROWSER)
 
@@ -281,6 +303,10 @@ install: CMD?=exit
 install: SERVER_NAME?=urth_widgets_install_validation
 install: OPTIONS?=-it --rm
 install: _run-$(PYTHON)
+
+install-all:
+	@$(MAKE) install
+	@PYTHON="python2" $(MAKE) install
 
 server: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
 server: INSTALL_DECLWID_CMD?=pip install $(PIP_OPTS) --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets install --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library && jupyter declarativewidgets activate;
@@ -296,6 +322,9 @@ server_4.2: OPTIONS?=-it --rm
 server_4.2: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server_4.2: REPO=$(REPO4.2)
 server_4.2: _run-$(PYTHON)
+
+remove-server:
+	-@docker $(DOCKER_OPTS) rm -f $(SERVER_NAME)
 
 _run-python3: _run
 
@@ -340,70 +369,68 @@ _dev: .watch dist
 		$(REPO) bash -c 'R CMD INSTALL -l /opt/conda/lib/R/library /src-kernel-r/declarativewidgets; $(PYTHON_SETUP_CMD) $(CMD)'
 	@$(MAKE) clean-watch
 
-start-selenium:
-	@echo "Installing and starting Selenium Server..."
-	@node_modules/selenium-standalone/bin/selenium-standalone install
-	@node_modules/selenium-standalone/bin/selenium-standalone start 2>/dev/null & echo $$! > SELENIUM_PID
-
 run-test: SERVER_NAME?=urth_widgets_integration_test_server
-run-test: BROWSER_LIST?=chrome
-run-test: SPECS?=system-test/*-specs.js
-run-test:
-	-@docker $(DOCKER_OPTS) rm -f $(SERVER_NAME)
+run-test: sdist remove-server
+	@echo $(TEST_MSG)
 	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) server$(JUPYTER)
 	@echo 'Waiting for server to start...'
 	@LIMIT=60; while [ $$LIMIT -gt 0 ] && ! docker logs $(SERVER_NAME) 2>&1 | grep 'Notebook is running'; do echo waiting $$LIMIT...; sleep 1; LIMIT=$$(expr $$LIMIT - 1); done
 	@$(foreach browser, $(BROWSER_LIST), echo 'Running system integration tests on $(browser)...'; npm run system-test -- $(SPECS) --baseurl $(BASEURL) --test-type $(TEST_TYPE) --browser $(browser) || exit)
+	@SERVER_NAME=$(SERVER_NAME) $(MAKE) remove-server
 
-system-test: BASEURL?=http://192.168.99.100:9500
-system-test: SERVER_NAME?=urth_widgets_integration_test_server
-system-test: BROWSER_LIST?=chrome
-system-test: SPECS?=system-test/*-specs.js
+system-test-python3: TEST_MSG="Starting system tests for Python 3"
+system-test-python3:
+	TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
+
+system-test-python2: PYTHON=python2
+system-test-python2: SPECS:=$(PYTHON2_SPECS)
+system-test-python2: TEST_MSG="Starting system tests for Python 2"
+system-test-python2:
+	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
+
+system-test-alt-jupyter: JUPYTER:=_$(ALT_JUPYTER_VERSION)
+system-test-alt-jupyter: SPECS:=$(ALT_JUPYTER_SPECS)
+system-test-alt-jupyter: TEST_MSG="Starting system tests for Jupyter $(ALT_JUPYTER_VERSION)"
+system-test-alt-jupyter:
+	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
+
+system-test-all: system-test-python3 system-test-python2 system-test-alt-jupyter
+
+start-selenium: stop-selenium
+	@echo "Installing and starting Selenium Server..."
+	@node_modules/selenium-standalone/bin/selenium-standalone install >/dev/null
+	@node_modules/selenium-standalone/bin/selenium-standalone start 2>/dev/null & echo $$! > SELENIUM_PID
+
+stop-selenium:
+	-@kill `cat SELENIUM_PID`
+	-@rm SELENIUM_PID
+
+system-test-all-local: TEST_TYPE:="local"
+system-test-all-local: start-selenium system-test-all stop-selenium
+
+system-test-all-remote: TEST_TYPE:="remote"
+system-test-all-remote: system-test-all
+
 system-test:
 ifdef SAUCE_USER_NAME
 	@echo 'Running system tests on Sauce Labs...'
-	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=remote SPECS="$(SPECS)" $(MAKE) run-test
+	@BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-remote
+else ifdef TRAVIS
+	@echo 'Starting system integration tests locally on Travis...'
+	@BROWSER_LIST="firefox" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-local
 else
-	$(MAKE) start-selenium
-	$(MAKE) sdist
 	@echo 'Starting system integration tests locally...'
-ifdef TRAVIS
-	BASEURL=$(BASEURL) BROWSER_LIST="chrome" TEST_TYPE=local SPECS="$(SPECS)" $(MAKE) run-test || (docker $(DOCKER_OPTS) rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
-else
-	BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" TEST_TYPE=local SPECS="$(SPECS)" $(MAKE) run-test || (docker $(DOCKER_OPTS) rm -f $(SERVER_NAME); kill `cat SELENIUM_PID`; rm SELENIUM_PID; exit 1)
-endif
-	-@kill `cat SELENIUM_PID`
-	-@rm SELENIUM_PID
+	@BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-local
 endif
 	@echo 'System integration tests complete.'
-	-@docker $(DOCKER_OPTS) rm -f $(SERVER_NAME)
 
 docs: DOC_PORT?=4001
-docs: BASEURL?=http://127.0.0.1
+docs: DOCURL?=http://127.0.0.1
 docs: .watch-docs dist/docs
-	@echo "Serving docs at $(BASEURL):$(DOC_PORT)"
+	@echo "Serving docs at $(DOCURL):$(DOC_PORT)"
 	@bash -c "trap 'make clean-watch-docs' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
 
-all: BASEURL?=http://192.168.99.100:9500
-all: BROWSER_LIST?=chrome
-all: JUPYTER_VERSION?=4.2
-all: ALT_BROWSER_LIST?=chrome
-all: PYTHON2_SPECS?=system-test/urth-system-test-specs.js
-all: ALT_JUPYTER_SPECS?=system-test/urth-system-test-specs.js system-test/urth-r-widgets-specs.js
-all: init
-	$(MAKE) test-js-remote
-	$(MAKE) test-py
-	PYTHON=python2 $(MAKE) test-py
-	$(MAKE) test-scala
-	$(MAKE) sdist
-	$(MAKE) install
-	PYTHON=python2 $(MAKE) install
-	@echo 'Starting system tests for Python 3'
-	@BASEURL=$(BASEURL) BROWSER_LIST="$(BROWSER_LIST)" $(MAKE) system-test
-	@echo 'Starting system tests for Python 2'
-	@BASEURL=$(BASEURL) BROWSER_LIST="$(ALT_BROWSER_LIST)" PYTHON=python2 SPECS="$(PYTHON2_SPECS)" $(MAKE) system-test
-	@echo 'Starting system tests on Jupyter $(JUPYTER_VERSION)'
-	@BASEURL=$(BASEURL) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=_$(JUPYTER_VERSION) SPECS="$(ALT_JUPYTER_SPECS)" $(MAKE) system-test
+all: init sdist install-all test-js-remote test-py-all test-scala system-test
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
 release: PRE_SDIST=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;

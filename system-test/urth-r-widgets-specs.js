@@ -16,7 +16,7 @@ process.env.PYTHON != "python2" && describe('Widgets R System Test', function() 
 
     it('should bind and update a channel variable', function(done) {
         boilerplate.browser
-            .elementByXPath('//button[text()="invoke"]').click()
+            .waitForElementById('invokeButton').click()
             .waitForElementByClassName('test2', wd.asserters.textInclude('mike'), 10000)
             .nodeify(done);
     });
