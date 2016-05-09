@@ -36,7 +36,7 @@ Example:
                 },
 
                 aggregates: {
-                    type: Object
+                    type: Array
                 },
 
                 query: {
@@ -96,20 +96,15 @@ Example:
                 var aggElts = Array.prototype.slice.call(
                         Polymer.dom(this.$.aggs).getDistributedNodes())
 
-                var aggregates = {};
-                aggElts.filter(function(aggElt){
+                this.aggregates = aggElts.filter(function(aggElt){
                             return aggElt.valid;
                         })
-                       .forEach(function(aggElt){
-                            if( aggregates[aggElt.col] ){
-                                aggregates[aggElt.col].push(aggElt.op);
-                            }
-                            else{
-                                aggregates[aggElt.col] = [aggElt.op];
+                       .map(function(aggElt){
+                            return {
+                                op: aggElt.op,
+                                col: aggElt.col
                             }
                        });
-
-                this.aggregates = aggregates;
             }
         });
     })();

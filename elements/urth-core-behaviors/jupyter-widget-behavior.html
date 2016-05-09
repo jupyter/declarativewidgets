@@ -6,6 +6,7 @@
 <!--
 This behavior is used to encapsulate some of the services needed for ipywidgets.
 -->
+<link rel="import" href="../promise-polyfill/promise-polyfill-lite.html">
 <link rel='import' href='error-display-behavior.html'>
 <link rel='import' href='logging-behavior.html'>
 
@@ -138,19 +139,57 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
             },
 
             /**
-             * Sends a message to the kernel side proxy of this element.
+             * Sends a message to the kernel side proxy of this element. A promise is return to notify when the message
+             * had been processed by the kernel (i.e. status back to idle). It is not intended to get data, rather meant
+             * to allow clients to throttle messages.
              *
              * @method send
              * @param {Object} msg A json message.
+             * @param {Number} timeout If specified, if timeout expired before status idle is received, promised is rejected
+             * @return {Promise}
              */
-            send: function( msg ){
-                if(this.isConnected()){
-                    this._debug('Urth.JupyterWidgetBehavior send - sending message', msg);
-                    this.model.send(msg, this._callbacks());
-                }
-                else{
-                    this._warn('Urth.JupyterWidgetBehavior send - model not ready, cannot send message');
-                }
+            send: function( msg, timeout ){
+                return new Promise(function(resolve, reject){
+                    if(this.isConnected()){
+                        this._debug('Urth.JupyterWidgetBehavior send - sending message', msg);
+
+                        var isResolved = false;
+                        var isRejected = false;
+
+                        /*
+                         * augmenting the iopub.status callback to handle the promise
+                         * this.callbacks already returns an object that will at least have callbacks.iopub = {}
+                         */
+                        var callbacks = this._callbacks();
+                        var ipy_status_handler = callbacks.iopub.status || function(){};
+
+                        callbacks.iopub.status = function(msg){
+                            try{
+                                ipy_status_handler(msg);
+                            }
+                            catch(e){}
+
+                            if(msg.content.execution_state === 'idle' && !isRejected){
+                                isResolved = true;
+                                resolve();
+                            }
+                        }
+                        this.model.send(msg, callbacks);
+
+                        if( timeout && timeout > 0 ){
+                            this.async(function(){
+                                if(!isResolved) {
+                                    isRejected = true;
+                                    reject();
+                                }
+                            }, timeout);
+                        }
+                    }
+                    else{
+                        this._warn('Urth.JupyterWidgetBehavior send - model not ready, cannot send message');
+                        reject(new Error('Model not ready, cannot send message'));
+                    }
+                }.bind(this));
             },
 
             /**

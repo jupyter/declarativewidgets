@@ -122,6 +122,15 @@ Example:
             },
 
             /**
+             * If true, it means that the element is waiting on the kernel to return the data
+             */
+            busy: {
+                type: Boolean,
+                value: false,
+                notify: true
+            },
+
+            /**
              * Sets the maximun number of rows to bring to the client.
              */
             limit: {
@@ -132,12 +141,30 @@ Example:
             },
 
             /**
-             * An Array with JSON structures that define queries to perform on the DataFrame.
+             * An Array with a JSON structures that define queries to perform on the DataFrame.
              */
             query: {
                 type: Array,
                 value: function(){return [];},
                 observer: '_onQueryChange'
+            },
+
+            /**
+             * Time to debounce synchronizing changes to the query with the kernel component.
+             */
+            queryDelay: {
+                type: Number,
+                value: 750
+            },
+
+            /**
+             * Amount of time to wait for a refresh/sync call to complete. This allows for throttling messages to get the
+             * data from the DataFrame. In cases like Spark, getting the data may take a long time and this setting allows
+             * throttling request to avoid overloading the DataFrame host.
+             */
+            refreshTimeout: {
+                type: Number,
+                value: 2000
             }
         },
 
@@ -211,14 +238,31 @@ Example:
          * @method refresh
          */
         refresh: function() {
+            if( this.busy ){
+                this._refreshQueued = true;
+                return;
+            }
+
             var jName = "urth-core-dataframe.refresh";
             if( this.isDebouncerActive(jName) ) {
                 this.cancelDebouncer(jName);
             }
 
             this.debounce(jName, function(){
-              this._debug("urth-core-dataframe sending sync message...");
-              this.send({ "event": "sync" });
+                this._debug("urth-core-dataframe sending sync message...");
+
+                this.busy = true;
+                var promiseHandler = function(){
+                    this.busy = false
+
+                    if(this._refreshQueued){
+                        this._refreshQueued = false;
+                        this.refresh();
+                    }
+
+                }.bind(this);
+
+                this.send({ "event": "sync" }, this.refreshTimeout).then(promiseHandler,promiseHandler);
             }.bind(this), 200);
         },
 
@@ -266,9 +310,16 @@ Example:
         },
 
         _onQueryChange: function(){
-            console.debug('urth-core-dataframe sending new query value', this.query);
-            this.sync({query: JSON.stringify(this.query)});
-            this.refresh();
+            var jName = "urth-core-dataframe.query_change";
+            if( this.isDebouncerActive(jName) ) {
+                this.cancelDebouncer(jName);
+            }
+
+            this.debounce(jName, function(){
+                console.debug('urth-core-dataframe sending new query value', this.query);
+                this.sync({query: JSON.stringify(this.query)});
+                this.refresh();
+            }.bind(this), this.queryDelay);
         }
 
     });
