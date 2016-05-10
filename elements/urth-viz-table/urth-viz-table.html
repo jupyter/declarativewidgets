@@ -48,7 +48,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
         }
         </style>
 
-        <table id="tableContainer" style="width:100%; height:auto;"></table>
+        <table id="tableContainer" style="width:100%;"></table>
         <content></content>
     </template>
     <script>
@@ -277,6 +277,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
 
                     var tableContainer = this.$.tableContainer;
                     tableContainer.innerHTML = '';
+                    tableContainer.style.height = 'auto';
 
                     var columnSettings = this._parseColumns();
 
