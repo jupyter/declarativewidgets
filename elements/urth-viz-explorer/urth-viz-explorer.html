@@ -32,9 +32,15 @@ Example:
             <span title="Scatter Chart" name="scatter" class="fa fa-bullseye fa-2x"></span>
             <span title="Pie Chart" name="pie" class="fa fa-pie-chart fa-2x"></span>
         </iron-selector>
-        <urth-core-dataframe id="f1" ref$="{{ref}}" value="{{df}}" auto></urth-core-dataframe>
-        <urth-viz-chart id="c1" type$="{{type}}" datarows="{{df.data}}" columns="{{df.columns}}" multi-select="[[multiSelect]]"></urth-viz-chart>
-        <urth-viz-table id="t1" datarows="{{df.data}}" columns="{{df.columns}}"></urth-viz-table>
+        <template is="dom-if" if="{{ref}}">
+            <urth-core-dataframe id="f1" ref$="{{ref}}" value="{{df}}" auto></urth-core-dataframe>
+        </template>
+        <template is="dom-if" if="{{!showAsTable}}">
+            <urth-viz-chart type$="{{type}}" datarows="{{df.data}}" columns="{{df.columns}}" multi-select="[[multiSelect]]"></urth-viz-chart>
+        </template>
+        <template is="dom-if" if="{{showAsTable}}">
+            <urth-viz-table datarows="{{df.data}}" columns="{{df.columns}}"></urth-viz-table>
+        </template>
         <content></content>
     </template>
 </dom-module>
@@ -57,6 +63,11 @@ Example:
                 observer: '_typeChanged'
             },
 
+            showAsTable: {
+                type: Boolean,
+                computed: '_showAsTable(type)'
+            },
+
             /**
              * Allows user to select multiple chart components (bars in barchart, slices in pie chart, etc).
              */
@@ -67,13 +78,17 @@ Example:
             }
         },
 
-        _typeChanged: function(newValue, oldValue) {
-            if (newValue == 'table') {
-                this.$.c1.style.display = 'none';
-                this.$.t1.style.display = 'inline';
-            } else {
-                this.$.c1.style.display = 'inline';
-                this.$.t1.style.display = 'none';
+        _showAsTable: function(type) {
+            return type == 'table';
+        },
+
+        ready: function() {
+            // If a child dataframe is given, bind that value to df whenever it changes
+            var child = this.querySelector('urth-core-dataframe');
+            if (child) {
+                child.addEventListener('value-changed', function(event) {
+                    this.df = event.detail.value;
+                }.bind(this))
             }
         }
     });
