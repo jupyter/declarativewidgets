@@ -7,6 +7,7 @@
 <link rel="import" href="../urth-core-behaviors/execution-complete-behavior.html">
 <link rel="import" href="urth-core-query-filter.html">
 <link rel="import" href="urth-core-query-group.html">
+<link rel="import" href="urth-core-query-sort.html">
 
 <!--
 This element represents a DataFrame. The `ref` property points to an instance of a DataFrame in the
@@ -45,7 +46,7 @@ Example:
             display: none;
         }
     </style>
-    <template><content id="queries" select="urth-core-query-filter,urth-core-query-group"></content></template>
+    <template><content id="queries" select="urth-core-query-filter,urth-core-query-group,urth-core-query-sort"></content></template>
 </dom-module>
 
 <script>

@@ -1,0 +1,100 @@
+!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+Example:
+
+
+@group Urth Core
+@element urth-core-query-sort
+-->
+<dom-module id="urth-core-query-sort">
+    <style>
+        :host {
+            display: none;
+        }
+    </style>
+    <template><content></content></template>
+</dom-module>
+<script>
+
+    (function() {
+        'use strict';
+
+        window.Urth = window.Urth || {};
+
+        window.Urth['urth-core-query-sort'] = Polymer({
+            is: 'urth-core-query-sort',
+
+            properties: {
+                by: {
+                    type: String
+                },
+
+                direction: {
+                    type: String
+                },
+
+                __by: {
+                    type: Object,
+                    computed: '_toStringOrArray(by)'
+                },
+
+                __direction: {
+                    type: Object,
+                    computed: '_toStringOrArray(direction)'
+                },
+
+                query: {
+                    type: Object,
+                    computed: '_buildQuery(__by,__direction, valid)',
+                    notify: true
+                },
+
+                valid: {
+                    type: Boolean,
+                    computed: 'isValid(__by,__direction)',
+                    notify: true
+                }
+            },
+
+            isValid: function(){
+                if( Array.isArray(this.__by) ){
+                    return Array.isArray(this.__direction) && this.__by.length === this.__direction.length;
+                }
+                else{
+                    return !Array.isArray(this.__direction);
+                }
+            },
+
+            _buildQuery: function(){
+                if( !this.valid ){
+                    return undefined;
+                }
+
+                return {
+                    type: "sort",
+                    expr: {
+                        by: this.__by,
+                        ascending: Array.isArray(this.__direction)
+                                ? this.__direction.map(function(dir){return dir == 'asc'})
+                                : this.__direction == 'asc'
+                    }
+                }
+            },
+
+            /**
+             * Takes a comma separated string and return a single String value is one element or an array of Strings
+             * @param commaStr
+             * @private
+             */
+            _toStringOrArray: function(commaStr){
+                var arrayVal = commaStr.split(',').map(function(part){return part.trim();});
+                return arrayVal.length > 1 ? arrayVal : arrayVal[0];
+            }
+        });
+    })();
+</script>
