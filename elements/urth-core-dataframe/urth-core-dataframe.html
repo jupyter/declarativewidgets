@@ -42,11 +42,33 @@ Example:
 -->
 <dom-module id="urth-core-dataframe">
     <style>
-        :host {
+        #queries {
             display: none;
         }
     </style>
-    <template><content id="queries" select="urth-core-query-filter,urth-core-query-group,urth-core-query-sort"></content></template>
+    <template>
+        <template is="dom-if" if="{{debug}}">
+            <table>
+                <thead>
+                    <tr>
+                        <template is="dom-repeat" items="{{value.columns}}">
+                            <th>{{item}}</th>
+                        </template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template is="dom-repeat" items="{{_head(value.data)}}" as="r">
+                        <tr>
+                            <template is="dom-repeat" items="{{r}}" as="c">
+                                <td>{{c}}</td>
+                            </template>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </template>
+        <content id="queries" select="urth-core-query-filter,urth-core-query-group,urth-core-query-sort"></content>
+    </template>
 </dom-module>
 
 <script>
@@ -132,13 +154,21 @@ Example:
             },
 
             /**
+             * If true, this element will render a simple table help inspect the data
+             */
+            debug: {
+                type: Boolean,
+                value: false
+            },
+
+            /**
              * Sets the maximun number of rows to bring to the client.
              */
             limit: {
-              type: Number,
-              value: 100,
-              reflectToAttribute: true,
-              observer: '_onLimitChange'
+                type: Number,
+                value: 100,
+                reflectToAttribute: true,
+                observer: '_onLimitChange'
             },
 
             /**
@@ -321,6 +351,17 @@ Example:
                 this.sync({query: JSON.stringify(this.query)});
                 this.refresh();
             }.bind(this), this.queryDelay);
+        },
+
+        /**
+         * Returns at most 10 elements from the array
+         *
+         * @param rows - All the data
+         * @return {Array}
+         * @private
+         */
+        _head: function(rows){
+            return rows.slice(0, 10);
         }
 
     });
