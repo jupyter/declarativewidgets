@@ -1,8 +1,9 @@
 env:
   global:
     - DISPLAY=:99.0
-    - BASEURL=http://localhost:9500
-    - BROWSER_LIST="chrome firefox"
+    - PORT_MAP="-p 4000:8888"
+    - BASEURL=http://declarativewidgets.org:4000
+    - BROWSER_LIST="chrome firefox safari InternetExplorer"
 
 sudo: required
 
@@ -18,6 +19,8 @@ addons:
   firefox: "latest"
   sauce_connect:
     no_ssl_bump_domains: all
+  hosts:
+    - declarativewidgets.org
 
 before_script:
   - curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
