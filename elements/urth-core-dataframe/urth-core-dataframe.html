@@ -7,12 +7,32 @@
 <link rel="import" href="../urth-core-behaviors/execution-complete-behavior.html">
 
 <!--
-Represents a widget that binds to a DataFrame variable. The DataFrame's
-representation is surfaced in the 'value' property.
+This element represents a DataFrame. The `ref` property points to an instance of a DataFrame in the
+kernel. Currently, there is support for:
+
+* Pandas DataFrame
+* PySpark DataFrame
+* Spark DataFrame in Scala
+* R DataFrame
+* Spark DataFrame in R
+
+The data for the DataFrame is available in a variety of way:
+
+* The `value` property has an Object representation of the DataFrame.
+* The `rows` property has only the data portion of the DataFrame and can be structured as a 2D Array or
+an Array of Objects.
+* The `columns` property has an Array of column names
+
+The amount of data rows that is made available to this element from the kernel instance is controled by
+the `limit` property.
 
 Example:
 
-    <urth-core-dataframe id="f1" ref="aDataFrame" value="{{x}}" auto></urth-core-dataframe>
+    <urth-core-dataframe id="f1" ref="aDataFrame" value="{{df}}" auto></urth-core-dataframe>
+
+    <urth-core-dataframe id="f1" ref="aDataFrame" rows="{{rows}}" columns="{{cols}}" auto></urth-core-dataframe>
+
+    <urth-core-dataframe id="f1" ref="aDataFrame" rows="{{rows}}" rows-as-object auto></urth-core-dataframe>
 
 @group Urth Core
 @element urth-core-dataframe
@@ -39,12 +59,48 @@ Example:
             },
 
             /**
-             * The serialized representation of the DataFrame `ref`.
+             * The serialized representation of the DataFrame `ref`. The structure contains:
+             * {
+             *  columns: Array of column names
+             *  data: 2D Array of rows with column values
+             *  index: Array with index values
+             * }
              */
             value: {
                 type: Object,
                 readOnly: true,
                 notify: true
+            },
+
+            /**
+             * An Array with the column names for the DataFrame
+             */
+            columns: {
+                type: Array,
+                computed: '_columns(value)',
+                notify: true
+            },
+
+            /**
+             * An Array containing the data rows of the DataFrame. If 'row-as-object` is false, this
+             * property will contain a 2D Array where the outer Array contains each row and the inner Array contains
+             * the values for each column in the order defined by the `columns` property. If 'row-as-object` is true,
+             * this property will contain an Array of Objects, where each Object represents a row of data with column
+             * values keyed by column names.
+             */
+            rows: {
+                type: Array,
+                computed: '_rows(value, rowAsObject)',
+                notify: true
+            },
+
+            /**
+             * Controls the shape of the `rows` property. If true, `rows` is an Array of Objects, else `rows` is a 2D
+             * Array.
+             */
+            rowAsObject:{
+                type: Boolean,
+                value: false
             },
 
             /**
@@ -143,6 +199,35 @@ Example:
               console.debug("urth-core-dataframe sending sync message...");
               this.send({ "event": "sync" });
             }.bind(this), 200);
+        },
+
+        /**
+         * Returns the columns portion of the serialized DataFrame
+         * @param df - the serialized DataFrame
+         * @return the columns array
+         * @private
+         */
+        _columns: function(df){
+            return df.columns;
+        },
+
+        /**
+         * Returns the data portion of the serialized DataFrame as a 2D array or as an Array of Objects depending on the
+         * value of `rowAsObject`.
+         * @param df - the serialized DataFrame
+         * @param rowAsObject
+         * @private
+         */
+        _rows: function(df, rowAsObject){
+            return !rowAsObject
+                        ? df.data
+                        : df.data.map(function(row){
+                            var rowObj = {};
+                            row.forEach(function(col, idx){
+                                rowObj[df.columns[idx]] = col;
+                            })
+                            return rowObj;
+                        });
         },
 
         _onLimitChange: function(){
