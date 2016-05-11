@@ -1,0 +1,113 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-core-function tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../urth-core-dataframe.html'>
+
+</head>
+
+<body>
+
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id='basic'>
+        <template>
+            <urth-core-dataframe ref="someDataFrame"></urth-core-dataframe>
+        </template>
+    </test-fixture>
+
+    <script>
+        // STEP 4: Define any globals needed by the test suite.
+        before(function() {
+            /*
+             * Non-lifecycle methods must be mocked on the prototype.
+             * Lifecycle methods(e.g. detached, ready) remain in the behavior, so they
+             * must be mocked there.
+             */
+            sinon.stub(Urth["urth-core-dataframe"].prototype, "createModel");
+            sinon.stub(Urth["urth-core-dataframe"].prototype, "displayErrorMessage");
+            sinon.stub(Urth.ExecutionCompleteBehavior, "ready");
+            sinon.stub(Urth.ExecutionCompleteBehavior, "detached");
+        });
+
+        // STEP 5: Define suite(s) and tests.
+        describe('_rows', function() {
+            it('should return data as 2D Array when rowAsObject is false', function () {
+                var dfElmt = fixture('basic');
+
+                var df = {
+                    columns: ['a', 'b', 'c'],
+                    data: [
+                        [1,2,3],
+                        [4,5,6],
+                        [7,8,9]
+                    ]
+                };
+
+                var rows = dfElmt._rows(df, false)
+
+                expect(rows).to.eql([
+                    [1,2,3],
+                    [4,5,6],
+                    [7,8,9]
+                ]);
+            });
+
+            it('should return data as Array of Objects when rowAsObject is true', function () {
+                var dfElmt = fixture('basic');
+
+                var df = {
+                    columns: ['a', 'b', 'c'],
+                    data: [
+                        [1,2,3],
+                        [4,5,6],
+                        [7,8,9]
+                    ]
+                };
+
+                var rows = dfElmt._rows(df, true)
+
+                expect(rows).to.eql([
+                        {"a":1,"b":2,"c":3},
+                        {"a":4,"b":5,"c":6},
+                        {"a":7,"b":8,"c":9}
+                ]);
+            });
+
+            it('should return empty Array when df.data is empty', function () {
+                var dfElmt = fixture('basic');
+
+                var df = {
+                    columns: ['a', 'b', 'c'],
+                    data: []
+                };
+
+                var rows = dfElmt._rows(df, false)
+
+                expect(rows).to.eql([]);
+
+                rows = dfElmt._rows(df, true)
+
+                expect(rows).to.eql([]);
+            });
+        });
+    </script>
+</body>
+</html>
