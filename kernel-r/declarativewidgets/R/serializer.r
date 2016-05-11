@@ -5,7 +5,8 @@ Serializer <- R6Class(
     'Serializer',
     public = list(
         serializer_list = list(),
-        serialize = function(obj) {
+        serialize = function(obj, limit=100) {
+            print(c("limit is ", limit))
             #if serializer for the class is registered use it else just return the object
             ref_klass <- class(obj)
             klass_name <- if (!is.na(ref_klass[2]) && ref_klass[2] == "R6") ref_klass[1] else ref_klass

@@ -104,7 +104,7 @@ Time_Series_Serializer <- R6Class(
             }
             return (index_list)
         },
-        serialize = function(obj, limit) {
+        serialize = function(obj, limit=100) {
             json <- list()
             json[['data']] <- as.list(unclass(obj))
             json[['index']] <- self$index_to_list(obj)

@@ -21,3 +21,5 @@ Collate:
     'widget_dataframe.r'
     'serializer.r'
     'serializers.r'
+    'querier.r'
+    'queriers.r'
