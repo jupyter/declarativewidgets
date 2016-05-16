@@ -28,7 +28,6 @@ Widget_Dataframe <- R6Class(
             }
             if(!is.null(msg_query)) {
                 self$register_query(msg_query)
-                print(msg_query)
             } else {
                 print("No name query provided for Widget_Dataframe")
             }
@@ -36,7 +35,6 @@ Widget_Dataframe <- R6Class(
         handle_custom = function(msg) {
             if(!is.null(msg$event)) {
                 if(msg$event == 'sync') {
-                    print("handle_custom")
                     self$serialize_and_send(self$variable_name, self$limit, self$query)
                 } else {
                     print(c("Unhandled custome event: ", msg$event))
@@ -56,7 +54,6 @@ Widget_Dataframe <- R6Class(
         serialize_and_send = function(name, limit, query = list()) {
             if(self$df_in_interpreter(name)) {
                 #apply query before sending over
-                print("serialize_and_send")
                 df_after_query <- self$querier$apply_query(get(name, envir = .GlobalEnv), query)
                 serialized_df <- self$serializer$serialize(df_after_query, limit)
                 self$send_update("value", serialized_df)
@@ -75,8 +72,6 @@ Widget_Dataframe <- R6Class(
             self$limit <- limit
         },
         register_query = function(query) {
-            print("register_query")
-            print(query)
             self$query <- fromJSON(query)
             response <- self$serialize_and_send(name, self$limit, self$query)
             self$handle_function_response(response)
