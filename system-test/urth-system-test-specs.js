@@ -10,14 +10,13 @@ describe('Widgets System Test', function() {
 
     it('should not execute Urth.whenReady API until components have upgraded', function(done) {
         boilerplate.browser
-            .elementById('apiTestText')
+            .waitForElementById('apiTestText', wd.asserters.isDisplayed, 10000)
             .text().should.eventually.include('Luke')
             .nodeify(done);
     });
     it('should print the correct variable that is used for urth-core-function', function(done) {
         boilerplate.browser
             .waitForElementById('invokeButton', wd.asserters.isDisplayed, 10000)
-            .elementById('invokeButton')
             .click()
             .click() // Safari requires extra click for some reason
             .waitForElementById('test1', wd.asserters.textInclude('world'), 10000)

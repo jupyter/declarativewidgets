@@ -396,7 +396,7 @@ system-test-alt-jupyter:
 
 system-test-all: system-test-python3 system-test-python2 system-test-alt-jupyter
 
-start-selenium: stop-selenium
+start-selenium: node_modules stop-selenium
 	@echo "Installing and starting Selenium Server..."
 	@node_modules/selenium-standalone/bin/selenium-standalone install >/dev/null
 	@node_modules/selenium-standalone/bin/selenium-standalone start 2>/dev/null & echo $$! > SELENIUM_PID
