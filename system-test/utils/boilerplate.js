@@ -86,19 +86,22 @@ Boilerplate.prototype.setup = function(testName, startingURL){
 
     this.browser.init(desired)
         .get(startingURL || '/')
-        .waitForElementByCssSelector("#kernel_indicator_icon.kernel_idle_icon", wd.asserters.isDisplayed, 10000)
-        .waitForElementByLinkText("Cell", wd.asserters.isDisplayed, 10000)
-        .elementByLinkText("Cell")
+        .waitForElementByCssSelector('#kernel_indicator_icon.kernel_idle_icon', wd.asserters.isDisplayed, 10000)
+        .waitForElementByLinkText('Cell', wd.asserters.isDisplayed, 10000)
+        .safeExecute('localStorage.clear()')
+        .elementByLinkText('Cell')
         .click()
-        .waitForElementByLinkText("Run All", wd.asserters.isDisplayed, 10000)
-        .elementByLinkText("Run All")
+        .waitForElementByLinkText('Run All', wd.asserters.isDisplayed, 10000)
+        .elementByLinkText('Run All')
         .click()
-        .eval("!!document.body.createShadowRoot", function(err, value) {
+        .eval('!!document.body.createShadowRoot', function(err, value) {
             this.browserSupportsShadowDOM = value;
         }.bind(this))
         .waitForElementByCssSelector('div.output_area', wd.asserters.isDisplayed, 10000)
-        .sleep(5000)
+        .setAsyncScriptTimeout(15000)
+        .waitForConditionInBrowser('window.Urth && Urth.kernel && Urth.kernel.is_connected()', 10000)
         .waitForElementByCssSelector('#kernel_indicator_icon.kernel_idle_icon', wd.asserters.isDisplayed, 10000)
+        .waitForConditionInBrowser('typeof Urth.whenReady === "function"', 10000)
         .nodeify(done);
   }.bind(this));
 

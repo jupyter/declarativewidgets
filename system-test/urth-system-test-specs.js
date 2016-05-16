@@ -8,19 +8,25 @@ var boilerplate = new Boilerplate();
 describe('Widgets System Test', function() {
     boilerplate.setup(this.title, '/notebooks/tests/Walkthrough.ipynb');
 
+    it('should not execute Urth.whenReady API until components have upgraded', function(done) {
+        boilerplate.browser
+            .elementById('apiTestText')
+            .text().should.eventually.include('Luke')
+            .nodeify(done);
+    });
     it('should print the correct variable that is used for urth-core-function', function(done) {
         boilerplate.browser
-            .elementsByCssSelector('div.output_area').nth(2)
             .waitForElementById('invokeButton', wd.asserters.isDisplayed, 10000)
-            .elementById('invokeButton').click()
+            .elementById('invokeButton')
+            .click()
+            .click() // Safari requires extra click for some reason
             .waitForElementById('test1', wd.asserters.textInclude('world'), 10000)
             .nodeify(done);
     });
 
     it('should bind variable to channel a', function(done) {
         boilerplate.browser
-            .elementsByCssSelector('div.output_area').nth(3)
-            .elementByCssSelector('>', 'input')
+            .elementById('aInput')
             .type('A')
             .waitForElementById('test2', wd.asserters.textInclude('A'), 10000)
             .nodeify(done);
@@ -28,8 +34,7 @@ describe('Widgets System Test', function() {
 
     it('should bind variable to channel b', function(done) {
         boilerplate.browser
-            .elementsByCssSelector('div.output_area').nth(4)
-            .elementByCssSelector('>', 'input')
+            .elementById('bInput')
             .click()
             .type(boilerplate.SPECIAL_KEYS.Enter) // Needed for IE
             .type('B')
@@ -39,8 +44,7 @@ describe('Widgets System Test', function() {
 
     it('should bind variables to channels independently', function(done) {
         boilerplate.browser
-            .elementsByCssSelector('div.output_area').nth(3)
-            .elementByCssSelector('>', 'input')
+            .elementById('aInput')
             .click()
             .type(boilerplate.SPECIAL_KEYS.Enter) // Needed for IE
             .type('2')
@@ -53,8 +57,7 @@ describe('Widgets System Test', function() {
 
     it('should watch for changes in a watched variable', function(done) {
         boilerplate.browser
-            .elementsByCssSelector('div.output_area').nth(5)
-            .elementByCssSelector('>', 'input')
+            .elementById('watchInput')
             .click()
             .type(boilerplate.SPECIAL_KEYS.Enter) // Needed for IE
             .type('watched message')
@@ -64,14 +67,13 @@ describe('Widgets System Test', function() {
 
     it('should update output when DataFrame is modified and set to auto', function(done) {
         boilerplate.browser
-            .elementsByCssSelector('div.input').nth(10)
+            .elementByXPath('//div[contains(@class, "code_cell")]/div[contains(@class, "input")]/*[contains(., "Set dataframe data.")]')
             .click()
-            .elementByLinkText("<", "Cell")
+            .elementByLinkText('<', 'Cell')
             .click()
-            .waitForElementByLinkText("Run Cells", wd.asserters.isDisplayed, 10000)
-            .elementByLinkText("Run Cells")
+            .waitForElementByLinkText('Run Cells', wd.asserters.isDisplayed, 10000)
+            .elementByLinkText('Run Cells')
             .click()
-            .elementsByCssSelector('<', 'div.output_area').nth(7)
             .waitForElementByClassName('test5', wd.asserters.textInclude('Jane Doe'), 10000)
             .nodeify(done);
     });

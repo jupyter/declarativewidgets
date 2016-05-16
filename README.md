@@ -71,7 +71,7 @@ jupyter declarativewidgets activate
 ```bash
 # installing R support
 jupyter declarativewidgets installr --library path/to/r/libs
-``` 
+```
 
 ##### Note
 On all Jupyter versions, you will need to restart your notebook server if it was running during the enable/activate step. Also, note that you can run jupyter --paths to get a sense of where the extension files will be installed.
@@ -182,7 +182,7 @@ On a Mac, `make test` will execute the browser, python and scala tests.
 $ make test
 Installing and starting Selenium server for local browsers
 Selenium server running on port 50625
-Web server running on port 2000 and serving from /Users/drewwalt/Work/Urth/widgets
+Web server running on port 2000 and serving from /Users/youruser/declarativewidgets
 chrome 45                Beginning tests via http://localhost:2000/generated-index.html?cli_browser_id=0
 chrome 45                Tests passed
 Test run ended with great success
@@ -255,11 +255,49 @@ Serving docs at http://127.0.0.1:4001
 Load the specified url in your browser to explore the documentation.
 
 ## Other Topics
+
+### Initializing the Declarative Widgets extension
+
+Before using the features provided by the Declarative Widgets extension in a
+notebook, the extension must first be initialized. The initialization process
+loads all dependencies and performs other required environment setup.
+Initialization is accomplished through a kernel specific API. Examples for each
+of the supported kernels is provided below. The initialization cell must precede
+the first cell in the notebook that makes use of Declarative Widgets features.
+
+#### Python Initialization
+
+```
+from urth import widgets
+
+widgets.init()
+```
+
+#### Scala Initialization
+
+```
+// modify to IP and Port of this notebook server
+%addjar http://localhost:8888/nbextensions/urth_widgets/urth-widgets.jar
+
+import urth.widgets._
+
+initWidgets
+```
+
+#### R Initialization
+
+```
+library("declarativewidgets")
+initWidgets()
+```
+
 ### Including a Web Component in a Notebook
 
-The Urth widgets framework provides a mechanism to easily install and import a web component into
-a notebook. This mechanism is built on top of [bower packages](http://bower.io/) which are the
-current standard for publishing web components. Use the `urth-core-import` element upgraded `link` tag to include a web component element in a notebook.
+The Declarative Widgets framework provides a mechanism to easily install and
+import a web component into a notebook. This mechanism is built on top of
+[bower packages](http://bower.io/) which are the current standard for publishing
+web components. Use the `urth-core-import` element upgraded `link` tag to
+include a web component element in a notebook.
 
 ```
 %%html
@@ -272,3 +310,27 @@ The above code will first attempt to load `paper-slider.html`. If that fails,
 the specified package will be downloaded and installed on the server with `bower install`. The link `href` will then be requested again to load `paper-slider.html` and the related tag (`paper-slider` in this example) will render as is defined by the element.
 
 To display some minimal details about the package loading in the developer console, specify the `debug` parameter.
+
+### Custom JavaScript API execution
+
+Since Declarative Widgets initialization and import of web components is
+performed asynchronously, an elements upgraded JavaScript API may not be
+accessible upon execution of the cell. In order to ensure that the required
+API is available, make use of `Urth.whenReady(function)`. This API will invoke
+the specified function only after prerequisites have been satisfied. The example
+code below demonstrates how to safely access the API of the custom
+`urth-core-channel` element:
+
+```
+%%html
+<urth-core-channel name="mine" id="mychannel"></urth-core-channel>
+```
+
+```
+%%javascript
+var channel = document.getElementById('mychannel');
+
+Urth.whenReady(function() {
+    channel.set('myvar', 'myvalue');
+});
+```

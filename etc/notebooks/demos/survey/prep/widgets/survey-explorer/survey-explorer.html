@@ -10,7 +10,7 @@ Example:
 @element survey-explorer
 -->
 <dom-module id="survey-explorer">
-    <template is="dom-bind">
+    <template>
         <style>
         .select-bar {
           background-color: #ddd; padding: 10px;
@@ -71,56 +71,61 @@ Example:
         </div>
         <content></content>
     </template>
-</dom-module>
-<script>
+    <script>
     'use strict';
-    Polymer({
-        is: 'survey-explorer',
-        properties: {
-            series: Array,
-            group_by: {
-                type: String,
-                value: 'no_grouping',
-                observer: 'resetSelection'
+    // Since elements defined in the notebook cannot properly declare their
+    // HTML import dependencies, need to wrap the `Polymer` call in `Urth.whenReady`
+    // to ensure that dependencies have loaded.
+    Urth.whenReady(function() {
+        Polymer({
+            is: 'survey-explorer',
+            properties: {
+                series: Array,
+                group_by: {
+                    type: String,
+                    value: 'no_grouping',
+                    observer: 'resetSelection'
+                },
+                labels: {
+                    type: Array,
+                    value: function () { return ['Keyword patterns', 'Annotator themes']; }
+                },
+                selectedLabel: {
+                    type: String,
+                    observer: 'resetSelection'
+                },
+                percentages: Boolean,
+                xlabel: {
+                    type: String,
+                    computed: 'xlabelText(selectedLabel)'
+                },
+                ylabel: {
+                    type: String,
+                    computed: 'ylabelText(percentages, group_by)'
+                },
+                sampleSource: Array
             },
-            labels: {
-                type: Array,
-                value: function () { return ['Keyword patterns', 'Annotator themes']; }
+            labelSlice: function(labels, series) {
+                return series ? labels.slice(0, series.length) : [];
             },
-            selectedLabel: {
-                type: String,
-                observer: 'resetSelection'
+            resetSelection: function() {
+                this.sel = null;
             },
-            percentages: Boolean,
-            xlabel: {
-                type: String,
-                computed: 'xlabelText(selectedLabel)'
+            seriesByLabel: function(label) {
+                var index = this.labels.indexOf(label);
+                return this.series[index];
             },
-            ylabel: {
-                type: String,
-                computed: 'ylabelText(percentages, group_by)'
+            xlabelText: function(selectedLabel) {
+                return 'Top ' +  selectedLabel + ' (15 max)';
             },
-            sampleSource: Array
-        },
-        labelSlice: function(labels, series) {
-            return series ? labels.slice(0, series.length) : [];
-        },
-        resetSelection: function() {
-            this.sel = null;
-        },
-        seriesByLabel: function(label) {
-            var index = this.labels.indexOf(label);
-            return this.series[index];
-        },
-        xlabelText: function(selectedLabel) {
-            return 'Top ' +  selectedLabel + ' (15 max)';    
-        },
-        ylabelText: function(percentages, group_by) {
-            var text = percentages ? 'Percentage of respondents' : 'Respondents';
-            if (group_by && group_by != 'no_grouping') {
-                text += ' grouped by ' + group_by;
+            ylabelText: function(percentages, group_by) {
+                var text = percentages ? 'Percentage of respondents' : 'Respondents';
+                if (group_by && group_by != 'no_grouping') {
+                    text += ' grouped by ' + group_by;
+                }
+                return text;
             }
-            return text;
-        }
+        });
     });
-</script>
+    </script>
+</dom-module>
