@@ -100,7 +100,7 @@ Boilerplate.prototype.setup = function(testName, startingURL){
         .waitForElementByCssSelector('div.output_area', wd.asserters.isDisplayed, 10000)
         .setAsyncScriptTimeout(15000)
         .waitForConditionInBrowser('window.Urth && Urth.kernel && Urth.kernel.is_connected()', 10000)
-        .waitForElementByCssSelector('#kernel_indicator_icon.kernel_idle_icon', wd.asserters.isDisplayed, 10000)
+        .waitForElementByCssSelector('#kernel_indicator_icon.kernel_idle_icon', wd.asserters.isDisplayed, 20000)
         .waitForConditionInBrowser('typeof Urth.whenReady === "function"', 10000)
         .nodeify(done);
   }.bind(this));
