@@ -26,7 +26,7 @@ def handle_filter( df, fltr_expr ):
     """
     Handles a filter expression
     :param df: a Pyspark DataFrame
-    :param fltr_expr: an array of filter expressions
+    :param fltr_expr: a string filter expressions
     :return: filtered DataFrame
     """
     return df.filter(fltr_expr)

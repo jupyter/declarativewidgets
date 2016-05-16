@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(
   "org.apache.toree" %% "toree-kernel" % toreeVersion % "provided",
   "org.apache.spark" %% "spark-core" % sparkVersion  % "provided",
   "org.apache.spark" %% "spark-repl" % sparkVersion  % "provided",
+  "org.apache.spark" %% "spark-core" % sparkVersion  % "test" classifier "tests",
   "org.scalatest" %% "scalatest" % "2.2.0" % "test", // Apache v2
   "org.scalactic" %% "scalactic" % "2.2.0" % "test", // Apache v2
   "org.mockito" % "mockito-all" % "1.9.5" % "test"   // MIT
