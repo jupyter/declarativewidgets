@@ -1,0 +1,140 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-core-function tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../urth-core-query-sort.html'>
+
+</head>
+
+<body>
+
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id='basic'>
+        <template>
+            <urth-core-query-sort></urth-core-query-sort>
+        </template>
+    </test-fixture>
+
+    <script>
+        // STEP 4: Define any globals needed by the test suite.
+        before(function() {});
+
+        // STEP 5: Define suite(s) and tests.
+        describe('isValid', function() {
+            it('should return false if __by and __direction are same length arrays', function () {
+                var elmt = fixture('basic');
+
+                var __by = ["a", "b", "c"];
+                var __direction = ["asc", "desc", "asc"]
+                expect(elmt.isValid(__by,__direction)).to.be.true;
+            });
+
+            it('should return false if __by and __direction are not same length arrays', function () {
+                var elmt = fixture('basic');
+
+                var __by = ["a", "b", "c"];
+                var __direction = ["asc", "desc"]
+                expect(elmt.isValid(__by,__direction)).to.be.false;
+            });
+
+            it('should return false if __by is simple value and __direction is an array', function () {
+                var elmt = fixture('basic');
+
+                var __by = "a"
+                var __direction = ["asc", "desc"]
+                expect(elmt.isValid(__by,__direction)).to.be.false;
+            });
+
+            it('should return false if __by is an array and __direction is a simple value', function () {
+                var elmt = fixture('basic');
+
+                var __by = ["a", "b", "c"];
+                var __direction = "asc"
+                expect(elmt.isValid(__by,__direction)).to.be.false;
+            });
+
+            it('should return true if __by is a simple value and __direction is a simple value', function () {
+                var elmt = fixture('basic');
+
+                var __by = "a";
+                var __direction = "asc"
+                expect(elmt.isValid(__by,__direction)).to.be.true;
+            });
+        });
+
+        describe('_buildQuery', function() {
+            it('should return undefined if not valid', function () {
+                var elmt = fixture('basic');
+
+                var valid = false;
+                var __by = ["a", "b", "c"];
+                var __direction = ["asc", "desc", "asc"]
+                expect(elmt._buildQuery(__by, __direction,valid)).to.be.undefined;
+            });
+
+            it('should return query structure with arrays', function () {
+                var elmt = fixture('basic');
+
+                var valid = true;
+                var __by = ["a", "b", "c"];
+                var __direction = ["asc", "desc", "asc"]
+                expect(elmt._buildQuery(__by, __direction,valid)).to.deep.eql({
+                    type: "sort",
+                    expr: {
+                        by: ["a", "b", "c"],
+                        ascending: [true, false, true]
+                    }
+                });
+            });
+
+            it('should return query structure with simple values with ascending true', function () {
+                var elmt = fixture('basic');
+
+                var valid = true;
+                var __by = "a";
+                var __direction = "asc"
+                expect(elmt._buildQuery(__by, __direction,valid)).to.deep.eql({
+                    type: "sort",
+                    expr: {
+                        by: "a",
+                        ascending: true
+                    }
+                });
+            });
+
+            it('should return query structure with simple values with ascending false', function () {
+                var elmt = fixture('basic');
+
+                var valid = true;
+                var __by = "a";
+                var __direction = "desc"
+                expect(elmt._buildQuery(__by, __direction,valid)).to.deep.eql({
+                    type: "sort",
+                    expr: {
+                        by: "a",
+                        ascending: false
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

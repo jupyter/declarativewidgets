@@ -5,8 +5,26 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <!--
+This element is used to define an aggregate function to performend on grouped data. It is intended
+as a child element of `<urth-core-query-group`>. The `op` property defines a supported aggregate
+function in for the type of DataFrame. The `col` property is a valid column name for which to perform
+the aggregation. Please refer to the following for details:
+
+- Pandas DataFrame: http://pandas.pydata.org/pandas-docs/version/0.16.0/groupby.html#applying-different-functions-to-dataframe-columns
+- PySpark DataFrame: http://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.GroupedData.agg
+- Scala Spark DataFrame: https://spark.apache.org/docs/1.4.0/api/java/org/apache/spark/sql/GroupedData.html#agg(org.apache.spark.sql.Column,%20scala.collection.Seq)
+- R DataFrame: https://stat.ethz.ch/R-manual/R-devel/library/stats/html/aggregate.html
+- SparkR DataFrame: https://spark.apache.org/docs/latest/api/R/groupBy.html
+
 Example:
 
+```
+<urth-core-dataframe ref="someDf">
+    <urth-core-query-group by="{{aCol}}">
+        <urth-core-query-agg op="sum" col="someCol"></urth-core-query-agg>
+    </urth-core-query-group>
+<urth-core-dataframe>
+```
 
 @group Urth Core
 @element urth-core-query-agg
@@ -30,14 +48,23 @@ Example:
             is: 'urth-core-query-agg',
 
             properties: {
+                /**
+                 * Name of aggregate operation
+                 */
                 op: {
                     type: String
                 },
 
+                /**
+                 * Name of column
+                 */
                 col: {
                     type: String
                 },
 
+                /**
+                 * True if both op and col are set
+                 */
                 valid: {
                     type: Boolean,
                     computed: 'isValid(op,col)',
@@ -45,8 +72,11 @@ Example:
                 }
             },
 
-            isValid: function(){
-                return !!this.op && !! this.col;
+            /**
+             * True if both op and col are set
+             */
+            isValid: function(op, col){
+                return !!op && !! col;
             }
         });
     })();

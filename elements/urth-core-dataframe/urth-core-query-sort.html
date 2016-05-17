@@ -3,10 +3,21 @@
 # Distributed under the terms of the Modified BSD License.
 -->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="urth-core-query-behavior.html">
 
 <!--
+This element is used to define a sort clause. The 2 main properties are:
+
+by - comma separated string of column names
+direction - comma separated string of asc|desc for the sort direction
+
 Example:
 
+```
+<urth-core-dataframe ref="someDf">
+    <urth-core-query-sort by="a,b,c" direction="asc,asc,desc"></urth-core-query-sort>
+<urth-core-dataframe>
+```
 
 @group Urth Core
 @element urth-core-query-sort
@@ -30,10 +41,16 @@ Example:
             is: 'urth-core-query-sort',
 
             properties: {
+                /**
+                 * Comma separated string of column names
+                 */
                 by: {
                     type: String
                 },
 
+                /**
+                 * Comma separated string of asc|desc
+                 */
                 direction: {
                     type: String
                 },
@@ -48,12 +65,19 @@ Example:
                     computed: '_toStringOrArray(direction)'
                 },
 
+                /**
+                 * The structure query
+                 */
                 query: {
                     type: Object,
                     computed: '_buildQuery(__by,__direction, valid)',
                     notify: true
                 },
 
+                /**
+                 * True if the values of `by` and `direction` are compatible in terms
+                 * of length.
+                 */
                 valid: {
                     type: Boolean,
                     computed: 'isValid(__by,__direction)',
@@ -61,39 +85,40 @@ Example:
                 }
             },
 
-            isValid: function(){
-                if( Array.isArray(this.__by) ){
-                    return Array.isArray(this.__direction) && this.__by.length === this.__direction.length;
+            behaviors: [
+                Urth.QueryBehavior
+            ],
+
+            /**
+             * Returns true if the paramters of the query are valid
+             */
+            isValid: function(__by, __direction){
+                if( Array.isArray(__by) ){
+                    return Array.isArray(__direction) && __by.length === __direction.length;
                 }
                 else{
-                    return !Array.isArray(this.__direction);
+                    return !Array.isArray(__direction);
                 }
             },
 
-            _buildQuery: function(){
-                if( !this.valid ){
+            /**
+             * Builds the query structure that is sent to the kernel
+             * @private
+             */
+            _buildQuery: function(__by,__direction, valid){
+                if( !valid ){
                     return undefined;
                 }
 
                 return {
                     type: "sort",
                     expr: {
-                        by: this.__by,
-                        ascending: Array.isArray(this.__direction)
-                                ? this.__direction.map(function(dir){return dir == 'asc'})
-                                : this.__direction == 'asc'
+                        by: __by,
+                        ascending: Array.isArray(__direction)
+                                ? __direction.map(function(dir){return dir == 'asc'})
+                                : __direction == 'asc'
                     }
                 }
-            },
-
-            /**
-             * Takes a comma separated string and return a single String value is one element or an array of Strings
-             * @param commaStr
-             * @private
-             */
-            _toStringOrArray: function(commaStr){
-                var arrayVal = commaStr.split(',').map(function(part){return part.trim();});
-                return arrayVal.length > 1 ? arrayVal : arrayVal[0];
             }
         });
     })();

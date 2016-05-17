@@ -1,0 +1,229 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-core-function tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../urth-core-query-group.html'>
+
+</head>
+
+<body>
+
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id='basic'>
+        <template>
+            <urth-core-query-group></urth-core-query-group>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='withAgg'>
+        <template>
+            <urth-core-query-group by="someCol">
+                <urth-core-query-agg op="anOp" col="aCol"></urth-core-query-agg>
+            </urth-core-query-group>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='withInvalidAgg'>
+        <template>
+            <urth-core-query-group by="someCol">
+                <urth-core-query-agg op="anOp" col="aCol"></urth-core-query-agg>
+                <urth-core-query-agg op="anOp"></urth-core-query-agg>
+            </urth-core-query-group>
+        </template>
+    </test-fixture>
+
+    <script>
+        // STEP 4: Define any globals needed by the test suite.
+        before(function() {});
+
+        // STEP 5: Define suite(s) and tests.
+        describe('attached', function() {
+            it('should have aggregate clause set based on children', function () {
+                var elmt = fixture('withAgg');
+
+                expect(elmt.aggregates).to.be.deep.eql([
+                    {
+                        op: "anOp",
+                        col: "aCol"
+                    }
+                ]);
+            });
+
+            it('should have aggregate clause set based only on valid children', function () {
+                var elmt = fixture('withInvalidAgg');
+
+                expect(elmt.aggregates).to.be.deep.eql([
+                    {
+                        op: "anOp",
+                        col: "aCol"
+                    }
+                ]);
+            });
+
+        });
+
+        describe('isValid', function() {
+            it('should return false if by property is not set', function () {
+                var elmt = fixture('basic');
+
+                var __by;
+                var aggregates = [
+                    {
+                        op: "anOp",
+                        col: "aCol"
+                    }
+                ];
+
+                expect(elmt.isValid(__by, aggregates)).to.be.false;
+            });
+
+            it('should return false if by property is empty string', function () {
+                var elmt = fixture('basic');
+
+                var __by = "";
+                var aggregates = [
+                    {
+                        op: "anOp",
+                        col: "aCol"
+                    }
+                ] ;
+
+                expect(elmt.isValid(__by, aggregates)).to.be.false;
+            });
+
+            it('should return false if by property is empty array', function () {
+                var elmt = fixture('basic');
+
+                var __by = [];
+                var aggregates = [
+                    {
+                        op: "anOp",
+                        col: "aCol"
+                    }
+                ];
+
+                expect(elmt.isValid(__by, aggregates)).to.be.false;
+            });
+
+            it('should return false if aggregates property is not set', function () {
+                var elmt = fixture('basic');
+
+                var __by = "someCol";
+                var aggregates;
+
+                expect(elmt.isValid(__by, aggregates)).to.be.false;
+            });
+
+            it('should return false if aggregates property is empty', function () {
+                var elmt = fixture('basic');
+
+                var __by = "someCol";
+                var aggregates = [];
+
+                expect(elmt.isValid(__by, aggregates)).to.be.false;
+            });
+        });
+
+        describe('_buildQuery', function() {
+            it('should return undefined if not valid', function () {
+                var elmt = fixture('basic');
+
+                var __by = [];
+                var aggregates = [
+                    {
+                        op: "anOp",
+                        col: "aCol"
+                    }
+                ];
+                var valid = false;
+
+                expect(elmt._buildQuery(__by,aggregates,valid)).to.be.undefined;
+            });
+
+            it('should return query structure when not disabled', function () {
+                var elmt = fixture('basic');
+
+                var __by = ["a", "b", "c"];
+                var aggregates = [
+                    {
+                        op: "anOp",
+                        col: "aCol"
+                    }
+                ];
+                var valid = true;
+
+                expect(elmt._buildQuery(__by,aggregates,valid)).to.be.deep.eql({
+                    type: "group",
+                    expr: {
+                        by: ["a","b","c"],
+                        agg: [
+                            {
+                                op: "anOp",
+                                col: "aCol"
+                            }
+                        ]
+                    }
+                });
+            });
+        });
+
+        describe('_contentChanged', function() {
+            it('should change aggregates when nodes are added or removed', function (done) {
+                var elmt = fixture('withAgg');
+
+                var newAgg = document.createElement('urth-core-query-agg');
+                newAgg.op = "anotherOp"
+                newAgg.col = "anotherCol"
+
+
+                Polymer.dom(elmt).appendChild(newAgg);
+                Polymer.dom.flush();
+
+                async.nextTick(function(){
+                    expect(elmt.aggregates).to.be.deep.eql([
+                        {
+                            op: "anOp",
+                            col: "aCol"
+                        },
+                        {
+                            op: "anotherOp",
+                            col: "anotherCol"
+                        }
+                    ]);
+
+                    Polymer.dom(elmt).removeChild(Polymer.dom(elmt).children[1])
+
+                    async.nextTick(function() {
+                        expect(elmt.aggregates).to.be.deep.eql([
+                            {
+                                op: "anOp",
+                                col: "aCol"
+                            }
+                        ]);
+
+                        done();
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

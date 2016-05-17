@@ -3,11 +3,22 @@
 # Distributed under the terms of the Modified BSD License.
 -->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="urth-core-query-behavior.html">
 <link rel="import" href="urth-core-query-agg.html">
 
 <!--
+This element is used to define a group clause. The `by` property is a comma separated string of column names.
+The aggregate calculations are done by placing `urth-core-query-agg` elements as children.
+
 Example:
 
+```
+<urth-core-dataframe ref="someDf">
+    <urth-core-query-group by="{{aCol}}">
+        <urth-core-query-agg op="sum" col="someCol"></urth-core-query-agg>
+    </urth-core-query-group>
+<urth-core-dataframe>
+```
 
 @group Urth Core
 @element urth-core-query-group
@@ -31,27 +42,52 @@ Example:
             is: 'urth-core-query-group',
 
             properties: {
+                /**
+                 * Comma separated string of column names
+                 */
                 by: {
                     type: String
                 },
 
+                __by: {
+                    type: Object,
+                    computed: '_toStringOrArray(by)'
+                },
+
+                /**
+                 * An array containing the aggregate clause structure
+                 */
                 aggregates: {
                     type: Array
                 },
 
+                /**
+                 * The structure query
+                 */
                 query: {
                     type: Object,
-                    computed: '_buildQuery(by,aggregates, valid)',
+                    computed: '_buildQuery(__by,aggregates, valid)',
                     notify: true
                 },
 
+                /**
+                 * True if the values of `by` is set to at least one column and there is at least on aggregate clause
+                 */
                 valid: {
                     type: Boolean,
-                    computed: 'isValid(by,aggregates)',
+                    computed: 'isValid(__by,aggregates)',
                     notify: true
                 }
             },
 
+            behaviors: [
+                Urth.QueryBehavior
+            ],
+
+            /**
+             * Adds a mutation observer to react to changes to count of `urth-core-query-agg` child
+             * elements.
+             */
             attached: function(){
                 this._contentObserver = new MutationObserver( this._contentChanged.bind(this));
                 this._contentObserver.observe( this, {
@@ -61,34 +97,48 @@ Example:
                 this._contentChanged();
             },
 
+            /**
+             * Remove mutation observer
+             */
             detached: function(){
                 this._contentObserver.disconnect();
             },
 
-            isValid: function(){
-                return !!this.by && Object.keys(this.aggregates).length > 0
+            /**
+             * True if the value of `by` is correctly set to one or more columns and there is at least on
+             * aggregate clause.
+             */
+            isValid: function(__by, aggregates){
+                var validBy = (Array.isArray(__by) && __by.length > 0) || (!Array.isArray(__by) && !!__by);
+                var validAgg = (aggregates || []).length > 0;
+
+                return validBy && validAgg;
             },
 
-            _buildQuery: function(){
-                if( !this.valid ){
+            /**
+             * Builds the query structure that is sent to the kernel
+             * @private
+             */
+            _buildQuery: function(__by,aggregates, valid){
+                if( !valid ){
                     return undefined;
                 }
 
                 return {
                     type: "group",
                     expr: {
-                        by: this.by.split(',').map(function(col){return col.trim();}),
-                        agg: this.aggregates
+                        by: __by,
+                        agg: aggregates
                     }
                 }
             },
 
             /**
-             * Builds a structure based on pandas agg function
+             * Builds an array with aggregate structures of the form
              *
              * {
-             *    "col1":["sum","mean"]
-             *    "col2":["mean"]
+             *    op: "an operation"
+             *    col: "a column name"
              * }
              * @private
              */

@@ -1,0 +1,63 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-core-function tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../urth-core-query-behavior.html'>
+
+</head>
+
+<body>
+
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+
+    <script>
+        // STEP 4: Define any globals needed by the test suite.
+        before(function() {});
+
+        // STEP 5: Define suite(s) and tests.
+        describe('_toStringOrArray', function() {
+            it('should return array of values trimmed', function () {
+
+                var commaStr = "a, b  , c  ";
+                expect(Urth.QueryBehavior._toStringOrArray(commaStr)).to.eql(["a","b","c"]);
+            });
+
+            it('should return single of values trimmed if not comma separated', function () {
+
+                var commaStr = "  a  ";
+                expect(Urth.QueryBehavior._toStringOrArray(commaStr)).to.eql("a");
+            });
+
+            it('should return undefined if only commas and spaces in string', function () {
+
+                var commaStr = ",,  , ";
+                expect(Urth.QueryBehavior._toStringOrArray(commaStr)).to.be.undefined;
+            });
+
+            it('should return only non-empty string between the commas', function () {
+
+                var commaStr = ",,  a , ";
+                expect(Urth.QueryBehavior._toStringOrArray(commaStr)).to.be.eql("a");
+            });
+        });
+    </script>
+</body>
+</html>

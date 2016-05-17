@@ -1,0 +1,101 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-core-function tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../urth-core-query-filter.html'>
+
+</head>
+
+<body>
+
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id='basic'>
+        <template>
+            <urth-core-query-filter>some text</urth-core-query-filter>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='multiline'>
+        <template>
+            <urth-core-query-filter>some text that
+            spans multiple
+            lines
+            </urth-core-query-filter>
+        </template>
+    </test-fixture>
+
+    <script>
+        // STEP 4: Define any globals needed by the test suite.
+        before(function() {});
+
+        // STEP 5: Define suite(s) and tests.
+        describe('attached', function() {
+            it('should have expression set to text content', function () {
+                var elmt = fixture('basic');
+
+                expect(elmt.expression).to.be.eql("some text");
+            });
+
+            it('should have expression set to text content', function () {
+                var elmt = fixture('multiline');
+
+                expect(elmt.expression).to.be.eql("some text that spans multiple lines");
+            });
+        });
+
+        describe('_buildQuery', function() {
+            it('should return undefined if disabled', function () {
+                var elmt = fixture('basic');
+
+                var expression = "some expression";
+                var disabled = true;
+
+                expect(elmt._buildQuery(expression,disabled)).to.be.undefined;
+            });
+
+            it('should return query structure when not disabled', function () {
+                var elmt = fixture('basic');
+
+                var expression = "some expression";
+                var disabled = false;
+
+                expect(elmt._buildQuery(expression,disabled)).to.be.deep.eql({
+                    type: "filter",
+                    expr: "some expression"
+                });
+            });
+        });
+
+        describe('_contentChanged', function() {
+            it('should change expression when text content changes', function (done) {
+                var elmt = fixture('basic');
+
+                elmt.innerText = "some other text";
+
+                async.nextTick(function(){
+                    expect(elmt.expression).to.be.eql("some other text");
+                    done();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

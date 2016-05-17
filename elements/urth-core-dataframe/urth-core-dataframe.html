@@ -37,6 +37,16 @@ Example:
 
     <urth-core-dataframe id="f1" ref="aDataFrame" rows="{{rows}}" rows-as-object auto></urth-core-dataframe>
 
+This element also support querying the DataFrame using the `urth-core-query-*` elements as children.
+
+Example:
+    <urth-core-dataframe id="f1" ref="aDataFrame" value="{{df}}">
+        <urth-core-query-filter>aCol > {{someVal}}</urth-core-query-filter>
+        <urth-core-query-group by="anotherCol">
+            <urth-core-query-agg op="avg" col="someOtherCol"></urth-core-query-agg>
+        </urth-core-query-group>
+    </urth-core-dataframe>
+
 @group Urth Core
 @element urth-core-dataframe
 -->
@@ -176,8 +186,16 @@ Example:
              */
             query: {
                 type: Array,
-                value: function(){return [];},
+                readOnly: true,
                 observer: '_onQueryChange'
+            },
+
+            /**
+             * Array with the child elements used to define the query.
+             */
+            queryChildren: {
+                type: Array,
+                readOnly: true
             },
 
             /**
@@ -204,6 +222,10 @@ Example:
             Urth.ExecutionCompleteBehavior
         ],
 
+        observers: [
+            '_handleChildChanged(queryChildren)'
+        ],
+
         listeners: {
             'watch_notify': 'refresh'
         },
@@ -215,8 +237,18 @@ Example:
 
         ready: function() {
             this._debug("urth-core-dataframe ready");
-            this.$.queries.addEventListener("query-changed", this._handleQueryContentChanged.bind(this), true);
-            this._handleQueryContentChanged();
+            this._contentObserver = new MutationObserver( this._handleQueryChildrenChanged.bind(this));
+            this._contentObserver.observe( this, {
+                childList: true
+            });
+            this._handleQueryChildrenChanged();
+        },
+
+        /**
+         * Remove mutation observer
+         */
+        detached: function(){
+            this._contentObserver.disconnect();
         },
 
         /*
@@ -228,7 +260,7 @@ Example:
             var syncData = {
                 variable_name: this.ref,
                 limit: this.limit
-            }
+            };
             this._debug('urth-core-dataframe sending initial sync', syncData);
             this.sync(syncData);
 
@@ -308,6 +340,16 @@ Example:
         },
 
         /**
+         * Returns the structure query based on the child query elements
+         * @param queryChildren - Array of child nodes
+         * @return the query structure
+         * @private
+         */
+        _query: function(queryChildren){
+            return queryChildren.map(function(qElt){return qElt.query}).filter(function(q){return !!q});
+        },
+
+        /**
          * Returns the data portion of the serialized DataFrame as a 2D array or as an Array of Objects depending on the
          * value of `rowAsObject`.
          * @param df - the serialized DataFrame
@@ -332,12 +374,27 @@ Example:
             this.refresh();
         },
 
-        _handleQueryContentChanged: function(){
-            //get all the query children and compose an array with all the queries
-            var queries = Array.prototype.slice.call(
+        _handleQueryChildrenChanged: function(){
+            if(!this._handleChildChangedListener){
+                this._handleChildChangedListener = this._handleChildChanged.bind(this);
+            }
+
+            (this.queryChildren || []).forEach(function(child){
+                child.removeEventListener("query-changed", this._handleChildChangedListener);
+            }.bind(this));
+
+            var queryChildren = Array.prototype.slice.call(
                     Polymer.dom(this.$.queries).getDistributedNodes());
 
-            this.query = queries.map(function(qElt){return qElt.query}).filter(function(q){return !!q});
+            queryChildren.forEach(function(child){
+                child.addEventListener("query-changed", this._handleChildChangedListener);
+            }.bind(this));
+
+            this._setQueryChildren(queryChildren);
+        },
+
+        _handleChildChanged: function(){
+            this._setQuery(this._query(this.queryChildren));
         },
 
         _onQueryChange: function(){
