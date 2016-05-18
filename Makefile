@@ -6,7 +6,7 @@
 .PHONY: server server_4.2 remove-server install install-all all release
 .PHONY: start-selenium stop-selenium _run _run-python3 _run-python2 run-test
 .PHONY: test testdev test-js test-js-remote test-py test-py-all _test-py
-.PHONY: _test-py-python2 _test-py-python3 test-scala
+.PHONY: _test-py-python2 _test-py-python3 test-scala test-r
 .PHONY: system-test system-test-all system-test-all-local system-test-all-remote
 .PHONY: system-test-python3 system-test-python2 system-test-alt-jupyter
 .SUFFIXES:
@@ -27,6 +27,7 @@ help:
 	@echo '         test-py - run python units'
 	@echo '         test-js - run javascript units'
 	@echo '      test-scala - run scala units'
+	@echo '      test-r     - run r units'
 	@echo '             all - run all necessary streps to produce and validate a build'
 
 # Docker images and repos
@@ -246,7 +247,7 @@ sdist: dist
 			python setup.py -q sdist $(POST_SDIST) && \
 			cp -r dist/*.tar.gz /src/.'
 
-test: test-js test-py test-scala
+test: test-js test-py test-scala test-r
 
 test-js: BROWSER?=chrome
 test-js: | $(URTH_COMP_LINKS)
@@ -293,6 +294,23 @@ else
 		-v `pwd`/etc/ivy:/root/.ivy2 \
 		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/* /app/. && \
 			sbt --warn test'
+endif
+
+test-r:
+ifeq ($(NOR), true)
+	@echo 'Skipping R tests...'
+else
+	@echo 'Running R tests'
+	#See http://askubuntu.com/questions/575505/glibcxx-3-4-20-not-found-how-to-fix-this-error
+	#for the unlinking/linking issue of a conda outdated lib
+	@docker $(DOCKER_OPTS) run -it --rm \
+		-v `pwd`/kernel-r/declarativewidgets:/src-kernel-r/declarativewidgets \
+		-v `pwd`/etc/r/install_prereq.r:/src-kernel-r/install_prereq.r \
+		$(REPO) bash -c 'R --quiet CMD build /src-kernel-r/declarativewidgets && \
+		Rscript /src-kernel-r/install_prereq.r && \
+		unlink /opt/conda/lib/libstdc++.so.6 && \
+		ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20 /opt/conda/lib/libstdc++.so.6 && \
+		R CMD check declarativewidgets_0.1.tar.gz'
 endif
 
 testdev: BROWSER?=chrome

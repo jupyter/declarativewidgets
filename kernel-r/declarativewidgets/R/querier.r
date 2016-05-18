@@ -18,7 +18,6 @@ Querier <- R6Class(
                 return (df)
             } else {
                 new_df <- df
-                query_type_expr_map <- list()
                 for(i in 1:length(query$type)) {
                     expr <- if (length(query$type) > 1) query$expr[[i]] else query$expr
                     if(query$type[[i]] == "group") {
