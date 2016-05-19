@@ -59,4 +59,8 @@ def handle_sort(df, sort_expr):
 
 
 def to_array_of_func_exprs(agg_array):
-    return map(F.expr, ["{0}({1})".format(x["op"],x["col"]) for x in agg_array])
+    return map(F.expr, to_array_of_func_exprs_string(agg_array))
+
+
+def to_array_of_func_exprs_string(agg_array):
+    return ["{0}({1})".format(x["op"], x["col"]) for x in agg_array]

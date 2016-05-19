@@ -47,7 +47,7 @@ def handle_group(df, grp_expr):
     for _ in df.index.names:
         df.reset_index(level=0, inplace=True)
 
-    df.columns = map(lambda col: col[:-1] if col.endswith('_') else col, ['_'.join(col).strip() for col in df.columns.values])
+    df.columns = to_single_column_names(df.columns.values)
 
     return df
 
@@ -92,3 +92,7 @@ def to_dict_agg(agg_array):
         else:
             dict_agg[agg["col"]] = [agg["op"]]
     return dict_agg
+
+
+def to_single_column_names(column_array):
+    return map(lambda col: col[:-1] if col.endswith('_') else col, ['_'.join(col).strip() for col in column_array])

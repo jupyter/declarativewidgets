@@ -6,9 +6,9 @@
 query_support_map = {}
 
 try:
-    import pandas as pd
+    from pandas import DataFrame
     from .pandas import apply_query as pandas_apply_query
-    query_support_map[pd.DataFrame] = pandas_apply_query
+    query_support_map[DataFrame] = pandas_apply_query
 except ImportError:
     # TODO: LOG WARNING
     pass
