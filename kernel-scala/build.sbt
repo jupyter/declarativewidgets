@@ -27,3 +27,4 @@ libraryDependencies ++= Seq(
 
 ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
 
+parallelExecution in Test := false
