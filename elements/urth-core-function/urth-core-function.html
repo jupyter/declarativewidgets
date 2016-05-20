@@ -145,12 +145,12 @@ Note that when using the 'click' event approach described above in #3, a click o
             },
 
             created: function(){
-                console.debug('urth-core-function created', arguments);
+                this._debug('urth-core-function created', arguments);
                 this.createModel('urth.widgets.widget_function.Function');
             },
 
             ready: function() {
-                console.debug('urth-core-function ready');
+                this._debug('urth-core-function ready');
 
                 if( !this.args ){
                     //sync with the attributes
@@ -162,13 +162,13 @@ Note that when using the 'click' event approach described above in #3, a click o
              * onModelReady is invoked when have created the model portion of the widget
              */
             onModelReady: function(){
-                console.debug('urth-core-function onModelReady');
+                this._debug('urth-core-function onModelReady');
 
                 var syncData = {
                     function_name: this.ref,
                     limit: this.limit
                 }
-                console.debug('urth-core-function sending initial sync', syncData);
+                this._debug('urth-core-function sending initial sync', syncData);
                 this.sync(syncData);
             },
 
@@ -177,13 +177,13 @@ Note that when using the 'click' event approach described above in #3, a click o
              * the Backbone model changes.
              */
             onModelResultChange: function(newVal){
-                console.debug( 'urth-core-function onModelResultChange', newVal );
+                this._debug( 'urth-core-function onModelResultChange', newVal );
                 //Using _setName function because we want result to be read-pnly to the outside world
                 this._setResult( newVal );
             },
 
             onModelSignatureChange: function(newVal){
-                console.debug('urth-core-function onModelSignatureChange', newVal);
+                this._debug('urth-core-function onModelSignatureChange', newVal);
                 this._setSignature( newVal );
             },
 
@@ -191,7 +191,7 @@ Note that when using the 'click' event approach described above in #3, a click o
                 if(this._syncing)
                     return;
 
-                console.debug('urth-core-function _onArgsChanged', rec);
+                this._debug('urth-core-function _onArgsChanged', rec);
                 if( rec.path === 'args' ){
                     //entire parameter map changed
                     this._syncParamAttributes(rec.value);
@@ -203,7 +203,7 @@ Note that when using the 'click' event approach described above in #3, a click o
                     var param =  matches.length === 2 ? matches[1] : undefined;
 
                     if( param ){
-                        console.debug('urth-core-function got change for param', param);
+                        this._debug('urth-core-function got change for param', param);
                         //reflect on the attibutes
                         var params = {};
                         var newVal = rec.base[param];
@@ -256,11 +256,13 @@ Note that when using the 'click' event approach described above in #3, a click o
                 }
 
                 this.debounce(jName, function(){
-                    console.debug("urth-core-function invoking...");
+                    var argsToSend = this._serializeParamsForSend();
+
+                    this._info("urth-core-function invoking with ", argsToSend);
 
                     this.send({
                         event: 'invoke',
-                        args: this._serializeParamsForSend()
+                        args: argsToSend
                     });
                 }.bind(this), this.delay);
             },
@@ -351,7 +353,7 @@ Note that when using the 'click' event approach described above in #3, a click o
             },
 
             _onParameterChange: function( argName, argValue ){
-                console.debug("urth-core-function _onParameterChange", argName, argValue);
+                this._debug("urth-core-function _onParameterChange", argName, argValue);
 
                 if (this.auto) {
                     this._tryInvoke();
@@ -359,7 +361,7 @@ Note that when using the 'click' event approach described above in #3, a click o
             },
 
             _onLimitChange: function(limit){
-                console.debug('urth-core-function _onLimitChange sending new limit value', this.limit);
+                this._debug('urth-core-function _onLimitChange sending new limit value', this.limit);
                 this.sync({limit: limit});
                 this._tryInvoke();
             },
@@ -371,7 +373,7 @@ Note that when using the 'click' event approach described above in #3, a click o
              *
              */
             _onSignatureChange: function(sig){
-                console.debug('urth-core-function _onSignatureChange got new signature', sig);
+                this._debug('urth-core-function _onSignatureChange got new signature', sig);
                 this._clearErrorMessages();
                 this.resetDynamicProperties();
 
@@ -428,14 +430,14 @@ Note that when using the 'click' event approach described above in #3, a click o
              * @method refresh
              */
             refresh: function() {
-                console.debug("urth-core-function sending sync message...");
+                this._debug("urth-core-function sending sync message...");
                 this.send({ "event": "sync" });
             },
 
             _createArgChangeHandler: function(param){
 
                 return function(newVal){
-                    console.log('urth-core-function handling change to', param);
+                    this._debug('urth-core-function handling change to', param);
 
                     if(this._syncing)
                         return;
@@ -456,7 +458,7 @@ Note that when using the 'click' event approach described above in #3, a click o
                     this.invoke(true);
                 }
                 else {
-                    console.warn('urth-core-function tried to invoke but arguments are not in valid state', this.args);
+                    this._warn('urth-core-function tried to invoke but arguments are not in valid state', this.args);
                 }
             },
 

@@ -132,25 +132,25 @@ Example:
         },
 
         created: function(){
-            console.debug('urth-core-datafram created', arguments);
+            this._debug('urth-core-datafram created', arguments);
             this.createModel('urth.widgets.widget_dataframe.DataFrame');
         },
 
         ready: function() {
-            console.debug("urth-core-dataframe ready");
+            this._debug("urth-core-dataframe ready");
         },
 
         /*
          * onModelReady is invoked when have created the model portion of the widget
          */
         onModelReady: function(){
-            console.debug('urth-core-dataframe onModelReady');
+            this._debug('urth-core-dataframe onModelReady');
 
             var syncData = {
                 variable_name: this.ref,
                 limit: this.limit
             }
-            console.debug('urth-core-dataframe sending initial sync', syncData);
+            this._debug('urth-core-dataframe sending initial sync', syncData);
             this.sync(syncData);
 
             this.refresh();
@@ -161,7 +161,7 @@ Example:
          * the Backbone model changes.
          */
         onModelValueChange: function(newVal){
-            console.debug( "urth-core-dataframe onModelValueChange", newVal );
+            this._debug( "urth-core-dataframe onModelValueChange", newVal );
             this._setValue(newVal || {data:[]});
         },
 
@@ -196,7 +196,7 @@ Example:
             }
 
             this.debounce(jName, function(){
-              console.debug("urth-core-dataframe sending sync message...");
+              this._debug("urth-core-dataframe sending sync message...");
               this.send({ "event": "sync" });
             }.bind(this), 200);
         },
@@ -231,7 +231,7 @@ Example:
         },
 
         _onLimitChange: function(){
-            console.debug('urth-core-dataframe sending new limit value', this.limit);
+            this._debug('urth-core-dataframe sending new limit value', this.limit);
             this.sync({limit: this.limit});
             this.refresh();
         }

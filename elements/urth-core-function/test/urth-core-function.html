@@ -61,8 +61,8 @@
              */
             sinon.stub(Urth["urth-core-function"].prototype, "createModel");
             sinon.stub(Urth["urth-core-function"].prototype, "displayErrorMessage");
-            sinon.stub(Urth.ExecutionCompleteBehavior, "ready");
-            sinon.stub(Urth.ExecutionCompleteBehavior, "detached");
+            sinon.stub(Urth.ExecutionCompleteBehavior[0], "ready");
+            sinon.stub(Urth.ExecutionCompleteBehavior[0], "detached");
         });
 
         // STEP 5: Define suite(s) and tests.

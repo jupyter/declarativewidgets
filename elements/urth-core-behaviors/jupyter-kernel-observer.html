@@ -6,6 +6,8 @@
 <!--
 This behavior is used to implement handlers to kernel events
 -->
+<link rel='import' href='logging-behavior.html'>
+
 <script>
     (function() {
         'use strict';
@@ -17,13 +19,13 @@ This behavior is used to implement handlers to kernel events
          * @group Urth Core
          * @polymerBehavior Urth.JupyterKernelObserver
          */
-        Urth.JupyterKernelObserver = {
+        Urth.JupyterKernelObserver = [{
 
             created: function(){
                 if (!Urth.events) {
                     return;
                 }
-                console.debug("Registering onKernelReady for Kernel Ready messages.")
+                this._debug("Registering onKernelReady for Kernel Ready messages.")
 
                 this.__kernelReadyCallback = function(){
                     this.onKernelReady(Urth.kernel);
@@ -39,7 +41,7 @@ This behavior is used to implement handlers to kernel events
 
             detached: function(){
                 if (this.__kernelReadyCallback) {
-                    console.debug("Unregistering onKernelReady for Kernel Ready messages.")
+                    this._debug("Unregistering onKernelReady for Kernel Ready messages.")
                     Urth.events.off(
                         'kernel_ready.Kernel', this.__kernelReadyCallback
                     );
@@ -57,6 +59,6 @@ This behavior is used to implement handlers to kernel events
             onKernelReady: function(kernel){}
 
 
-        };
+        }, Urth.LoggingBehavior];
     })();
 </script>

@@ -5,7 +5,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="./urth-core-channel-broker.html">
 <link rel="import" href="./urth-core-channel-viewer.html">
-
+<link rel="import" href="../urth-core-behaviors/logging-behavior.html">
 
 <!--
 An element that provides [monostate](http://c2.com/cgi/wiki?MonostatePattern)
@@ -111,6 +111,8 @@ dataChannel.set('user', 'Luke');
                     value: false
                 }
             },
+
+            behaviors: [Urth.LoggingBehavior],
 
             /**
              * Clears all the data in the channel.
@@ -221,7 +223,7 @@ dataChannel.set('user', 'Luke');
                     Object.keys(data).forEach(function(key) {
                         element[key] = data[key];
                     });
-                    console.debug('urth-core-channel registered element to channel',
+                    this._debug('urth-core-channel registered element to channel',
                             this.name);
                 }
             },
