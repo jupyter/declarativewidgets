@@ -3,6 +3,7 @@
 # Distributed under the terms of the Modified BSD License.
 -->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../urth-core-behaviors/logging-behavior.html">
 <!--
 Creates an element that listens to changes to the `value` property. When it changes, it fires 'watch_notify' custom
 event on child elements.
@@ -48,12 +49,14 @@ Example: _One or more children. urth-core-function and urth-core-dataframe suppo
                 value: Object
             },
 
+            behaviors: [Urth.LoggingBehavior],
+
             observers: [
                 '_valueChanged(value.*)'
             ],
 
             _valueChanged: function() {
-                console.log('urth-core-watch: valueChanged');
+                this._debug('urth-core-watch: valueChanged');
                 for (var i = 0, iLen = this.childNodes.length; i < iLen; i++) {
                     this.fire( 'watch_notify', null, {
                         node: this.childNodes[i]

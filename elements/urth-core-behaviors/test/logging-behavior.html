@@ -1,0 +1,164 @@
+<!doctype html>
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- STEP 1: Provide a title for the test suite. -->
+    <title>urth-core-function tests</title>
+    <meta name='viewport' content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes'>
+
+    <!-- Need the web component polyfill for browsers without native support. -->
+    <script src='../../webcomponentsjs/webcomponents-lite.js'></script>
+
+    <!-- Load test framework and helpers. -->
+    <script src='../../web-component-tester/browser.js'></script>
+    <script src='../../test-fixture/test-fixture-mocha.js'></script>
+    <link rel='import' href='../../polymer/polymer.html'>
+    <link rel='import' href='../../test-fixture/test-fixture.html'>
+
+    <!-- STEP 2: Import the element to test. -->
+    <link rel='import' href='../logging-behavior.html'>
+
+</head>
+
+<body>
+
+    <!-- STEP 3: Setup document with DOM to test. Use test-fixture elements
+         to ease setup and cleanup of elements. -->
+    <test-fixture id='basic'>
+        <template>
+            <test-logging></test-logging>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='info-only'>
+        <template>
+            <test-logging log="info"></test-logging>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='info-error-only'>
+        <template>
+            <test-logging log="info,error"></test-logging>
+        </template>
+    </test-fixture>
+
+    <test-fixture id='all'>
+        <template>
+            <test-logging log="all"></test-logging>
+        </template>
+    </test-fixture>
+
+    <!-- This is a custom element that will be used to test
+         save invocation. -->
+    <dom-module id="test-logging">
+        <script>
+            HTMLImports.whenReady(function () {
+                Polymer({
+                    is: 'test-logging',
+                    behaviors: [ Urth.LoggingBehavior]
+                });
+            });
+        </script>
+    </dom-module>
+
+    <script>
+        // STEP 4: Define any globals needed by the test suite.
+        beforeEach(function(){
+            if( Urth )
+                delete Urth.debug;
+        })
+
+
+        // STEP 5: Define suite(s) and tests.
+        describe('_toLogBooleanMap', function() {
+            it('should create boolean map with provided comma separated string', function() {
+                var actual = Urth.LoggingBehavior._toLogBooleanMap('info, DEBUG, eRROR,   warn');
+                expect(actual).to.be.deep.eql({
+                    "INFO": true,
+                    "DEBUG": true,
+                    "ERROR": true,
+                    "WARN": true
+                });
+            });
+
+            it('should empty map with empty string', function() {
+                var actual = Urth.LoggingBehavior._toLogBooleanMap('');
+                expect(actual).to.be.deep.eql({});
+            });
+
+            it('should empty map with undefined passed in', function() {
+                var actual = Urth.LoggingBehavior._toLogBooleanMap();
+                expect(actual).to.be.deep.eql({});
+            });
+
+            it('should empty map with provided comman separated string that has spaces only', function() {
+                var actual = Urth.LoggingBehavior._toLogBooleanMap('  ,   ,  ,,,   ,');
+                expect(actual).to.be.deep.eql({});
+            });
+
+            it('should create boolean map with provided comma separated string that includes spaces only', function() {
+                var actual = Urth.LoggingBehavior._toLogBooleanMap('info, DEBUG, ,eRROR,   warn, ');
+                expect(actual).to.be.deep.eql({
+                    "INFO": true,
+                            "DEBUG": true,
+                            "ERROR": true,
+                            "WARN": true
+                });
+            });
+        });
+
+        describe('_testLevel', function() {
+            it('should not allow any logging', function () {
+                var testLogging = fixture('basic');
+                expect(testLogging._testLevel('INFO')).to.be.false;
+                expect(testLogging._testLevel('WARN')).to.be.false;
+                expect(testLogging._testLevel('DEBUG')).to.be.false;
+                expect(testLogging._testLevel('ERROR')).to.be.false;
+            });
+
+            it('should allow all logging with global override', function () {
+                Urth.debug = true;
+                var testLogging = fixture('basic');
+                expect(testLogging._testLevel('INFO')).to.be.true;
+                expect(testLogging._testLevel('WARN')).to.be.true;
+                expect(testLogging._testLevel('DEBUG')).to.be.true;
+                expect(testLogging._testLevel('ERROR')).to.be.true;
+            });
+
+            it('should allow all when log is set to all', function () {
+                Urth.debug = true;
+                var testLogging = fixture('all');
+                expect(testLogging._testLevel('INFO')).to.be.true;
+                expect(testLogging._testLevel('WARN')).to.be.true;
+                expect(testLogging._testLevel('DEBUG')).to.be.true;
+                expect(testLogging._testLevel('ERROR')).to.be.true;
+            });
+
+            it('should allow only allow info log is set to info', function () {
+                var testLogging = fixture('info-only');
+                expect(testLogging._testLevel('INFO')).to.be.true;
+                expect(testLogging._testLevel('WARN')).to.be.false;
+                expect(testLogging._testLevel('DEBUG')).to.be.false;
+                expect(testLogging._testLevel('ERROR')).to.be.false;
+            });
+
+            it('should allow only allow info and error log is set to info,error', function () {
+                var testLogging = fixture('info-error-only');
+                expect(testLogging._testLevel('INFO')).to.be.true;
+                expect(testLogging._testLevel('WARN')).to.be.false;
+                expect(testLogging._testLevel('DEBUG')).to.be.false;
+                expect(testLogging._testLevel('ERROR')).to.be.true;
+            });
+
+            it('should allow return false when it gets unsupported levels', function () {
+                var testLogging = fixture('basic');
+                expect(testLogging._testLevel('UNSUPPORTED')).to.be.false;
+            });
+        });
+    </script>
+</body>
+</html>

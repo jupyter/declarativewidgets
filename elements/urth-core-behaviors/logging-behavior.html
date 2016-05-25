@@ -1,0 +1,137 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<script>
+    'use strict';
+    (function() {
+        var Urth = window.Urth = window.Urth || {};
+
+        /**
+         * Behavior for logging. It redefines the logging methods in Polymer.Base to
+         * control their invocation based on the log levels set in the `log` property.
+         * Setting the `log` property to a comma separated list of levels turns on that particular
+         * level. By default, no logs are sent to the console. A global override to turn on all logs
+         * is available by setting `Urth.debug` to `true`.
+         *
+         * @group Urth Core
+         * @polymerBehavior Urth.LoggingBehavior
+         */
+        Urth.LoggingBehavior = {
+
+            properties: {
+
+                /**
+                 * Comma separated string of log levels to allow. The levels are INFO, WARN, DEBUG, ERROR, ALL.
+                 * An empty string or unset property is interpreted no logs
+                 */
+                log: {
+                    type: String,
+                    value: "",
+                    reflectToAttribute: true
+                },
+
+                /**
+                 * Internal map representation to facilitate test
+                 */
+                _logBooleanMap: {
+                    type: Object,
+                    computed: '_toLogBooleanMap(log)'
+                }
+            },
+
+            /**
+             * Converts the comma separated string into a map of booleans
+             * @param log
+             * @return {{}}
+             * @private
+             */
+            _toLogBooleanMap: function(log){
+
+                var _logBooleanMap = {};
+                (log || "").split(',')
+                    .map(function(part){return part.trim().toUpperCase();})
+                    .filter(function(part){
+                        return !!part;
+                    })
+                    .forEach(function(level){
+                        _logBooleanMap[level] = true;
+                    });
+
+                return _logBooleanMap;
+
+            },
+
+            /**
+             * Alias method for info level messages
+             * @private
+             */
+            _log: function(){
+              this._info.apply(this, arguments);
+            },
+
+            /**
+             * Logs info level messages
+             * @private
+             */
+            _info: function() {
+                if( this._testLevel("INFO") ){
+                    Polymer.Base._log.call(this, arguments);
+                }
+            },
+
+            /**
+             * Logs warn level messages
+             * @private
+             */
+            _warn: function() {
+                if( this._testLevel("WARN") ){
+                    Polymer.Base._warn.call(this, arguments);
+                }
+            },
+
+            /**
+             * Logs debug level messages
+             * @private
+             */
+            _debug: function() {
+                if( this._testLevel("DEBUG") ){
+
+                    var consoleDebug = console["debug"] || console["log"];
+                    if(console["debug"]){
+                        consoleDebug.apply(console, arguments)
+                    }
+
+                }
+            },
+
+            /**
+             * Logs error level messages
+             * @private
+             */
+            _error: function() {
+                if( this._testLevel("ERROR") ){
+                    Polymer.Base._error.call(this, arguments);
+                }
+            },
+
+            /**
+             * Internal utility to determine if the message should be sent to the console
+             * @param level
+             * @return {boolean} True if message should reach thec onsole
+             * @private
+             */
+            _testLevel: function( level ){
+                var _logBooleanMap;
+                try{
+                    _logBooleanMap = this._logBooleanMap;
+                }catch(e){
+                    _logBooleanMap = this._toLogBooleanMap(this.getAttribute("log"));
+                }
+
+                return !!(_logBooleanMap[level] || _logBooleanMap.ALL || (Urth && Urth.debug));
+            }
+
+        };
+    })();
+</script>

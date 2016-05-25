@@ -7,6 +7,8 @@
 This behavior is used to encapsulate some of the services needed for ipywidgets.
 -->
 <link rel='import' href='error-display-behavior.html'>
+<link rel='import' href='logging-behavior.html'>
+
 <script>
     (function() {
         'use strict';
@@ -44,7 +46,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
             },
 
             _doCreateModel: function(){
-                console.debug('Urth.JupyterWidgetBehavior createModel', this.kernelClass);
+                this._debug('Urth.JupyterWidgetBehavior createModel', this.kernelClass);
                 Urth.kernel.widget_manager.new_widget(
                     {
                         model_module: 'jupyter-decl-widgets/DeclWidgetModel',
@@ -59,7 +61,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                             return;
                         }
 
-                        console.log('Model creation successful!', model);
+                        this._log('Model creation successful!', model);
                         this.__modelChangeCallback = this._onModelChange.bind(this);
                         this.__commCloseCallback = this._handleCommDisconnect.bind(this);
 
@@ -71,7 +73,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                         this.fire('connected');
                     }.bind(this),
                     function(error){
-                        console.error(error);
+                        this._error(error);
                     }
                 );
             },
@@ -89,9 +91,9 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
             },
 
             _retryCreateModel: function(){
-                console.debug('Urth.JupyterWidgetBehavior _retryCreateModel - Waiting for another code exec...');
+                this._debug('Urth.JupyterWidgetBehavior _retryCreateModel - Waiting for another code exec...');
                 this.__shellReplyCallback = function(){
-                    console.debug('Urth.JupyterWidgetBehavior createModel - retrying...');
+                    this._debug('Urth.JupyterWidgetBehavior createModel - retrying...');
                     this._doCreateModel();
                 }.bind(this);
 
@@ -101,7 +103,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
             },
 
             _handleCommDisconnect: function(){
-                console.debug('Urth.JupyterWidgetBehavior _handleCommDisconnect - Model comm got closed');
+                this._debug('Urth.JupyterWidgetBehavior _handleCommDisconnect - Model comm got closed');
                 if( this.retryCount > 0 ){
                     try{
                         this._retryCreateModel();
@@ -110,7 +112,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                         this.retryCount--;
                     }
                 } else {
-                    console.error('Urth.JupyterWidgetBehavior no longer retrying createModel!');
+                    this._error('Urth.JupyterWidgetBehavior no longer retrying createModel!');
                 }
             },
 
@@ -143,11 +145,11 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
              */
             send: function( msg ){
                 if(this.isConnected()){
-                    console.debug('Urth.JupyterWidgetBehavior send - sending message', msg);
+                    this._debug('Urth.JupyterWidgetBehavior send - sending message', msg);
                     this.model.send(msg, this._callbacks());
                 }
                 else{
-                    console.warn('Urth.JupyterWidgetBehavior send - model not ready, cannot send message');
+                    this._warn('Urth.JupyterWidgetBehavior send - model not ready, cannot send message');
                 }
             },
 
@@ -160,7 +162,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
              */
             sync: function( values ){
                 if(this.isConnected()) {
-                    console.debug('Urth.JupyterWidgetBehavior sync - sending values', values);
+                    this._debug('Urth.JupyterWidgetBehavior sync - sending values', values);
                     var valKeys = Object.keys(values || {});
                     valKeys.forEach(function (value) {
                         this.model.set(value, values[value], {silent: true});
@@ -170,7 +172,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                         this.model.save_changes();
                 }
                 else{
-                    console.warn('Urth.JupyterWidgetBehavior sync - model not ready, cannot sync');
+                    this._warn('Urth.JupyterWidgetBehavior sync - model not ready, cannot sync');
                 }
             },
 
@@ -225,7 +227,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
             onModelReady: function(){},
 
             _onModelChange: function(options){
-                console.debug('Urth.JupyterWidgetBehavior _onModelChange', options);
+                this._debug('Urth.JupyterWidgetBehavior _onModelChange', options);
                 var changes = options.changed;
                 Object.keys(changes).forEach(function(change){
                     var funcName = "onModel"+(change[0].toUpperCase()+change.substring(1))+"Change";
@@ -275,6 +277,6 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
         };
 
         // JupyterWidgetBehavior inherits DisplayErrorBehavior
-        Urth.JupyterWidgetBehavior = [Urth.DisplayErrorBehavior, Urth.JupyterWidgetBehaviorImpl];
+        Urth.JupyterWidgetBehavior = [Urth.DisplayErrorBehavior, Urth.JupyterWidgetBehaviorImpl, Urth.LoggingBehavior];
     })();
 </script>

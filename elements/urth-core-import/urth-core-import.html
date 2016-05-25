@@ -5,6 +5,7 @@
 <link rel='import' href='../polymer/polymer.html'>
 <link rel='import' href='../iron-ajax/iron-ajax.html'>
 <link rel='import' href='../urth-core-behaviors/jupyter-notebook-env.html'>
+<link rel="import" href="../urth-core-behaviors/logging-behavior.html">
 <link rel='import' href='./urth-core-import-broker.html'>
 
 <!--
@@ -103,7 +104,10 @@
             }
         },
 
-        behaviors: [Urth.JupyterNotebookEnv],
+        behaviors: [
+            Urth.JupyterNotebookEnv,
+            Urth.LoggingBehavior
+        ],
 
         listeners: {
             'load': '_onLinkLoad'
@@ -133,14 +137,14 @@
 
         _downloadPackage: function(successCB, errorCB) {
             if (this.debug) {
-                console.debug(LOG_TAG + 'Sending server request to install ' + this.package);
+                this._debug(LOG_TAG + 'Sending server request to install ' + this.package);
             }
 
             // Listen to the 'response' event to handle the ajax POST return value.
             this.$.ajaxPost.addEventListener('response', function(response) {
                 if (response && response.detail.status === 200) {
                     if (this.debug) {
-                        console.debug(LOG_TAG + 'Successfully installed ' + this.package);
+                        this._debug(LOG_TAG + 'Successfully installed ' + this.package);
                     }
 
                     // Add a dummy parameter to the url to force the browser
@@ -202,14 +206,14 @@
         },
 
         _onLoadError: function(msg) {
-            console.warn(LOG_TAG + msg);
+            this._warn(LOG_TAG + msg);
             this.fire('importerror', { msg: msg });
         },
 
         _onLoadSuccess: function() {
             this.fire('load');
             if (this.debug) {
-                console.debug(LOG_TAG + 'Successfully imported ' + this.href);
+                this._debug(LOG_TAG + 'Successfully imported ' + this.href);
             }
         },
 

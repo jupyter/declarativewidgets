@@ -9,6 +9,7 @@
 <link rel="import" href="../urth-viz-col/urth-viz-col.html">
 <link rel="import" href="../urth-viz-behaviors/urth-viz-selection-behavior.html">
 <link rel="import" href="../urth-core-behaviors/error-display-behavior.html">
+<link rel="import" href="../urth-core-behaviors/logging-behavior.html">
 
 <!-- import the nvd3 stylesheet into the main page as well as the shadow dom
      because the nvtooltip is a child of BODY -->
@@ -196,7 +197,7 @@
             }
 
             if (this.columns.length && datarows[0] && this.columns.length != datarows[0].length) {
-                console.warn('Warning: arity of columns does not match data');
+                this._warn('Warning: arity of columns does not match data');
             }
 
             var columnSettings = this.columnSettings;
@@ -651,7 +652,8 @@
         Polymer.IronResizableBehavior,
         Urth.VizSelectionBehavior,
         Urth.DisplayErrorBehavior,
-        Urth.VizChartCommonBehaviorImpl
+        Urth.VizChartCommonBehaviorImpl,
+        Urth.LoggingBehavior
     ];
 
 })();

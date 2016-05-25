@@ -83,7 +83,7 @@
              * must be mocked there.
              */
             sinon.stub(Urth['urth-core-channel-broker'].prototype, 'createModel');
-            sinon.stub(Urth.JupyterKernelObserver, 'created');
+            sinon.stub(Urth.JupyterKernelObserver[0], 'created');
             sinon.stub(Urth.JupyterWidgetBehaviorImpl, 'detached');
             sinon.stub(Urth['urth-core-channel-broker'].prototype, '_callbacks');
         });

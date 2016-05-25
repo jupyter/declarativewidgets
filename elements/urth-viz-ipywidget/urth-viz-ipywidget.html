@@ -95,7 +95,7 @@ names for these properties have the form `trait-<name of trait>`.
             ],
 
             onKernelReady: function(kernel){
-                console.debug('urth-viz-ipywidget onKernelReady', arguments);
+                this._debug('urth-viz-ipywidget onKernelReady', arguments);
 
                 //Need to know the kernel language to continue creation
                 kernel.get_info(this._onKernelInfo.bind(this))
@@ -112,7 +112,7 @@ names for these properties have the form `trait-<name of trait>`.
             },
 
             ready: function() {
-                console.debug('urth-viz-ipywidget ready');
+                this._debug('urth-viz-ipywidget ready');
 
                 if( !this.traits ){
                     //sync with the attributes
@@ -125,18 +125,18 @@ names for these properties have the form `trait-<name of trait>`.
              * kernel side the value of `ref`.
              */
             onModelReady: function(){
-                console.debug('urth-viz-ipywidget onModelReady');
+                this._debug('urth-viz-ipywidget onModelReady');
 
                 var syncData = {
                     widget_name: this.ref
                 }
-                console.debug('urth-viz-ipywidget sending initial sync', syncData);
+                this._debug('urth-viz-ipywidget sending initial sync', syncData);
                 this.sync(syncData);
             },
 
 
             onModelIdChange: function(modelid){
-                console.debug('urth-viz-ipywidget onModelIdChange', modelid);
+                this._debug('urth-viz-ipywidget onModelIdChange', modelid);
                 this._setModelId(modelid);
             },
 
@@ -154,7 +154,7 @@ names for these properties have the form `trait-<name of trait>`.
                 if(this._syncing)
                     return;
 
-                console.debug('urth-viz-ipywidget _onTraitPropertyChanged', rec);
+                this._debug('urth-viz-ipywidget _onTraitPropertyChanged', rec);
                 if( rec.path === 'traits' ){
                     //entire parameter map changed
                     this._syncTraitProperty(rec.value);
@@ -166,7 +166,7 @@ names for these properties have the form `trait-<name of trait>`.
                     var trait =  matches.length === 2 ? matches[1] : undefined;
 
                     if( trait ){
-                        console.debug('urth-viz-ipywidget got change for trait', trait);
+                        this._debug('urth-viz-ipywidget got change for trait', trait);
                         //reflect on the attibutes
                         var traits = {};
                         var newVal = rec.base[trait];
@@ -245,7 +245,7 @@ names for these properties have the form `trait-<name of trait>`.
             },
 
             _onTraitChange: function( argName, argValue ){
-                console.debug("urth-viz-ipywidget _onTraitChange", argName, argValue);
+                this._debug("urth-viz-ipywidget _onTraitChange", argName, argValue);
 
                 if( this.isConnected() ){
                     this.widgetModel.set(argName, argValue);
@@ -260,7 +260,7 @@ names for these properties have the form `trait-<name of trait>`.
              *
              */
             _onWidgetModelChange: function(){
-                console.debug('urth-viz-ipywidget _onWidgetModelChange');
+                this._debug('urth-viz-ipywidget _onWidgetModelChange');
                 this._clearErrorMessages();
 
                 //hook listener to model changes
@@ -277,7 +277,7 @@ names for these properties have the form `trait-<name of trait>`.
             },
 
             _setupTraitProperties: function(widgetTraits){
-                console.debug('urth-viz-ipywidget _setupTraitProperties', widgetTraits);
+                this._debug('urth-viz-ipywidget _setupTraitProperties', widgetTraits);
                 this.resetDynamicProperties();
 
                 //get the traits to expose them as properties
@@ -338,7 +338,7 @@ names for these properties have the form `trait-<name of trait>`.
 
             _createWidgetView: function(){
                 this.model.widget_manager.create_view(this.widgetModel).then( function(v){
-                    console.log( "Created ipywidget view", v);
+                    this._log( "Created ipywidget view", v);
                     Polymer.dom(this.root).innerHTML = ''; //clearing area first
                     Polymer.dom(this.root).appendChild(v.el);
                 }.bind(this))
@@ -351,14 +351,14 @@ names for these properties have the form `trait-<name of trait>`.
              * @method refresh
              */
             refresh: function() {
-                console.debug("urth-viz-ipywidget sending sync message...");
+                this._debug("urth-viz-ipywidget sending sync message...");
                 this.send({ "event": "sync" });
             },
 
             _createTraitChangeHandler: function(param){
 
                 return function(newVal){
-                    console.log('urth-viz-ipywidget handling change to', param);
+                    this._log('urth-viz-ipywidget handling change to', param);
 
                     if(this._syncing)
                         return;

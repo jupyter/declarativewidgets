@@ -6,16 +6,18 @@
 <!--
 This Behavior represents the completion of a code cell's execution.
 -->
+<link rel='import' href='logging-behavior.html'>
+
 <script>
   (function() {
     'use strict';
     var Urth = window.Urth = window.Urth || {};
 
-    Urth.ExecutionCompleteBehavior = {
+    Urth.ExecutionCompleteBehavior = [{
 
       ready: function() {
         // Code execution defined to be complete when an ExecuteReply is received.
-        console.debug("Registering _onExecutionComplete for Execute Reply messages.");
+        this._debug("Registering _onExecutionComplete for Execute Reply messages.");
         this.__replyCallback = this._onExecutionComplete.bind(this);
 
         Urth.events.on(
@@ -24,7 +26,7 @@ This Behavior represents the completion of a code cell's execution.
       },
 
       detached: function() {
-          console.debug("Unregistering _onExecutionComplete for Execute Reply messages.");
+          this._debug("Unregistering _onExecutionComplete for Execute Reply messages.");
           if (this.__replyCallback){
               Urth.events.off(
                   'shell_reply.Kernel', this.__replyCallback
@@ -36,6 +38,6 @@ This Behavior represents the completion of a code cell's execution.
        * A callback fired when code execution has completed for a cell.
        */
       _onExecutionComplete: function() {}
-    };
+    }, Urth.LoggingBehavior];
   })();
 </script>

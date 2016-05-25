@@ -57,8 +57,8 @@
              */
             createModel = sinon.stub(Urth["urth-viz-ipywidget"].prototype, "createModel");
             sinon.stub(Urth["urth-viz-ipywidget"].prototype, "displayErrorMessage");
-            sinon.stub(Urth.ExecutionCompleteBehavior, "ready");
-            sinon.stub(Urth.ExecutionCompleteBehavior, "detached");
+            sinon.stub(Urth.ExecutionCompleteBehavior[0], "ready");
+            sinon.stub(Urth.ExecutionCompleteBehavior[0], "detached");
             sinon.stub(Urth["urth-viz-ipywidget"].prototype, "onKernelReady");
         });
 

@@ -21,7 +21,6 @@ define(["jupyter-js-widgets"], function(widgets) {
          * create model.
          */
         request_state: function(callbacks) {
-            console.trace( "Empty implementation of request_state()");
             return Promise.resolve(this);
         },
 
