@@ -160,7 +160,8 @@ Example:
             busy: {
                 type: Boolean,
                 value: false,
-                notify: true
+                notify: true,
+                readOnly: true
             },
 
             /**
@@ -207,7 +208,7 @@ Example:
             },
 
             /**
-             * Amount of time to wait for a refresh/sync call to complete. This allows for throttling messages to get the
+             * Amount of time to wait (milliseconds) for a refresh/sync call to complete. This allows for throttling messages to get the
              * data from the DataFrame. In cases like Spark, getting the data may take a long time and this setting allows
              * throttling request to avoid overloading the DataFrame host.
              */
@@ -237,10 +238,8 @@ Example:
 
         ready: function() {
             this._debug("urth-core-dataframe ready");
-            this._contentObserver = new MutationObserver( this._handleQueryChildrenChanged.bind(this));
-            this._contentObserver.observe( this, {
-                childList: true
-            });
+
+            this._contentObserver = Polymer.dom(this.$.queries).observeNodes(this._handleQueryChildrenChanged.bind(this));
             this._handleQueryChildrenChanged();
         },
 
@@ -248,7 +247,7 @@ Example:
          * Remove mutation observer
          */
         detached: function(){
-            this._contentObserver.disconnect();
+            Polymer.dom(this.$.queries).unobserveNodes(this._contentObserver);
         },
 
         /*
@@ -314,9 +313,9 @@ Example:
             this.debounce(jName, function(){
                 this._debug("urth-core-dataframe sending sync message...");
 
-                this.busy = true;
+                this._setBusy(true);
                 var promiseHandler = function(){
-                    this.busy = false
+                    this._setBusy(false);
 
                     if(this._refreshQueued){
                         this._refreshQueued = false;
@@ -404,7 +403,7 @@ Example:
             }
 
             this.debounce(jName, function(){
-                console.debug('urth-core-dataframe sending new query value', this.query);
+                this._debug('urth-core-dataframe sending new query value', this.query);
                 this.sync({query: JSON.stringify(this.query)});
                 this.refresh();
             }.bind(this), this.queryDelay);

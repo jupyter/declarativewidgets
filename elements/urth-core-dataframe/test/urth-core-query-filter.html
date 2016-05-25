@@ -44,7 +44,6 @@
 
     <script>
         // STEP 4: Define any globals needed by the test suite.
-        before(function() {});
 
         // STEP 5: Define suite(s) and tests.
         describe('attached', function() {
@@ -92,7 +91,47 @@
 
                 async.nextTick(function(){
                     expect(elmt.expression).to.be.eql("some other text");
-                    done();
+
+                    elmt.innerText = "some more text";
+
+                    async.nextTick(function() {
+                        expect(elmt.expression).to.be.eql("some more text");
+                        done();
+                    });
+                });
+            });
+
+            it('should change expression when a text node content changes', function (done) {
+                var elmt = fixture('basic');
+
+                elmt.childNodes[0].data = "some other text";
+
+                async.nextTick(function(){
+                    expect(elmt.expression).to.be.eql("some other text");
+
+                    elmt.childNodes[0].data = "some more text";
+
+                    async.nextTick(function() {
+                        expect(elmt.expression).to.be.eql("some more text");
+                        done();
+                    });
+                });
+            });
+
+            it('should change expression when a text node content is replaced', function (done) {
+                var elmt = fixture('basic');
+
+                elmt.childNodes[0].replaceData(5, 4, "other text");
+
+                async.nextTick(function(){
+                    expect(elmt.expression).to.be.eql("some other text");
+
+                    elmt.childNodes[0].replaceData(5, 5, "more");
+
+                    async.nextTick(function() {
+                        expect(elmt.expression).to.be.eql("some more text");
+                        done();
+                    });
                 });
             });
         });

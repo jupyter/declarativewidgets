@@ -139,13 +139,13 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
             },
 
             /**
-             * Sends a message to the kernel side proxy of this element. A promise is return to notify when the message
+             * Sends a message to the kernel side proxy of this element. A promise is returned to notify when the message
              * had been processed by the kernel (i.e. status back to idle). It is not intended to get data, rather meant
              * to allow clients to throttle messages.
              *
              * @method send
              * @param {Object} msg A json message.
-             * @param {Number} timeout If specified, if timeout expired before status idle is received, promised is rejected
+             * @param {Number} timeout The time in (milliseconds) to wait for a response before rejecting the promise. If not set, the promise may never be rejected.
              * @return {Promise}
              */
             send: function( msg, timeout ){

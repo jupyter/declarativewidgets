@@ -89,11 +89,7 @@ Example:
              * elements.
              */
             attached: function(){
-                this._contentObserver = new MutationObserver( this._contentChanged.bind(this));
-                this._contentObserver.observe( this, {
-                    childList: true
-                });
-
+                this._contentObserver = Polymer.dom(this.$.aggs).observeNodes(this._contentChanged.bind(this));
                 this._contentChanged();
             },
 
@@ -101,7 +97,7 @@ Example:
              * Remove mutation observer
              */
             detached: function(){
-                this._contentObserver.disconnect();
+                Polymer.dom(this.$.aggs).unobserveNodes(this._contentObserver);
             },
 
             /**
