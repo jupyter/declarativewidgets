@@ -19,7 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "handsontable": "handsontable/handsontable#^0.22",
+    "handsontable": "handsontable/handsontable#^0.25",
     "polymer": "Polymer/polymer#^1.2.4",
     "requirejs": "^2.1.0"
   },
