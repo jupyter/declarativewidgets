@@ -94,7 +94,7 @@ dev_image_4.2:
 	@docker $(DOCKER_OPTS) run -it --user root --name 4.2-build \
 		$(REPO) bash -c 'pip uninstall --yes ipywidgets && \
     pip install --upgrade notebook==4.2.0 $(PIP_OPTS) && \
-    pip install ipywidgets==5.1.1 $(PIP_OPTS) && \
+    pip install ipywidgets==5.1.5 $(PIP_OPTS) && \
     jupyter nbextension enable --system --py widgetsnbextension && \
     pip install --pre --upgrade toree $(PIP_OPTS) && \
     jupyter toree install'
