@@ -121,7 +121,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
             },
 
             _updateColumns: function (newColumns) {
-                if(!newColumns) { return; }
+                if (!newColumns) { return; }
 
                 var columnSettings = this._parseColumns();
                 this.hot.updateSettings({
@@ -131,13 +131,13 @@ The table accepts data via attribute `datarows` and column headers via attribute
             },
 
             _updateDatarows: function (newDataRows) {
-                if(!newDataRows) { return; }
+                if (!newDataRows) { return; }
                 if (!Array.isArray(newDataRows[0]) && newDataRows.length) {
                     newDataRows = [newDataRows];
                 }
 
                 // if data will not fit, we need to add a height to table to add scrollbar
-                if(!this._willDataFit(newDataRows)) {
+                if (!this._willDataFit(newDataRows)) {
                     this.hot.loadData(newDataRows);
 
                     this.hot.updateSettings({
@@ -156,7 +156,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
 
             computeTableView: function(datarows, columns) {
                 var jName = "computeTableView";
-                if( this.isDebouncerActive(jName) ) {
+                if (this.isDebouncerActive(jName) ) {
                     this.cancelDebouncer(jName);
                 }
                 this.debounce(jName, function () {
@@ -187,6 +187,8 @@ The table accepts data via attribute `datarows` and column headers via attribute
              * through the path of selecting the entire row.
              */
             _forceRowSelection: function (event, coords) {
+                this.rowActive = coords.row;
+                this.colActive = coords.col;
                 coords.col = -1; //force row selection
             },
 
@@ -200,12 +202,21 @@ The table accepts data via attribute `datarows` and column headers via attribute
              * Handle when selection has finished taking place on handson
              */
             _handleSelection: function (rowStart, colStart, rowEnd, colEnd) {
+                this._setSelectionInfo({
+                    rowActive: this.rowActive,
+                    colActive: this.colActive,
+                    rowStart: rowStart,
+                    colStart: colStart,
+                    rowEnd: rowEnd,
+                    colEnd: colEnd
+                });
+
                 // if table has been sorted, we need to get physical index of the row in the datasource
                 // since rowStart is only the logical index of the table view
-                var physicalIndex = this.hot.sortIndex.length > 0 ?
+                var physicalIndex = this.hot.sortIndex.length ?
                                         this.hot.sortIndex[rowStart][0] : rowStart;
                 this.selectionIndex = physicalIndex;
-                if(this.selectionAsObject) {
+                if (this.selectionAsObject) {
                     var sel = {};
                     var row = this.datarows[physicalIndex];
                     this.columns.forEach(function(col, i) {
@@ -220,7 +231,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
             },
 
             _willDataFit: function(datarows) {
-                return (datarows.length < this.rowsVisible);
+                return datarows.length < this.rowsVisible;
             },
 
             _isHeightSet: function() {
@@ -238,7 +249,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 console.assert(datarows);
                 var firstRow = Array.isArray(datarows[0]) ? datarows[0] : datarows;
 
-                if(firstRow && firstRow.length > 0) {
+                if (firstRow && firstRow.length) {
                     var columnSettings = firstRow.map(function (col) {
                         return {
                             editor: false
@@ -263,7 +274,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
             _parseColumn: function(column, colSettings) {
                 this.COL_OPTIONS.forEach(function(opt) {
                     var val = column.getAttribute(opt);
-                    if(val) { colSettings[opt] = val; }
+                    if (val) { colSettings[opt] = val; }
                 });
             },
 
@@ -291,6 +302,13 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         sortIndicator: true,
                         columns: columnSettings,
                         stretchH: 'all',
+                        afterDocumentKeyDown: function(row, col) {
+                            var selected = this.hot.getSelected();
+                            if (selected) {
+                                this.rowActive = selected[0];
+                                this.colActive = selected[1];
+                            }
+                        }.bind(this),
                         beforeOnCellMouseDown: this._forceRowSelection.bind(this),
                         afterSelectionEnd: this._handleSelection.bind(this),
                         afterColumnSort: function() {
