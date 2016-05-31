@@ -3,11 +3,11 @@
  * Distributed under the terms of the Modified BSD License.
  */
 define([
+    'require',
     'module',
     'base/js/namespace',
-    'base/js/events',
-    './init/init'
-], function(module, Jupyter, events, init) {
+    'base/js/events'
+], function(require, module, Jupyter, events) {
 
     'use strict';
 
@@ -17,7 +17,7 @@ define([
             '*': {
                 'jupyter-decl-widgets': 'nbextensions/declarativewidgets/js/widgets'
             },
-            'nbextensions/declarativewidgets/js/widgets': {
+            'nbextensions/declarativewidgets/js': {
                 'jupyter-js-widgets': 'ipywidgets4-or-jupyter-js-widgets'
             }
         },
@@ -38,11 +38,14 @@ define([
     ['debug', 'error', 'trace', 'warn'].forEach(function(method) {
         window.console[method] = window.console[method] || window.console.log;
     });
-    
-    init({
-        namespace: Jupyter,
-        events: events
+
+    require(['./init/init'],function(init){
+        init({
+            namespace: Jupyter,
+            events: events
+        });
     });
+
 
     var getModuleBasedComponentRoot = function() {
         var moduleuri = module.uri;
