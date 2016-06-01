@@ -1,0 +1,40 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+
+<!--
+This behavior contains a set of utility methods that can be shared by
+query elements.
+-->
+<script>
+    'use strict';
+    (function() {
+        var Urth = window.Urth = window.Urth || {};
+
+        /**
+         * Behavior that contains a set of utility methods that can be shared by
+         * query elements.
+         *
+         * @group Urth Core
+         * @polymerBehavior Urth.QueryBehavior
+         */
+        Urth.QueryBehavior = {
+
+            /**
+             * Takes a comma separated string and return a single String value is one element or an array of Strings
+             * @param commaStr
+             * @private
+             */
+            _toStringOrArray: function(commaStr){
+                var arrayVal = commaStr.split(',')
+                        .map(function(part){return part.trim();})
+                        .filter(function(part){
+                            return !!part;
+                        });
+                return arrayVal.length > 1 ? arrayVal : arrayVal[0];
+            }
+
+        };
+    })();
+</script>

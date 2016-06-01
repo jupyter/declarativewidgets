@@ -33,6 +33,17 @@
         </template>
     </test-fixture>
 
+    <test-fixture id='withQuery'>
+        <template>
+            <urth-core-dataframe id='withQuery' ref="someDataFrame">
+                <urth-core-query-filter>some filter</urth-core-query-filter>
+                <urth-core-query-group by="someCol">
+                    <urth-core-query-agg op="anOp" col="aCol"></urth-core-query-agg>
+                </urth-core-query-group>
+            </urth-core-dataframe>
+        </template>
+    </test-fixture>
+
     <script>
         // STEP 4: Define any globals needed by the test suite.
         before(function() {
@@ -48,6 +59,34 @@
         });
 
         // STEP 5: Define suite(s) and tests.
+        describe('ready', function() {
+            it('should have query set based on children', function (done) {
+                var dfElmt = fixture('withQuery');
+
+                flush(function(){
+                    expect(dfElmt.query).to.deep.eql([
+                        {
+                            type: "filter",
+                            expr: "some filter"
+                        },
+                        {
+                            type: "group",
+                            expr: {
+                                by: "someCol",
+                                agg: [
+                                    {
+                                        op: "anOp",
+                                        col: "aCol"
+                                    }
+                                ]
+                            }
+                        }
+                    ]);
+                    done();
+                });
+            });
+        });
+
         describe('_rows', function() {
             it('should return data as 2D Array when rowAsObject is false', function () {
                 var dfElmt = fixture('basic');
@@ -108,6 +147,147 @@
                 expect(rows).to.eql([]);
             });
         });
+
+        describe('_query', function() {
+            it('should return query of only child nodes that have query set', function () {
+                var dfElmt = fixture('basic');
+
+                var fElt1 = document.createElement("urth-core-query-filter");
+                fElt1.disabled = true;
+                var fElt2 = document.createElement("urth-core-query-filter");
+                fElt2.expression = "some expression";
+                var fElt3 = document.createElement("urth-core-query-filter");
+                fElt3.disabled = true;
+
+                expect(dfElmt._query([fElt1,fElt2,fElt3])).to.have.lengthOf(1);
+            });
+        });
+
+        /**
+         * These are more integration test, but trying to avoid unit testing dom
+         * listeners and mutation observers.
+         */
+        describe('query', function() {
+            it('should change when a child is modified', function (done) {
+                var dfElmt = fixture('withQuery');
+
+                dfElmt.queryChildren[0].textContent = "some other filter";
+
+                flush(function(){
+                    expect(dfElmt.query).to.deep.eql([
+                        {
+                            type: "filter",
+                            expr: "some other filter"
+                        },
+                        {
+                            type: "group",
+                            expr: {
+                                by: "someCol",
+                                agg: [
+                                    {
+                                        op: "anOp",
+                                        col: "aCol"
+                                    }
+                                ]
+                            }
+                        }
+                    ]);
+                    done();
+                });
+            });
+
+            it('should change when a child is added', function (done) {
+                var dfElmt = fixture('withQuery');
+
+                var anotherFElt = document.createElement("urth-core-query-filter");
+                anotherFElt.textContent = "some other filter";
+
+                Polymer.dom(dfElmt).appendChild(anotherFElt);
+                Polymer.dom.flush();
+
+                async.nextTick(function(){
+                    expect(dfElmt.query).to.deep.eql([
+                        {
+                            type: "filter",
+                            expr: "some filter"
+                        },
+                        {
+                            type: "group",
+                            expr: {
+                                by: "someCol",
+                                agg: [
+                                    {
+                                        op: "anOp",
+                                        col: "aCol"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            type: "filter",
+                            expr: "some other filter"
+                        }
+                    ]);
+                    done();
+                });
+            });
+
+            it('should change when a child is added', function (done) {
+                var dfElmt = fixture('withQuery');
+
+
+                Polymer.dom(dfElmt).removeChild(dfElmt.queryChildren[1]);
+                Polymer.dom.flush();
+
+                async.nextTick(function(){
+                    expect(dfElmt.query).to.deep.eql([
+                        {
+                            type: "filter",
+                            expr: "some filter"
+                        }
+                    ]);
+                    done();
+                });
+            });
+
+            it('should change when a multiple mutations to children', function (done) {
+                var dfElmt = fixture('withQuery');
+
+
+                Polymer.dom(dfElmt).removeChild(dfElmt.queryChildren[1]);
+                Polymer.dom.flush();
+
+                async.nextTick(function(){
+                    expect(dfElmt.query).to.deep.eql([
+                        {
+                            type: "filter",
+                            expr: "some filter"
+                        }
+                    ]);
+
+                    var anotherFElt = document.createElement("urth-core-query-filter");
+                    anotherFElt.textContent = "some other filter";
+
+                    Polymer.dom(dfElmt).appendChild(anotherFElt);
+                    Polymer.dom.flush();
+
+                    async.nextTick(function(){
+                        expect(dfElmt.query).to.deep.eql([
+                            {
+                                type: "filter",
+                                expr: "some filter"
+                            },
+                            {
+                                type: "filter",
+                                expr: "some other filter"
+                            }
+                        ]);
+                        done();
+                    });
+                });
+            });
+        });
+
     </script>
 </body>
 </html>

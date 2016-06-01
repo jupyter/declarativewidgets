@@ -5,10 +5,12 @@
 
 package urth.widgets
 
+import org.apache.spark.sql.DataFrame
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.interpreter.Interpreter
 import org.apache.toree.kernel.protocol.v5.MsgData
-import play.api.libs.json.JsValue
+import play.api.libs.json._
+import urth.widgets.query.QuerySupport
 import urth.widgets.util.SerializationSupport
 
 /**
@@ -17,13 +19,16 @@ import urth.widgets.util.SerializationSupport
  * @param comm CommWriter used for communication with the front-end.
  */
 class WidgetDataFrame(comm: CommWriter)
-  extends Widget(comm) with SerializationSupport {
+  extends Widget(comm) with SerializationSupport with QuerySupport{
 
   // name of the DataFrame in the kernel
   var variableName: String = _
 
   // maximum number of rows to send
   var limit: Int = Default.Limit
+
+  // the query to apply to the DataFrame. Defaults to JSON empty array.
+  var query: String = "[]"
 
   lazy val kernelInterpreter: Interpreter = getKernel.interpreter
 
@@ -33,15 +38,11 @@ class WidgetDataFrame(comm: CommWriter)
    */
   def handleBackbone(msg: MsgData): Unit = {
     logger.debug(s"Handling backbone message ${msg}...")
-    (msg \ Comm.KeySyncData \ Comm.KeyLimit).asOpt[Int] match {
-      case Some(lim) => registerLimit(lim)
-      case _ => logger.warn(
-        s"No ${Comm.KeyLimit} value provided. Using limit = ${this.limit}.")
-    }
-    (msg \ Comm.KeySyncData \ Comm.KeyDataFrameName).asOpt[String] match {
-      case Some(dfName) => registerName(dfName)
-      case _ => logger.error(s"No ${Comm.KeyDataFrameName} value provided!")
-    }
+    (msg \ Comm.KeySyncData \ Comm.KeyLimit).asOpt[Int].foreach(registerLimit(_))
+
+    (msg \ Comm.KeySyncData \ Comm.KeyDataFrameName).asOpt[String].foreach(registerName(_))
+
+    (msg \ Comm.KeySyncData \ "query").asOpt[String].foreach(registerQuery(_))
   }
 
   /**
@@ -52,7 +53,7 @@ class WidgetDataFrame(comm: CommWriter)
     logger.debug(s"Handling custom message ${msgContent}...")
     (msgContent \ Comm.KeyEvent).asOpt[String] match {
       case Some(Comm.EventSync) =>
-        serializeAndSend(this.variableName, this.limit)
+        syncData()
       case Some(evt) =>
         logger.warn(s"Unhandled custom event ${evt}.")
       case None =>
@@ -69,24 +70,47 @@ class WidgetDataFrame(comm: CommWriter)
   private[widgets] def registerName(name: String): Unit = {
     this.variableName = name
     logger.debug(s"Registered DataFrame variable name ${name}.")
-    serializeAndSend(name, this.limit) match {
-      case Right(_)  => sendOk()
-      case Left(msg) => sendError(msg)
-    }
   }
 
-  private[widgets] def serializeAndSend(
-    name: String, limit: Int
-  ): Either[String, Unit] = {
-    kernelInterpreter.read(name) match {
-      case Some(df) =>
-        val serialized = serialize(df, limit)
-        sendSyncData(serialized)
-        logger.trace(s"Sent sync message for DataFrame $name")
-        Right()
+  private[widgets] def registerQuery(query: String): Unit = {
+    this.query = query
+    logger.debug(s"Registered query ${query}.")
+  }
+
+  private[widgets] def theDataframe = {
+    kernelInterpreter.read(variableName)
+  }
+
+  private[widgets] def syncData() = {
+
+    val result: Either[String, JsValue] = theDataframe match {
+      case Some(df:DataFrame) =>
+         try{
+           val query = Json.parse(this.query).asOpt[JsArray].getOrElse(new JsArray())
+           Right(serialize(applyQuery(df, query), this.limit))
+         }
+        catch {
+          case parseError:com.fasterxml.jackson.core.JsonParseException =>
+            parseError.printStackTrace()
+            Left(parseError.getMessage)
+        }
+
+      case Some(_) =>
+        logger.warn(s"${this.variableName} is not a DataFrame")
+        Left(s"${this.variableName} is not a DataFrame")
+
       case None =>
-        logger.warn(s"DataFrame ${name} not found! No sync message sent.")
-        Left(s"DataFrame ${name} not found!")
+        logger.warn(s"DataFrame ${this.variableName} not found! No sync message sent.")
+        Left(s"DataFrame ${this.variableName} not found!")
+    }
+
+    result match {
+      case Right(serDf) =>
+        sendSyncData(serDf)
+        sendOk()
+
+      case Left(error) =>
+        sendError(error)
     }
   }
 

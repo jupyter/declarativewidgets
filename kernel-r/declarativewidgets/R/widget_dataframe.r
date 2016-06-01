@@ -1,4 +1,4 @@
-#' @include widget.r serializer.r
+#' @include widget.r serializer.r querier.r
 NULL
 #' Widget_Dataframe
 #'
@@ -9,10 +9,13 @@ Widget_Dataframe <- R6Class(
     public = list(
         serializer = NULL,
         limit = NULL,
+        query = NULL,
         variable_name = NULL,
+        querier = NULL,
         handle_backbone = function(msg) {
             msg_limit <- msg$sync_data$limit
             msg_name <- msg$sync_data$variable_name
+            msg_query <- msg$sync_data$query
             if(!is.null(msg_limit)) {
                 self$register_limit(msg_limit)
             } else {
@@ -23,11 +26,16 @@ Widget_Dataframe <- R6Class(
             } else {
                 print("No name value provided for Widget_Dataframe")
             }
+            if(!is.null(msg_query)) {
+                self$register_query(msg_query)
+            } else {
+                print("No name query provided for Widget_Dataframe")
+            }
         },
         handle_custom = function(msg) {
             if(!is.null(msg$event)) {
                 if(msg$event == 'sync') {
-                    self$serialize_and_send(self$variable_name, self$limit)
+                    self$serialize_and_send(self$variable_name, self$limit, self$query)
                 } else {
                     print(c("Unhandled custome event: ", msg$event))
                 }
@@ -43,9 +51,11 @@ Widget_Dataframe <- R6Class(
             })
             return (TRUE)
         },
-        serialize_and_send = function(name, limit) {
+        serialize_and_send = function(name, limit, query = list()) {
             if(self$df_in_interpreter(name)) {
-                serialized_df <- self$serializer$serialize(get(name, envir = .GlobalEnv))
+                #apply query before sending over
+                df_after_query <- self$querier$apply_query(get(name, envir = .GlobalEnv), query)
+                serialized_df <- self$serializer$serialize(df_after_query, limit)
                 self$send_update("value", serialized_df)
                 return (TRUE)
             } else {
@@ -61,10 +71,16 @@ Widget_Dataframe <- R6Class(
         register_limit = function(limit) {
             self$limit <- limit
         },
-        initialize = function(comm, serializer) {
+        register_query = function(query) {
+            self$query <- fromJSON(query)
+            response <- self$serialize_and_send(name, self$limit, self$query)
+            self$handle_function_response(response)
+        },
+        initialize = function(comm, serializer, querier) {
             #initialize super class Widget and serializer
             super$initialize(comm)
             self$serializer <- serializer
+            self$querier <- querier
         }
     )
 )

@@ -10,13 +10,13 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 
 * A base extension that enable the use of [Web Components](http://webcomponents.org) and [Polymer](https://www.polymer-project.org/1.0/) elements
 * A set of core elements facilitate interacting with code running on the kernel
+* Ability of read and query DataFrames from a variety of implementations (i.e. Spark, R, Pandas).
 * Extensions to data binding support and installing of 3rd party elements.
 * Implementations for Python, R (using [IRkernel](https://github.com/IRkernel/IRkernel)) and Scala (using [Apache Toree](https://github.com/apache/incubator-toree))
 
 ## What It Lacks
 
 * Support for disconnected (no kernel) environments (i.e. nbviewer)
-* Interactions with DataFrames. Currently read-only.
 
 ## Runtime Requirements
 
@@ -27,6 +27,9 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 ##### Optional Requirements based on language support
 * Apache Toree for access to Spark using Scala
 * [IRkernel](https://github.com/IRkernel/IRkernel) for R language
+
+##### Additional requirements for Pandas DataFrame queries
+* `pip install numexpr`
 
 ##### Additional requirements for Python 2.7
 * `pip install futures==3.0.3`

@@ -1,0 +1,126 @@
+!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+This element is used to define a filter clause. It uses the text content as the area
+for the filter expression to allow the flexibility of complex filter. The content of
+the filter expression depends on the type of DataFrame. Please refer to the following
+for details:
+
+- Pandas DataFrame: http://pandas.pydata.org/pandas-docs/version/0.18.1/generated/pandas.DataFrame.query.html
+- PySpark DataFrame: https://spark.apache.org/docs/1.5.2/api/python/pyspark.sql.html#pyspark.sql.DataFrame.filter
+- Scala Spark DataFrame: https://spark.apache.org/docs/1.6.1/api/java/org/apache/spark/sql/DataFrame.html#filter(java.lang.String)
+- R DataFrame: https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html
+- SparkR DataFrame: https://spark.apache.org/docs/latest/api/R/filter.html
+
+Example:
+
+```
+<urth-core-dataframe ref="someDf">
+    <urth-core-query-filter>someCol = value and anotherCor = {{bindingVar}}</urth-core-query-filter>
+<urth-core-dataframe>
+```
+
+
+@group Urth Core
+@element urth-core-query-filter
+-->
+<dom-module id="urth-core-query-filter">
+    <style>
+        :host {
+            display: none;
+        }
+    </style>
+    <template><content id="expressions"></content></template>
+</dom-module>
+<script>
+
+    (function() {
+        'use strict';
+
+        window.Urth = window.Urth || {};
+
+        window.Urth['urth-core-query-filter'] = Polymer({
+            is: 'urth-core-query-filter',
+
+            properties: {
+                /**
+                 * If false, this element will return an undefined query. It basically
+                 * allows disabling the filter on a condition.
+                 */
+                disabled: {
+                    type: Boolean,
+                    value: false
+                },
+
+                /**
+                 * The cleaned up expression from text content
+                 */
+                expression: {
+                    type: String,
+                    notify: true
+                },
+
+                /**
+                 * The structure query
+                 */
+                query: {
+                    type: Object,
+                    computed: '_buildQuery(expression, disabled)',
+                    notify: true
+                }
+            },
+
+            /**
+             * Adds a mutation observer to see changes in the text content
+             */
+            attached: function(){
+                this._contentObserver = new MutationObserver( this._contentChanged.bind(this));
+                this._contentObserver.observe( this, {
+                    childList: true,
+                    characterData: true,
+                    subtree: true
+                });
+
+                this._contentChanged();
+            },
+
+            /**
+             * Remove mutation observer
+             */
+            detached: function(){
+                this._contentObserver.disconnect();
+            },
+
+            /**
+             * Builds the query structure that is sent to the kernel
+             * @private
+             */
+            _buildQuery: function(expression, disabled){
+                if( disabled ){
+                    return undefined;
+                }
+                return {
+                    type: "filter",
+                    expr: expression
+                }
+            },
+
+            /**
+             * Construct a cleaned up expression based on text content
+             * @private
+             */
+            _contentChanged: function(){
+                //set the expression
+                this.expression = this.textContent
+                    .split('\n')
+                    .map(function(line){return line.trim()})
+                    .join(' ')
+                    .trim();
+            }
+        });
+    })();
+</script>

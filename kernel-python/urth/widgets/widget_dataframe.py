@@ -5,8 +5,10 @@ from traitlets import Unicode, Integer # Used to declare attributes of our widge
 from IPython.core.getipython import get_ipython
 
 from urth.util.serializer import Serializer
+from urth.util.query import apply_query
 from .urth_widget import UrthWidget
 from .urth_exception import UrthException
+import json
 
 
 class DataFrame(UrthWidget):
@@ -15,6 +17,7 @@ class DataFrame(UrthWidget):
     """
     variable_name = Unicode('', sync=True)
     limit = Integer(100, sync=True)
+    query = Unicode('[]', sync=True)
 
     def __init__(self, value=None, **kwargs):
         self.log.info("Created a new DataFrame widget.")
@@ -30,6 +33,9 @@ class DataFrame(UrthWidget):
     def _limit_changed(self, old, new):
         self.log.info("Changed value of limit to {}...".format(new))
 
+    def _query_changed(self, old, new):
+        self.log.info("Changed value of query to {}...".format(new))
+
     def _the_dataframe(self):
         if self.variable_name in self.shell.user_ns:
             return self.shell.user_ns[self.variable_name]
@@ -44,7 +50,7 @@ class DataFrame(UrthWidget):
     def _sync_state(self):
         try:
             val = self._the_dataframe()
-            serialized_result = self.serializer.serialize(val, limit=self.limit)
+            serialized_result = self.serializer.serialize(apply_query(val, json.loads(self.query)), limit=self.limit, query=self.query)
             self._send_update("value", serialized_result)
             self.ok()
         except Exception as e:

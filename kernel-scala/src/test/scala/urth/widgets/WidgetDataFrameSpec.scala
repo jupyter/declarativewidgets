@@ -5,18 +5,36 @@
 
 package urth.widgets
 
+import org.apache.spark.SharedSparkContext
+import org.apache.spark.sql.{SQLContext, DataFrame}
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.interpreter.Interpreter
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.FunSpec
-import org.scalatest.Matchers
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter, FunSpec, Matchers}
 import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.Json
 
-class WidgetDataFrameSpec extends FunSpec with Matchers with MockitoSugar {
+class WidgetDataFrameSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAfterAll with SharedSparkContext{
 
   class TestWidget(comm: CommWriter) extends WidgetDataFrame(comm)
+
+  case class TestRow( val name:String, val age: Int )
+
+  object TestRow {
+    def from(line: String): TestRow = {
+      val f = line.split(",")
+      TestRow(f(0), f(1).trim().toInt)
+    }
+  }
+
+  var df:DataFrame = _
+
+  override def beforeAll() = {
+    super.beforeAll()
+    val sqlCtx = new SQLContext(sc)
+    df = sqlCtx.createDataFrame(Seq("jon, 10", "mary, 15", "bob, 8").map(TestRow.from))
+  }
 
   describe("WidgetDataFrame"){
     describe("#handleBackbone") {
@@ -45,11 +63,19 @@ class WidgetDataFrameSpec extends FunSpec with Matchers with MockitoSugar {
         verify(test).registerLimit(100)
       }
 
+
       it("should not register a limit when no limit is provided") {
         val test = spy(new TestWidget(mock[CommWriter]))
         val msg = Json.obj(Comm.KeySyncData -> "")
         test.handleBackbone(msg)
         verify(test, times(0)).registerLimit(anyInt())
+      }
+
+      it("should register a query") {
+        val test = spy(new TestWidget(mock[CommWriter]))
+        val msg = Json.obj(Comm.KeySyncData -> Map("query" -> "some query"))
+        test.handleBackbone(msg)
+        verify(test).registerQuery("some query")
       }
     }
 
@@ -59,81 +85,68 @@ class WidgetDataFrameSpec extends FunSpec with Matchers with MockitoSugar {
 
         val msg = Json.obj(Comm.KeyEvent -> Comm.EventSync)
 
-        val df = ""
-        val intp = mock[Interpreter]
-        doReturn(Some(df)).when(intp).read(anyString())
-        doReturn(intp).when(test).kernelInterpreter
-
-        test.registerLimit(100)
-        test.registerName("df")
+        doNothing().when(test).syncData()
 
         test.handleCustom(msg)
 
-        // one from registerName and one from handleCustom
-        val varName = test.variableName
-        val limit = test.limit
-        verify(test, times(2)).serializeAndSend(varName, limit)
+        verify(test, times(1)).syncData()
       }
 
       it("should not handle an invalid event") {
         val test = spy(new TestWidget(mock[CommWriter]))
         val msg = Json.obj(Comm.KeyEvent -> "asdf")
         test.handleCustom(msg)
-        verify(test, times(0)).serializeAndSend(anyString(), anyInt())
+        verify(test, times(0)).syncData()
       }
     }
 
-    describe("#registerName") {
-      it("should try to serialize and send the DataFrame with the given name"){
+    describe("#syncData") {
+      it("should serialize the dataframe, send sync message, and ok message when the DataFrame is present") {
         val test = spy(new TestWidget(mock[CommWriter]))
-        doReturn(Right(())).when(test).serializeAndSend(anyString(), anyInt())
-        test.registerName("foo")
-        verify(test).serializeAndSend("foo", test.limit)
-      }
 
-      it("should send a status ok message if the DataFrame name is valid"){
-        val test = spy(new TestWidget(mock[CommWriter]))
-        doReturn(Right(())).when(test).serializeAndSend(anyString(), anyInt())
-        test.registerName("foo")
-        verify(test).sendOk()
-      }
+        doReturn(Some(df)).when(test).theDataframe
 
-      it("should send a status error message if the DataFrame name is invalid"){
-        val test = spy(new TestWidget(mock[CommWriter]))
-        doReturn(Left("uh oh")).when(test).serializeAndSend(anyString(), anyInt())
-        test.registerName("foo")
-        verify(test).sendError("uh oh")
-      }
-    }
-
-    describe("#serializeAndSend") {
-      it("should serialize the dataframe and send a message when the DataFrame is present") {
-        val test = spy(new TestWidget(mock[CommWriter]))
-        val msg = Json.obj(Comm.KeyEvent -> Comm.EventSync)
-
-        val df = ""
-        val intp = mock[Interpreter]
-        doReturn(Some(df)).when(intp).read(anyString())
-        doReturn(intp).when(test).kernelInterpreter
-
-        test.serializeAndSend("df", 100)
+        test.syncData()
         verify(test).serialize(df, 100)
         verify(test).sendSyncData(any())
+        verify(test).sendOk(any())
       }
 
-      it("should do nothing when the dataframe is not present") {
+      it("should send error message when the dataframe is not present") {
         val test = spy(new TestWidget(mock[CommWriter]))
-        val msg = Json.obj(Comm.KeyEvent -> Comm.EventSync)
 
-        val df = ""
-        val intp = mock[Interpreter]
-        doReturn(None).when(intp).read("df")
-        doReturn(intp).when(test).kernelInterpreter
+        doReturn(None).when(test).theDataframe
 
-        test.serializeAndSend("df", 100)
+        test.syncData()
         verify(test, times(0)).serialize(any(), anyInt())
         verify(test, times(0)).sendSyncData(any())
+        verify(test).sendError(any())
       }
+
+      it("should send error message when the query is not parseable") {
+        val test = spy(new TestWidget(mock[CommWriter]))
+        test.query = "not parseable"
+
+        doReturn(Some(df)).when(test).theDataframe
+
+        test.syncData()
+        verify(test, times(0)).serialize(any(), anyInt())
+        verify(test, times(0)).sendSyncData(any())
+        verify(test).sendError(any())
+      }
+
+      it("should send error message when the variableName does not map a DataFrame") {
+        val test = spy(new TestWidget(mock[CommWriter]))
+        test.query = "not parseable"
+
+        doReturn(Some("not a dataframe")).when(test).theDataframe
+
+        test.syncData()
+        verify(test, times(0)).serialize(any(), anyInt())
+        verify(test, times(0)).sendSyncData(any())
+        verify(test).sendError(any())
+      }
+
     }
   }
 }

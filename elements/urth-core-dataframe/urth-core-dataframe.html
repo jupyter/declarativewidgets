@@ -5,6 +5,9 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-core-behaviors/jupyter-widget-behavior.html">
 <link rel="import" href="../urth-core-behaviors/execution-complete-behavior.html">
+<link rel="import" href="urth-core-query-filter.html">
+<link rel="import" href="urth-core-query-group.html">
+<link rel="import" href="urth-core-query-sort.html">
 
 <!--
 This element represents a DataFrame. The `ref` property points to an instance of a DataFrame in the
@@ -34,11 +37,51 @@ Example:
 
     <urth-core-dataframe id="f1" ref="aDataFrame" rows="{{rows}}" rows-as-object auto></urth-core-dataframe>
 
+This element also support querying the DataFrame using the `urth-core-query-*` elements as children.
+
+Example:
+    <urth-core-dataframe id="f1" ref="aDataFrame" value="{{df}}">
+        <urth-core-query-filter>aCol > {{someVal}}</urth-core-query-filter>
+        <urth-core-query-group by="anotherCol">
+            <urth-core-query-agg op="avg" col="someOtherCol"></urth-core-query-agg>
+        </urth-core-query-group>
+    </urth-core-dataframe>
+
 @group Urth Core
 @element urth-core-dataframe
 -->
-<script>
+<dom-module id="urth-core-dataframe">
+    <style>
+        #queries {
+            display: none;
+        }
+    </style>
+    <template>
+        <template is="dom-if" if="{{debug}}">
+            <table>
+                <thead>
+                    <tr>
+                        <template is="dom-repeat" items="{{value.columns}}">
+                            <th>{{item}}</th>
+                        </template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template is="dom-repeat" items="{{_head(value.data)}}" as="r">
+                        <tr>
+                            <template is="dom-repeat" items="{{r}}" as="c">
+                                <td>{{c}}</td>
+                            </template>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </template>
+        <content id="queries" select="urth-core-query-filter,urth-core-query-group,urth-core-query-sort"></content>
+    </template>
+</dom-module>
 
+<script>
 (function(){
     'use strict';
 
@@ -112,19 +155,76 @@ Example:
             },
 
             /**
+             * If true, it means that the element is waiting on the kernel to return the data
+             */
+            busy: {
+                type: Boolean,
+                value: false,
+                notify: true,
+                readOnly: true
+            },
+
+            /**
+             * If true, this element will render a simple table help inspect the data
+             */
+            debug: {
+                type: Boolean,
+                value: false
+            },
+
+            /**
              * Sets the maximun number of rows to bring to the client.
              */
             limit: {
-              type: Number,
-              value: 100,
-              reflectToAttribute: true,
-              observer: '_onLimitChange'
+                type: Number,
+                value: 100,
+                reflectToAttribute: true,
+                observer: '_onLimitChange'
+            },
+
+            /**
+             * An Array with a JSON structures that define queries to perform on the DataFrame.
+             */
+            query: {
+                type: Array,
+                readOnly: true,
+                observer: '_onQueryChange'
+            },
+
+            /**
+             * Array with the child elements used to define the query.
+             */
+            queryChildren: {
+                type: Array,
+                readOnly: true
+            },
+
+            /**
+             * Time to debounce synchronizing changes to the query with the kernel component.
+             */
+            queryDelay: {
+                type: Number,
+                value: 750
+            },
+
+            /**
+             * Amount of time to wait (milliseconds) for a refresh/sync call to complete. This allows for throttling messages to get the
+             * data from the DataFrame. In cases like Spark, getting the data may take a long time and this setting allows
+             * throttling request to avoid overloading the DataFrame host.
+             */
+            refreshTimeout: {
+                type: Number,
+                value: 10000
             }
         },
 
         behaviors: [
             Urth.JupyterWidgetBehavior,
             Urth.ExecutionCompleteBehavior
+        ],
+
+        observers: [
+            '_handleChildChanged(queryChildren)'
         ],
 
         listeners: {
@@ -138,6 +238,16 @@ Example:
 
         ready: function() {
             this._debug("urth-core-dataframe ready");
+
+            this._contentObserver = Polymer.dom(this.$.queries).observeNodes(this._handleQueryChildrenChanged.bind(this));
+            this._handleQueryChildrenChanged();
+        },
+
+        /**
+         * Remove mutation observer
+         */
+        detached: function(){
+            Polymer.dom(this.$.queries).unobserveNodes(this._contentObserver);
         },
 
         /*
@@ -149,7 +259,7 @@ Example:
             var syncData = {
                 variable_name: this.ref,
                 limit: this.limit
-            }
+            };
             this._debug('urth-core-dataframe sending initial sync', syncData);
             this.sync(syncData);
 
@@ -190,14 +300,31 @@ Example:
          * @method refresh
          */
         refresh: function() {
+            if( this.busy ){
+                this._refreshQueued = true;
+                return;
+            }
+
             var jName = "urth-core-dataframe.refresh";
             if( this.isDebouncerActive(jName) ) {
                 this.cancelDebouncer(jName);
             }
 
             this.debounce(jName, function(){
-              this._debug("urth-core-dataframe sending sync message...");
-              this.send({ "event": "sync" });
+                this._debug("urth-core-dataframe sending sync message...");
+
+                this._setBusy(true);
+                var promiseHandler = function(){
+                    this._setBusy(false);
+
+                    if(this._refreshQueued){
+                        this._refreshQueued = false;
+                        this.refresh();
+                    }
+
+                }.bind(this);
+
+                this.send({ "event": "sync" }, this.refreshTimeout).then(promiseHandler,promiseHandler);
             }.bind(this), 200);
         },
 
@@ -209,6 +336,16 @@ Example:
          */
         _columns: function(df){
             return df.columns;
+        },
+
+        /**
+         * Returns the structure query based on the child query elements
+         * @param queryChildren - Array of child nodes
+         * @return the query structure
+         * @private
+         */
+        _query: function(queryChildren){
+            return queryChildren.map(function(qElt){return qElt.query}).filter(function(q){return !!q});
         },
 
         /**
@@ -234,6 +371,53 @@ Example:
             this._debug('urth-core-dataframe sending new limit value', this.limit);
             this.sync({limit: this.limit});
             this.refresh();
+        },
+
+        _handleQueryChildrenChanged: function(){
+            if(!this._handleChildChangedListener){
+                this._handleChildChangedListener = this._handleChildChanged.bind(this);
+            }
+
+            (this.queryChildren || []).forEach(function(child){
+                child.removeEventListener("query-changed", this._handleChildChangedListener);
+            }.bind(this));
+
+            var queryChildren = Array.prototype.slice.call(
+                    Polymer.dom(this.$.queries).getDistributedNodes());
+
+            queryChildren.forEach(function(child){
+                child.addEventListener("query-changed", this._handleChildChangedListener);
+            }.bind(this));
+
+            this._setQueryChildren(queryChildren);
+        },
+
+        _handleChildChanged: function(){
+            this._setQuery(this._query(this.queryChildren));
+        },
+
+        _onQueryChange: function(){
+            var jName = "urth-core-dataframe.query_change";
+            if( this.isDebouncerActive(jName) ) {
+                this.cancelDebouncer(jName);
+            }
+
+            this.debounce(jName, function(){
+                this._debug('urth-core-dataframe sending new query value', this.query);
+                this.sync({query: JSON.stringify(this.query)});
+                this.refresh();
+            }.bind(this), this.queryDelay);
+        },
+
+        /**
+         * Returns at most 10 elements from the array
+         *
+         * @param rows - All the data
+         * @return {Array}
+         * @private
+         */
+        _head: function(rows){
+            return rows.slice(0, 10);
         }
 
     });
