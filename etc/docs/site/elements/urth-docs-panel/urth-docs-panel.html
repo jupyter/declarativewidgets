@@ -376,7 +376,7 @@ content generated through Polymer [hydrolysis](https://github.com/Polymer/hydrol
             if (markdownData) {
                 page.markdownData = markdownData;
                 page.title = markdownData.title;
-                page.dataUrl = '../../' + markdownData.file;
+                page.dataUrl = markdownData.file;
                 if (page.section) {
                     // The `marked-element` sets id of each header section so use
                     // that as selector.
