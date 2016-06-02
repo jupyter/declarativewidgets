@@ -157,17 +157,6 @@
                 },
 
                 /**
-                 * Object containing UI information based on the current selection.
-                 * Returns an Array of Objects where `multiSelect` is enabled.
-                 */
-                selectionInfo: {
-                    type: Array,
-                    value: function () { return this.multiSelect ? [] : null; },
-                    readOnly: true,
-                    notify: true
-                },
-
-                /**
                  * Allows user to select multiple chart components (bar in barchart, slice in pie chart, etc).
                  */
                 multiSelect: {
