@@ -5,8 +5,8 @@ var wd = require('wd');
 var Boilerplate = require('./utils/boilerplate');
 var boilerplate = new Boilerplate();
 
-describe('Widgets System Test', function() {
-    boilerplate.setup(this.title, '/notebooks/tests/Walkthrough.ipynb');
+describe('Widgets Python System Test', function() {
+    boilerplate.setup(this.title, '/notebooks/tests/Walkthrough.ipynb', 13);
 
     it('should not execute Urth.whenReady API until components have upgraded', function(done) {
         boilerplate.browser
@@ -61,6 +61,8 @@ describe('Widgets System Test', function() {
             .type(boilerplate.SPECIAL_KEYS.Enter) // Needed for IE
             .type('watched message')
             .waitForElementById('test4', wd.asserters.textInclude('watched message'), 10000)
+            .elementsByCssSelector('div.output_area').nth(7)
+            .click()
             .nodeify(done);
     });
 
@@ -86,3 +88,4 @@ describe('Widgets System Test', function() {
             .nodeify(done);
     });
 });
+
