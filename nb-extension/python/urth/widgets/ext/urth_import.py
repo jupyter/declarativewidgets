@@ -63,12 +63,17 @@ class UrthImportHandler(RequestHandler):
 # Executes bower install requests in a subprocess and returns 0 for success
 # and non-zero for an error.
 def do_install(package_name):
-    logger.info('Installing {0}'.format(package_name))
+    logger.info('Installing %r', package_name)
+    args = ['bower', 'install', package_name, '--allow-root',
+            '--config.interactive=false', '--production', '--quiet']
+    # In Windows`bower` is not an `.exe` (see #373)
+    if os.name == 'nt':
+        args = ['cmd', '/C'] + args
     try:
-        subprocess.check_call(['bower', 'install', package_name, '--allow-root',
-                '--config.interactive=false', '--production', '--quiet'],
-                cwd=widgets_dir)
+        subprocess.check_call(args, cwd=widgets_dir)
     except subprocess.CalledProcessError as e:
+        logger.error("Failed installing %r into %r with cmd:\n  %s\n  due to: %s", 
+                     package_name, widgets_dir, args, e)
         return -1
 
     return 0
