@@ -3,10 +3,8 @@
  * Distributed under the terms of the Modified BSD License.
  */
 define([
-    'base/js/namespace',
-    'base/js/events',
-    './init/init'
-], function(Jupyter, events, init) {
+    'require'
+], function(require) {
     'use strict';
 
     var load_css = function (name) {
@@ -25,7 +23,7 @@ define([
                     '*': {
                         'jupyter-decl-widgets': 'nbextensions/declarativewidgets/js/widgets'
                     },
-                    'nbextensions/declarativewidgets/js/widgets': {
+                    'nbextensions/declarativewidgets/js': {
                         'jupyter-js-widgets': 'ipywidgets4-or-jupyter-js-widgets'
                     }
                 },
@@ -38,13 +36,19 @@ define([
                 }
             });
 
-            init({
-                namespace: Jupyter,
-                events: events
-            });
+            require([
+                'base/js/namespace',
+                'base/js/events',
+                './init/init'
+            ],function(Jupyter, events, init) {
+                init({
+                    namespace: Jupyter,
+                    events: events
+                });
 
-            load_css(window.Urth._getModuleBasedComponentRoot() + 'css/main.css');
-            console.debug('loaded declarativewidgets');
+                load_css(window.Urth._getModuleBasedComponentRoot() + 'css/main.css');
+                console.debug('loaded declarativewidgets');
+            });
         }
     };
 });
