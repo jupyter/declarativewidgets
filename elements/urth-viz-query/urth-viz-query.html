@@ -1,0 +1,190 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../urth-core-dataframe/urth-core-dataframe.html">
+<link rel="import" href="../urth-core-dataframe/urth-core-query-filter.html">
+<link rel="import" href="../urth-viz-table/urth-viz-table.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+
+<!--
+This element represents a query executed against an urth-core-dataframe element.
+
+Example:
+@group Urth Viz
+@element urth-viz-query
+-->
+
+<dom-module id="urth-viz-query">
+    <style>
+        .querior > h3 {
+            font-variant: small-caps;
+        }
+        .querior > urth-viz-table {
+            margin-top: 1em;
+            display: block;
+        }
+        .query-rule {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+        }
+        .query-rule.enabled-false {
+            display: none;
+        }
+        .query-rule > :not(paper-button) {
+            margin-left: 0.3em;
+            margin-right: 0.3em;
+        }
+        .query-rule > paper-button {
+            min-width: initial;
+            align-items: flex-end;
+            color: #737373;
+        }
+        .query-rule > paper-button[disabled] {
+            visibility: hidden;
+        }
+    </style>
+​
+  <template>
+    <div class="querior">
+        <h3>Match <em>all</em> of the following rules:</h3>
+        <div class="query-rule">
+            <paper-dropdown-menu label="column" selected-item-label="{{col1}}">
+                <paper-listbox class="dropdown-content">
+                    <template is="dom-repeat" items="{{df.columns}}">
+                        <paper-item>{{item}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-dropdown-menu>
+                <paper-listbox class="dropdown-content" selected="{{op1}}" attr-for-selected="value">
+                    <paper-item value="==">equals</paper-item>
+                    <paper-item value="!=">does not equal</paper-item>
+                    <!-- <paper-item>contains</paper-item>
+                    <paper-item>does not contain</paper-item> -->
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-input label="value" value="{{val1}}"></paper-input>
+            <paper-button disabled="[[!val1]]" toggles active="{{toggle1}}">
+                <iron-icon icon="icons:add-circle-outline"></iron-icon>
+            </paper-button>
+        </div>
+        <div class$="query-rule enabled-{{toggle1}}">
+            <paper-dropdown-menu label="column" selected-item-label="{{col2}}">
+                <paper-listbox class="dropdown-content">
+                    <template is="dom-repeat" items="{{df.columns}}">
+                        <paper-item>{{item}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-dropdown-menu>
+                <paper-listbox class="dropdown-content" selected="{{op2}}" attr-for-selected="value">
+                    <paper-item value="==">equals</paper-item>
+                    <paper-item value="!=">does not equal</paper-item>
+                    <!-- <paper-item>contains</paper-item>
+                    <paper-item>does not contain</paper-item> -->
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-input label="value" value="{{val2}}"></paper-input>
+            <paper-button disabled="[[!val2]]" toggles active="{{toggle2}}">
+                <iron-icon icon="icons:add-circle-outline"></iron-icon>
+            </paper-button>
+        </div>
+        <div class$="query-rule enabled-{{toggle2}}">
+            <paper-dropdown-menu label="column" selected-item-label="{{col3}}">
+                <paper-listbox class="dropdown-content">
+                    <template is="dom-repeat" items="{{df.columns}}">
+                        <paper-item>{{item}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-dropdown-menu>
+                <paper-listbox class="dropdown-content" selected="{{op3}}" attr-for-selected="value">
+                    <paper-item value="==">equals</paper-item>
+                    <paper-item value="!=">does not equal</paper-item>
+                    <!-- <paper-item>contains</paper-item>
+                    <paper-item>does not contain</paper-item> -->
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-input label="value" value="{{val3}}"></paper-input>
+            <paper-button disabled="[[!val3]]" toggles active="{{toggle3}}">
+                <iron-icon icon="icons:add-circle-outline"></iron-icon>
+            </paper-button>
+        </div>
+        <div class$="query-rule enabled-{{toggle3}}">
+            <paper-dropdown-menu label="column" selected-item-label="{{col4}}">
+                <paper-listbox class="dropdown-content">
+                    <template is="dom-repeat" items="{{df.columns}}">
+                        <paper-item>{{item}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-dropdown-menu>
+                <paper-listbox class="dropdown-content" selected="{{op4}}" attr-for-selected="value">
+                    <paper-item value="==">equals</paper-item>
+                    <paper-item value="!=">does not equal</paper-item>
+                    <!-- <paper-item>contains</paper-item>
+                    <paper-item>does not contain</paper-item> -->
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-input label="value" value="{{val4}}"></paper-input>
+            <paper-button disabled="[[!val4]]" toggles active="{{toggle4}}">
+                <iron-icon icon="icons:add-circle-outline"></iron-icon>
+            </paper-button>
+        </div>
+        <div class$="query-rule enabled-{{toggle4}}">
+            <paper-dropdown-menu label="column" selected-item-label="{{col5}}">
+                <paper-listbox class="dropdown-content">
+                    <template is="dom-repeat" items="{{df.columns}}">
+                        <paper-item>{{item}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-dropdown-menu>
+                <paper-listbox class="dropdown-content" selected="{{op5}}" attr-for-selected="value">
+                    <paper-item value="==">equals</paper-item>
+                    <paper-item value="!=">does not equal</paper-item>
+                    <!-- <paper-item>contains</paper-item>
+                    <paper-item>does not contain</paper-item> -->
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-input label="value" value="{{val5}}"></paper-input>
+            <paper-button disabled="[[!val5]]" toggles active="{{toggle5}}" style="visibility:hidden;">
+                <iron-icon icon="icons:add-circle-outline"></iron-icon>
+            </paper-button>
+        </div>
+​
+        <urth-core-dataframe id="df1" ref="{{dataframe}}" value="{{df}}" limit="20">
+            <urth-core-query-filter disabled="[[!val1]]">{{col1}} {{op1}} '[[val1]]'</urth-core-query-filter>
+            <urth-core-query-filter disabled="[[!val2]]">{{col2}} {{op2}} '[[val2]]'</urth-core-query-filter>
+            <urth-core-query-filter disabled="[[!val3]]">{{col3}} {{op3}} '[[val3]]'</urth-core-query-filter>
+            <urth-core-query-filter disabled="[[!val4]]">{{col4}} {{op4}} '[[val4]]'</urth-core-query-filter>
+            <urth-core-query-filter disabled="[[!val5]]">{{col5}} {{op5}} '[[val5]]'</urth-core-query-filter>
+        </urth-core-dataframe>
+        <h3>Results:</h3>
+        <urth-viz-table datarows="{{df.data}}" columns="{{df.columns}}"></urth-viz-table>
+    </div>
+  </template>
+</dom-module>
+<script>
+(function(){
+    'use strict';
+
+    window.Urth = window.Urth || {};
+
+    window.Urth['urth-viz-query'] = Polymer({
+        is: 'urth-viz-query',
+
+        properties: {
+            dataframe: String
+        }
+    });
+})();
+</script>

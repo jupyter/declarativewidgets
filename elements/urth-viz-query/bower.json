@@ -1,0 +1,33 @@
+{
+  "name": "urth-viz-query",
+  "version": "0.0.1",
+  "authors": [
+    "Jupyter Community"
+  ],
+  "description": "A widget that executes queries against a given dataframe.",
+  "main": "urth-viz-query.html",
+  "keywords": [
+    "urth",
+    "query",
+    "dataframe",
+    "web-components"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "fontawesome": "*",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu",
+    "paper-listbox": "PolymerElements/paper-listbox",
+    "paper-item": "PolymerElements/paper-item",
+    "paper-button": "PolymerElements/paper-button",
+    "paper-input": "PolymerElements/paper-input",
+    "iron-icon": "PolymerElements/iron-icon",
+    "polymer": "Polymer/polymer#^1.2.4"
+  },
+  "private": true
+}
