@@ -9,9 +9,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="../bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <link rel="import" href="urth-docs.html">
     <link rel="import" href="elements/urth-docs-panel/urth-docs-panel.html">
 </head>
 <body class="fullbleed unresolved" unresolved>
-    <urth-docs-panel doc-src="generated_docs.json" repository-url="https://github.com/jupyter-incubator/declarativewidgets"></urth-docs-panel>
+    <urth-docs-panel id="DocsPanel" doc-src="generated_docs.json" repository-url="https://github.com/jupyter-incubator/declarativewidgets"></urth-docs-panel>
 </body>
+<script>
+    HTMLImports.whenReady(function() {
+        if (window.URTH_DOCS) {
+            var urthDocs = document.getElementById('DocsPanel');
+            urthDocs.setAttribute('urth-docs', JSON.stringify(URTH_DOCS));
+        }
+    });
+</script>
 </html>

@@ -1,2 +1,2 @@
-recursive-include declarativewidgets/static *.html *.js *.css *.jar *.json *.tgz
+recursive-include declarativewidgets/static *.html *.js *.css *.jar *.json *.tgz *.md
 include VERSION

@@ -1,12 +1,23 @@
-
+<link rel="import" href="../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../../bower_components/iron-component-page/iron-component-page.html">
 <link rel="import" href="../../../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../../../bower_components/marked-element/marked-element.html">
 <link rel="import" href="../../../bower_components/paper-drawer-panel/paper-drawer-panel.html">
 <link rel="import" href="../../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
 
+<!--
+An element to display markdown and API docs. Contains a responsive header and
+left hand navigation along with a content panel to display markdown content and
+content generated through Polymer [hydrolysis](https://github.com/Polymer/hydrolysis).
+
+@group Urth Docs
+@element urth-docs-panel
+-->
 <dom-module id='urth-docs-panel'>
     <template>
         <style>
@@ -70,9 +81,66 @@
                 text-decoration: none;
             }
 
+            .doc-container {
+                padding: 20px;
+                margin: 0 auto;
+                max-width: 48em;
+            }
+
+            .doc-heading {
+                color: #424242;
+                font-family: 'Roboto','Noto',sans-serif;
+                -webkit-font-smoothing: antialiased;
+                white-space: nowrap;
+                font-size: 20px;
+                font-weight: 500;
+                line-height: 28px;
+            }
+
+            .urth-docs {
+                font-family: 'Roboto','Noto',sans-serif;
+                -webkit-font-smoothing: antialiased;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 20px;
+                color: #212121;
+            }
+
+            .urth-docs code {
+                font-family: 'Roboto Mono','Consolas','Menlo',monospace;
+                -webkit-font-smoothing: antialiased;
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 20px;
+                background: #eeeeee;
+                padding: 3px;
+                border-radius: 3px;
+            }
+
+            .urth-docs blockquote {
+                padding: 0 15px;
+                color: #777;
+                border-left: 4px solid #ddd;
+            }
+
+            .urth-docs pre {
+                background-color: #eeeeee;
+                border-radius: 3px;
+                font-size: 15px;
+                overflow-x: auto;
+                padding: 12px 24px;
+                word-wrap: break-word;
+            }
+
             paper-header-panel[drawer] {
                 --paper-header-panel-waterfall-container: {
                     background: #343131;
+                 };
+            }
+
+            paper-header-panel[main] {
+                --paper-header-panel-waterfall-container: {
+                    background: #fafafa;
                  };
             }
 
@@ -94,34 +162,60 @@
                 --paper-toolbar-color: #000000;
             }
         </style>
+
+        <app-location route="{{_route}}" use-hash-as-path></app-location>
+        <app-route route="{{_route}}" pattern=":fragment" data="{{_routeData}}"></app-route>
+
         <paper-drawer-panel id="drawerPanel">
             <paper-header-panel drawer mode="waterfall">
                 <paper-toolbar class="elementbar">
                     <a class="project-name" href$="[[homeUrl]]">Jupyter Declaritive Widgets</a>
                 </paper-toolbar>
-                <iron-selector id="selector" attr-for-selected="name" selectable=".selectable" selected="{{activeDescriptor}}">
+                <iron-selector id="selector" attr-for-selected="name" selectable=".selectable" selected="{{_selectedTopic}}">
+                    <div class="selector-header">Usage</div>
+                    <template is="dom-repeat" items="[[urthDocs]]">
+                        <div class="selectable" name="[[item.title]]">[[item.title]]</div>
+                    </template>
                     <div class="selector-header">Elements</div>
-                    <template is="dom-repeat" items="[[elementDescriptors]]">
+                    <template is="dom-repeat" items="[[_elementDescriptors]]">
                         <div class="selectable" name="[[item.is]]">[[item.is]]</div>
                     </template>
                     <div class="selector-header">Behaviors</div>
-                    <template is="dom-repeat" items="[[behaviorDescriptors]]">
+                    <template is="dom-repeat" items="[[_behaviorDescriptors]]">
                         <div class="selectable" name="[[item.is]]">[[item.is]]</div>
                     </template>
-                <iron-selector>
+                </iron-selector>
             </paper-header-panel>
-            <paper-header-panel main mode="waterfall">
+            <paper-header-panel id="contentHeaderPanel" main mode="waterfall">
                 <paper-toolbar class="navbar">
                     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
                     <template is="dom-if" if="[[repositoryUrl]]">
                         <a class="top-nav-item" href$="[[repositoryUrl]]">Repository</a>
                     </template>
                 </paper-toolbar>
-                <iron-component-page catalog active="{{activeDescriptor}}" doc-elements="{{elementDescriptors}}"
-                        doc-behaviors="{{behaviorDescriptors}}" doc-src="[[docSrc]]">
-                </iron-component-page>
+                <div id="docContainer" class="doc-container">
+                    <template id="pageContainer" is="dom-if" if="[[_selectedPage]]">
+                        <h2 class="doc-heading">[[_selectedPage.title]]</h2>
+                        <template is="dom-if" if="[[_selectedPage.markdownData]]">
+                            <iron-ajax auto url="[[_selectedPage.dataUrl]]" handle-as="text"
+                                    last-response="{{markdownDocContent}}"></iron-ajax>
+                            <marked-element id="markdownContainer" markdown="[[markdownDocContent]]">
+                                <div class="markdown-html urth-docs"></div>
+                            </marked-element>
+                        </template>
+                        <template id="apiContainer" is="dom-if" if="[[!_selectedPage.markdownData]]">
+                            <iron-doc-viewer descriptor="[[_selectedPage.descriptor]]"
+                                    prefix="[[_selectedPage.prefix]]"
+                                    on-iron-doc-viewer-component-selected="_handleComponentSelectedEvent">
+                            </iron-doc-viewer>
+                        </template>
+                    </template>
+                </div>
             </paper-header-panel>
         </paper-drawer-panel>
+        <iron-component-page id="ironComponentPage" catalog doc-elements="{{_elementDescriptors}}"
+                        doc-behaviors="{{_behaviorDescriptors}}" doc-src="[[docSrc]]" style="display:none;">
+        </iron-component-page>
     </template>
 
     <script>
@@ -129,22 +223,90 @@
         is: 'urth-docs-panel',
         properties: {
             /**
-             * Data rows for table. Must be an Array of Arrays
-             *
-             * @attribute datarows
-             * @type Array
+             * An Array of objects describing the markdown content to render.
+             * Required.
+             */
+            urthDocs: {
+                type: Array
+            },
+            /**
+             * Path to the json generated from hydrolysis
+             * of the API documentation. Required.
              */
             docSrc: {
                 type: String
             },
+            /**
+             * URL of the source repository being documented.
+             */
             repositoryUrl: {
                 type: String
             },
+            /**
+             * URL of the home page for the project.
+             */
             homeUrl: {
                 type: String,
                 value: '.'
+            },
+            /**
+             * The element descriptors parsed from the `docSrc` data.
+             */
+            _elementDescriptors: {
+                type: Array
+            },
+            /**
+             * The behavior descriptors parsed from the `docSrc` data.
+             */
+            _behaviorDescriptors: {
+                type: Array
+            },
+            /**
+             * An object representing the current URL path.
+             */
+            _route: {
+                type: Object,
+            },
+            /**
+             * Custom data parsed from the current URL path.
+             */
+            _routeData: {
+                type: Object,
+            },
+            /**
+             * An object representing the current page.
+             */
+            _selectedPage: {
+                type: Object,
+                computed: '_getSelectedPage(_fragment, _elementDescriptors, _behaviorDescriptors)'
+            },
+            /**
+             * The fragment piece of the current URL path.
+             */
+            _fragment: {
+                type: String,
+                readOnly: true
+            },
+            /**
+             * The charactor used to separate the topic from the section in the
+             * URL fragment.
+             */
+            _fragmentSeparator: {
+                type: String,
+                value: '+'
+            },
+            /**
+             * The name of the selected topic in the navigation tree.
+             */
+            _selectedTopic: {
+                type: String,
+                observer: '_setSelectedDocFromNav'
             }
         },
+        observers: [
+            '_setFragment(_routeData, urthDocs)',
+            '_scrollPage(_selectedPage)'
+        ],
 
         ready: function() {
             this.$.selector.addEventListener('iron-activate', function() {
@@ -152,6 +314,221 @@
                     this.$.drawerPanel.closeDrawer();
                 }
             }.bind(this));
+
+            this.$.selector.addEventListener('iron-select', function() {
+                if (!this.$.drawerPanel.narrow) {
+                    // if the selected doc label is not visible on screen, we need to scroll it into view
+                    if (this.$.selector.selectedItem.getBoundingClientRect().bottom > window.innerHeight) {
+                        this.$.selector.selectedItem.scrollIntoView();
+                    }
+                }
+            }.bind(this));
+
+            // Links in the docs will be target references (ie '#urth-core-channel').
+            // Browsers seem to shortcut that and don't reload the page. Since
+            // this element uses '#' to page navigate, need to intercept clicks
+            // and update `_routeData`.
+            this.$.docContainer.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    var href = e.target.getAttribute('href');
+                    if (href && href[0] === '#') {
+                        this._routeData = {
+                            fragment: href.slice(1)
+                        };
+                    }
+                }
+            }.bind(this))
+        },
+
+        /**
+         * Builds a fragment based on the specified topic, section id and
+         * configured fragment separator.
+         *
+         * @param {String} topic The documentation topic.
+         * @param {String} id The section identifier.
+         * @return {String} The composed fragment.
+         */
+        _buildFragment: function(topic, id) {
+            return topic + (id !== undefined && id !== null ? this._fragmentSeparator + id : '');
+        },
+
+        /**
+         * Builds an object representation of the requested page. Invoked by
+         * data binding when all properties have been initialized in order to
+         * prevent premature rendering before data is ready.
+         *
+         * @param {String} fragment The requested URL fragment.
+         * @param {Array} elementDescriptors The element descriptors.
+         * @param {Array} behaviorDescriptors The behavior descriptors.
+         * @return {Object} An object representation of the requested page.
+         */
+        _getSelectedPage: function(fragment, elementDescriptors, behaviorDescriptors) {
+            if (!fragment) {
+                return;
+            }
+            var page = this._parseFragment(fragment);
+
+            // Determine if the fragment represents markdown or api docs.
+            var markdownData = this.urthDocs.find(function(doc) {
+                return doc.url === page.id;
+            });
+
+            if (markdownData) {
+                page.markdownData = markdownData;
+                page.title = markdownData.title;
+                page.dataUrl = markdownData.file;
+                if (page.section) {
+                    // The `marked-element` sets id of each header section so use
+                    // that as selector.
+                    page.selector = '#' + page.section
+                }
+            } else {
+                var components = this.$.ironComponentPage.docElements.concat(this.$.ironComponentPage.docBehaviors);
+
+                page.descriptor = components.find(function(component) {
+                    return component.is === page.id;
+                });
+
+                if (page.section) {
+                    // `iron-doc-viewer` sets either the `anchor-id` attribute
+                    // or `id` attribute to the configured prefix and section
+                    // name. ie. 'urth-core-channel+property-auto'
+                    var selector = this._buildFragment(page.id + '\\', page.section);
+                    page.selector = '[anchor-id="' + selector + '"]' + ', #' + selector;
+                }
+            }
+
+            // Prefix used by `iron-doc-viewer` for all links. This prefix
+            // ensures the url always contains the page and an option section.
+            page.prefix = this._buildFragment(page.id, '');
+
+            // Update navigation tree so correct item is selected.
+            this._selectedTopic = page.title;
+
+            return page;
+        },
+
+        /**
+        * Update `_routeData` when a behavior is clicked.
+        *
+        * @param {Object} ev The click event.
+        */
+        _handleComponentSelectedEvent: function(ev) {
+            // `iron-doc-viewer` fires an `iron-doc-viewer-component-selected`
+            // event when one of the implemented behaviors at the bottom of API
+            // docs is clicked. This method allows proper navigation for the
+            // list of behaviors.
+            if (ev.detail) {
+                this._routeData = {
+                    fragment: ev.detail
+                };
+            }
+        },
+
+        /**
+        * Parse the fragment into its individual components.
+        *
+        * @param {String} fragment The URL fragment to parse.
+        * @return {Object} An object representation of the fabric with `id`,
+        * `section` and `title` properties set appropriately.
+        */
+        _parseFragment: function(fragment) {
+            var page = {
+                id: fragment,
+                title: fragment
+            };
+            var pieces = fragment.split(this._fragmentSeparator);
+
+            if (pieces.length > 1) {
+                page.id = pieces[0];
+                page.section = pieces[1];
+                page.title = pieces[0];
+            }
+
+            return page;
+        },
+
+        /**
+        * Manages the scrollpoint of a page when navigation occurs.
+        *
+        * @param {Object} page The object representation of the current page.
+        */
+        _scrollPage: function(page) {
+            if (page && page.selector) {
+                // Force the page to render first, so the element identified
+                // by the selector will be in the page.
+                this.$.pageContainer.render();
+                if (page.markdownData) {
+                    // Need to wait for the markdown content to render before
+                    // scrolling.
+                    var container = this.$$('#markdownContainer');
+                    var callback = function() {
+                        container.removeEventListener('marked-render-complete', callback);
+                        this._scrollSection(page.selector);
+                    }.bind(this)
+                    container.addEventListener('marked-render-complete', callback);
+                } else {
+                    this._scrollSection(page.selector)
+                }
+            } else {
+                // Default is to scroll to top of page on navigation.
+                this.$.contentHeaderPanel.scroller.scrollTop = 0;
+            }
+        },
+
+        /**
+        * Attempts to scroll the page to an element identified by the specified
+        * CSS selector.
+        *
+        * @param {String} selector The CSS element selector.
+        */
+        _scrollSection: function(selector) {
+            var anchorElem = this.querySelector(selector);
+            if (anchorElem) {
+                anchorElem.scrollIntoView();
+            } else {
+                // Default to scrolling doc content pane back to top if selector
+                // did not match an element.
+                this.$.contentHeaderPanel.scroller.scrollTop = 0;
+            }
+        },
+
+        /**
+         * Sets the `_fragment` property to the value in the `_routeData`.
+         * If `_routeData` is not defined, then sets a default `_route`.
+         *
+         * @param {Object} routeData The URL route data.
+         * @param {Array} urthDocs Array of objects representing markdown content.
+         */
+        _setFragment: function(routeData, urthDocs) {
+            if (!routeData || !routeData.fragment) {
+                if (urthDocs && urthDocs[0] && urthDocs[0].url) {
+                    // Default to first markdown file.
+                    this._route = { path: urthDocs[0].url, prefix: '' };
+                }
+            } else {
+                this._set_fragment(routeData.fragment);
+            }
+        },
+
+        /**
+         * Update the `_routeData` based on the selected navigation item.
+         *
+         * @param {String} selectedTopic The selected item in the navigation.
+         * @param {String} oldTopic The previous selected navigation item.
+         */
+        _setSelectedDocFromNav: function(selectedTopic, oldTopic) {
+            var data = this.urthDocs.find(function(doc) {
+                return doc.title === selectedTopic;
+            });
+            var topic = data && data.url ? data.url : selectedTopic;
+
+            if (!this._routeData || !this._routeData.fragment ||
+                topic !== this._routeData.fragment) {
+                this._routeData = {
+                    fragment: data && data.url ? data.url : selectedTopic
+                };
+            }
         }
     });
     </script>
