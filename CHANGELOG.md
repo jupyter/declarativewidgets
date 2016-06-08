@@ -1,4 +1,9 @@
 # Changelog
+## 0.5.3 (2016-06-08)
+* Fixes to timing error related to loading order of this extension in relation to ipywidgets/jupyter-js-widgets
+* Fixes to support running Windows
+* Added selection-info on `<urth-viz-table>` to get cell coordinates
+
 ## 0.5.2 (2016-05-03)
 * Support for selectionIndex in urth-viz-*
 * Custom serializers in R
@@ -12,8 +17,8 @@
 * Support for R language through IRkernel
 * `selection` property on charts references row data. Chart-specific selection data available as `selectionInfo`
 * `selection` property on charts references a single row rather than Array of length==1, continues to return Array of rows when `multiSelect` is used.
-* New element <urth-help> to display help documentation inline
-* New element <urth-viz-ipywidget> to embed an ipywidget in a declarative template
+* New element `<urth-help>` to display help documentation inline
+* New element `<urth-viz-ipywidget>` to embed an ipywidget in a declarative template
 * Better support for dependency injection when starting up declarativewidgets
 
 ## 0.4.5 (2016-04-06)
