@@ -1,6 +1,13 @@
 # Changelog
 ## 0.6.0 (ONLY PRE RELEASED)
-* User must manualy activate declarativewidgets using a code cell
+* User must manually activate declarativewidgets using a code cell
+* Declarative query support for dataframes
+* Usage documentation
+
+## 0.5.3 (2016-06-08)
+* Fixes to timing error related to loading order of this extension in relation to ipywidgets/jupyter-js-widgets
+* Fixes to support running Windows
+* Added selection-info on `<urth-viz-table>` to get cell coordinates
 
 ## 0.5.2 (2016-05-03)
 * Support for selectionIndex in urth-viz-*
