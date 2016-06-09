@@ -89,9 +89,9 @@ Widget <- R6Class("Widget",
 create_widget_instance <- function(class_name, comm, serializer, querier) {
     switch(
         class_name,
-        urth.widgets.widget_function.Function      = return (Widget_Function$new(comm = comm, serializer = serializer)),
-        urth.widgets.widget_channels.Channels      = return (Widget_Channels$new(comm = comm, serializer = serializer)),
-        urth.widgets.widget_dataframe.DataFrame    = return (Widget_Dataframe$new(comm = comm, serializer = serializer, querier = querier)),
+        declarativewidgets.Function      = return (Widget_Function$new(comm = comm, serializer = serializer)),
+        declarativewidgets.Channels      = return (Widget_Channels$new(comm = comm, serializer = serializer)),
+        declarativewidgets.DataFrame    = return (Widget_Dataframe$new(comm = comm, serializer = serializer, querier = querier)),
         print(c('Got unhandled class_name:', class_name))
     )
 }
