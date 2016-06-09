@@ -263,7 +263,12 @@ Note that when using the 'click' event approach described above in #3, a click o
                     this.send({
                         event: 'invoke',
                         args: argsToSend
-                    });
+                    }).then(function(){
+                        //after each invocation is done, check if the status is back to ok
+                        if( this.getModelStatusMsg().status === 'ok' ){
+                            this._clearErrorMessages();
+                        }
+                    }.bind(this));
                 }.bind(this), this.delay);
             },
 
