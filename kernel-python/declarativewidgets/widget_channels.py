@@ -42,7 +42,7 @@ class Channels(UrthWidget):
         # The Kernel errors if the inline magic runs
         # after the modules get imported.
         if self.serializer is None:
-            from urth.util.serializer import Serializer
+            from .util.serializer import Serializer
             self.serializer = Serializer()
 
         attr = "{}:{}".format(chan, key)

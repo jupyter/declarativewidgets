@@ -11,7 +11,7 @@ except ImportError as e:
     from mock import Mock
 
 from ipykernel.comm import Comm
-from ..widget_channels import *
+from declarativewidgets.widget_channels import *
 
 
 class TestWidgetChannels(unittest.TestCase):

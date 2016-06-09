@@ -11,7 +11,7 @@ except ImportError as e:
     from mock import Mock
 
 from ipykernel.comm import Comm
-from ..urth_widget import *
+from declarativewidgets.urth_widget import *
 
 
 class TestUrthWidget(unittest.TestCase):

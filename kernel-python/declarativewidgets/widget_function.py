@@ -4,8 +4,8 @@
 from traitlets import Integer, Unicode # Used to declare attributes of our widget
 from IPython.core.getipython import get_ipython
 
-from urth.util.serializer import Serializer
-from urth.util.functions import apply_with_conversion, signature_spec
+from .util.serializer import Serializer
+from .util.functions import apply_with_conversion, signature_spec
 from .urth_widget import UrthWidget
 from .urth_exception import UrthException
 

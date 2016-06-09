@@ -32,3 +32,10 @@ def init():
 
     # Send the code to the browser.
     display(Javascript(code))
+
+from .widget_channels import channel
+from .widget_channels import Channels
+from .widget_function import Function
+from .widget_dataframe import DataFrame
+from .widget_ipw_proxy import IpywProxy
+

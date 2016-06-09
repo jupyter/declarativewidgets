@@ -21,11 +21,12 @@ NOTE: Due to changed syntax for meta-classes, this is not compatible with
 import sys
 import json
 
-from urth.util.serializer_registrar import SerializerRegistrar
+from .serializer_registrar import SerializerRegistrar
+
 if sys.version_info[0] == 2:
-    from urth.util.base_serializer_py2 import BaseSerializer
+    from .base_serializer_py2 import BaseSerializer
 else:
-    from urth.util.base_serializer_py3 import BaseSerializer
+    from .base_serializer_py3 import BaseSerializer
 
 
 class PandasSeriesSerializer(BaseSerializer):
@@ -48,7 +49,7 @@ class PandasSeriesSerializer(BaseSerializer):
         except ImportError:
             return False
         return True
-    
+
 class PandasDataFrameSerializer(BaseSerializer):
     """A serializer for pandas.DataFrame"""
 

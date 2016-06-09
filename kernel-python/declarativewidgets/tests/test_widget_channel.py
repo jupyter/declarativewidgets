@@ -11,8 +11,8 @@ except ImportError as e:
     from mock import Mock
 
 from ipykernel.comm import Comm
-from .. import widget_channels
-from ..widget_channels import Channels, Channel
+from declarativewidgets import widget_channels
+from declarativewidgets.widget_channels import Channels, Channel
 from collections import defaultdict
 
 

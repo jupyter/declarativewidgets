@@ -6,21 +6,21 @@
 Serialization is done using the `serialize()` method of the `Serializer` class.
 
 The serialization is performed using subclasses of BaseSerializer, implemented
-in the urth.util.serializers package. Each BaseSerializer subclass defines
+in the declarativewidgets.util.serializers package. Each BaseSerializer subclass defines
 the serialization process for one class. If a variable's class matches the
 class represented by a serializer, that serializer will be used to serialize
 the variable.
 
 New serializers are registered by declaring a new subclass of BaseSerializer
-in the urth.util.serializers package.
+in the declarativewidgets.util.serializers package.
 
 """
 
-import urth.util.serializers as serializers
-import urth.util.serializer_registrar as sr
+from .serializers import BaseSerializer
+from .serializer_registrar import serializer_map as sr_map
 
 
-class Serializer():
+class Serializer:
     """ A class used to serialize objects.
 
     Examples
@@ -70,7 +70,7 @@ class Serializer():
             A map of classes to serialization functions.
 
         """
-        return sr.serializer_map
+        return sr_map
 
     def _valid_serializer(self, cls):
         """Checks whether a class name represents a valid serializer class.
@@ -85,6 +85,6 @@ class Serializer():
         boolean
             True if `cls` is a valid serializer class
         """
-        return (issubclass(cls, serializers.BaseSerializer)
-                and cls != serializers.BaseSerializer
+        return (issubclass(cls, BaseSerializer)
+                and cls != BaseSerializer
                 and cls.check_packages())

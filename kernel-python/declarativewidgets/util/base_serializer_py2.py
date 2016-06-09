@@ -1,7 +1,8 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from urth.util.serializer_registrar import SerializerRegistrar
+from .serializer_registrar import SerializerRegistrar
+
 
 class BaseSerializer(object):
     """
