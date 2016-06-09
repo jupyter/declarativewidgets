@@ -55,8 +55,9 @@ Example:
   <template>
     <div class="querior">
         <h3>Match <em>all</em> of the following rules:</h3>
+<template is="dom-repeat" items="{{rules}}" as="rule">
         <div class="query-rule">
-            <paper-dropdown-menu label="column" selected-item-label="{{col1}}">
+            <paper-dropdown-menu label="column" selected-item-label="{{rule.col}}">
                 <paper-listbox class="dropdown-content">
                     <template is="dom-repeat" items="{{df.columns}}">
                         <paper-item>{{item}}</paper-item>
@@ -64,18 +65,20 @@ Example:
                 </paper-listbox>
             </paper-dropdown-menu>
             <paper-dropdown-menu>
-                <paper-listbox class="dropdown-content" selected="{{op1}}" attr-for-selected="value">
+                <paper-listbox class="dropdown-content" selected="{{rule.op}}" attr-for-selected="value">
                     <paper-item value="==">equals</paper-item>
                     <paper-item value="!=">does not equal</paper-item>
                     <!-- <paper-item>contains</paper-item>
                     <paper-item>does not contain</paper-item> -->
                 </paper-listbox>
             </paper-dropdown-menu>
-            <paper-input label="value" value="{{val1}}"></paper-input>
-            <paper-button disabled="[[!val1]]" toggles active="{{toggle1}}">
+            <paper-input label="value" value="{{rule.val}}"></paper-input>
+            <paper-button disabled="[[!rule.val]]" toggles active="{{toggle1}}">
                 <iron-icon icon="icons:add-circle-outline"></iron-icon>
             </paper-button>
         </div>
+</template>
+<!--
         <div class$="query-rule enabled-{{toggle1}}">
             <paper-dropdown-menu label="column" selected-item-label="{{col2}}">
                 <paper-listbox class="dropdown-content">
@@ -88,8 +91,8 @@ Example:
                 <paper-listbox class="dropdown-content" selected="{{op2}}" attr-for-selected="value">
                     <paper-item value="==">equals</paper-item>
                     <paper-item value="!=">does not equal</paper-item>
-                    <!-- <paper-item>contains</paper-item>
-                    <paper-item>does not contain</paper-item> -->
+                    <!- <paper-item>contains</paper-item>
+                    <paper-item>does not contain</paper-item> ->
                 </paper-listbox>
             </paper-dropdown-menu>
             <paper-input label="value" value="{{val2}}"></paper-input>
@@ -97,76 +100,11 @@ Example:
                 <iron-icon icon="icons:add-circle-outline"></iron-icon>
             </paper-button>
         </div>
-        <div class$="query-rule enabled-{{toggle2}}">
-            <paper-dropdown-menu label="column" selected-item-label="{{col3}}">
-                <paper-listbox class="dropdown-content">
-                    <template is="dom-repeat" items="{{df.columns}}">
-                        <paper-item>{{item}}</paper-item>
-                    </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-dropdown-menu>
-                <paper-listbox class="dropdown-content" selected="{{op3}}" attr-for-selected="value">
-                    <paper-item value="==">equals</paper-item>
-                    <paper-item value="!=">does not equal</paper-item>
-                    <!-- <paper-item>contains</paper-item>
-                    <paper-item>does not contain</paper-item> -->
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-input label="value" value="{{val3}}"></paper-input>
-            <paper-button disabled="[[!val3]]" toggles active="{{toggle3}}">
-                <iron-icon icon="icons:add-circle-outline"></iron-icon>
-            </paper-button>
-        </div>
-        <div class$="query-rule enabled-{{toggle3}}">
-            <paper-dropdown-menu label="column" selected-item-label="{{col4}}">
-                <paper-listbox class="dropdown-content">
-                    <template is="dom-repeat" items="{{df.columns}}">
-                        <paper-item>{{item}}</paper-item>
-                    </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-dropdown-menu>
-                <paper-listbox class="dropdown-content" selected="{{op4}}" attr-for-selected="value">
-                    <paper-item value="==">equals</paper-item>
-                    <paper-item value="!=">does not equal</paper-item>
-                    <!-- <paper-item>contains</paper-item>
-                    <paper-item>does not contain</paper-item> -->
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-input label="value" value="{{val4}}"></paper-input>
-            <paper-button disabled="[[!val4]]" toggles active="{{toggle4}}">
-                <iron-icon icon="icons:add-circle-outline"></iron-icon>
-            </paper-button>
-        </div>
-        <div class$="query-rule enabled-{{toggle4}}">
-            <paper-dropdown-menu label="column" selected-item-label="{{col5}}">
-                <paper-listbox class="dropdown-content">
-                    <template is="dom-repeat" items="{{df.columns}}">
-                        <paper-item>{{item}}</paper-item>
-                    </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-dropdown-menu>
-                <paper-listbox class="dropdown-content" selected="{{op5}}" attr-for-selected="value">
-                    <paper-item value="==">equals</paper-item>
-                    <paper-item value="!=">does not equal</paper-item>
-                    <!-- <paper-item>contains</paper-item>
-                    <paper-item>does not contain</paper-item> -->
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-input label="value" value="{{val5}}"></paper-input>
-            <paper-button disabled="[[!val5]]" toggles active="{{toggle5}}" style="visibility:hidden;">
-                <iron-icon icon="icons:add-circle-outline"></iron-icon>
-            </paper-button>
-        </div>
-​
+-->
         <urth-core-dataframe id="df1" ref="{{dataframe}}" value="{{df}}" limit="20">
-            <urth-core-query-filter disabled="[[!val1]]">{{col1}} {{op1}} '[[val1]]'</urth-core-query-filter>
-            <urth-core-query-filter disabled="[[!val2]]">{{col2}} {{op2}} '[[val2]]'</urth-core-query-filter>
-            <urth-core-query-filter disabled="[[!val3]]">{{col3}} {{op3}} '[[val3]]'</urth-core-query-filter>
-            <urth-core-query-filter disabled="[[!val4]]">{{col4}} {{op4}} '[[val4]]'</urth-core-query-filter>
-            <urth-core-query-filter disabled="[[!val5]]">{{col5}} {{op5}} '[[val5]]'</urth-core-query-filter>
+            <template is="dom-repeat" items="{{rules}}" as="rule" filter="hasValue" observe="val">
+                <urth-core-query-filter disabled="[[!rule.val]]">{{ruleExpression(rule.col, rule.op, rule.val)}}</urth-core-query-filter>
+            </template>
         </urth-core-dataframe>
         <h3>Results:</h3>
         <urth-viz-table datarows="{{df.data}}" columns="{{df.columns}}"></urth-viz-table>
@@ -183,8 +121,24 @@ Example:
         is: 'urth-viz-query',
 
         properties: {
-            dataframe: String
-        }
+            dataframe: String,
+
+            // n-element array with shape to fit query form
+            rules: {
+                type: Array,
+                value: function() { return [null, null, null].map(function(){ return { col: null, op: null, val: null }; }); } }
+        },
+
+        ruleExpression: function(col, op, val) {
+            if (Number.isNaN(+val)) {
+                val = "'" + val + "'";
+            }
+            return col + ' ' + op + ' ' + val;
+        },
+
+        hasValue: function(rule) {
+            return rule.val !== null && rule.val !== '';
+        },
     });
 })();
 </script>
