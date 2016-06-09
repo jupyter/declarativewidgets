@@ -20,6 +20,7 @@ NOTE: Due to changed syntax for meta-classes, this is not compatible with
 
 import sys
 import json
+import re
 
 from .serializer_registrar import SerializerRegistrar
 
@@ -28,6 +29,22 @@ if sys.version_info[0] == 2:
 else:
     from .base_serializer_py3 import BaseSerializer
 
+def serialize_pandas_df(obj, **kwargs):
+    limit = kwargs.get('limit', 100)
+    # Default to split orientation
+    # {index -> [index], columns -> [columns], data -> [values]}
+    date_format = kwargs.get('date_format', 'iso')
+    df_dict = json.loads(obj[:limit].to_json(orient='split', date_format=date_format))
+    df_dict['column_types'] = [str(x) for x in obj.dtypes.tolist()]
+    for i in range(0, len(df_dict['column_types'])):
+        if df_dict['column_types'][i] == "datetime64[ns]":
+            for j in range(0, len(df_dict['data'])):
+                #If this date element has no timezone drop the t/z from the serialized element
+                #Note on filter where rows are dropped we must associate the dict index with the original df index
+                row_index_in_obj = obj[df_dict['columns'][i]].index[j]
+                if obj[df_dict['columns'][i]][row_index_in_obj].tzinfo is None:
+                    df_dict['data'][j][i] = (re.sub("T|Z", " ", df_dict['data'][j][i]))
+    return df_dict
 
 class PandasSeriesSerializer(BaseSerializer):
     @staticmethod
@@ -60,11 +77,7 @@ class PandasDataFrameSerializer(BaseSerializer):
 
     @staticmethod
     def serialize(obj, **kwargs):
-        limit = kwargs.get('limit', 100)
-        # Default to split orientation 
-        # {index -> [index], columns -> [columns], data -> [values]}
-        date_format = kwargs.get('date_format', 'iso')
-        return json.loads(obj[:limit].to_json(orient='split', date_format=date_format))
+        return serialize_pandas_df(obj, **kwargs)
 
     @staticmethod
     def check_packages():
@@ -120,12 +133,7 @@ class SparkDataFrameSerializer(BaseSerializer):
         df = pandas.DataFrame.from_records(
             obj.limit(kwargs.get('limit', 100)).collect(), columns=obj.columns)
 
-        json = {
-            "columns": [str(c) for c in df.columns.tolist()],
-            "data": df.values.tolist(),
-            "index": [str(i) for i in df.index.tolist()]
-        }
-        return json
+        return serialize_pandas_df(df, **kwargs)
 
     @staticmethod
     def check_packages():

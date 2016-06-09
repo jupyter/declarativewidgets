@@ -125,6 +125,15 @@ Example:
             },
 
             /**
+             * Column type metadata for the DataFrame
+             */
+             columnTypes: {
+                type: Array,
+                computed: '_columnTypes(value)',
+                notify: true
+             },
+
+            /**
              * An Array containing the data rows of the DataFrame. If 'row-as-object` is false, this
              * property will contain a 2D Array where the outer Array contains each row and the inner Array contains
              * the values for each column in the order defined by the `columns` property. If 'row-as-object` is true,
@@ -272,7 +281,26 @@ Example:
          */
         onModelValueChange: function(newVal){
             this._debug( "urth-core-dataframe onModelValueChange", newVal );
+            newVal = this._deserializeColumnTypes(newVal);
             this._setValue(newVal || {data:[]});
+        },
+
+        /*
+         * Returns the deserialized DataFrame reconstructed via the column_types
+         * @param df - the serialized DataFrame
+         * @return the reconstructed DataFrame
+         */
+        _deserializeColumnTypes: function(df) {
+            for (var i=0; i<df.column_types.length; i++) {
+                //if this column is of type date convert the string content to a date object
+                if(df.column_types[i] === "datetime64[ns]" || df.column_types[i] === "Date"
+                    || df.column_types[i] === "TimestampType") {
+                    for (var j=0; j<df.data.length; j++) {
+                        df.data[j][i] = new Date(df.data[j][i]);
+                    }
+                }
+            }
+            return df;
         },
 
         /* 
@@ -336,6 +364,16 @@ Example:
          */
         _columns: function(df){
             return df.columns;
+        },
+
+        /**
+         * Returns the type information of the serialized Dataframe
+         * @param df - the serialized DataFrame
+         * @return the types array
+         * @private
+         */
+        _columnTypes: function(df){
+            return df.column_types;
         },
 
         /**

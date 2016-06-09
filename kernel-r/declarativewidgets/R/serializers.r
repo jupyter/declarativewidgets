@@ -1,5 +1,23 @@
 #' @include serializer.r
 
+serialize_element <- function(elem) {
+    if(class(elem) == "Date") {
+        options(digits.secs=3)
+        return (format(elem, "%Y-%m-%dT%H:%M:%OSZ"))
+    } else {
+        return (as.character(elem))
+    }
+}
+
+get_df_column_types <- function(df) {
+    class_info <- lapply(aDataFrame, class)
+    type_info <- list()
+    for (i in class_info) {
+        type_info <- append(type_info, i)
+    }
+    return (unlist(type_info))
+}
+
 DataFrame_Serializer <- R6Class(
     'DataFrame_Serializer',
     inherit = Serializer,
@@ -19,7 +37,7 @@ DataFrame_Serializer <- R6Class(
             for(i in 1:min(limit, nrow(df))) {
                 row_elements <- list()
                 for(j in 1:ncol(df)) {
-                    row_elements <- append(row_elements, as.character(df[i,j]))
+                    row_elements <- append(row_elements, serialize_element(df[i,j]))
                 }
                 rows <- append(rows, list(row_elements))
             }
@@ -28,6 +46,7 @@ DataFrame_Serializer <- R6Class(
         serialize = function(obj, row_limit=100) {
             json <- list()
             json[['columns']] <- colnames(obj)
+            json[['column_types']] <- get_df_column_types(obj)
             json[['data']] <- self$df_to_lists(obj, row_limit)
             json[['index']] <- as.numeric(rownames(obj))
             return (json)
@@ -59,7 +78,7 @@ Spark_DataFrame_Serializer <- R6Class(
             for(i in 1:nrow(df)) {
                 row_elements <- list()
                 for(j in 1:ncol(df)) {
-                    row_elements <- append(row_elements, as.character(df[i,j]))
+                    row_elements <- append(row_elements, serialize_element(df[i,j]))
                 }
                 rows <- append(rows, list(row_elements))
             }

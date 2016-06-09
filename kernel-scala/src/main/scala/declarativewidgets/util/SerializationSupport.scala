@@ -53,12 +53,15 @@ trait SerializationSupport extends LogLike {
     (df: DataFrame) => {
       val columns: Array[String] = df.columns
 
+      val column_types: Array[String] = df.schema.map(x => x.dataType.toString()).toArray
+
       val data: Array[Array[JsValue]] = df.toJSON.take(limit).map( jsonRow => toArray(Json.parse(jsonRow).as[JsObject], columns))
 
       val index: Array[String] = (0 until data.length).map(_.toString).toArray
 
       Json.obj(
         "columns" -> columns,
+        "column_types" -> column_types,
         "index"   -> index,
         "data"    -> data
       )
