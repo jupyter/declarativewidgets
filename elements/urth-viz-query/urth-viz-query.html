@@ -35,9 +35,6 @@ Example:
             flex-flow: row nowrap;
             justify-content: space-between;
         }
-        .query-rule.enabled-false {
-            display: none;
-        }
         .query-rule > :not(paper-button) {
             margin-left: 0.3em;
             margin-right: 0.3em;
@@ -55,6 +52,9 @@ Example:
   <template>
     <div class="querior">
         <h3>Match <em>all</em> of the following rules:</h3>
+        <paper-button on-tap="addRule">
+            <iron-icon icon="icons:add-circle-outline"></iron-icon>
+        </paper-button>
 <template is="dom-repeat" items="{{rules}}" as="rule">
         <div class="query-rule">
             <paper-dropdown-menu label="column" selected-item-label="{{rule.col}}">
@@ -73,34 +73,11 @@ Example:
                 </paper-listbox>
             </paper-dropdown-menu>
             <paper-input label="value" value="{{rule.val}}"></paper-input>
-            <paper-button disabled="[[!rule.val]]" toggles active="{{toggle1}}">
-                <iron-icon icon="icons:add-circle-outline"></iron-icon>
+            <paper-button on-tap="deleteRule">
+                <iron-icon icon="icons:delete"></iron-icon>
             </paper-button>
         </div>
 </template>
-<!--
-        <div class$="query-rule enabled-{{toggle1}}">
-            <paper-dropdown-menu label="column" selected-item-label="{{col2}}">
-                <paper-listbox class="dropdown-content">
-                    <template is="dom-repeat" items="{{df.columns}}">
-                        <paper-item>{{item}}</paper-item>
-                    </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-dropdown-menu>
-                <paper-listbox class="dropdown-content" selected="{{op2}}" attr-for-selected="value">
-                    <paper-item value="==">equals</paper-item>
-                    <paper-item value="!=">does not equal</paper-item>
-                    <!- <paper-item>contains</paper-item>
-                    <paper-item>does not contain</paper-item> ->
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-input label="value" value="{{val2}}"></paper-input>
-            <paper-button disabled="[[!val2]]" toggles active="{{toggle2}}">
-                <iron-icon icon="icons:add-circle-outline"></iron-icon>
-            </paper-button>
-        </div>
--->
         <urth-core-dataframe id="df1" ref="{{dataframe}}" value="{{df}}" limit="20">
             <template is="dom-repeat" items="{{rules}}" as="rule" filter="hasValue" observe="val">
                 <urth-core-query-filter disabled="[[!rule.val]]">{{ruleExpression(rule.col, rule.op, rule.val)}}</urth-core-query-filter>
@@ -126,7 +103,8 @@ Example:
             // n-element array with shape to fit query form
             rules: {
                 type: Array,
-                value: function() { return [null, null, null].map(function(){ return { col: null, op: null, val: null }; }); } }
+                value: function() { return [{ col: null, op: null, val: null }]; }
+            }
         },
 
         ruleExpression: function(col, op, val) {
@@ -139,6 +117,14 @@ Example:
         hasValue: function(rule) {
             return rule.val !== null && rule.val !== '';
         },
+
+        addRule: function(event) {
+            this.push("rules", { col: null, op: null, val: null });
+        },
+
+        deleteRule: function(event) {
+            this.splice("rules", event.model.index, 1);
+        }
     });
 })();
 </script>
