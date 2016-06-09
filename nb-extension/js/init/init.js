@@ -150,20 +150,16 @@ define([
         // into the page.
         this._initialized = this._initialized || $.Deferred();
 
-        if (typeof config === 'string') {
-            // backwards compatibility with old API, which took `baseURL` as first argument and
-            // optional `config` as second arg
-            this._baseURL = config;
-            this._config = arguments[1] || {};
-        } else {
-            this._baseURL = config.namespace ? config.namespace.notebook.base_url : '/';
-            this._config = config;
-        }
+        this._config = config || {};
+        this._baseURL = this._config.namespace &&
+                        this._config.namespace.notebook &&
+                        this._config.namespace.notebook.base_url ?
+                            this._config.namespace.notebook.base_url : '/';
 
         // expose suppressErrors, false by default to display errors
-        this.suppressErrors = config.suppressErrors;
+        this.suppressErrors = this._config.suppressErrors;
 
-        this.events = config.events;
+        this.events = this._config.events;
 
         // specify a getter for the kernel instance, since it can be restarted and a new kernel
         // instantiated
@@ -171,7 +167,10 @@ define([
             get: function () {
                 // TODO What is the correct way of handling this outside of the notebook? What
                 //      should we do when using jupyter-js-services and kernel is restarted?
-                return this._config.namespace.notebook.kernel;
+                return this._config.namespace &&
+                        this._config.namespace.notebook &&
+                        this._config.namespace.notebook.kernel ?
+                            this._config.namespace.notebook.kernel : null;
             }
         });
     }
