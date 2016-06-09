@@ -3,7 +3,7 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-package urth.widgets.util
+package declarativewidgets.util
 
 import java.io.{OutputStream, ByteArrayOutputStream}
 

@@ -3,12 +3,10 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-package urth
-
 import org.apache.toree.kernel.api.Kernel
 import org.apache.spark.repl.SparkIMain
 
-package object widgets {
+package object declarativewidgets {
 
   // Types
   type WatchHandler[T] = (Option[T], T) => Unit

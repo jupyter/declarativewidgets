@@ -3,7 +3,7 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-package urth.widgets
+package declarativewidgets
 
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.kernel.protocol.v5.MsgData

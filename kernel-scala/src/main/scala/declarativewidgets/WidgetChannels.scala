@@ -1,10 +1,11 @@
-package urth.widgets
+package declarativewidgets
 
+import declarativewidgets.util.{SerializationSupport, StandardFunctionSupport, MessageSupport}
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.kernel.protocol.v5.MsgData
 import org.apache.toree.utils.LogLike
 import play.api.libs.json.{JsNull, JsValue}
-import urth.widgets.util.{StandardFunctionSupport, MessageSupport, SerializationSupport}
+import urth.widgets.util.MessageSupport
 
 /**
  * A widget that provides an API for setting bound channel variables.

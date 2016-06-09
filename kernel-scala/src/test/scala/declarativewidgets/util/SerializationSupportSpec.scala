@@ -3,14 +3,14 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-package urth.widgets.util
+package declarativewidgets.util
 
+import declarativewidgets.Default
 import org.apache.spark.sql.DataFrame
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, FunSpec}
 import org.mockito.Mockito._
 import play.api.libs.json._
-import urth.widgets.Default
 
 class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  {
 

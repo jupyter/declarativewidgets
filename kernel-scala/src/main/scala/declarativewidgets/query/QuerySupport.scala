@@ -1,4 +1,4 @@
-package urth.widgets.query
+package declarativewidgets.query
 
 import org.apache.spark.sql.{DataFrame, Column}
 import org.apache.spark.sql.functions.{expr, col}

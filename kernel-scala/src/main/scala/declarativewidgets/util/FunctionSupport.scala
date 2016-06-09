@@ -3,8 +3,9 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-package urth.widgets.util
+package declarativewidgets.util
 
+import declarativewidgets._
 import org.apache.toree.interpreter.Interpreter
 import play.api.libs.json._
 

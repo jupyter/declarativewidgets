@@ -3,15 +3,15 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-package urth.widgets
+package declarativewidgets
 
+import declarativewidgets.query.QuerySupport
+import declarativewidgets.util.SerializationSupport
 import org.apache.spark.sql.DataFrame
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.interpreter.Interpreter
 import org.apache.toree.kernel.protocol.v5.MsgData
 import play.api.libs.json._
-import urth.widgets.query.QuerySupport
-import urth.widgets.util.SerializationSupport
 
 /**
  * A widget for retrieving the value of a DataFrame in the kernel.

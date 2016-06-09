@@ -1,9 +1,9 @@
-package urth.widgets.util
+package declarativewidgets.util
 
+import declarativewidgets.Comm
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.utils.LogLike
 import play.api.libs.json.{Json, JsValue}
-import urth.widgets.Comm
 
 /**
  * Provides functions for sending messages using a CommWriter.

@@ -1,11 +1,11 @@
-package urth.widgets.util
+package declarativewidgets.util
 
+import declarativewidgets.Comm
 import org.apache.toree.comm.CommWriter
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, FunSpec}
 import play.api.libs.json.{JsNumber, JsString, Json}
-import urth.widgets.Comm
 
 class MessageSupportSpec extends FunSpec with Matchers with MockitoSugar {
 

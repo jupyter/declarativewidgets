@@ -3,12 +3,13 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-package urth.widgets
+package declarativewidgets
 
+import declarativewidgets.util.{SerializationSupport, StandardFunctionSupport}
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.kernel.protocol.v5.MsgData
 import play.api.libs.json.{JsString, JsValue, Json}
-import urth.widgets.util.{SerializationSupport, StandardFunctionSupport}
+import urth.widgets.util.SerializationSupport
 
 import scala.util.{Failure, Success, Try}
 

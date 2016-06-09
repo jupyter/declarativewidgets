@@ -1,4 +1,4 @@
-package urth.widgets
+package declarativewidgets
 
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.kernel.protocol.v5._

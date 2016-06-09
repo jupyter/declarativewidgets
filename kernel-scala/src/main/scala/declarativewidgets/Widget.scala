@@ -3,14 +3,14 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-package urth.widgets
+package declarativewidgets
 
+import declarativewidgets.exceptions.WidgetNotAvailableException
+import declarativewidgets.util.MessageSupport
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.kernel.protocol.v5.{MsgData, UUID}
 import org.apache.toree.utils.LogLike
 import play.api.libs.json.{Json, JsValue}
-import urth.widgets.exceptions.WidgetNotAvailableException
-import urth.widgets.util.MessageSupport
 
 /**
  * Object that contains Comm handlers related to widgets, and manages

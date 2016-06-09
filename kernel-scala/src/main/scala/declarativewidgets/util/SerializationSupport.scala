@@ -3,12 +3,12 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-package urth.widgets.util
+package declarativewidgets.util
 
+import declarativewidgets.Default
 import org.apache.toree.utils.LogLike
 import org.apache.spark.sql.DataFrame
 import play.api.libs.json._
-import urth.widgets.Default
 
 /**
  * Contains methods for serializing a variable based on its type.
