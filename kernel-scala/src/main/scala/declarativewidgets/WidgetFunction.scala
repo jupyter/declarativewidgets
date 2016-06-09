@@ -9,7 +9,7 @@ import declarativewidgets.util.{SerializationSupport, StandardFunctionSupport}
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.kernel.protocol.v5.MsgData
 import play.api.libs.json.{JsString, JsValue, Json}
-import urth.widgets.util.SerializationSupport
+import declarativewidgets.util.SerializationSupport
 
 import scala.util.{Failure, Success, Try}
 
@@ -66,7 +66,7 @@ class WidgetFunction(comm: CommWriter)
     }
   }
 
-  private[widgets] def handleInvoke(msg: MsgData, name: String, limit: Int): Unit = {
+  private[declarativewidgets] def handleInvoke(msg: MsgData, name: String, limit: Int): Unit = {
     logger.debug(s"Handling invoke message ${msg}...")
     (msg \ Comm.KeyArgs).asOpt[JsValue] match {
       case Some(args) =>
@@ -84,7 +84,7 @@ class WidgetFunction(comm: CommWriter)
     }
   }
 
-  private[widgets] def invokeFunc(funcName: String, args: JsValue, limit: Int = limit): Try[JsValue] = {
+  private[declarativewidgets] def invokeFunc(funcName: String, args: JsValue, limit: Int = limit): Try[JsValue] = {
     logger.debug(s"Invoking registered function with args ${args}")
     argMap(args) match {
       case Some(map) => invokeFunction(funcName, map) map (serialize(_, limit))
@@ -105,7 +105,7 @@ class WidgetFunction(comm: CommWriter)
         None
     }
 
-  private[widgets] def registerFunction(funcName: String): Unit = {
+  private[declarativewidgets] def registerFunction(funcName: String): Unit = {
     this.theFunctionName = funcName
     logger.debug(s"Registered function ${funcName}.")
     sendSignature(funcName) match {
@@ -114,12 +114,12 @@ class WidgetFunction(comm: CommWriter)
     }
   }
 
-  private[widgets] def registerLimit(limit: Int): Unit = {
+  private[declarativewidgets] def registerLimit(limit: Int): Unit = {
     this.limit = limit
     logger.debug(s"Registered limit ${limit}.")
   }
 
-  private[widgets] def sendSignature(funcName: String): Either[String, Unit] = {
+  private[declarativewidgets] def sendSignature(funcName: String): Either[String, Unit] = {
     signature(funcName) match {
       case Some(sig) =>
         val sigJSON = Json.toJson(sig)
@@ -131,7 +131,7 @@ class WidgetFunction(comm: CommWriter)
     }
   }
 
-  private[widgets] def sendResult(result: JsValue): Unit =
+  private[declarativewidgets] def sendResult(result: JsValue): Unit =
     sendState(Comm.StateResult, result)
 
 }

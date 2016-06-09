@@ -11,7 +11,6 @@ import play.api.libs.json._
 
 import scala.util.{Failure, Success, Try}
 
-import urth.widgets._
 import org.apache.spark.repl.SparkIMain
 
 import org.apache.toree.utils.LogLike

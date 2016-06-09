@@ -148,7 +148,7 @@ dist/declarativewidgets: dist/declarativewidgets/static ${shell find nb-extensio
 	@echo '\n\n' >> dist/declarativewidgets/__init__.py
 	@cat kernel-python/declarativewidgets/__init__.py >> dist/declarativewidgets/__init__.py
 
-dist/declarativewidgets/static: bower.json dist/declarativewidgets/static/css dist/declarativewidgets/static/docs dist/declarativewidgets/static/elements dist/declarativewidgets/static/js dist/declarativewidgets/static/urth_components dist/declarativewidgets/static/urth-widgets.jar dist/declarativewidgets/static/urth-widgets.tgz
+dist/declarativewidgets/static: bower.json dist/declarativewidgets/static/css dist/declarativewidgets/static/docs dist/declarativewidgets/static/elements dist/declarativewidgets/static/js dist/declarativewidgets/static/urth_components dist/declarativewidgets/static/declarativewidgets.jar dist/declarativewidgets/static/urth-widgets.tgz
 	@cp bower.json dist/declarativewidgets/static/bower.json
 	@touch dist/declarativewidgets/static
 
@@ -179,19 +179,20 @@ dist/declarativewidgets/static/urth_components: bower_components ${shell find el
 	@cp -RL bower_components/* dist/declarativewidgets/static/urth_components/.
 	@touch dist/declarativewidgets/static/urth_components
 
-dist/declarativewidgets/static/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
+dist/declarativewidgets/static/declarativewidgets.jar: ${shell find kernel-scala/src/main/scala/}
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala code'
 else
 	@echo 'Building scala code'
-	@echo 'Building declarativewidgets/static/urth-widgets.jar'
+	@echo 'Building declarativewidgets/static/declarativewidgets.jar'
 	@mkdir -p dist/declarativewidgets/static
 	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`:/src \
 		-v `pwd`/etc/ivy:/root/.ivy2 \
 		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/kernel-scala/* /app/. && \
 			sbt --warn package && \
-			cp target/scala-2.10/urth-widgets*.jar /src/dist/declarativewidgets/static/urth-widgets.jar'
+			cp target/scala-2.10/declarativewidgets*.jar /src/dist/declarativewidgets/static/declarativewidgets.jar && \
+			cp target/scala-2.10/declarativewidgets*.jar /src/dist/declarativewidgets/static/urth-widgets.jar'
 endif
 
 dist/declarativewidgets/static/urth-widgets.tgz: ${shell find kernel-r/declarativewidgets}

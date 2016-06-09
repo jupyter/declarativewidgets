@@ -5,7 +5,7 @@ import org.apache.toree.comm.CommWriter
 import org.apache.toree.kernel.protocol.v5.MsgData
 import org.apache.toree.utils.LogLike
 import play.api.libs.json.{JsNull, JsValue}
-import urth.widgets.util.MessageSupport
+import declarativewidgets.util.MessageSupport
 
 /**
  * A widget that provides an API for setting bound channel variables.
@@ -40,7 +40,7 @@ class WidgetChannels(val comm: CommWriter)
    * @param msgContent Message contents.
    * @return Right(Unit) or Left(error_message) if an error occurred.
    */
-  private[widgets] def handleChange(msgContent: MsgData): Either[String, Unit] =
+  private[declarativewidgets] def handleChange(msgContent: MsgData): Either[String, Unit] =
     parseMessage(msgContent) match {
       case Some((chan, name, oldVal, newVal)) =>
         getHandler(chan, name) match {
@@ -62,7 +62,7 @@ class WidgetChannels(val comm: CommWriter)
    * @param msgContent Message to parse.
    * @return Tuple of field values, or None if parsing fails.
    */
-  private[widgets] def parseMessage(
+  private[declarativewidgets] def parseMessage(
     msgContent: MsgData
   ): Option[(String, String, JsValue, JsValue)] = for {
       chan <- (msgContent \ Comm.ChangeData \ Comm.ChangeChannel).asOpt[String]
@@ -76,7 +76,7 @@ class WidgetChannels(val comm: CommWriter)
    * @param msgContent Message to parse.
    * @return Some(old_val) or Some(JsNull) if old_val isn't present.
    */
-  private[widgets] def parseOldVal(msgContent: MsgData): Option[JsValue] = {
+  private[declarativewidgets] def parseOldVal(msgContent: MsgData): Option[JsValue] = {
     (msgContent \ Comm.ChangeData \ Comm.ChangeOldVal).asOpt[JsValue] match {
       case s@Some(_) => s
       case None => Some(JsNull)
@@ -89,7 +89,7 @@ class WidgetChannels(val comm: CommWriter)
    * @param name variable name
    * @return WatchHandler or None if no handler is found.
    */
-  private[widgets] def getHandler(
+  private[declarativewidgets] def getHandler(
     chan: String, name: String
   ): Option[WatchHandler[_]] = for {
       handlers <- WidgetChannels.chanHandlers.get(chan)
@@ -135,10 +135,10 @@ case class Channel(comm: CommWriter, chan: String)
 object WidgetChannels extends LogLike {
 
   // Stores the most recently created WidgetChannels widget instance.
-  private[widgets] var theChannels: WidgetChannels = _
+  private[declarativewidgets] var theChannels: WidgetChannels = _
 
   // Maps channel name to a map of variable name to handler.
-  private[widgets] var chanHandlers: Map[String, Map[String, WatchHandler[_]]] =
+  private[declarativewidgets] var chanHandlers: Map[String, Map[String, WatchHandler[_]]] =
     Map()
 
   /**
@@ -157,7 +157,7 @@ object WidgetChannels extends LogLike {
    * @param variable Variable name to watch for changes.
    * @param handler Handler to register.
    */
-  private[widgets] def watch(
+  private[declarativewidgets] def watch(
      chan: String, variable: String, handler: WatchHandler[_]
   ): Unit = {
     logger.trace(s"Registering handler $handler for $variable on channel $chan")
@@ -169,7 +169,7 @@ object WidgetChannels extends LogLike {
    * Stores the given widget as the global widget to use for communication.
    * @param widget WidgetChannels widget instance to store.
    */
-  private[widgets] def register(widget: WidgetChannels) : Unit = {
+  private[declarativewidgets] def register(widget: WidgetChannels) : Unit = {
     this.theChannels = widget
     logger.debug(s"Registered widget $widget as the global Channels.")
   }

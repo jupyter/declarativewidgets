@@ -61,27 +61,27 @@ class WidgetDataFrame(comm: CommWriter)
     }
   }
 
-  private[widgets] def registerLimit(limit: Int): Unit = {
+  private[declarativewidgets] def registerLimit(limit: Int): Unit = {
     this.limit = limit
     logger.debug(s"Registered limit ${limit}.")
 
   }
 
-  private[widgets] def registerName(name: String): Unit = {
+  private[declarativewidgets] def registerName(name: String): Unit = {
     this.variableName = name
     logger.debug(s"Registered DataFrame variable name ${name}.")
   }
 
-  private[widgets] def registerQuery(query: String): Unit = {
+  private[declarativewidgets] def registerQuery(query: String): Unit = {
     this.query = query
     logger.debug(s"Registered query ${query}.")
   }
 
-  private[widgets] def theDataframe = {
+  private[declarativewidgets] def theDataframe = {
     kernelInterpreter.read(variableName)
   }
 
-  private[widgets] def syncData() = {
+  private[declarativewidgets] def syncData() = {
 
     val result: Either[String, JsValue] = theDataframe match {
       case Some(df:DataFrame) =>
@@ -114,7 +114,7 @@ class WidgetDataFrame(comm: CommWriter)
     }
   }
 
-  private[widgets] def sendSyncData(result: JsValue) =
+  private[declarativewidgets] def sendSyncData(result: JsValue) =
     sendState(Comm.StateValue, result)
 
 }

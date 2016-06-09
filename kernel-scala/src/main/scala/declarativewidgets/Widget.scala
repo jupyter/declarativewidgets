@@ -28,7 +28,7 @@ object Widget extends LogLike {
    * @return The new Widget.
    * @throws WidgetNotAvailableException given an invalid `klassName`
    */
-  private[widgets] def createWidgetInstance(
+  private[declarativewidgets] def createWidgetInstance(
     klassName: String, comm: CommWriter
   ): Widget = {
     logger.debug(s"Creating widget for class ${klassName}")

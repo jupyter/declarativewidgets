@@ -12,9 +12,9 @@ package object declarativewidgets {
   type WatchHandler[T] = (Option[T], T) => Unit
 
   object WidgetClass {
-    val Function  = "urth.widgets.widget_function.Function"
-    val DataFrame = "urth.widgets.widget_dataframe.DataFrame"
-    val Channels  = "urth.widgets.widget_channels.Channels"
+    val Function  = "declarativewidgets.Function"
+    val DataFrame = "declarativewidgets.DataFrame"
+    val Channels  = "declarativewidgets.Channels"
   }
 
   object Comm {
@@ -75,7 +75,7 @@ package object declarativewidgets {
     val Channel: String = "default"
   }
 
-  private var _the_kernel: Kernel = _
+  private[declarativewidgets] var _the_kernel: Kernel = _
 
   def initWidgets(implicit kernel: Kernel): Unit = {
     /*
@@ -131,4 +131,6 @@ package object declarativewidgets {
     val sparkIMain = sparkIMainMethod.invoke(getKernel.interpreter).asInstanceOf[org.apache.spark.repl.SparkIMain]
     sparkIMain
   }
+
+  val channel = WidgetChannels.channel _
 }
