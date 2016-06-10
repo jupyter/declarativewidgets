@@ -5,7 +5,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-core-dataframe/urth-core-dataframe.html">
 <link rel="import" href="../urth-core-dataframe/urth-core-query-filter.html">
-<link rel="import" href="../urth-viz-table/urth-viz-table.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
@@ -26,10 +25,6 @@ Example:
         .querior > h3 {
             font-variant: small-caps;
         }
-        .querior > urth-viz-table {
-            margin-top: 1em;
-            display: block;
-        }
         .query-rule {
             display: flex;
             flex-flow: row nowrap;
@@ -48,44 +43,46 @@ Example:
             visibility: hidden;
         }
     </style>
-​
+
   <template>
-    <div class="querior">
-        <h3>Match <em>all</em> of the following rules:</h3>
-        <paper-button on-tap="addRule">
-            <iron-icon icon="icons:add-circle-outline"></iron-icon>
-        </paper-button>
-<template is="dom-repeat" items="{{rules}}" as="rule">
-        <div class="query-rule">
-            <paper-dropdown-menu label="column" selected-item-label="{{rule.col}}">
-                <paper-listbox class="dropdown-content">
-                    <template is="dom-repeat" items="{{df.columns}}">
-                        <paper-item>{{item}}</paper-item>
-                    </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-dropdown-menu>
-                <paper-listbox class="dropdown-content" selected="{{rule.op}}" attr-for-selected="value">
-                    <paper-item value="==">equals</paper-item>
-                    <paper-item value="!=">does not equal</paper-item>
-                    <!-- <paper-item>contains</paper-item>
-                    <paper-item>does not contain</paper-item> -->
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-input label="value" value="{{rule.val}}"></paper-input>
-            <paper-button on-tap="deleteRule">
-                <iron-icon icon="icons:delete"></iron-icon>
-            </paper-button>
-        </div>
-</template>
-        <urth-core-dataframe id="df1" ref="{{dataframe}}" value="{{df}}" limit="20">
-            <template is="dom-repeat" items="{{rules}}" as="rule" filter="hasValue" observe="val">
-                <urth-core-query-filter disabled="[[!rule.val]]">{{ruleExpression(rule.col, rule.op, rule.val)}}</urth-core-query-filter>
-            </template>
-        </urth-core-dataframe>
-        <h3>Results:</h3>
-        <urth-viz-table datarows="{{df.data}}" columns="{{df.columns}}"></urth-viz-table>
-    </div>
+      <div class="querior">
+          <h3>Match <em>all</em> of the following rules:</h3>
+          <template is="dom-repeat" items="{{rules}}" as="rule">
+              <div class="query-rule">
+                  <paper-dropdown-menu label="column" selected-item-label="{{rule.col}}">
+                      <paper-listbox class="dropdown-content">
+                          <template is="dom-repeat" items="{{columns}}">
+                              <paper-item>{{item}}</paper-item>
+                          </template>
+                      </paper-listbox>
+                  </paper-dropdown-menu>
+                  <paper-dropdown-menu>
+                      <paper-listbox class="dropdown-content" selected="{{rule.op}}" attr-for-selected="value">
+                          <paper-item value="==">equals</paper-item>
+                          <paper-item value="!=">does not equal</paper-item>
+                          <!-- <paper-item>contains</paper-item>
+                          <paper-item>does not contain</paper-item> -->
+                      </paper-listbox>
+                  </paper-dropdown-menu>
+                  <paper-input label="value" value="{{rule.val}}"></paper-input>
+                  <paper-button on-tap="deleteRule">
+                      <iron-icon icon="icons:delete"></iron-icon>
+                  </paper-button>
+              </div>
+          </template>
+          <paper-button on-tap="addRule">
+              <iron-icon icon="icons:add-circle-outline"></iron-icon>
+              Add filter
+          </paper-button>
+
+          <!-- repeating query-filter elements to be stamped as children of myDataframe -->
+          <template id="filters" is="dom-repeat" items="{{rules}}" as="rule" filter="hasValue" observe="col op val">
+              <urth-core-query-filter disabled="[[!rule.val]]">{{ruleExpression(rule.col, rule.op, rule.val)}}</urth-core-query-filter>
+          </template>
+
+          <!-- user declares dataframe here -->
+          <content id="myDataframe" select="urth-core-dataframe"></content>
+      </div>
   </template>
 </dom-module>
 <script>
@@ -98,8 +95,6 @@ Example:
         is: 'urth-viz-query',
 
         properties: {
-            dataframe: String,
-
             // n-element array with shape to fit query form
             rules: {
                 type: Array,
@@ -119,11 +114,22 @@ Example:
         },
 
         addRule: function(event) {
-            this.push("rules", { col: null, op: null, val: null });
+            this.push('rules', { col: null, op: null, val: null });
         },
 
         deleteRule: function(event) {
-            this.splice("rules", event.model.index, 1);
+            this.splice('rules', event.model.index, 1);
+        },
+
+        ready: function() {
+            // move filters template to user-supplied urth-core-dataframe in light DOM
+            var df = this.$.myDataframe.getDistributedNodes()[0];
+            df.appendChild(this.$.filters.root);
+
+            this.columns = df.columns;
+            df.addEventListener('columns-changed', function(event) {
+                this.columns = df.columns;
+            }.bind(this));
         }
     });
 })();
