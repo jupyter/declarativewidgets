@@ -91,6 +91,7 @@
             ],
 
             created: function() {
+                this.showLoadingMsg(true);
                 this._createChannel();
             },
 
@@ -112,9 +113,9 @@
 
             showLoadingMsg: function(show) {
                 if (show) {
-                    Polymer.dom(this.root).classList.add('loading');
+                    Polymer.dom(this.root).classList.add('urth-loading');
                 } else {
-                    Polymer.dom(this).classList.remove('loading');
+                    Polymer.dom(this).classList.remove('urth-loading');
                 }
             },
 
@@ -133,7 +134,6 @@
                     var pendingImports = importBroker.getPendingImports().map(function(key) {
                         return key.completed;
                     });
-                    this.showLoadingMsg(true);
                     this._pendingImports = Promise.all(pendingImports);
                 } else {
                     this._pendingImports = Promise.resolve(true);
