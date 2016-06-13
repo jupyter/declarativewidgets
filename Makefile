@@ -139,12 +139,16 @@ dist/urth: ${shell find kernel-python/urth} dist/urth/widgets/ext
 	@mkdir -p dist/urth
 	@cp -R kernel-python/urth/* dist/urth/.
 
-dist/declarativewidgets: dist/declarativewidgets/static ${shell find nb-extension/python/declarativewidgets}
+dist/declarativewidgets: dist/declarativewidgets/static ${shell find nb-extension/python/declarativewidgets} ${shell find kernel-python/declarativewidgets}
 	@mkdir -p dist/declarativewidgets
 	@echo 'Building declarativewidgets python module'
 	@cp -R nb-extension/python/declarativewidgets/* dist/declarativewidgets/.
+	@cp -R kernel-python/declarativewidgets/* dist/declarativewidgets/.
+	@cat nb-extension/python/declarativewidgets/__init__.py > dist/declarativewidgets/__init__.py
+	@echo '\n\n' >> dist/declarativewidgets/__init__.py
+	@cat kernel-python/declarativewidgets/__init__.py >> dist/declarativewidgets/__init__.py
 
-dist/declarativewidgets/static: bower.json dist/declarativewidgets/static/css dist/declarativewidgets/static/docs dist/declarativewidgets/static/elements dist/declarativewidgets/static/js dist/declarativewidgets/static/urth_components dist/declarativewidgets/static/urth-widgets.jar dist/declarativewidgets/static/urth-widgets.tgz
+dist/declarativewidgets/static: bower.json dist/declarativewidgets/static/css dist/declarativewidgets/static/docs dist/declarativewidgets/static/elements dist/declarativewidgets/static/js dist/declarativewidgets/static/urth_components dist/declarativewidgets/static/declarativewidgets.jar dist/declarativewidgets/static/urth-widgets.tgz
 	@cp bower.json dist/declarativewidgets/static/bower.json
 	@touch dist/declarativewidgets/static
 
@@ -175,19 +179,20 @@ dist/declarativewidgets/static/urth_components: bower_components ${shell find el
 	@cp -RL bower_components/* dist/declarativewidgets/static/urth_components/.
 	@touch dist/declarativewidgets/static/urth_components
 
-dist/declarativewidgets/static/urth-widgets.jar: ${shell find kernel-scala/src/main/scala/}
+dist/declarativewidgets/static/declarativewidgets.jar: ${shell find kernel-scala/src/main/scala/}
 ifeq ($(NOSCALA), true)
 	@echo 'Skipping scala code'
 else
 	@echo 'Building scala code'
-	@echo 'Building declarativewidgets/static/urth-widgets.jar'
+	@echo 'Building declarativewidgets/static/declarativewidgets.jar'
 	@mkdir -p dist/declarativewidgets/static
 	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`:/src \
 		-v `pwd`/etc/ivy:/root/.ivy2 \
 		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/kernel-scala/* /app/. && \
 			sbt --warn package && \
-			cp target/scala-2.10/urth-widgets*.jar /src/dist/declarativewidgets/static/urth-widgets.jar'
+			cp target/scala-2.10/declarativewidgets*.jar /src/dist/declarativewidgets/static/declarativewidgets.jar && \
+			cp target/scala-2.10/declarativewidgets*.jar /src/dist/declarativewidgets/static/urth-widgets.jar'
 endif
 
 dist/declarativewidgets/static/urth-widgets.tgz: ${shell find kernel-r/declarativewidgets}
@@ -262,22 +267,22 @@ else
 	@npm run test -- --local firefox
 endif
 
-test-py: dist/urth
+test-py: dist/urth dist/declarativewidgets
 	@echo 'Running python tests in $(PYTHON)...'
 	@$(MAKE) _test-py-$(PYTHON)
 
-_test-py-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
-_test-py-python2: CMD=python --version; python -m unittest discover $(EXTENSION_DIR) "test*[!_py3].py"
+_test-py-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages
+_test-py-python2: CMD=python --version; python -m unittest discover $(EXTENSION_DIR)/declarativewidgets "test*[!_py3].py"
 _test-py-python2: PYTHON_SETUP_CMD=source activate python2; pip install -U mock $(PIP_OPTS);
 _test-py-python2: _test-py
 
-_test-py-python3: EXTENSION_DIR=/usr/local/lib/python3.4/dist-packages/urth
+_test-py-python3: EXTENSION_DIR=/usr/local/lib/python3.4/dist-packages
 _test-py-python3: CMD=python --version; python -m unittest discover $(EXTENSION_DIR)
 _test-py-python3: _test-py
 
 _test-py:
 	@docker $(DOCKER_OPTS) run -it --rm \
-		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
+		-v `pwd`/dist/declarativewidgets:$(EXTENSION_DIR)/declarativewidgets \
 		$(REPO) bash -c '$(PYTHON_SETUP_CMD) $(CMD)'
 
 test-py-all:
@@ -363,11 +368,11 @@ _run:
 dev: CMD?=sh -c "python --version; jupyter notebook --no-browser --port 8888 --ip='*'"
 dev: _dev-$(PYTHON)
 
-_dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
+_dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages
 _dev-python2: PYTHON_SETUP_CMD=source activate python2; pip install $(PIP_OPTS) futures==3.0.3;
 _dev-python2: _dev
 
-_dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.5/site-packages/urth
+_dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.5/site-packages
 _dev-python3: _dev
 
 _dev: NB_HOME?=/home/jovyan
@@ -378,7 +383,8 @@ _dev: .watch dist
 		--user jovyan \
 		-e SPARK_OPTS="--master=local[4] --driver-java-options=-Dlog4j.logLevel=trace" \
 		-v `pwd`/dist/declarativewidgets/static:$(NB_HOME)/.local/share/jupyter/nbextensions/declarativewidgets \
-		-v `pwd`/dist/urth:$(EXTENSION_DIR) \
+		-v `pwd`/dist/declarativewidgets:$(EXTENSION_DIR)/declarativewidgets \
+		-v `pwd`/dist/urth:$(EXTENSION_DIR)/urth \
 		-v `pwd`/etc:$(NB_HOME)/nbconfig \
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/.jupyter/nbconfig/notebook.json \
 		-v `pwd`/etc/jupyter_notebook_config.py:$(NB_HOME)/.jupyter/jupyter_notebook_config.py \
