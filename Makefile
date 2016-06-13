@@ -454,7 +454,7 @@ docs: .watch-docs dist/docs
 	@echo "Serving docs at $(DOCURL):$(DOC_PORT)"
 	@bash -c "trap 'make clean-watch-docs' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
 
-all: init sdist install-all test-js-remote test-py-all test-scala system-test
+all: init test-js-remote test-py-all test-scala sdist install-all system-test
 
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
 release: PRE_SDIST=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;
