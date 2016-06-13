@@ -3,6 +3,7 @@
 * User must manually activate declarativewidgets using a code cell
 * Declarative query support for dataframes
 * Usage documentation
+* Deprecation of `urth.widgets` module. Use `declarativewidgets` instead
 
 ## 0.5.3 (2016-06-08)
 * Fixes to timing error related to loading order of this extension in relation to ipywidgets/jupyter-js-widgets
