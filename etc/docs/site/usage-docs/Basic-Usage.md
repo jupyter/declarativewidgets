@@ -18,18 +18,18 @@ the first cell in the notebook that makes use of Declarative Widgets features.
 ##### Python Initialization
 
 ```
-from urth import widgets
+import declarativewidgets as declwidgets
 
-widgets.init()
+declwidgets.init()
 ```
 
 ##### Scala Initialization
 
 ```
 // modify to IP and Port of this notebook server
-%addjar http://localhost:8888/nbextensions/urth_widgets/urth-widgets.jar
+%addjar http://localhost:8888/nbextensions/declarativewidgets/declarativewidgets.jar
 
-import urth.widgets._
+import declarativewidgets._
 
 initWidgets
 ```
