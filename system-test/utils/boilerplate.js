@@ -102,6 +102,7 @@ Boilerplate.prototype.setup = function(testName, startingURL){
         .waitForConditionInBrowser('window.Urth && Urth.kernel && Urth.kernel.is_connected()', 10000)
         .waitForElementByCssSelector('#kernel_indicator_icon.kernel_idle_icon', wd.asserters.isDisplayed, 20000)
         .waitForConditionInBrowser('typeof Urth.whenReady === "function"', 10000)
+        .elementByCssSelector('div.code_cell .input').click() // to keep the first code cell in view on sauce
         .nodeify(done);
   }.bind(this));
 
