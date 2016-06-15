@@ -66,6 +66,32 @@ the other data channel.
 
 ![Multiple data channels](images/Data-Binding-multiple.gif)
 
+#### Reading and Modifying Data Channel Values
+
+Each data value in the selected channel is accessible for reading or modification
+easily from the `urth-core-bind` element through JavaScript. The data channel
+keys are exposed as properties on the element and can be directly accessed.
+To retrieve or modify a data value, simply obtain a reference to the associated
+`urth-core-bind` element and get or set the property on the element reference.
+
+Assuming the following `urth-core-bind` element is defined:
+
+    %%html
+    <template is="urth-core-bind" id="mytemplate">
+        <div>Hello <span>[[user]]</span></div>
+    </template>
+
+The value of `user` could be set via JavaScript as shown below (Note: This is
+dependent on the kernel currently in use supporting the `%%javascript` magic):
+
+    %%javascript
+    var bindElem = document.getElementById('mytemplate');
+    bindElem.user = "Luke";
+
+Additionally, kernel and JavaScript API are available to retrieve and modify
+the properties defined in the data channel. Reference the
+[Data Channels](#data-channels) documentation for more information.
+
 #### Driving Function Invocations
 
 A powerful feature of Declarative Widgets is the ability to invoke functions
