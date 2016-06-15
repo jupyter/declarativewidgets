@@ -16,7 +16,9 @@ define([
 
     // Enable shadow dom if it is there for polymer elements.
     window.Polymer = window.Polymer || {};
-    window.Polymer.dom = 'shadow';
+    //  NOTE: This breaks some code because it is expecting Polymer.dom to be a function
+    // window.Polymer.dom = 'shadow';
+    window.Polymer.dom = window.Polymer.dom ? window.Polymer.dom : 'shadow';
 
     // Some versions of IE do not have window.console defined. Some versions
     // do not define the debug and other methods. This is a minimal workaround
@@ -28,7 +30,7 @@ define([
         window.console[method] = window.console[method] || window.console.log;
     });
 
-    var COMPONENTS_DIR = 'urth_components';
+    var COMPONENTS_DIR = '';
 
     function loadComponents(components_root, links) {
         console.debug('Components root is: ', components_root);
@@ -201,7 +203,7 @@ define([
             // use a direct path based on this module's uri.
             var components_root = isAvailable
                 ? this._baseURL
-                : getModuleBasedComponentRoot(module);
+                : this._getModuleBasedComponentRoot(module);
 
             this.BASE_URL = components_root;
             components_root += COMPONENTS_DIR;
