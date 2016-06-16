@@ -161,7 +161,7 @@ define([
         // expose suppressErrors, false by default to display errors
         this.suppressErrors = this._config.suppressErrors;
 
-        this.events = this._config.events;
+        this.events = this._config.events ? this._config.events : $([{}]);
 
         // specify a getter for the kernel instance, since it can be restarted and a new kernel
         // instantiated
