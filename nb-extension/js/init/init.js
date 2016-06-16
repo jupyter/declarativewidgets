@@ -30,8 +30,6 @@ define([
         window.console[method] = window.console[method] || window.console.log;
     });
 
-    var COMPONENTS_DIR = '';
-
     function loadComponents(components_root, links) {
         console.debug('Components root is: ', components_root);
         var whenLoaded = $.Deferred();
@@ -158,6 +156,7 @@ define([
                         this._config.namespace.notebook &&
                         this._config.namespace.notebook.base_url ?
                             this._config.namespace.notebook.base_url : '/';
+        this._componentsDir = this._config.componentsDir ? this._config.componentsDir : 'urth_components';
 
         // expose suppressErrors, false by default to display errors
         this.suppressErrors = this._config.suppressErrors;
@@ -176,7 +175,7 @@ define([
                             this._config.namespace.notebook.kernel : null;
             }
         });
-    }
+    };
 
     /**
      * Inherit any predefined Urth properties if they exist.
@@ -196,7 +195,7 @@ define([
         var whenConnected = $.Deferred();
         this._whenConnected = whenConnected.promise();
 
-        isServerExtensionAvailable(this._baseURL + COMPONENTS_DIR, function (isAvailable) {
+        isServerExtensionAvailable(this._baseURL + this._componentsDir, function (isAvailable) {
             console.log('Server extension is ' + (isAvailable ? '' : 'NOT ') + 'available!');
 
             // If server extension is available, use the baseURL route, else
@@ -206,7 +205,7 @@ define([
                 : this._getModuleBasedComponentRoot(module);
 
             this.BASE_URL = components_root;
-            components_root += COMPONENTS_DIR;
+            components_root += this._componentsDir;
 
             // Load the polyfill and the required components then listen for
             // kernel connection. Need to load polyfill first because loading
@@ -226,7 +225,7 @@ define([
                         });
                     }
                 }.bind(this)).fail(function() {
-                    console.error('Failed to load required components.')
+                    console.error('Failed to load required components.');
                     whenConnected.reject();
                 });
             }.bind(this), function (e) {
@@ -265,7 +264,7 @@ define([
     DeclWidgets.prototype._getModuleBasedComponentRoot = function() {
         var moduleuri = module.uri;
         return moduleuri.substring(0, moduleuri.lastIndexOf('/')) + '/../../';
-    }
+    };
 
     var the_declwidgets;
     var getOrCreate = function(config){
@@ -274,7 +273,7 @@ define([
             the_declwidgets._initialized.resolve();
         }
         return the_declwidgets;
-    }
+    };
 
     return getOrCreate;
 });
