@@ -285,7 +285,7 @@ Note that when using the 'click' event approach described above in #3, a click o
                             return !!this.signature[arg].required
                         }.bind(this))
                         .every(function(arg){
-                            return this.args[arg] !== undefined;
+                            return this.args[arg] !== undefined && this.args[arg] !== null;
                         }.bind(this));
             },
 
