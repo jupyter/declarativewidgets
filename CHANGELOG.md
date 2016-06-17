@@ -1,5 +1,5 @@
 # Changelog
-## 0.6.0 (ONLY PRE RELEASED)
+## 0.6.0 (2016-06-17)
 * User must manually activate declarativewidgets using a code cell
 * Declarative query support for dataframes
 * Usage documentation
