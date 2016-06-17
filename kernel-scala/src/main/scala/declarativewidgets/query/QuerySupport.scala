@@ -55,8 +55,10 @@ trait QuerySupport extends LogLike {
 
       }
     )
-
-    df.groupBy(by:_*).agg(agg.head, agg.tail :_*)
+    //rename resultant column names to dataframe format i.e. sum(columnName) -> sum_columnName
+    val regex = "\\(".r
+    val renamedColumns = by.map(_.toString()) ++ agg.map(x => regex.replaceFirstIn(x.toString(), "_").dropRight(1))
+    df.groupBy(by:_*).agg(agg.head, agg.tail :_*).toDF(renamedColumns:_*)
   }
 
   /**

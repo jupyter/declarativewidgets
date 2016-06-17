@@ -72,16 +72,16 @@ class QuerySupportSpec extends FunSpec with Matchers with MockitoSugar with Befo
       val queryJson = Json.parse(query).asOpt[JsArray].getOrElse(new JsArray())
       val newDf = support.applyQuery(queryDf, queryJson)
       assert(newDf.count() == 4)
-      assert(newDf.select("sum(numbers)").rdd.map(r => r(0).asInstanceOf[Long]).collect()(2) == 12)
-      assert(newDf.select("mean(numbers)").rdd.map(r => r(0).asInstanceOf[Double]).collect()(2) == 4)
+      assert(newDf.select("sum_numbers").rdd.map(r => r(0).asInstanceOf[Long]).collect()(2) == 12)
+      assert(newDf.select("mean_numbers").rdd.map(r => r(0).asInstanceOf[Double]).collect()(2) == 4)
     }
     it("should apply_query_groupby_and_filter") {
       val query = """[{"type":"filter","expr":"letters = 'C'"}, {"type":"group","expr":{"by":["letters"],"agg":[{"op":"sum","col":"numbers"},{"op":"mean","col":"numbers"}]}}]"""
       val queryJson = Json.parse(query).asOpt[JsArray].getOrElse(new JsArray())
       val newDf = support.applyQuery(queryDf, queryJson)
       assert(newDf.count() == 1)
-      assert(newDf.select("sum(numbers)").rdd.map(r => r(0).asInstanceOf[Long]).collect()(0) == 12)
-      assert(newDf.select("mean(numbers)").rdd.map(r => r(0).asInstanceOf[Double]).collect()(0) == 4)
+      assert(newDf.select("sum_numbers").rdd.map(r => r(0).asInstanceOf[Long]).collect()(0) == 12)
+      assert(newDf.select("mean_numbers").rdd.map(r => r(0).asInstanceOf[Double]).collect()(0) == 4)
     }
   }
 }
