@@ -72,25 +72,25 @@ test_that("apply_query_groupby", {
 
     new_df <- querier$apply_query(df, query)
     expect_equal(nrow(new_df), 4)
-    expect_equal(as.numeric(new_df$numbers_sum[3]), 12)
-    expect_equal(as.numeric(new_df$numbers_mean[3]), 4)
+    expect_equal(as.numeric(new_df$sum_numbers[3]), 12)
+    expect_equal(as.numeric(new_df$mean_numbers[3]), 4)
 
     new_spark_df <- querier$apply_query(spark_df, query)
     expect_equal(nrow(collect(new_spark_df)), 4)
-    expect_equal(as.numeric(collect(new_spark_df)$numbers_sum[3]), 12)
-    expect_equal(as.numeric(collect(new_spark_df)$numbers_mean[3]), 4)
+    expect_equal(as.numeric(collect(new_spark_df)$sum_numbers[3]), 12)
+    expect_equal(as.numeric(collect(new_spark_df)$mean_numbers[3]), 4)
 })
 
 test_that("apply_query_groupby_and_filter", {
     groupby_and_filter_query_df <- "[{\"type\":\"filter\",\"expr\":\"letters == 'C'\"}, {\"type\":\"group\",\"expr\":{\"by\":[\"letters\"],\"agg\":[{\"op\":\"sum\",\"col\":\"numbers\"},{\"op\":\"mean\",\"col\":\"numbers\"}]}}]"
     new_df <- querier$apply_query(df, fromJSON(groupby_and_filter_query_df))
     expect_equal(nrow(new_df), 1)
-    expect_equal(as.numeric(new_df$numbers_sum[1]), 12)
-    expect_equal(as.numeric(new_df$numbers_mean[1]), 4)
+    expect_equal(as.numeric(new_df$sum_numbers[1]), 12)
+    expect_equal(as.numeric(new_df$mean_numbers[1]), 4)
 
     groupby_and_filter_query_spark_df <- "[{\"type\":\"filter\",\"expr\":\"letters = 'C'\"}, {\"type\":\"group\",\"expr\":{\"by\":[\"letters\"],\"agg\":[{\"op\":\"sum\",\"col\":\"numbers\"},{\"op\":\"mean\",\"col\":\"numbers\"}]}}]"
     new_spark_df <- querier$apply_query(spark_df, fromJSON(groupby_and_filter_query_spark_df))
     expect_equal(nrow(collect(new_spark_df)), 1)
-    expect_equal(as.numeric(collect(new_spark_df)$numbers_sum[1]), 12)
-    expect_equal(as.numeric(collect(new_spark_df)$numbers_mean[1]), 4)
+    expect_equal(as.numeric(collect(new_spark_df)$sum_numbers[1]), 12)
+    expect_equal(as.numeric(collect(new_spark_df)$mean_numbers[1]), 4)
 })

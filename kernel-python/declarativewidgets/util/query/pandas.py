@@ -95,4 +95,4 @@ def to_dict_agg(agg_array):
 
 
 def to_single_column_names(column_array):
-    return map(lambda col: col[:-1] if col.endswith('_') else col, ['_'.join(col).strip() for col in column_array])
+    return map(lambda col: col[1:] if col.startswith('_') else col, ['_'.join(col[::-1]).strip() for col in column_array])

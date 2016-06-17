@@ -38,8 +38,8 @@ class TestFunctions(unittest.TestCase):
 
         expected = [
             "col1",
-            "col2_count",
-            "col3_sum"
+            "count_col2",
+            "sum_col3"
         ]
 
         actual = to_single_column_names(arg_array)
