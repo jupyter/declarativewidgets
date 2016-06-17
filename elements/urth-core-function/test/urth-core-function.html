@@ -323,6 +323,38 @@
                 expect(fElmt.isValid()).to.be.false;
             });
 
+            it('should return false if any required args in signature has null value in args', function() {
+                var fElmt = fixture('basic');
+
+                fElmt.args = {
+                    x: "5",
+                    y: "4",
+                    z: null
+                }
+                fElmt._setSignature({
+                    x: {'required': true},
+                    y: {'required': true},
+                    z: {'required': true}
+                });
+                expect(fElmt.isValid()).to.be.false;
+            });
+
+            it('should return true if an optional arg in signature has null value in args', function() {
+                var fElmt = fixture('basic');
+
+                fElmt.args = {
+                    x: "5",
+                    y: "4",
+                    z: null
+                }
+                fElmt._setSignature({
+                    x: {'required': true},
+                    y: {'required': true}
+                });
+                expect(fElmt.isValid()).to.be.true;
+            });
+
+
             it('should return false if more required args in signature than are in args', function() {
                 var fElmt = fixture('basic');
                 
