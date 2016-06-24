@@ -105,6 +105,7 @@ Example:
              * The serialized representation of the DataFrame `ref`. The structure contains:
              * {
              *  columns: Array of column names
+             *  column_types: Array of column type names
              *  data: 2D Array of rows with column values
              *  index: Array with index values
              * }
@@ -126,6 +127,7 @@ Example:
 
             /**
              * Column type metadata for the DataFrame
+             * For internal use ONLY
              */
              columnTypes: {
                 type: Array,
@@ -281,20 +283,22 @@ Example:
          */
         onModelValueChange: function(newVal){
             this._debug( "urth-core-dataframe onModelValueChange", newVal );
-            newVal = this._deserializeColumnTypes(newVal);
+            newVal = this._deserializeDateTypes(newVal || {data:[]});
             this._setValue(newVal || {data:[]});
         },
 
         /*
-         * Returns the deserialized DataFrame reconstructed via the column_types
+         * Returns the dataFrame with deserialized Date types of the dataFrame reconstructed via the column_types
          * @param df - the serialized DataFrame
          * @return the reconstructed DataFrame
          */
-        _deserializeColumnTypes: function(df) {
+        _deserializeDateTypes: function(df) {
+            if (!df.column_types || !df.data) {
+                return df;
+            }
             for (var i=0; i<df.column_types.length; i++) {
-                //if this column is of type date convert the string content to a date object
-                if(df.column_types[i] === "datetime64[ns]" || df.column_types[i] === "Date"
-                    || df.column_types[i] === "TimestampType") {
+                //If this column is of type date convert the string content to a date object
+                if(df.column_types[i] === "Date") {
                     for (var j=0; j<df.data.length; j++) {
                         df.data[j][i] = new Date(df.data[j][i]);
                     }
@@ -369,7 +373,7 @@ Example:
         /**
          * Returns the type information of the serialized Dataframe
          * @param df - the serialized DataFrame
-         * @return the types array
+         * @return the types array, where each element is a type name of that particular column
          * @private
          */
         _columnTypes: function(df){

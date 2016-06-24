@@ -29,23 +29,6 @@ if sys.version_info[0] == 2:
 else:
     from .base_serializer_py3 import BaseSerializer
 
-def serialize_pandas_df(obj, **kwargs):
-    limit = kwargs.get('limit', 100)
-    # Default to split orientation
-    # {index -> [index], columns -> [columns], data -> [values]}
-    date_format = kwargs.get('date_format', 'iso')
-    df_dict = json.loads(obj[:limit].to_json(orient='split', date_format=date_format))
-    df_dict['column_types'] = [str(x) for x in obj.dtypes.tolist()]
-    for i in range(0, len(df_dict['column_types'])):
-        if df_dict['column_types'][i] == "datetime64[ns]":
-            for j in range(0, len(df_dict['data'])):
-                #If this date element has no timezone drop the t/z from the serialized element
-                #Note on filter where rows are dropped we must associate the dict index with the original df index
-                row_index_in_obj = obj[df_dict['columns'][i]].index[j]
-                if obj[df_dict['columns'][i]][row_index_in_obj].tzinfo is None:
-                    df_dict['data'][j][i] = (re.sub("T|Z", " ", df_dict['data'][j][i]))
-    return df_dict
-
 class PandasSeriesSerializer(BaseSerializer):
     @staticmethod
     def klass():
@@ -77,7 +60,23 @@ class PandasDataFrameSerializer(BaseSerializer):
 
     @staticmethod
     def serialize(obj, **kwargs):
-        return serialize_pandas_df(obj, **kwargs)
+        limit = kwargs.get('limit', 100)
+        # Default to split orientation
+        # {index -> [index], columns -> [columns], data -> [values]}
+        date_format = kwargs.get('date_format', 'iso')
+        df_dict = json.loads(obj[:limit].to_json(orient='split', date_format=date_format))
+        df_dict['column_types'] = kwargs.get('column_types', [str(x) for x in obj.dtypes.tolist()])
+        df_dict['column_types'] = ["Date" if x == "datetime64[ns]" or x == "date" else x for x in df_dict['column_types']]
+        for i in range(0, len(df_dict['column_types'])):
+            if df_dict['column_types'][i] == "Date":
+                for j in range(0, len(df_dict['data'])):
+                    #If this date element has no timezone drop the t/z from the serialized element
+                    #Note on filter where rows are dropped we must associate the dict index with the original df index
+                    row_index_in_obj = obj[df_dict['columns'][i]].index[j]
+                    date_element = obj[df_dict['columns'][i]][row_index_in_obj]
+                    if not hasattr(date_element, 'tzinfo') or date_element.tzinfo is None:
+                        df_dict['data'][j][i] = re.sub("T|Z", " ", df_dict['data'][j][i])
+        return df_dict
 
     @staticmethod
     def check_packages():
@@ -133,7 +132,9 @@ class SparkDataFrameSerializer(BaseSerializer):
         df = pandas.DataFrame.from_records(
             obj.limit(kwargs.get('limit', 100)).collect(), columns=obj.columns)
 
-        return serialize_pandas_df(df, **kwargs)
+        #recover column_types from the original object before it is collected/converted
+        column_types = [str(x[1]) for x in obj.dtypes]
+        return PandasDataFrameSerializer.serialize(df, column_types=column_types, **kwargs)
 
     @staticmethod
     def check_packages():

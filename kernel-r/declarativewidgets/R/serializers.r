@@ -88,6 +88,7 @@ Spark_DataFrame_Serializer <- R6Class(
             df <- collect(limit(obj, row_limit))
             json <- list()
             json[['columns']] <- colnames(df)
+            json[['column_types']] <- get_df_column_types(df)
             json[['data']] <- self$df_to_lists(df)
             json[['index']] <- list(1:nrow(df))
             return (json)
