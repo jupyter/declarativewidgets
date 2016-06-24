@@ -118,16 +118,6 @@ class TestWidgetChannel(unittest.TestCase):
         self.assertEqual(MockSet.call_count, 1)
         MockSet.assert_called_with(self.name, 'myvalue', 'c')
 
-    def test_set_before_channels(self):
-        """should call set on the channels model when set is called before Channels instantiated"""
-        self.widget.set(self.name, 'myvalue')
-        MockSet = Mock()
-        Channels.set = MockSet
-        comm = Mock(spec=Comm)
-        Channels(comm=comm)
-        self.assertEqual(MockSet.call_count, 1)
-        MockSet.assert_called_with(self.name, 'myvalue', 'c')
-
     def test_set_args(self):
         """should call set on the channels model with args"""
         MockSet = Mock()
@@ -138,12 +128,14 @@ class TestWidgetChannel(unittest.TestCase):
         self.assertEqual(MockSet.call_count, 1)
         MockSet.assert_called_with(self.name, 'myvalue', 'c', a = 'vala', b = 'valb')
 
-    def test_set_args_before_channels(self):
-        """should call set on the channels model with args when set is called before Channels instantiated"""
-        self.widget.set(self.name, 'myvalue', a = 'vala', b = 'valb')
-        MockSet = Mock()
-        Channels.set = MockSet
+    ### get_state()
+    def test_get_state_flushes_data_cached_by_channels(self):
+        """should return the state of the channels stored before created"""
+        self.widget.set(self.name, 'myvalue')
+
         comm = Mock(spec=Comm)
-        Channels(comm=comm)
-        self.assertEqual(MockSet.call_count, 1)
-        MockSet.assert_called_with(self.name, 'myvalue', 'c', a = 'vala', b = 'valb')
+        channels = Channels(comm=comm)
+        state = channels.get_state()
+
+        self.assertEqual(state, {"c:{}".format(self.name): 'myvalue'})
+        self.assertTrue(not widget_channels.channel_data)

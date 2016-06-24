@@ -11,12 +11,11 @@ class UrthWidget(widgets.Widget):
     def __init__(self, **kwargs):
         super(UrthWidget, self).__init__(**kwargs)
 
-    def send_state(self, key=None):
+    def get_state(self, key=None):
         """
-        Overrides the Widget send_state to prevent
-        an unnecessary initial state message.
+        In general, urth widgets don't have initial state
         """
-        pass
+        return {}
 
     def _send_update(self, attribute, value):
         """

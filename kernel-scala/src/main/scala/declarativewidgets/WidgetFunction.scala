@@ -5,11 +5,10 @@
 
 package declarativewidgets
 
-import declarativewidgets.util.{SerializationSupport, StandardFunctionSupport}
+import declarativewidgets.util.{MessageSupport, SerializationSupport, StandardFunctionSupport}
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.kernel.protocol.v5.MsgData
 import play.api.libs.json.{JsString, JsValue, Json}
-import declarativewidgets.util.SerializationSupport
 
 import scala.util.{Failure, Success, Try}
 
@@ -31,13 +30,13 @@ class WidgetFunction(comm: CommWriter)
    * Handles a Comm Message whose method is backbone.
    * @param msg The Comm Message.
    */
-  def handleBackbone(msg: MsgData): Unit = {
+  override def handleBackbone(msg: MsgData, msgSupport:MessageSupport): Unit = {
     logger.debug(s"Handling backbone message ${msg}...")
     (msg \ Comm.KeySyncData \ Comm.KeyFunctionName).asOpt[String] match {
       case Some(name) =>
         logger.trace(s"Sync data ${Comm.KeyFunctionName}: $name")
         val funcName = name.toString
-        registerFunction(funcName)
+        registerFunction(funcName, msgSupport)
       case _ => logger.error(s"No ${Comm.KeyFunctionName} value provided!")
     }
 
@@ -52,13 +51,13 @@ class WidgetFunction(comm: CommWriter)
    * Handles a Comm Message whose method is custom.
    * @param msgContent The content field of the Comm Message.
    */
-  def handleCustom(msgContent: MsgData): Unit = {
+  override def handleCustom(msgContent: MsgData, msgSupport:MessageSupport): Unit = {
     logger.debug(s"Handling custom message ${msgContent}...")
     (msgContent \ Comm.KeyEvent).asOpt[String] match {
       case Some(Comm.EventInvoke) =>
-        handleInvoke(msgContent, this.theFunctionName, this.limit)
+        handleInvoke(msgContent, this.theFunctionName, this.limit, msgSupport)
       case Some(Comm.EventSync) =>
-        sendSignature(this.theFunctionName)
+        sendSignature(this.theFunctionName, msgSupport)
       case Some(evt) =>
         logger.warn(s"Unhandled custom event ${evt}.")
       case None =>
@@ -66,20 +65,20 @@ class WidgetFunction(comm: CommWriter)
     }
   }
 
-  private[declarativewidgets] def handleInvoke(msg: MsgData, name: String, limit: Int): Unit = {
+  private[declarativewidgets] def handleInvoke(msg: MsgData, name: String, limit: Int, msgSupport:MessageSupport): Unit = {
     logger.debug(s"Handling invoke message ${msg}...")
     (msg \ Comm.KeyArgs).asOpt[JsValue] match {
       case Some(args) =>
         invokeFunc(name, args, limit) match {
           case Success(result) =>
-            sendResult(result)
-            sendOk()
+            sendResult(result, msgSupport)
+            msgSupport.sendOk()
           case Failure(t) =>
-            sendError(s"Error invoking ${theFunctionName}: ${t.getCause}")
+            msgSupport.sendError(s"Error invoking ${theFunctionName}: ${t.getCause}")
             logger.error(s"Error invoking ${theFunctionName}: ${t.getCause}")
         }
       case None =>
-        sendError(s"No arguments were provided in message $msg for invocation!")
+        msgSupport.sendError(s"No arguments were provided in message $msg for invocation!")
         logger.warn(s"No arguments were provided for invocation!")
     }
   }
@@ -105,12 +104,12 @@ class WidgetFunction(comm: CommWriter)
         None
     }
 
-  private[declarativewidgets] def registerFunction(funcName: String): Unit = {
+  private[declarativewidgets] def registerFunction(funcName: String, msgSupport:MessageSupport): Unit = {
     this.theFunctionName = funcName
     logger.debug(s"Registered function ${funcName}.")
-    sendSignature(funcName) match {
-      case Right(_)  => sendOk()
-      case Left(msg) => sendError(msg)
+    sendSignature(funcName, msgSupport) match {
+      case Right(_)  => msgSupport.sendOk()
+      case Left(msg) => msgSupport.sendError(msg)
     }
   }
 
@@ -119,19 +118,19 @@ class WidgetFunction(comm: CommWriter)
     logger.debug(s"Registered limit ${limit}.")
   }
 
-  private[declarativewidgets] def sendSignature(funcName: String): Either[String, Unit] = {
+  private[declarativewidgets] def sendSignature(funcName: String, msgSupport:MessageSupport): Either[String, Unit] = {
     signature(funcName) match {
       case Some(sig) =>
         val sigJSON = Json.toJson(sig)
         logger.trace(s"Signature for ${funcName}: ${sigJSON}")
-        Right(sendState(Comm.StateSignature, sigJSON))
+        Right(msgSupport.sendState(Comm.StateSignature, sigJSON))
       case None =>
         logger.trace(s"Could not determine signature for function $funcName.")
         Left(s"Invalid function name $funcName. Could not determine signature.")
     }
   }
 
-  private[declarativewidgets] def sendResult(result: JsValue): Unit =
-    sendState(Comm.StateResult, result)
+  private[declarativewidgets] def sendResult(result: JsValue, msgSupport:MessageSupport): Unit =
+    msgSupport.sendState(Comm.StateResult, result)
 
 }

@@ -1,6 +1,6 @@
 package urth
 
-import declarativewidgets.{Channel, Default}
+import declarativewidgets.{Channel, ConnectedChannel, Default}
 import org.apache.toree.kernel.api.Kernel
 
 package object widgets {

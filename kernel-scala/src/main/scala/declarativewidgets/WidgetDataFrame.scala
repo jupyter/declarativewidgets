@@ -6,7 +6,7 @@
 package declarativewidgets
 
 import declarativewidgets.query.QuerySupport
-import declarativewidgets.util.SerializationSupport
+import declarativewidgets.util.{MessageSupport, SerializationSupport}
 import org.apache.spark.sql.DataFrame
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.interpreter.Interpreter
@@ -36,7 +36,7 @@ class WidgetDataFrame(comm: CommWriter)
    * Handles a Comm Message whose method is backbone.
    * @param msg The Comm Message.
    */
-  def handleBackbone(msg: MsgData): Unit = {
+  override def handleBackbone(msg: MsgData, msgSupport:MessageSupport): Unit = {
     logger.debug(s"Handling backbone message ${msg}...")
     (msg \ Comm.KeySyncData \ Comm.KeyLimit).asOpt[Int].foreach(registerLimit(_))
 
@@ -49,11 +49,11 @@ class WidgetDataFrame(comm: CommWriter)
    * Handles a Comm Message whose method is custom.
    * @param msgContent The content field of the Comm Message.
    */
-  def handleCustom(msgContent: MsgData): Unit = {
+  override def handleCustom(msgContent: MsgData, msgSupport:MessageSupport): Unit = {
     logger.debug(s"Handling custom message ${msgContent}...")
     (msgContent \ Comm.KeyEvent).asOpt[String] match {
       case Some(Comm.EventSync) =>
-        syncData()
+        syncData(msgSupport)
       case Some(evt) =>
         logger.warn(s"Unhandled custom event ${evt}.")
       case None =>
@@ -81,7 +81,7 @@ class WidgetDataFrame(comm: CommWriter)
     kernelInterpreter.read(variableName)
   }
 
-  private[declarativewidgets] def syncData() = {
+  private[declarativewidgets] def syncData(msgSupport:MessageSupport) = {
 
     val result: Either[String, JsValue] = theDataframe match {
       case Some(df:DataFrame) =>
@@ -106,15 +106,15 @@ class WidgetDataFrame(comm: CommWriter)
 
     result match {
       case Right(serDf) =>
-        sendSyncData(serDf)
-        sendOk()
+        sendSyncData(serDf, msgSupport)
+        msgSupport.sendOk()
 
       case Left(error) =>
-        sendError(error)
+        msgSupport.sendError(error)
     }
   }
 
-  private[declarativewidgets] def sendSyncData(result: JsValue) =
-    sendState(Comm.StateValue, result)
+  private[declarativewidgets] def sendSyncData(result: JsValue,msgSupport:MessageSupport) =
+    msgSupport.sendState(Comm.StateValue, result)
 
 }
