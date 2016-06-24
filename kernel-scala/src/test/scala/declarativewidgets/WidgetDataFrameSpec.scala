@@ -5,6 +5,7 @@
 
 package declarativewidgets
 
+import declarativewidgets.util.MessageSupport
 import org.apache.spark.SharedSparkContext
 import org.apache.spark.sql.{SQLContext, DataFrame}
 import org.apache.toree.comm.CommWriter
@@ -45,21 +46,21 @@ class WidgetDataFrameSpec extends FunSpec with Matchers with MockitoSugar with B
         doReturn(Some("")).when(intp).read(anyString())
         doReturn(intp).when(test).kernelInterpreter
 
-        test.handleBackbone(msg)
+        test.handleBackbone(msg, mock[MessageSupport])
         verify(test).registerName("df")
       }
 
       it("should not register a dataframe when no dataframe name is provided") {
         val test = spy(new TestWidget(mock[CommWriter]))
         val msg = Json.obj(Comm.KeySyncData -> "")
-        test.handleBackbone(msg)
+        test.handleBackbone(msg, mock[MessageSupport])
         verify(test, times(0)).registerName(anyString())
       }
 
       it("should register a limit") {
         val test = spy(new TestWidget(mock[CommWriter]))
         val msg = Json.obj(Comm.KeySyncData -> Map(Comm.KeyLimit -> 100))
-        test.handleBackbone(msg)
+        test.handleBackbone(msg, mock[MessageSupport])
         verify(test).registerLimit(100)
       }
 
@@ -67,14 +68,14 @@ class WidgetDataFrameSpec extends FunSpec with Matchers with MockitoSugar with B
       it("should not register a limit when no limit is provided") {
         val test = spy(new TestWidget(mock[CommWriter]))
         val msg = Json.obj(Comm.KeySyncData -> "")
-        test.handleBackbone(msg)
+        test.handleBackbone(msg, mock[MessageSupport])
         verify(test, times(0)).registerLimit(anyInt())
       }
 
       it("should register a query") {
         val test = spy(new TestWidget(mock[CommWriter]))
         val msg = Json.obj(Comm.KeySyncData -> Map("query" -> "some query"))
-        test.handleBackbone(msg)
+        test.handleBackbone(msg, mock[MessageSupport])
         verify(test).registerQuery("some query")
       }
     }
@@ -85,66 +86,72 @@ class WidgetDataFrameSpec extends FunSpec with Matchers with MockitoSugar with B
 
         val msg = Json.obj(Comm.KeyEvent -> Comm.EventSync)
 
-        doNothing().when(test).syncData()
+        doNothing().when(test).syncData(any())
 
-        test.handleCustom(msg)
+        test.handleCustom(msg, mock[MessageSupport])
 
-        verify(test, times(1)).syncData()
+        verify(test, times(1)).syncData(any())
       }
 
       it("should not handle an invalid event") {
         val test = spy(new TestWidget(mock[CommWriter]))
         val msg = Json.obj(Comm.KeyEvent -> "asdf")
-        test.handleCustom(msg)
-        verify(test, times(0)).syncData()
+        test.handleCustom(msg, mock[MessageSupport])
+        verify(test, times(0)).syncData(any())
       }
     }
 
     describe("#syncData") {
       it("should serialize the dataframe, send sync message, and ok message when the DataFrame is present") {
         val test = spy(new TestWidget(mock[CommWriter]))
+        val msgSupport = spy(MessageSupport(mock[CommWriter]))
 
         doReturn(Some(df)).when(test).theDataframe
 
-        test.syncData()
+        test.syncData(msgSupport)
         verify(test).serialize(df, 100)
-        verify(test).sendSyncData(any())
-        verify(test).sendOk(any())
+        verify(test).sendSyncData(any(), org.mockito.Matchers.eq(msgSupport))
+        verify(msgSupport).sendOk(any())
       }
 
       it("should send error message when the dataframe is not present") {
         val test = spy(new TestWidget(mock[CommWriter]))
+        val msgSupport = spy(MessageSupport(mock[CommWriter]))
 
         doReturn(None).when(test).theDataframe
 
-        test.syncData()
+        test.syncData(msgSupport)
         verify(test, times(0)).serialize(any(), anyInt())
-        verify(test, times(0)).sendSyncData(any())
-        verify(test).sendError(any())
+        verify(test, times(0)).sendSyncData(any(), org.mockito.Matchers.eq(msgSupport))
+        verify(msgSupport).sendError(any())
       }
 
       it("should send error message when the query is not parseable") {
         val test = spy(new TestWidget(mock[CommWriter]))
         test.query = "not parseable"
 
+        val msgSupport = spy(MessageSupport(mock[CommWriter]))
+
         doReturn(Some(df)).when(test).theDataframe
 
-        test.syncData()
+        test.syncData(msgSupport)
         verify(test, times(0)).serialize(any(), anyInt())
-        verify(test, times(0)).sendSyncData(any())
-        verify(test).sendError(any())
+        verify(test, times(0)).sendSyncData(any(), org.mockito.Matchers.eq(msgSupport))
+        verify(msgSupport).sendError(any())
       }
 
       it("should send error message when the variableName does not map a DataFrame") {
         val test = spy(new TestWidget(mock[CommWriter]))
         test.query = "not parseable"
 
+        val msgSupport = spy(MessageSupport(mock[CommWriter]))
+
         doReturn(Some("not a dataframe")).when(test).theDataframe
 
-        test.syncData()
+        test.syncData(msgSupport)
         verify(test, times(0)).serialize(any(), anyInt())
-        verify(test, times(0)).sendSyncData(any())
-        verify(test).sendError(any())
+        verify(test, times(0)).sendSyncData(any(), org.mockito.Matchers.eq(msgSupport))
+        verify(msgSupport).sendError(any())
       }
 
     }

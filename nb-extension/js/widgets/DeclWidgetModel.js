@@ -17,14 +17,6 @@ define(["jupyter-js-widgets"], function(widgets) {
         },
 
         /*
-         * Making request_state a noop to avoid requiring this handshake to take place to
-         * create model.
-         */
-        request_state: function(callbacks) {
-            return Promise.resolve(this);
-        },
-
-        /*
          * Avoiding out of sequence messages due to new promise/async code in WidgetModel
          */
         send_sync_message: function(attrs, callbacks) {

@@ -380,8 +380,9 @@ _dev: .watch dist
 	-@docker $(DOCKER_OPTS) run -it --rm \
 		-p 8888:8888 \
 		-p 4040:4040 \
+		-p 5005:5005 \
 		--user jovyan \
-		-e SPARK_OPTS="--master=local[4] --driver-java-options=-Dlog4j.logLevel=trace" \
+		-e SPARK_OPTS="--master=local[4] --driver-java-options=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005" \
 		-v `pwd`/dist/declarativewidgets/static:$(NB_HOME)/.local/share/jupyter/nbextensions/declarativewidgets \
 		-v `pwd`/dist/declarativewidgets:$(EXTENSION_DIR)/declarativewidgets \
 		-v `pwd`/dist/urth:$(EXTENSION_DIR)/urth \

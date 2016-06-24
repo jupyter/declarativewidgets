@@ -70,6 +70,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                         model.once('comm:close', this.__commCloseCallback);
 
                         this.model = model;
+                        this.onModelChange(model);
                         this.onModelReady();
                         this.fire('connected');
                     }.bind(this),

@@ -31,12 +31,31 @@ class Channels(UrthWidget):
 
         super(Channels, self).__init__(**kwargs)
 
+    def get_state(self, key=None):
+        """
+        The channel may have accumulated data before getting created. This call
+        from the super happens when it gets a request_state call and it's
+        an opportunity to send what has been captured since.
+        """
+
         # Set any channel data that was specified prior to Channels model creation.
+        state = {}
         for channel, data in channel_data.items():
             for key, params in data.items():
-                self.set(key, params['value'], channel, **params['args'])
+                a_key, a_value = self._prep_to_send(key, params['value'], channel, **params['args'])
+                state[a_key] = a_value
+
+        channel_data.clear()
+        return state
 
     def set(self, key, value, chan='default', **kwargs):
+        attr, serialized = self._prep_to_send(key, value, chan, **kwargs)
+        self._send_update(attr, serialized)
+
+    def watch(self, key, handler, chan='default'):
+        self.watch_handlers[chan][key] = handler
+
+    def _prep_to_send(self, key, value, chan='default', **kwargs):
 
         # Need to lazy import Serializers to avoid issue with matplotlib.
         # The Kernel errors if the inline magic runs
@@ -47,10 +66,7 @@ class Channels(UrthWidget):
 
         attr = "{}:{}".format(chan, key)
         serialized = self.serializer.serialize(value, **kwargs)
-        self._send_update(attr, serialized)
-
-    def watch(self, key, handler, chan='default'):
-        self.watch_handlers[chan][key] = handler
+        return attr, serialized
 
     def _handle_change_msg(self, wid, content, buffers):
         if content.get('event', '') == 'change':

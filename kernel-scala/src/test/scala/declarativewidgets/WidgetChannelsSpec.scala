@@ -1,19 +1,27 @@
 package declarativewidgets
 
+import declarativewidgets.util.MessageSupport
 import org.apache.toree.comm.CommWriter
 import org.apache.toree.kernel.protocol.v5._
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.{Matchers, FunSpec}
+import org.scalatest.{BeforeAndAfterEach, Entry, Matchers, FunSpec}
 import org.mockito.Mockito._
 import play.api.libs.json._
 
-class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
+class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar with BeforeAndAfterEach{
 
   class TestWidget(comm: CommWriter) extends WidgetChannels(comm)
 
   class TestWidgetNoChange(comm: CommWriter) extends WidgetChannels(comm) {
     override def handleChange(msgContent: MsgData) = Right(Unit)
+  }
+
+  override def beforeEach(): Unit = {
+    WidgetChannels.theChannels = None
+    WidgetChannels.cachedChannelData.clear()
+    WidgetChannels.chanHandlers = Map()
   }
 
   describe("WidgetChannels") {
@@ -81,36 +89,64 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
       }
     }
 
+    describe("#handleRequestState") {
+      it("should send content of cachedChannelData"){
+        WidgetChannels.channel().set("akey", "a value")
+        WidgetChannels.channel("foo").set("anotherKey", "another value", 5)
+
+        val comm = mock[CommWriter]
+        val widget = spy(new WidgetChannels(comm))
+        val msgSupport = spy(MessageSupport(mock[CommWriter]))
+
+        widget.handleRequestState(mock[MsgData], msgSupport)
+
+        val stateCaptor = ArgumentCaptor.forClass(classOf[Map[String,JsValue]])
+
+        verify(msgSupport).sendState(stateCaptor.capture())
+
+        val state = stateCaptor.getValue
+        state.keys should contain theSameElementsAs(Seq("default:akey", "foo:anotherKey"))
+        state("default:akey") should be (JsString("a value"))
+        state("foo:anotherKey") should be (JsString("another value"))
+
+        WidgetChannels.cachedChannelData shouldBe empty
+      }
+    }
+
     describe("#handleCustom") {
       it("should handle a change event using the message contents") {
         val test = spy(new TestWidgetNoChange(mock[CommWriter]))
 
         val msg = Json.obj(Comm.KeyEvent -> Comm.EventChange)
-        test.handleCustom(msg)
+        test.handleCustom(msg, mock[MessageSupport])
         verify(test).handleChange(msg)
       }
 
       it("should not handle an invalid event") {
         val test = spy(new TestWidget(mock[CommWriter]))
         val msg = Json.obj(Comm.KeyEvent -> "asdf")
-        test.handleCustom(msg)
+        test.handleCustom(msg, mock[MessageSupport])
         verify(test, times(0)).handleChange(any())
       }
 
       it("should send a status ok message if handling the change succeeded"){
         val test = spy(new TestWidget(mock[CommWriter]))
+        val msgSupport = spy(MessageSupport(mock[CommWriter]))
+
         doReturn(Right(())).when(test).handleChange(any())
         val msg = Json.obj(Comm.KeyEvent -> Comm.EventChange)
-        test.handleCustom(msg)
-        verify(test).sendOk()
+        test.handleCustom(msg, msgSupport)
+        verify(msgSupport).sendOk()
       }
 
       it("should send a status error message if handling the change fails"){
         val test = spy(new TestWidget(mock[CommWriter]))
+        val msgSupport = spy(MessageSupport(mock[CommWriter]))
+
         doReturn(Left("uh oh")).when(test).handleChange(any())
         val msg = Json.obj(Comm.KeyEvent -> Comm.EventChange)
-        test.handleCustom(msg)
-        verify(test).sendError("uh oh")
+        test.handleCustom(msg, msgSupport)
+        verify(msgSupport).sendError("uh oh")
       }
     }
 
@@ -289,7 +325,10 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         doReturn(comm).when(widget).comm
         WidgetChannels.register(widget)
         WidgetChannels.channel().chan should be(Default.Channel)
-        WidgetChannels.channel().comm should be(comm)
+
+        WidgetChannels.channel() shouldBe a [ConnectedChannel]
+
+        WidgetChannels.channel().asInstanceOf[ConnectedChannel].comm should be(comm)
 
       }
       it ("should give a Channel object for the given channel using the " +
@@ -299,7 +338,48 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         doReturn(comm).when(widget).comm
         WidgetChannels.register(widget)
         WidgetChannels.channel("foo").chan should be("foo")
-        WidgetChannels.channel("foo").comm should be(comm)
+
+        WidgetChannels.channel("foo") shouldBe a [ConnectedChannel]
+
+        WidgetChannels.channel("foo").asInstanceOf[ConnectedChannel].comm should be(comm)
+      }
+
+      it ("should give a Channel object for the default channel that records to the cache map") {
+        val comm = mock[CommWriter]
+
+        val aChannel = WidgetChannels.channel()
+        aChannel.chan should be(Default.Channel)
+
+        aChannel.isInstanceOf[ConnectedChannel] should be(false)
+
+        aChannel.set("aKey", "a value")
+        aChannel.set("anotherKey", "another value", 5)
+
+        WidgetChannels.cachedChannelData.keys should contain only(Default.Channel)
+
+        val channelData = WidgetChannels.cachedChannelData(Default.Channel)
+
+        channelData should contain ("aKey" -> ("a value", Default.Limit))
+        channelData should contain ("anotherKey" -> ("another value", 5))
+      }
+
+      it ("should give a Channel object for the given channel that records to the cache map") {
+        val comm = mock[CommWriter]
+
+        val aChannel = WidgetChannels.channel("foo")
+        aChannel.chan should be("foo")
+
+        aChannel.isInstanceOf[ConnectedChannel] should be(false)
+
+        aChannel.set("aKey", "a value")
+        aChannel.set("anotherKey", "another value", 5)
+
+        WidgetChannels.cachedChannelData.keys should contain only("foo")
+
+        val channelData = WidgetChannels.cachedChannelData("foo")
+
+        channelData should contain ("aKey" -> ("a value", Default.Limit))
+        channelData should contain ("anotherKey" -> ("another value", 5))
       }
     }
 
@@ -307,7 +387,7 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
       it ("should register the widget instance when created") {
         val comm = mock[CommWriter]
         val widget = new WidgetChannels(comm)
-        WidgetChannels.theChannels should be (widget)
+        WidgetChannels.theChannels.get should be (widget)
       }
     }
 
@@ -393,7 +473,7 @@ class WidgetChannelsSpec extends FunSpec with Matchers with MockitoSugar {
         val chan = "c"
         val name = "n"
         val handler = (x: Option[Int], y: Int) => ()
-        Channel(mock[CommWriter], chan).watch(name, handler)
+        ConnectedChannel(mock[CommWriter], chan).watch(name, handler)
 
         val test = new TestWidget(mock[CommWriter])
         test.getHandler(chan, name) should be (Some(handler))
