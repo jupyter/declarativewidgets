@@ -42,7 +42,10 @@ def handle_group( df, grp_expr ):
     group_cols = grp_expr['by']
     group_aggs = grp_expr['agg']
 
-    return df.groupby(group_cols).agg(*to_array_of_func_exprs(group_aggs))
+    #rename resultant column names to dataframe format i.e. sum(columnName) -> sum_columnName
+    renamed_columns = [group_cols] + [x['op'] + "_" + x['col'] for x in group_aggs]
+
+    return df.groupby(group_cols).agg(*to_array_of_func_exprs(group_aggs)).toDF(*renamed_columns)
 
 
 def handle_sort(df, sort_expr):

@@ -22,7 +22,7 @@ DataFrame_Querier <- R6Class(
             cols <- append(cols, temp_index)
             for (i in 1:length(grp_expr$agg$op)) {
                 temp_index <- (aggregate(df[,c(grp_expr$agg[2][,1][i])] ~ df[,c(as.character(grp_expr$by))], df, grp_expr$agg[1][,1][i])[2])
-                names(temp_index) <- paste(grp_expr$agg[2][,1][i], "_", grp_expr$agg[1][,1][i], sep="")
+                names(temp_index) <- paste(grp_expr$agg[1][,1][i], "_", grp_expr$agg[2][,1][i], sep="")
                 cols <- append(cols, temp_index)
             }
             new_df <- format(data.frame(cols))
@@ -52,7 +52,7 @@ Spark_DataFrame_Querier <- R6Class(
             for (i in 1:length(grp_expr$agg$op)) {
                 temp_expr <- paste(grp_expr$agg[1][,1][i], "(", grp_expr$agg[2][,1][i], ")", sep="")
                 agg_args <- append(agg_args, expr(temp_expr))
-                temp_name <- paste(grp_expr$agg[2][,1][i], "_", grp_expr$agg[1][,1][i], sep="")
+                temp_name <- paste(grp_expr$agg[1][,1][i], "_", grp_expr$agg[2][,1][i], sep="")
                 col_names <- append(col_names, temp_name)
             }
             new_df <- do.call(agg, agg_args)
