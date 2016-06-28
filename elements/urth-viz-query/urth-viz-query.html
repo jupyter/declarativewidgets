@@ -45,13 +45,67 @@ Example:
     </style>
 
   <template>
+      <template is="dom-if" if="[[!groups.length]]">
+          <paper-button on-tap="addGroup">
+              <iron-icon icon="icons:add-circle-outline"></iron-icon>
+              Add group-by
+          </paper-button>
+      </template>
+
+      <template id="groups" is="dom-repeat" items="{{groups}}" as="group">
+          <div>
+              <span>Group by:</span>
+              <paper-dropdown-menu label="column" selected-item-label="{{group.col}}">
+                  <paper-listbox class="dropdown-content">
+                      <template is="dom-repeat" items="{{originalColumns}}">
+                          <paper-item>{{item}}</paper-item>
+                      </template>
+                  </paper-listbox>
+              </paper-dropdown-menu>
+              <paper-button on-tap="deleteGroup">
+                  <iron-icon icon="icons:delete"></iron-icon>
+              </paper-button>
+
+              <div style="margin-left: 50px;">
+                  <template is="dom-repeat" items="{{group.aggregators}}" as="agg">
+<div>
+                      <paper-dropdown-menu label="operation" selected-item-label="{{agg.op}}" on-iron-select="_contentChanged">
+                          <paper-listbox class="dropdown-content">
+                              <paper-item>sum</paper-item>
+                              <paper-item>mean</paper-item>
+                          </paper-listbox>
+                      </paper-dropdown-menu>
+
+                      <paper-dropdown-menu label="column" selected-item-label="{{agg.col}}" on-iron-select="_contentChanged">
+                          <paper-listbox class="dropdown-content">
+                              <template is="dom-repeat" items="{{originalColumns}}">
+                                  <paper-item>{{item}}</paper-item>
+                              </template>
+                          </paper-listbox>
+                      </paper-dropdown-menu>
+
+                      <paper-button on-tap="deleteAgg">
+                          <iron-icon icon="icons:delete"></iron-icon>
+                      </paper-button>
+</div>
+                  </template>
+
+<div>
+                  <paper-button on-tap="addAgg">
+                      <iron-icon icon="icons:add-circle-outline"></iron-icon>
+                      Add aggregate function
+                  </paper-button>
+</div>
+              </div>
+          </div>
+      </template>
       <div class="querior">
           <h3>Match <em>all</em> of the following rules:</h3>
           <template is="dom-repeat" items="{{rules}}" as="rule">
               <div class="query-rule">
                   <paper-dropdown-menu label="column" selected-item-label="{{rule.col}}">
                       <paper-listbox class="dropdown-content">
-                          <template is="dom-repeat" items="{{columns}}">
+                          <template is="dom-repeat" items="{{originalColumns}}">
                               <paper-item>{{item}}</paper-item>
                           </template>
                       </paper-listbox>
@@ -70,10 +124,21 @@ Example:
                   </paper-button>
               </div>
           </template>
-          <paper-button on-tap="addRule">
-              <iron-icon icon="icons:add-circle-outline"></iron-icon>
-              Add filter
-          </paper-button>
+          <div>
+              <paper-button on-tap="addRule">
+                  <iron-icon icon="icons:add-circle-outline"></iron-icon>
+                  Add filter
+              </paper-button>
+          </div>
+
+          <!-- repeating query-group elements to be stamped as children of myDataframe -->
+          <template id="groups" is="dom-repeat" items="{{groups}}" as="group">
+              <urth-core-query-group by$="{{group.col}}" disabled="[[!group.col]]">
+                  <template is="dom-repeat" items="{{group.aggregators}}" as="agg" observe="col op">
+                      <urth-core-query-agg op$="{{agg.op}}" col$="{{agg.col}}" disabled="[[!agg.col]]"></urth-core-query-agg>
+                  </template>
+              </urth-core-query-group>
+          </template>
 
           <!-- repeating query-filter elements to be stamped as children of myDataframe -->
           <template id="filters" is="dom-repeat" items="{{rules}}" as="rule" filter="hasValue" observe="col op val">
@@ -99,6 +164,11 @@ Example:
             rules: {
                 type: Array,
                 value: function() { return [{ col: null, op: null, val: null }]; }
+            },
+
+            groups: {
+                type: Array,
+                value: function() { return [{ col: null, aggregators: [] }]; }
             }
         },
 
@@ -117,18 +187,48 @@ Example:
             this.push('rules', { col: null, op: null, val: null });
         },
 
+        addGroup: function(event) {
+            this.push('groups', { col: this.$.groups.groupBy, aggregators: [] });
+        },
+
+        addAgg: function(event) {
+            this.push('groups.0.aggregators', { op: null, col: null });
+        },
+
         deleteRule: function(event) {
             this.splice('rules', event.model.index, 1);
         },
+
+        deleteGroup: function(event) {
+            this.splice('groups', event.model.index, 1);
+        },
+
+        deleteAgg: function(event) {
+            this.splice('groups.0.aggregators', event.model.index, 1);
+        },
+
+_contentChanged: function(event) {
+    this.querySelector('urth-core-query-group')._contentChanged(); // HACK. urth-core-group-agg property changes should trigger a change in the query group
+},
 
         ready: function() {
             // move filters template to user-supplied urth-core-dataframe in light DOM
             var df = this.$.myDataframe.getDistributedNodes()[0];
             df.appendChild(this.$.filters.root);
+            df.appendChild(this.$.groups.root);
 
             this.columns = df.columns;
+
+            // Keep track of dataframe columns prior to group operation
+            this.originalColumns = this.columns;
+
             df.addEventListener('columns-changed', function(event) {
                 this.columns = df.columns;
+
+                if (!this.groups || !this.groups.length || !this.groups[0].col) {
+                    // Only update if this is not a group operation
+                    this.originalColumns = this.columns;
+                }
             }.bind(this));
         }
     });
