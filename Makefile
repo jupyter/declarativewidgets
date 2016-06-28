@@ -441,7 +441,7 @@ ifdef SAUCE_USER_NAME
 	@BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-remote
 else ifdef TRAVIS
 	@echo 'Starting system integration tests locally on Travis...'
-	@BROWSER_LIST="firefox" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-local
+	@BROWSER_LIST="firefox" ALT_BROWSER_LIST="firefox" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-local
 else
 	@echo 'Starting system integration tests locally...'
 	@BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-local
