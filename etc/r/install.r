@@ -10,6 +10,7 @@
 
 temp_libPaths <- .libPaths()
 .libPaths(temp_libPaths[2])
+Sys.setenv(TAR = '/bin/tar')
 install.packages("devtools", repos='http://cran.us.r-project.org', quiet = TRUE)
 try(library(devtools), silent = TRUE)
 remove.packages("repr")
