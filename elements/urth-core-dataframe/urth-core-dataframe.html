@@ -105,6 +105,7 @@ Example:
              * The serialized representation of the DataFrame `ref`. The structure contains:
              * {
              *  columns: Array of column names
+             *  column_types: Array of column type names
              *  data: 2D Array of rows with column values
              *  index: Array with index values
              * }
@@ -123,6 +124,16 @@ Example:
                 computed: '_columns(value)',
                 notify: true
             },
+
+            /**
+             * Column type metadata for the DataFrame
+             * For internal use ONLY
+             */
+             columnTypes: {
+                type: Array,
+                computed: '_columnTypes(value)',
+                notify: true
+             },
 
             /**
              * An Array containing the data rows of the DataFrame. If 'row-as-object` is false, this
@@ -272,7 +283,28 @@ Example:
          */
         onModelValueChange: function(newVal){
             this._debug( "urth-core-dataframe onModelValueChange", newVal );
+            newVal = this._deserializeDateTypes(newVal || {data:[]});
             this._setValue(newVal || {data:[]});
+        },
+
+        /*
+         * Returns the dataFrame with deserialized Date types of the dataFrame reconstructed via the column_types
+         * @param df - the serialized DataFrame
+         * @return the reconstructed DataFrame
+         */
+        _deserializeDateTypes: function(df) {
+            if (!df.column_types || !df.data) {
+                return df;
+            }
+            for (var i=0; i<df.column_types.length; i++) {
+                //If this column is of type date convert the string content to a date object
+                if(df.column_types[i] === "Date") {
+                    for (var j=0; j<df.data.length; j++) {
+                        df.data[j][i] = new Date(df.data[j][i]);
+                    }
+                }
+            }
+            return df;
         },
 
         /* 
@@ -336,6 +368,16 @@ Example:
          */
         _columns: function(df){
             return df.columns;
+        },
+
+        /**
+         * Returns the type information of the serialized Dataframe
+         * @param df - the serialized DataFrame
+         * @return the types array, where each element is a type name of that particular column
+         * @private
+         */
+        _columnTypes: function(df){
+            return df.column_types;
         },
 
         /**

@@ -10,6 +10,9 @@ import org.apache.toree.utils.LogLike
 import org.apache.spark.sql.DataFrame
 import play.api.libs.json._
 
+import org.apache.spark.sql.types.TimestampType
+import org.apache.spark.sql.types.DateType
+
 /**
  * Contains methods for serializing a variable based on its type.
  */
@@ -53,12 +56,22 @@ trait SerializationSupport extends LogLike {
     (df: DataFrame) => {
       val columns: Array[String] = df.columns
 
+      //https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/types/package-tree.html
+      //match possible date types the user may be using
+      val column_types: Array[String] = df.schema.map(
+                                        x => x.dataType match {
+                                          case timeStamp: TimestampType => "Date"
+                                          case date: DateType => "Date"
+                                          case _ =>  x.dataType.toString()
+                                        }).toArray
+
       val data: Array[Array[JsValue]] = df.toJSON.take(limit).map( jsonRow => toArray(Json.parse(jsonRow).as[JsObject], columns))
 
       val index: Array[String] = (0 until data.length).map(_.toString).toArray
 
       Json.obj(
         "columns" -> columns,
+        "column_types" -> column_types,
         "index"   -> index,
         "data"    -> data
       )
