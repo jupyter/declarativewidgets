@@ -1,6 +1,22 @@
 #' @include widget.r serializer.r
 NULL
 
+# Creates a protected environment for channels and related init cached related data to live!
+widget_channels_env <- new.env()
+
+#Access a variable that is cached in the widget_channels_env
+get_from_widget_channel_env_cache <- function(variable) {
+    if(!exists(variable, envir = widget_channels_env)) {
+        assign(variable, list(), envir = widget_channels_env)
+    }
+    return (get(variable, envir  = widget_channels_env))
+}
+
+#Put (Create or Replace) a variable that is cached in the widget_channels_env
+put_from_widget_channel_env_cache <- function(variable, value) {
+    assign(variable, value, envir = widget_channels_env)
+}
+
 #' Widget_Channel
 #'
 #' Description = Encapsulates a widget_channel,
@@ -11,11 +27,30 @@ Channel <- setRefClass(
         channel_id = 'character'
     ),
     methods = list(
+        #helper to perform and action on a key/value pair (example set/watch)
+        update_key_action = function(func, cached_data_var, key, value) {
+            #If the Channels model hasn't been created yet, keep track of values
+            #that have been specified, otherwise go ahead and perform the action for the value.
+            if(exists("the_channels", envir = widget_channels_env)) {
+                do.call(func, list(key, value, channel_id))
+            } else {
+                content <- list()
+                content[[key]] <- value
+                temp_channel_data <- get_from_widget_channel_env_cache(cached_data_var)
+                #Update value in cache if key already exists else create/append new
+                if(key %in% names(temp_channel_data[[channel_id]])) {
+                    temp_channel_data[[channel_id]][[key]] <- value
+                } else {
+                    temp_channel_data[[channel_id]] <- append(temp_channel_data[[channel_id]], content)
+                }
+                put_from_widget_channel_env_cache(cached_data_var, temp_channel_data)
+            }
+        },
         set = function(key, value) {
-            the_channels$set(key, value, channel_id)
+            update_key_action(get_from_widget_channel_env_cache("the_channels")$set, "channel_set_data", key, value)
         },
         watch = function(key, handler) {
-            the_channels$watch(key, handler, channel_id)
+            update_key_action(get_from_widget_channel_env_cache("the_channels")$watch, "channel_watch_data", key, handler)
         },
         initialize = function(chan) {
             channel_id <<- chan
@@ -23,7 +58,10 @@ Channel <- setRefClass(
     )
 )
 
-the_channel <- function(chan='default'){
+#' channel user level accessor
+#'
+#' @export
+channel <- function(chan='default'){
     return (Channel$new(chan))
 }
 
@@ -66,7 +104,7 @@ Widget_Channels <- R6Class(
                 }
             }
         },
-        set = function(key, value, channel_id) {
+        set = function(key, value, channel_id='default') {
             attr <- paste(channel_id, ":", key, sep = "")
             serialized <- self$serializer$serialize(value)
             self$send_update(attr, serialized)
@@ -80,10 +118,31 @@ Widget_Channels <- R6Class(
                 self$handle_change(msg$data)
             }
         },
+        handle_request_state = function(msg) {
+            #restore channels set data
+            channel_set_cache_data <- get_from_widget_channel_env_cache("channel_set_data")
+            channel_names <- names(channel_set_cache_data)
+            for(channel_name in channel_names) {
+                for(key in names(channel_set_cache_data[[channel_name]])) {
+                    value <- channel_set_cache_data[[channel_name]][[key]]
+                    self$set(key, value, channel_name)
+                }
+            }
+            #restore channels watch data
+            channel_watch_cache_data <- get_from_widget_channel_env_cache("channel_watch_data")
+            channel_names <- names(channel_watch_cache_data)
+            for(channel_name in channel_names) {
+                for(key in names(channel_watch_cache_data[[channel_name]])) {
+                    handler <- channel_watch_cache_data[[channel_name]][[key]]
+                    self$watch(key, handler, channel_name)
+                }
+            }
+            ## Clear cache as we have inited and established state
+            put_from_widget_channel_env_cache("channel_set_data", list())
+            put_from_widget_channel_env_cache("channel_watch_data", list())
+        },
         initialize = function(comm, serializer) {
-            #expose channel to global env
-            assign("the_channels", self, envir = .GlobalEnv)
-            assign("channel", the_channel, envir = .GlobalEnv)
+            assign("the_channels", self, envir = widget_channels_env)
             #initialize super class Widget
             super$initialize(comm)
             self$serializer <- serializer

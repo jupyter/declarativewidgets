@@ -33,11 +33,27 @@ Widget <- R6Class("Widget",
                 print(c('No content in backbone message', msg))
             }
         },
+        handle_request_state = function(msg) {
+            msg <- list()
+            msg[["method"]] <- "update"
+            state_list <- list()
+            msg[["state"]] <- state_list
+            self$send(msg)
+        },
+        handle_request_state_content = function(msg) {
+            if(!is.null(msg)) {
+                #handle_request_state for widget_X
+                self$handle_request_state(msg)
+            } else {
+                print(c('No content in request_state message', msg))
+            }
+        },
         handle_msg = function(msg) {
             switch(
                 msg$method,
                 backbone    = self$handle_backbone_content(msg),
                 custom      = self$handle_custom_content(msg),
+                request_state = self$handle_request_state_content(msg),
                 print(c('Got unhandled msg type:', msg$method))
             )
         },
