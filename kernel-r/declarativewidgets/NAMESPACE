@@ -1,5 +1,6 @@
 export(initWidgets)
 export(Serializer)
+export(channel)
 import(IRdisplay)
 import(IRkernel)
 import(uuid)
