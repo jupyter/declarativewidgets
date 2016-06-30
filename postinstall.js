@@ -9,7 +9,8 @@ var logOutput = function(error, stdout, stderr){
   console.error(stderr);
   console.log(stdout);
 };
-var installPath = [process.env.PWD, '..'].join(path.sep);
+var installPath = [process.env.PWD, '..', '..'].join(path.sep);
+console.log('Installing declarativewidgets into: ' + installPath);
 
 fs.readdir([process.env.PWD, 'elements'].join(path.sep), function(err, items) {
     for (var i=0; i<items.length; i++) {

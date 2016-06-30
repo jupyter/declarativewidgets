@@ -39,8 +39,17 @@ define([
             require([
                 'base/js/namespace',
                 'base/js/events',
-                './init/init'
+                './init/init',
             ],function(Jupyter, events, init) {
+              var kernel = Jupyter.notebook.kernel;
+              var config = {};
+              this._baseURL = this._config.baseUrl ? this._config.baseUrl : '/';
+              this._baseURL = this._config.namespace &&
+                              this._config.namespace.notebook &&
+                              this._config.namespace.notebook.base_url ?
+                                  this._config.namespace.notebook.base_url : '/';
+              this._componentsDir = this._config.componentsDir ? this._config.componentsDir : 'urth_components';
+              
                 init({
                     namespace: Jupyter,
                     events: events

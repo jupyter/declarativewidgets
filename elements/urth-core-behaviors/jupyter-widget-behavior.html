@@ -48,6 +48,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
 
             _doCreateModel: function(){
                 this._debug('Urth.JupyterWidgetBehavior createModel', this.kernelClass);
+                // NOTE: Remove this from the kernel
                 Urth.kernel.widget_manager.new_widget(
                     {
                         model_module: 'jupyter-decl-widgets/DeclWidgetModel',

@@ -1,9 +1,9 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
-
+console.warn('imported decl widget model');
 define(["jupyter-js-widgets"], function(widgets) {
     "use strict";
-
+    console.warn('Loaded decl widget model');
     /**
      * Collection of patches on top of ipywidgets.WidgetModel
      */
