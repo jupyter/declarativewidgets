@@ -211,23 +211,73 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     colEnd: colEnd
                 });
 
-                // if table has been sorted, we need to get physical index of the row in the datasource
-                // since rowStart is only the logical index of the table view
-                var physicalIndex = this.hot.sortIndex.length ?
-                                        this.hot.sortIndex[rowStart][0] : rowStart;
-                this.selectionIndex = physicalIndex;
+                // store selectionIndex. If selected header row, then don't do anything, keep the old index
+                this.selectionIndex = this.rowActive > -1 ? this.rowActive : this.selectionIndex;
+
+                // Set selection
+                var selection = this.datarows[this.selectionIndex];
+
+                // if the table has been sorted, the selected row might have been moved
+                // to a different index.
+                if (this.hot.sortIndex.length > 0) {
+                    var logicalIndex = this.hot.sortIndex[this.selectionIndex][0];
+                    selection = this.datarows[logicalIndex];
+                }
+
+                // set selection to wither object or array
                 if (this.selectionAsObject) {
-                    var sel = {};
-                    var row = this.datarows[physicalIndex];
+                    var selObj = {};
+                    var row = selection;
                     this.columns.forEach(function(col, i) {
                         col = col.replace(" ", "_");
-                        sel[col] = row[i];
+                        selObj[col] = row[i];
                     });
-                    this._setSelection(sel);
+                    this._setSelection(selObj);
                 } else {
-                    this._setSelection(this.datarows[physicalIndex]);
+                    this._setSelection(selection);
                 }
-                this.selectedRow = rowStart; //storing index
+                // store selectedRow, so after sorting, we can look for this row
+                this.selectedRow = selection;
+            },
+
+            _handleAfterSort: function() {
+                // if there is a previous selection, we need to handle re-highlighting it
+                if (this.selectedRow) {
+                    // since table has been sorted, the selectionIndex is not always the correct index
+                    // of data anymore. Because even though the table view is sorted, this.datarows stays the same
+
+                    // We will find the logical index of the selection (the index in this.datarows)
+                    // and then use that to look up physical index of the table view
+
+                    // find logical index of selection in this.datarows
+                    var sel = this.selection;
+                    var logicalIndex = -1;
+                    this.datarows.some(function(row, rowIndex) {
+                        var matched = true;
+                        row.every(function(col, colIndex) {
+                            if (col != sel[colIndex]) {
+                                matched = false;
+                                return false;
+                            }
+                        });
+                        if (matched) {
+                            logicalIndex = rowIndex;
+                        }
+                        return matched;
+                    });
+
+                    // find physical index of sorted table view
+                    var physicalIndex = logicalIndex;
+                    this.hot.sortIndex.some(function(sortedRow, sortedIndex){
+                        if(sortedRow[0] == logicalIndex) {
+                            physicalIndex = sortedIndex;
+                            return true;
+                        }
+                    });
+
+                    // highligh the selection by setting this.selectionIndex to physicalIndex
+                    this.selectionIndex = physicalIndex > -1 ? physicalIndex : this.selectionIndex;
+                }
             },
 
             _willDataFit: function(datarows) {
@@ -311,9 +361,10 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         }.bind(this),
                         beforeOnCellMouseDown: this._forceRowSelection.bind(this),
                         afterSelectionEnd: this._handleSelection.bind(this),
-                        afterColumnSort: function() {
-                            this._handleSelection(0);
+                        beforeColumnSort: function() {
+                            this.selectionIndex = -1;
                         }.bind(this),
+                        afterColumnSort: this._handleAfterSort.bind(this),
                         afterRender: function(isForced) {
                             if (isForced && !this._rendered) {
                                 this._rendered = true;
