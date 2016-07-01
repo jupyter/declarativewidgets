@@ -114,12 +114,14 @@
 
         describe('_handleSelection', function() {
             it('should set the selection property to the right data', function() {
+                fElmt.rowActive = 1;
                 fElmt._handleSelection(1);
                 expect(fElmt.selection).to.eql([2,2,6]);
             });
 
             it('should set the selection property to an object if selectionAsObject is set', function() {
                 fElmt.selectionAsObject = true;
+                fElmt.rowActive = 1;
                 fElmt._handleSelection(1);
                 expect(fElmt.selection).to.eql({
                     Index: 2,
