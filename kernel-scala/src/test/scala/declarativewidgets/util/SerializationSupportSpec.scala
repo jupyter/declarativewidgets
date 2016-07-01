@@ -131,7 +131,7 @@ class SerializationSupportSpec extends FunSpec with Matchers with MockitoSugar  
 
     describe("toArray") {
       it("should return an array in the order specified by columns") {
-        val support = new TestSupport();
+        val support = new TestSupport()
 
         val rowJson = Json.parse(
           """

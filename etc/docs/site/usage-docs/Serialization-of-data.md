@@ -26,10 +26,22 @@ DataFrames from R, Pandas and Spark are serialized into the following structure:
 ```javascript
 {
   columns: [], //array of column names
+  columnTypes: [], //array of column type names
   data: [[]], //2 dimensional array with the data. The outer array holds each row.
   index: [] //index value for each row (partial support)  
 }
 ```
+
+Note: Column types from the native kernel language to the client are resolved/mapped according to the table below:
+
+JS objects| Pandas | pySpark |R data.frame| Spark R| Spark Scala|
+| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
+Number | int64 | bigint | integer | integer | Int |
+Number | float64 | double | numeric | numeric | Double |
+Boolean | bool | boolean | logical | logical | Boolean
+String | [object (object of ndarray of strings)](http://stackoverflow.com/questions/21018654/strings-in-a-dataframe-but-dtype-is-object) *See type of Unknown | string | character | character | String
+Date | datetime64[ns] | date | Date | Date | TimestampType, DateType|
+Unknown | object or ambiguous type | object or ambiguous type | object or ambiguous type | object or ambiguous type |object or ambiguous type|
 
 ##### Other types
 Depending on the language, other types might have built-in serialization. Here is a list of them per language.

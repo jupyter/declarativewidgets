@@ -27,8 +27,8 @@ help:
 	@echo '         test-py - run python units'
 	@echo '         test-js - run javascript units'
 	@echo '      test-scala - run scala units'
-	@echo '      test-r     - run r units'
-	@echo '             all - run all necessary streps to produce and validate a build'
+	@echo '          test-r - run r units'
+	@echo '             all - run all necessary steps to produce and validate a build'
 
 # Docker images and repos
 ROOT_REPO:=jupyter/all-spark-notebook:2d878db5cbff
@@ -84,6 +84,7 @@ dev_image:
 		apt-get -qq install --yes nodejs npm && \
 		ln -s /usr/bin/nodejs /usr/bin/node && \
 		npm install -g bower && \
+		pip install pandas==0.18.1 && \
 		Rscript /src-kernel-r/install.r && \
 		mkdir -p /home/jovyan/.local/share/jupyter/nbextensions && \
 		chown -R jovyan:users /home/jovyan/.local/share/jupyter/nbextensions'

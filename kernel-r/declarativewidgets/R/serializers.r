@@ -12,8 +12,16 @@ serialize_element <- function(elem) {
 get_df_column_types <- function(df) {
     class_info <- lapply(aDataFrame, class)
     type_info <- list()
-    for (i in class_info) {
-        type_info <- append(type_info, i)
+    for (klass in class_info) {
+        switch(
+            klass,
+            Date        = type_info <- append(type_info, "Date"),
+            integer     = type_info <- append(type_info, "Number"),
+            numeric     = type_info <- append(type_info, "Number"),
+            logical     = type_info <- append(type_info, "Boolean"),
+            character   = type_info <- append(type_info, "String"),
+            type_info <- append(type_info, "Unknown")
+        )
     }
     return (unlist(type_info))
 }
@@ -46,7 +54,7 @@ DataFrame_Serializer <- R6Class(
         serialize = function(obj, row_limit=100) {
             json <- list()
             json[['columns']] <- colnames(obj)
-            json[['column_types']] <- get_df_column_types(obj)
+            json[['columnTypes']] <- get_df_column_types(obj)
             json[['data']] <- self$df_to_lists(obj, row_limit)
             json[['index']] <- as.numeric(rownames(obj))
             return (json)
@@ -88,7 +96,7 @@ Spark_DataFrame_Serializer <- R6Class(
             df <- collect(limit(obj, row_limit))
             json <- list()
             json[['columns']] <- colnames(df)
-            json[['column_types']] <- get_df_column_types(df)
+            json[['columnTypes']] <- get_df_column_types(df)
             json[['data']] <- self$df_to_lists(df)
             json[['index']] <- list(1:nrow(df))
             return (json)
