@@ -1,4 +1,7 @@
 # Changelog
+## 0.5.4 (2016-07-01)
+* Fixed issue setting function arguments to null and function invoking
+
 ## 0.5.3 (2016-06-08)
 * Fixes to timing error related to loading order of this extension in relation to ipywidgets/jupyter-js-widgets
 * Fixes to support running Windows
