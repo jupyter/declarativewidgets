@@ -1,4 +1,8 @@
 # Changelog
+## 0.6.1 (2016-07-01)
+* Fix to issue when Run All and using channel.set
+* Minor fixes to declarative queries
+
 ## 0.6.0 (2016-06-17)
 * User must manually activate declarativewidgets using a code cell
 * Declarative query support for dataframes
