@@ -60,18 +60,19 @@ object Widget extends LogLike {
    * A Comm Msg callback that routes message handling to the proper Widget
    * based on the Comm ID.
    */
-  val msgCallback = (w: CommWriter, id: UUID, msg: MsgData) => {
+  val msgCallback = (commWriter: CommWriter, id: UUID, msg: MsgData) => {
     logger.trace(s"Widget received a comm message $msg")
-    widgets(id).handleMsg(msg)
+    widgets(id).handleMsg(msg, commWriter)
   }
 
+  def toMessageSupport(commWriter:CommWriter):MessageSupport = MessageSupport(commWriter)
 }
 
 /**
  * Represents a Widget that can handle Comm messages.
  * @param comm Comm used to communicate with the front-end.
  */
-abstract class Widget(comm: CommWriter) extends LogLike with MessageSupport {
+abstract class Widget(comm: CommWriter) extends LogLike {
 
   logger.debug(s"Widget ${getClass.getSimpleName} initialized.")
 
@@ -80,13 +81,16 @@ abstract class Widget(comm: CommWriter) extends LogLike with MessageSupport {
    * handler based on the method.
    * @param msg The Comm Message.
    */
-  def handleMsg(msg: MsgData) = {
+  def handleMsg(msg: MsgData, commWriter:CommWriter) = {
     logger.debug(s"Widget handling message ${msg}")
 
+    val msgSupport = Widget.toMessageSupport(commWriter)
+
     (msg \ Comm.KeyMethod).asOpt[String] match {
-      case Some(Comm.MethodBackbone) => handleBackbone(msg)
+      case Some(Comm.MethodBackbone) => handleBackbone(msg, msgSupport)
+      case Some(Comm.MethodRequestState) => handleRequestState(msg, msgSupport)
       case Some(Comm.MethodCustom) => (msg \ Comm.KeyContent).asOpt[JsValue] match {
-        case Some(contentJSON) => handleCustom(contentJSON)
+        case Some(contentJSON) => handleCustom(contentJSON, msgSupport)
         case None => logger.warn(
           s"No ${Comm.KeyContent} key in custom message $msg. Ignoring message."
         )
@@ -96,34 +100,21 @@ abstract class Widget(comm: CommWriter) extends LogLike with MessageSupport {
   }
 
   /**
-   * Send a state update to the front-end for the given state key and value.
-   * @param key Name of the state parameter to update.
-   * @param value JSON representation of the new parameter value.
-   */
-  def sendState(key: String, value: JsValue): Unit = sendState(comm, key, value)
-
-  /**
-   * Send a status error message to the front-end with the given message.
-   * @param msg An error message.
-   */
-  def sendError(msg: String) = sendStatus(comm, Comm.StatusError, msg)
-
-  /**
-   * Send a status ok message to the front-end with the given message.
-   * @param msg An optional status message.
-   */
-  def sendOk(msg: String = "") = sendStatus(comm, Comm.StatusOk, msg)
-
-  /**
    * Handles a Comm Message whose method is backbone.
    * @param msg The Comm Message.
    */
-  def handleBackbone(msg: MsgData)
+  def handleBackbone(msg: MsgData, msgSupport:MessageSupport)
 
   /**
    * Handles a Comm Message whose method is custom.
    * @param msgContent The content field of the Comm Message.
    */
-  def handleCustom(msgContent: MsgData)
+  def handleCustom(msgContent: MsgData, msgSupport:MessageSupport)
+
+  /**
+   * Handles a Comm Message whose method is request_state. Defaults to returning an empty state
+   * @param msgContent The Comm message
+   */
+  def handleRequestState(msgContent: MsgData, msgSupport:MessageSupport)  = msgSupport.sendState(Map[String,JsValue]())
 
 }

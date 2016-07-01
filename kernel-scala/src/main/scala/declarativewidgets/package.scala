@@ -18,9 +18,10 @@ package object declarativewidgets {
   }
 
   object Comm {
-
     // JSON keys
     val KeyMethod        = "method"
+
+
     val KeyWidgetClass   = "widget_class"
     val KeySyncData      = "sync_data"
     val KeyFunctionName  = "function_name"
@@ -39,9 +40,10 @@ package object declarativewidgets {
     val KeyTimestamp     = "timestamp"
 
     // Method types
-    val MethodBackbone   = "backbone"
-    val MethodCustom     = "custom"
-    val MethodUpdate     = "update"
+    val MethodBackbone      = "backbone"
+    val MethodRequestState  = "request_state"
+    val MethodCustom        = "custom"
+    val MethodUpdate        = "update"
 
     // Event types
     val EventChange      = "change"
@@ -132,5 +134,6 @@ package object declarativewidgets {
     sparkIMain
   }
 
-  val channel = WidgetChannels.channel _
+  def channel(chan: String = Default.Channel): Channel =
+    WidgetChannels.channel(chan)
 }
