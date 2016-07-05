@@ -4,7 +4,6 @@
 -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../urth-core-dataframe/urth-core-dataframe.html">
-<link rel="import" href="../urth-core-dataframe/urth-core-query-filter.html">
 <link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-item/paper-item.html">
@@ -52,7 +51,7 @@ Example:
           </paper-button>
       </template>
 
-      <template id="groups" is="dom-repeat" items="{{groups}}" as="group">
+      <template is="dom-repeat" items="{{groups}}" as="group">
           <div>
               <span>Group by:</span>
               <paper-dropdown-menu label="column" selected-item-label="{{group.col}}">
@@ -68,7 +67,7 @@ Example:
 
               <div style="margin-left: 50px;">
                   <template is="dom-repeat" items="{{group.aggregators}}" as="agg">
-<div>
+                    <div>
                       <paper-dropdown-menu label="operation" selected-item-label="{{agg.op}}" on-iron-select="_contentChanged">
                           <paper-listbox class="dropdown-content">
                               <paper-item>sum</paper-item>
@@ -87,15 +86,15 @@ Example:
                       <paper-button on-tap="deleteAgg">
                           <iron-icon icon="icons:delete"></iron-icon>
                       </paper-button>
-</div>
+                    </div>
                   </template>
 
-<div>
-                  <paper-button on-tap="addAgg">
-                      <iron-icon icon="icons:add-circle-outline"></iron-icon>
-                      Add aggregate function
-                  </paper-button>
-</div>
+                  <div>
+                      <paper-button on-tap="addAgg">
+                          <iron-icon icon="icons:add-circle-outline"></iron-icon>
+                          Add aggregate function
+                      </paper-button>
+                  </div>
               </div>
           </div>
       </template>
@@ -188,7 +187,7 @@ Example:
         },
 
         addGroup: function(event) {
-            this.push('groups', { col: this.$.groups.groupBy, aggregators: [] });
+            this.push('groups', { col: null, aggregators: [] });
         },
 
         addAgg: function(event) {
@@ -213,17 +212,17 @@ _contentChanged: function(event) {
 
         ready: function() {
             // move filters template to user-supplied urth-core-dataframe in light DOM
-            var df = this.$.myDataframe.getDistributedNodes()[0];
-            df.appendChild(this.$.filters.root);
-            df.appendChild(this.$.groups.root);
+            var dataframe = this.$.myDataframe.getDistributedNodes()[0];
+            dataframe.appendChild(this.$.filters.root);
+            dataframe.appendChild(this.$.groups.root);
 
-            this.columns = df.columns;
+            this.columns = dataframe.columns;
 
             // Keep track of dataframe columns prior to group operation
             this.originalColumns = this.columns;
 
-            df.addEventListener('columns-changed', function(event) {
-                this.columns = df.columns;
+            dataframe.addEventListener('columns-changed', function(event) {
+                this.columns = dataframe.columns;
 
                 if (!this.groups || !this.groups.length || !this.groups[0].col) {
                     // Only update if this is not a group operation
