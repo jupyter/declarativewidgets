@@ -19,17 +19,17 @@ Widget_Dataframe <- R6Class(
             if(!is.null(msg_limit)) {
                 self$register_limit(msg_limit)
             } else {
-                print("No limit value provided for Widget_Dataframe")
+                log_info("No limit value provided for Widget_Dataframe")
             }
             if(!is.null(msg_name)) {
                 self$register_name(msg_name)
             } else {
-                print("No name value provided for Widget_Dataframe")
+                log_info("No name value provided for Widget_Dataframe")
             }
             if(!is.null(msg_query)) {
                 self$register_query(msg_query)
             } else {
-                print("No name query provided for Widget_Dataframe")
+                log_info("No name query provided for Widget_Dataframe")
             }
         },
         handle_custom = function(msg) {
@@ -37,10 +37,10 @@ Widget_Dataframe <- R6Class(
                 if(msg$event == 'sync') {
                     self$serialize_and_send(self$variable_name, self$limit, self$query)
                 } else {
-                    print(c("Unhandled custome event: ", msg$event))
+                    log_info(paste("Unhandled custome event:",msg$event))
                 }
             } else {
-                print("No event value in custom Widget_Dataframe comm message")
+                log_info("No event value in custom Widget_Dataframe comm message")
             }
         },
         df_in_interpreter = function(name) {
@@ -59,7 +59,7 @@ Widget_Dataframe <- R6Class(
                 self$send_update("value", serialized_df)
                 return (TRUE)
             } else {
-                print(c("DataFrame ", name, " not found! No sync message sent."))
+                log_info(paste("DataFrame ", name, " not found! No sync message sent."))
                 return (paste("Dataframe", name, "not found!"))
             }
         },

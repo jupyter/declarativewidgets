@@ -96,8 +96,8 @@ Widget_Channels <- R6Class(
                         #send OK message back
                         self$send_ok()
                     }, error = function(e) {
-                        print(c("Error executing watch handler on channel: ", data[['channel']]))
-                        print(e)
+                        log_error(paste('Error executing watch handler on channel:', data[['channel']]))
+                        log_error(e)
                     })
                 } else {
                     #print(c(full_channel_name, " not in watch_handlers"))

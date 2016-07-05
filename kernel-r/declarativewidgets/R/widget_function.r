@@ -16,12 +16,12 @@ Widget_Function <- R6Class(
             if(!is.null(msg_name)) {
                 self$register_function(msg_name)
             } else {
-                print("No name value provided for Widget_Function")
+                log_info("No name value provided for Widget_Function")
             }
             if(!is.null(msg_limit)) {
                 self$register_limit(msg_limit)
             } else {
-                print("No limit value provided for Widget_Function")
+                log_info("No limit value provided for Widget_Function")
             }
         },
         handle_custom = function(msg) {
@@ -31,10 +31,10 @@ Widget_Function <- R6Class(
                 } else if (msg$event == 'invoke') {
                     self$handle_invoke(msg, self$function_name, self$limit)
                 } else {
-                    print(c("Unhandled custom event: ", msg$event))
+                    log_info(paste("Unhandled custom event: ", msg$event))
                 }
             } else {
-                print("No event value in custom Widget_Dataframe comm message")
+                log_info("No event value in custom Widget_Dataframe comm message")
             }
         },
         handle_invoke = function(msg, func_name, limit) {
@@ -47,13 +47,13 @@ Widget_Function <- R6Class(
                 }, error = function(e) {
                     err_msg <- paste("Error invoking function", func_name)
                     self$send_error(err_msg)
-                    print(e)
-                    print(err_msg)
+                    log_error(e)
+                    log_error(err_msg)
                 })
             } else {
                 err_msg <- "No arguments were provided for Widget_Function invocation!"
                 self$send_error(err_msg)
-                print(err_msg)
+                log_info(err_msg)
             }
         },
         register_function = function(func_name) {
@@ -111,7 +111,7 @@ Widget_Function <- R6Class(
                 return (TRUE)
             } else {
                 err_msg <- paste("Could not determing signature for function:", func_name)
-                print(err_msg)
+                log_info(err_msg)
                 return (err_msg)
             }
         },
@@ -146,8 +146,8 @@ Widget_Function <- R6Class(
                     )
                 }
             }, error = function(e) {
-                print(e)
-                print(c("Error getting signature of function: ", func_name))
+                log_error(err_msg)
+                log_error(paste("Error getting signature of function:", func_name))
             })
             return (names)
         },
