@@ -7,7 +7,6 @@ from IPython.core.getipython import get_ipython
 from .urth_widget import UrthWidget
 from .urth_exception import UrthException
 
-
 class IpywProxy(UrthWidget):
     """
     A Widget to prowy IPywidgets
@@ -28,7 +27,7 @@ class IpywProxy(UrthWidget):
             self._sync_state()
             self.ok()
         except Exception as e:
-            self.error(str(e))
+            self.error(e)
 
     def _handle_custom_event_msg(self, wid, content, buffers):
         event = content.get('event', '')

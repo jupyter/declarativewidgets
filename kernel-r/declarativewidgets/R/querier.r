@@ -9,7 +9,7 @@ Querier <- R6Class(
             if(!is.null(query) && class(df) %in% names(self$querier_list)) {
                 return (self$querier_list[[class(df)]]$apply_query_impl(df, query))
             } else {
-                print("df not in querier_list")
+                log_info("df not in querier_list")
                 return (df)
             }
         },

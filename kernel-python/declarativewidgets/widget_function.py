@@ -9,7 +9,6 @@ from .util.functions import apply_with_conversion, signature_spec
 from .urth_widget import UrthWidget
 from .urth_exception import UrthException
 
-
 class Function(UrthWidget):
     """
     A Widget for invoking a function on the kernel.
@@ -31,7 +30,7 @@ class Function(UrthWidget):
             self._sync_state()
             self.ok()
         except Exception as e:
-            self.error(str(e))
+            self.error(e)
 
     def _handle_custom_event_msg(self, wid, content, buffers):
         event = content.get('event', '')
