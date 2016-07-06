@@ -254,11 +254,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     var logicalIndex = -1;
                     this.datarows.some(function(row, rowIndex) {
                         var matched = row.every(function(col, colIndex) {
-                            if (col != sel[colIndex]) {
-                                return false;
-                            } else {
-                                return true;
-                            }
+                            return col === sel[colIndex];
                         });
                         if (matched) {
                             logicalIndex = rowIndex;
