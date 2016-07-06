@@ -84,6 +84,10 @@ Example:
                 Urth.QueryBehavior
             ],
 
+            listeners: {
+                'group-content-changed': '_contentChanged'
+            },
+
             /**
              * Adds a mutation observer to react to changes to count of `urth-core-query-agg` child
              * elements.
