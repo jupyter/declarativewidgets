@@ -219,7 +219,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
 
                 // if the table has been sorted, the selected row might have been moved
                 // to a different index.
-                if (this.hot.sortIndex.length > 0) {
+                if (this.hot.sortIndex.length > 0 && this.selectionIndex > -1) {
                     var logicalIndex = this.hot.sortIndex[this.selectionIndex][0];
                     selection = this.datarows[logicalIndex];
                 }
@@ -253,11 +253,11 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     var sel = this.selection;
                     var logicalIndex = -1;
                     this.datarows.some(function(row, rowIndex) {
-                        var matched = true;
-                        row.every(function(col, colIndex) {
+                        var matched = row.every(function(col, colIndex) {
                             if (col != sel[colIndex]) {
-                                matched = false;
                                 return false;
+                            } else {
+                                return true;
                             }
                         });
                         if (matched) {
