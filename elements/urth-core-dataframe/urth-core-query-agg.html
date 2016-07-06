@@ -67,9 +67,17 @@ Example:
                  */
                 valid: {
                     type: Boolean,
-                    computed: 'isValid(op,col)',
+                    computed: 'isValid(op, col)',
                     notify: true
                 }
+            },
+
+            observers: [
+                '_contentChanged(op, col)'
+            ],
+
+            _contentChanged: function() {
+                this.fire('group-content-changed');
             },
 
             /**
