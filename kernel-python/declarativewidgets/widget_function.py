@@ -40,9 +40,10 @@ class Function(UrthWidget):
             self._sync_state()
 
     def _the_function(self):
-        if self.function_name in self.shell.user_ns:
-            return self.shell.user_ns[self.function_name]
-        else:
+        try:
+            return eval(self.function_name, self.shell.user_global_ns,
+                        self.shell.user_ns)
+        except NameError:
             raise UrthException("Invalid function name {}".format(
                 self.function_name))
 
