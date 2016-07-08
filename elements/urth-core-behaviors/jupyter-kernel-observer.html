@@ -34,9 +34,10 @@ This behavior is used to implement handlers to kernel events
                     'kernel_ready.Kernel', this.__kernelReadyCallback
                 );
 
-                if (Urth.kernel && Urth.kernel.is_connected()) {
-                  this.onKernelReady(Urth.kernel);
-                }
+                this.onKernelReady(Urth.kernel);
+                // if (Urth.kernel && Urth.kernel.is_connected()) {
+                //   this.onKernelReady(Urth.kernel);
+                // }
             },
 
             detached: function(){

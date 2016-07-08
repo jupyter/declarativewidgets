@@ -10,13 +10,16 @@
 define([
     'module',
     'jquery',
-    'jupyter-js-widgets'
-], function(module, $) {
+    '../widgets/DeclWidgetManager',
+    'jupyter-js-services'
+], function(module, $, WidgetManager, JupyterJsServices) {
     'use strict';
 
     // Enable shadow dom if it is there for polymer elements.
     window.Polymer = window.Polymer || {};
-    window.Polymer.dom = 'shadow';
+    //  NOTE: This breaks some code because it is expecting Polymer.dom to be a function
+    // window.Polymer.dom = 'shadow';
+    window.Polymer.dom = window.Polymer.dom ? window.Polymer.dom : 'shadow';
 
     // Some versions of IE do not have window.console defined. Some versions
     // do not define the debug and other methods. This is a minimal workaround
@@ -27,8 +30,6 @@ define([
     ['debug', 'error', 'trace', 'warn'].forEach(function (method) {
         window.console[method] = window.console[method] || window.console.log;
     });
-
-    var COMPONENTS_DIR = 'urth_components';
 
     function loadComponents(components_root, links) {
         console.debug('Components root is: ', components_root);
@@ -145,36 +146,32 @@ define([
      * @param  {Object} config.events - Notebook events object
      * @param  {Object} config.suppressErrors - Set to true to disable error message output.
      */
-    var DeclWidgets = function(config) {
+    var DeclWidgets = function(kernel, config) {
         // Global deferred which is resolved when widgets are fully initialized.
         // Deferred may have been initialized already by kernel code injected
         // into the page.
         this._initialized = this._initialized || $.Deferred();
 
         this._config = config || {};
-        this._baseURL = this._config.namespace &&
-                        this._config.namespace.notebook &&
-                        this._config.namespace.notebook.base_url ?
-                            this._config.namespace.notebook.base_url : '/';
+        this._baseDir = this._config.baseDir ? this._config.baseDir : '/';
+        this._componentsDir = this._config.componentsDir || this._config.componentsDir === ''  ? this._config.componentsDir : 'urth_components';
 
         // expose suppressErrors, false by default to display errors
         this.suppressErrors = this._config.suppressErrors;
 
-        this.events = this._config.events;
-
+        this.events = this._config.events ? this._config.events : $([{}]);
+        //  We may not need to keep this reference around
+        this.widget_manager = this._config.widgetManager ? this._config.widgetManager : new WidgetManager(kernel, this.events);
         // specify a getter for the kernel instance, since it can be restarted and a new kernel
         // instantiated
         Object.defineProperty(this, 'kernel', {
             get: function () {
                 // TODO What is the correct way of handling this outside of the notebook? What
                 //      should we do when using jupyter-js-services and kernel is restarted?
-                return this._config.namespace &&
-                        this._config.namespace.notebook &&
-                        this._config.namespace.notebook.kernel ?
-                            this._config.namespace.notebook.kernel : null;
+                return kernel;
             }
         });
-    }
+    };
 
     /**
      * Inherit any predefined Urth properties if they exist.
@@ -194,17 +191,15 @@ define([
         var whenConnected = $.Deferred();
         this._whenConnected = whenConnected.promise();
 
-        isServerExtensionAvailable(this._baseURL + COMPONENTS_DIR, function (isAvailable) {
+        isServerExtensionAvailable(this._baseDir + this._componentsDir, function (isAvailable) {
             console.log('Server extension is ' + (isAvailable ? '' : 'NOT ') + 'available!');
 
             // If server extension is available, use the baseURL route, else
             // use a direct path based on this module's uri.
-            var components_root = isAvailable
-                ? this._baseURL
-                : getModuleBasedComponentRoot(module);
-
-            this.BASE_URL = components_root;
-            components_root += COMPONENTS_DIR;
+            this.BASE_DIR = isAvailable ? this._baseDir
+                : this._getModuleBasedComponentRoot(module);
+                
+            var components_root = this.BASE_DIR + this._componentsDir;
 
             // Load the polyfill and the required components then listen for
             // kernel connection. Need to load polyfill first because loading
@@ -216,7 +211,8 @@ define([
 
                     // If the kernel has already connected then resolve the
                     // promise, otherwise wait for the `connected` event.
-                    if (this.kernel && this.kernel.is_connected()) {
+                    if (this.kernel.status == JupyterJsServices.KernelStatus.Idle ||
+                        this.kernel.status == JupyterJsServices.KernelStatus.Busy ) {
                         whenConnected.resolve();
                     } else {
                         broker.addEventListener('connected', function() {
@@ -224,7 +220,7 @@ define([
                         });
                     }
                 }.bind(this)).fail(function() {
-                    console.error('Failed to load required components.')
+                    console.error('Failed to load required components.');
                     whenConnected.reject();
                 });
             }.bind(this), function (e) {
@@ -263,16 +259,16 @@ define([
     DeclWidgets.prototype._getModuleBasedComponentRoot = function() {
         var moduleuri = module.uri;
         return moduleuri.substring(0, moduleuri.lastIndexOf('/')) + '/../../';
-    }
+    };
 
     var the_declwidgets;
-    var getOrCreate = function(config){
+    var getOrCreate = function(kernel, config){
         if (!the_declwidgets) {
-            window.Urth = the_declwidgets = new DeclWidgets(config);
+            window.Urth = the_declwidgets = new DeclWidgets(kernel, config);
             the_declwidgets._initialized.resolve();
         }
         return the_declwidgets;
-    }
+    };
 
     return getOrCreate;
 });

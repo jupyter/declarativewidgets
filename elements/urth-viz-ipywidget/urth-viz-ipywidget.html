@@ -145,6 +145,7 @@ names for these properties have the form `trait-<name of trait>`.
              * to set it up using observers.
              */
             __setWidgetModel: function(modelid){
+                // NOTE: Remove this from the model
                 this.model.widget_manager.get_model(modelid).then(function(widgetmodel){
                     this._setWidgetModel(widgetmodel);
                 }.bind(this));
@@ -337,6 +338,7 @@ names for these properties have the form `trait-<name of trait>`.
             },
 
             _createWidgetView: function(){
+              // NOTE: Remove this from the model
                 this.model.widget_manager.create_view(this.widgetModel).then( function(v){
                     this._log( "Created ipywidget view", v);
                     Polymer.dom(this.root).innerHTML = ''; //clearing area first

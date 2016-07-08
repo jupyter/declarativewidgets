@@ -21,6 +21,8 @@
     "vulcanize": "1.14.8",
     "wct-local": "2.0.3"
   },
+  "main": "index.js",
+  "files" :  ["dist", "elements", "postinstall.js"],
   "config": {},
   "scripts": {
     "bower": "bower",
@@ -31,6 +33,7 @@
     "test-sauce": "wct --skip-plugin local --plugin sauce elements/*/test",
     "system-test": "node_modules/mocha/bin/mocha --timeout 500000 --reporter spec",
     "watch": "gulp watch",
+    "postinstall" : "node postinstall.js",
     "watch-docs": "gulp watch-docs"
   },
   "repository": {
