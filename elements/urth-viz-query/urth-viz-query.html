@@ -20,134 +20,155 @@ Example:
 -->
 
 <dom-module id="urth-viz-query">
-    <style>
-        .querior > h3 {
+    <style is="custom-style">
+        .add-agg,
+        .add-filter {
+            text-align: right;
+        }
+        .agg-line {
+            display: flex;
+            flex-direction: row;
+        }
+        .agg-line > .agg-col,
+        .query-filter-line-2 > paper-input {
+            margin-left: 0.3em;
+        }
+        .aggs-label,
+        .filters-label {
             font-variant: small-caps;
         }
-        .query-rule {
+        .query-filter-line-2 {
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;
         }
-        .query-rule > :not(paper-button) {
-            margin-left: 0.3em;
-            margin-right: 0.3em;
+        .query-filter > paper-dropdown-menu {
+            width: 100%;
         }
-        .query-rule > paper-button {
+        .query-filter > paper-button {
             min-width: initial;
             align-items: flex-end;
             color: #737373;
         }
-        .query-rule > paper-button[disabled] {
+        .query-filter > paper-button[disabled] {
             visibility: hidden;
+        }
+
+        :host {
+            --paper-item-min-height: 24px;
+            --paper-item: {
+                font-size: 1em;
+            };
+            --paper-button: {
+                min-width: 40px;
+            };
         }
     </style>
 
-  <template>
-      <template is="dom-if" if="[[!groups.length]]">
-          <paper-button on-tap="addGroup">
-              <iron-icon icon="icons:add-circle-outline"></iron-icon>
-              Add group-by
-          </paper-button>
-      </template>
+    <template>
+        <template is="dom-if" if="[[!groups.length]]">
+            <paper-button on-tap="addGroup">
+                <iron-icon icon="icons:add"></iron-icon>
+                Add group-by
+            </paper-button>
+        </template>
 
-      <template is="dom-repeat" items="{{groups}}" as="group">
-          <div>
-              <span>Group by:</span>
-              <paper-dropdown-menu label="column" selected-item-label="{{group.col}}">
-                  <paper-listbox class="dropdown-content">
-                      <template is="dom-repeat" items="{{originalColumns}}">
-                          <paper-item>{{item}}</paper-item>
-                      </template>
-                  </paper-listbox>
-              </paper-dropdown-menu>
-              <paper-button on-tap="deleteGroup">
-                  <iron-icon icon="icons:delete"></iron-icon>
-              </paper-button>
+        <!-- Groups -->
+        <template is="dom-repeat" items="{{groups}}" as="group">
+            <div class="query-group">
+                <!-- group -->
+                <paper-dropdown-menu label="Group By" selected-item-label="{{group.col}}">
+                    <paper-listbox class="dropdown-content">
+                        <template is="dom-repeat" items="{{originalColumns}}">
+                            <paper-item>{{item}}</paper-item>
+                        </template>
+                    </paper-listbox>
+                </paper-dropdown-menu>
+                <paper-button on-tap="deleteGroup">
+                    <iron-icon icon="icons:delete"></iron-icon>
+                </paper-button>
 
-              <div style="margin-left: 50px;">
-                  <template is="dom-repeat" items="{{group.aggregators}}" as="agg">
-                    <div>
-                      <paper-dropdown-menu label="operation" selected-item-label="{{agg.op}}">
-                          <paper-listbox class="dropdown-content">
-                              <paper-item>sum</paper-item>
-                              <paper-item>mean</paper-item>
-                          </paper-listbox>
-                      </paper-dropdown-menu>
+                <!-- aggregators -->
+                <h3 class="aggs-label">Aggregation functions:</h3>
+                <template is="dom-repeat" items="{{group.aggregators}}" as="agg">
+                    <div class="agg-line">
+                        <paper-dropdown-menu class="agg-op" label="operation" selected-item-label="{{agg.op}}">
+                            <paper-listbox class="dropdown-content">
+                                <paper-item>sum</paper-item>
+                                <paper-item>mean</paper-item>
+                            </paper-listbox>
+                        </paper-dropdown-menu>
 
-                      <paper-dropdown-menu label="column" selected-item-label="{{agg.col}}">
-                          <paper-listbox class="dropdown-content">
-                              <template is="dom-repeat" items="{{originalColumns}}">
-                                  <paper-item>{{item}}</paper-item>
-                              </template>
-                          </paper-listbox>
-                      </paper-dropdown-menu>
+                        <paper-dropdown-menu class="agg-col" label="column" selected-item-label="{{agg.col}}">
+                            <paper-listbox class="dropdown-content">
+                                <template is="dom-repeat" items="{{originalColumns}}">
+                                    <paper-item>{{item}}</paper-item>
+                                </template>
+                            </paper-listbox>
+                        </paper-dropdown-menu>
 
-                      <paper-button on-tap="deleteAgg">
-                          <iron-icon icon="icons:delete"></iron-icon>
-                      </paper-button>
+                        <paper-button on-tap="deleteAgg">
+                            <iron-icon icon="icons:delete"></iron-icon>
+                        </paper-button>
                     </div>
-                  </template>
+                </template>
 
-                  <div>
-                      <paper-button on-tap="addAgg">
-                          <iron-icon icon="icons:add-circle-outline"></iron-icon>
-                          Add aggregate function
-                      </paper-button>
-                  </div>
-              </div>
-          </div>
-      </template>
-      <div class="querior">
-          <h3>Match <em>all</em> of the following rules:</h3>
-          <template is="dom-repeat" items="{{rules}}" as="rule">
-              <div class="query-rule">
-                  <paper-dropdown-menu label="column" selected-item-label="{{rule.col}}">
-                      <paper-listbox class="dropdown-content">
-                          <template is="dom-repeat" items="{{originalColumns}}">
-                              <paper-item>{{item}}</paper-item>
-                          </template>
-                      </paper-listbox>
-                  </paper-dropdown-menu>
-                  <paper-dropdown-menu>
-                      <paper-listbox class="dropdown-content" selected="{{rule.op}}" attr-for-selected="value">
-                          <paper-item value="==">equals</paper-item>
-                          <paper-item value="!=">does not equal</paper-item>
-                          <!-- <paper-item>contains</paper-item>
-                          <paper-item>does not contain</paper-item> -->
-                      </paper-listbox>
-                  </paper-dropdown-menu>
-                  <paper-input label="value" value="{{rule.val}}"></paper-input>
-                  <paper-button on-tap="deleteRule">
-                      <iron-icon icon="icons:delete"></iron-icon>
-                  </paper-button>
-              </div>
-          </template>
-          <div>
-              <paper-button on-tap="addRule">
-                  <iron-icon icon="icons:add-circle-outline"></iron-icon>
-                  Add filter
-              </paper-button>
-          </div>
+                <paper-button class="add-agg" on-tap="addAgg">
+                    <iron-icon icon="icons:add"></iron-icon>
+                    Add aggregate function
+                </paper-button>
+            </div>
+        </template>
 
-          <!-- repeating query-group elements to be stamped as children of myDataframe -->
-          <template id="groups" is="dom-repeat" items="{{groups}}" as="group">
-              <urth-core-query-group by$="{{group.col}}" disabled="[[!group.col]]">
-                  <template is="dom-repeat" items="{{group.aggregators}}" as="agg" observe="col op">
-                      <urth-core-query-agg op$="{{agg.op}}" col$="{{agg.col}}" disabled="[[!agg.col]]"></urth-core-query-agg>
-                  </template>
-              </urth-core-query-group>
-          </template>
+        <!-- Filters -->
+        <h3 class="filters-label">Filters (matches all):</h3>
+        <template is="dom-repeat" items="{{filters}}" as="filter">
+            <div class="query-filter">
+                <paper-dropdown-menu label="column" selected-item-label="{{filter.col}}">
+                    <paper-listbox class="dropdown-content">
+                        <template is="dom-repeat" items="{{originalColumns}}">
+                            <paper-item>{{item}}</paper-item>
+                        </template>
+                    </paper-listbox>
+                </paper-dropdown-menu>
+                <div class="query-filter-line-2">
+                    <paper-dropdown-menu label="comparator">
+                        <paper-listbox class="dropdown-content" selected="{{filter.op}}" attr-for-selected="value">
+                            <paper-item value="==">equals</paper-item>
+                            <paper-item value="!=">does not equal</paper-item>
+                            <!-- <paper-item>contains</paper-item>
+                            <paper-item>does not contain</paper-item> -->
+                        </paper-listbox>
+                    </paper-dropdown-menu>
+                    <paper-input label="value" value="{{filter.val}}"></paper-input>
+                    <paper-button on-tap="deleteFilter">
+                        <iron-icon icon="icons:delete"></iron-icon>
+                    </paper-button>
+                </div>
+            </div>
+        </template>
+        <paper-button class="add-filter" on-tap="addFilter">
+            <iron-icon icon="icons:add"></iron-icon>
+            Add filter
+        </paper-button>
 
-          <!-- repeating query-filter elements to be stamped as children of myDataframe -->
-          <template id="filters" is="dom-repeat" items="{{rules}}" as="rule" filter="hasValue" observe="col op val">
-              <urth-core-query-filter disabled="[[!rule.val]]">{{ruleExpression(rule.col, rule.op, rule.val)}}</urth-core-query-filter>
-          </template>
+        <!-- repeating query-group elements to be stamped as children of myDataframe -->
+        <template id="groups" is="dom-repeat" items="{{groups}}" as="group">
+            <urth-core-query-group by$="{{group.col}}" disabled="[[!group.col]]">
+                <template is="dom-repeat" items="{{group.aggregators}}" as="agg" observe="col op">
+                    <urth-core-query-agg op$="{{agg.op}}" col$="{{agg.col}}" disabled="[[!agg.col]]"></urth-core-query-agg>
+                </template>
+            </urth-core-query-group>
+        </template>
 
-          <!-- user declares dataframe here -->
-          <content id="myDataframe" select="urth-core-dataframe"></content>
-      </div>
-  </template>
+        <!-- repeating query-filter elements to be stamped as children of myDataframe -->
+        <template id="filters" is="dom-repeat" items="{{filters}}" as="filter" filter="hasValue" observe="col op val">
+            <urth-core-query-filter disabled="[[!filter.val]]">{{filterExpression(filter.col, filter.op, filter.val)}}</urth-core-query-filter>
+        </template>
+
+        <!-- user declares dataframe here -->
+        <content id="myDataframe" select="urth-core-dataframe"></content>
+    </template>
 </dom-module>
 <script>
 (function(){
@@ -160,7 +181,7 @@ Example:
 
         properties: {
             // n-element array with shape to fit query form
-            rules: {
+            filters: {
                 type: Array,
                 value: function() { return [{ col: null, op: null, val: null }]; }
             },
@@ -171,19 +192,19 @@ Example:
             }
         },
 
-        ruleExpression: function(col, op, val) {
+        filterExpression: function(col, op, val) {
             if (Number.isNaN(+val)) {
                 val = "'" + val + "'";
             }
             return col + ' ' + op + ' ' + val;
         },
 
-        hasValue: function(rule) {
-            return rule.val !== null && rule.val !== '';
+        hasValue: function(filter) {
+            return filter.val !== null && filter.val !== '';
         },
 
-        addRule: function(event) {
-            this.push('rules', { col: null, op: null, val: null });
+        addFilter: function(event) {
+            this.push('filters', { col: null, op: null, val: null });
         },
 
         addGroup: function(event) {
@@ -194,8 +215,8 @@ Example:
             this.push('groups.0.aggregators', { op: null, col: null });
         },
 
-        deleteRule: function(event) {
-            this.splice('rules', event.model.index, 1);
+        deleteFilter: function(event) {
+            this.splice('filters', event.model.index, 1);
         },
 
         deleteGroup: function(event) {
