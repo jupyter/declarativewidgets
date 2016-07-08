@@ -343,7 +343,6 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         colHeaders: this.columns,
                         fillHandle: false,
                         manualColumnResize: true,
-                        outsideClickDeselects: false,
                         columnSorting: true,
                         sortIndicator: true,
                         columns: columnSettings,
@@ -357,6 +356,11 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         }.bind(this),
                         beforeOnCellMouseDown: this._forceRowSelection.bind(this),
                         afterSelectionEnd: this._handleSelection.bind(this),
+                        afterDeselect: function() {
+                            var index = this.selectionIndex;
+                            this.hot.selectCell(index, 0, index, this.columns.length - 1, true);
+                            this.hot.unlisten();
+                        }.bind(this),
                         beforeColumnSort: function() {
                             this.selectionIndex = -1;
                         }.bind(this),
