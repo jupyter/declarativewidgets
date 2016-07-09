@@ -134,10 +134,9 @@ Example:
                 <div class="query-filter-line-2">
                     <paper-dropdown-menu label="comparator">
                         <paper-listbox class="dropdown-content" selected="{{filter.op}}" attr-for-selected="value">
-                            <paper-item value="==">equals</paper-item>
-                            <paper-item value="!=">does not equal</paper-item>
-                            <!-- <paper-item>contains</paper-item>
-                            <paper-item>does not contain</paper-item> -->
+                            <template is="dom-repeat" items="{{filterOpSet(filter.col)}}">
+                                <paper-item value="{{item.op}}">{{item.desc}}</paper-item>
+                            </template>
                         </paper-listbox>
                     </paper-dropdown-menu>
                     <paper-input label="value" value="{{filter.val}}"></paper-input>
@@ -199,6 +198,26 @@ Example:
             return col + ' ' + op + ' ' + val;
         },
 
+        filterOpSet: function(column) {
+            if (!column) { return []; }
+
+            var datatype = this.originalColumnTypes[this.columns.indexOf(column)];
+            var set = [{op: '==', desc: 'equals'}, {op: '!=', desc: 'not equals'}];
+  
+            //TODO: Need to settle on normalized set of data types, see #426
+            //TODO: contain? does not contain? possible with query?
+            if (/^[Dd]ate/.test(datatype)) {
+            } else if (/^(?:float|int)/.test(datatype)) {
+                set.push(
+                    {op: '<', desc: 'less than'},
+                    {op: '<=', desc: 'less than or equal'},
+                    {op: '>', desc: 'greater than'},
+                    {op: '>=', desc: 'greater than or equal'});
+            }
+
+            return set;
+        },
+
         hasValue: function(filter) {
             return filter.val !== null && filter.val !== '';
         },
@@ -244,6 +263,15 @@ Example:
                 if (!this.groups || !this.groups.length || !this.groups[0].col) {
                     // Only update if this is not a group operation
                     this.originalColumns = this.columns;
+                }
+            }.bind(this));
+
+            dataframe.addEventListener('column-types-changed', function(event) {
+                this.columnTypes = dataframe.columnTypes;
+
+                if (!this.groups || !this.groups.length || !this.groups[0].col) {
+                    // Only update if this is not a group operation
+                    this.originalColumnTypes = this.columnTypes;
                 }
             }.bind(this));
         }
