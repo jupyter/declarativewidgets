@@ -39,6 +39,10 @@ The table accepts data via attribute `datarows` and column headers via attribute
             white-space: normal;
         }
 
+        .handsontable td.htDimmed{
+            color: black; // We set Hot to be readOnly, that causes text to be grey
+        }
+
         .handsontable .manualColumnResizer,
         .handsontable .manualRowResizer,
         .ht_clone_top, .ht_clone_left,
@@ -298,7 +302,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 if (firstRow && firstRow.length) {
                     var columnSettings = firstRow.map(function (col) {
                         return {
-                            editor: false
+                            readOnly: true
                         };
                     });
 
