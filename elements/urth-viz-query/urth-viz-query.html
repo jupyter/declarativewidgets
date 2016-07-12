@@ -1,0 +1,280 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../urth-core-dataframe/urth-core-dataframe.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+
+<!--
+This element represents a query executed against an urth-core-dataframe element.
+
+Example:
+@group Urth Viz
+@element urth-viz-query
+-->
+
+<dom-module id="urth-viz-query">
+    <style is="custom-style">
+        .add-agg,
+        .add-filter {
+            text-align: right;
+        }
+        .agg-line {
+            display: flex;
+            flex-direction: row;
+        }
+        .agg-line > .agg-col,
+        .query-filter-line-2 > paper-input {
+            margin-left: 0.3em;
+        }
+        .aggs-label,
+        .filters-label {
+            font-variant: small-caps;
+        }
+        .query-filter-line-2 {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+        }
+        .query-filter > paper-dropdown-menu {
+            width: 100%;
+        }
+        .query-filter > paper-button {
+            min-width: initial;
+            align-items: flex-end;
+            color: #737373;
+        }
+        .query-filter > paper-button[disabled] {
+            visibility: hidden;
+        }
+
+        :host {
+            --paper-item-min-height: 24px;
+            --paper-item: {
+                font-size: 1em;
+            };
+            --paper-button: {
+                min-width: 40px;
+            };
+        }
+    </style>
+
+    <template>
+        <template is="dom-if" if="[[!groups.length]]">
+            <paper-button on-tap="addGroup">
+                <iron-icon icon="icons:add"></iron-icon>
+                Add group-by
+            </paper-button>
+        </template>
+
+        <!-- Groups -->
+        <template is="dom-repeat" items="{{groups}}" as="group">
+            <div class="query-group">
+                <!-- group -->
+                <paper-dropdown-menu label="Group By" selected-item-label="{{group.col}}">
+                    <paper-listbox class="dropdown-content">
+                        <template is="dom-repeat" items="{{originalColumns}}">
+                            <paper-item>{{item}}</paper-item>
+                        </template>
+                    </paper-listbox>
+                </paper-dropdown-menu>
+                <paper-button on-tap="deleteGroup">
+                    <iron-icon icon="icons:delete"></iron-icon>
+                </paper-button>
+
+                <!-- aggregators -->
+                <h3 class="aggs-label">Aggregation functions:</h3>
+                <template is="dom-repeat" items="{{group.aggregators}}" as="agg">
+                    <div class="agg-line">
+                        <paper-dropdown-menu class="agg-op" label="operation" selected-item-label="{{agg.op}}">
+                            <paper-listbox class="dropdown-content">
+                                <paper-item>sum</paper-item>
+                                <paper-item>mean</paper-item>
+                            </paper-listbox>
+                        </paper-dropdown-menu>
+
+                        <paper-dropdown-menu class="agg-col" label="column" selected-item-label="{{agg.col}}">
+                            <paper-listbox class="dropdown-content">
+                                <template is="dom-repeat" items="{{originalColumns}}">
+                                    <paper-item>{{item}}</paper-item>
+                                </template>
+                            </paper-listbox>
+                        </paper-dropdown-menu>
+
+                        <paper-button on-tap="deleteAgg">
+                            <iron-icon icon="icons:delete"></iron-icon>
+                        </paper-button>
+                    </div>
+                </template>
+
+                <paper-button class="add-agg" on-tap="addAgg">
+                    <iron-icon icon="icons:add"></iron-icon>
+                    Add aggregate function
+                </paper-button>
+            </div>
+        </template>
+
+        <!-- Filters -->
+        <h3 class="filters-label">Filters (matches all):</h3>
+        <template is="dom-repeat" items="{{filters}}" as="filter">
+            <div class="query-filter">
+                <paper-dropdown-menu label="column" selected-item-label="{{filter.col}}">
+                    <paper-listbox class="dropdown-content">
+                        <template is="dom-repeat" items="{{originalColumns}}">
+                            <paper-item>{{item}}</paper-item>
+                        </template>
+                    </paper-listbox>
+                </paper-dropdown-menu>
+                <div class="query-filter-line-2">
+                    <paper-dropdown-menu label="comparator">
+                        <paper-listbox class="dropdown-content" selected="{{filter.op}}" attr-for-selected="value">
+                            <template is="dom-repeat" items="{{filterOpSet(filter.col)}}">
+                                <paper-item value="{{item.op}}">{{item.desc}}</paper-item>
+                            </template>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
+                    <paper-input label="value" value="{{filter.val}}"></paper-input>
+                    <paper-button on-tap="deleteFilter">
+                        <iron-icon icon="icons:delete"></iron-icon>
+                    </paper-button>
+                </div>
+            </div>
+        </template>
+        <paper-button class="add-filter" on-tap="addFilter">
+            <iron-icon icon="icons:add"></iron-icon>
+            Add filter
+        </paper-button>
+
+        <!-- repeating query-group elements to be stamped as children of myDataframe -->
+        <template id="groups" is="dom-repeat" items="{{groups}}" as="group">
+            <urth-core-query-group by$="{{group.col}}" disabled="[[!group.col]]">
+                <template is="dom-repeat" items="{{group.aggregators}}" as="agg" observe="col op">
+                    <urth-core-query-agg op$="{{agg.op}}" col$="{{agg.col}}" disabled="[[!agg.col]]"></urth-core-query-agg>
+                </template>
+            </urth-core-query-group>
+        </template>
+
+        <!-- repeating query-filter elements to be stamped as children of myDataframe -->
+        <template id="filters" is="dom-repeat" items="{{filters}}" as="filter" filter="hasValue" observe="col op val">
+            <urth-core-query-filter disabled="[[!filter.val]]">{{filterExpression(filter.col, filter.op, filter.val)}}</urth-core-query-filter>
+        </template>
+
+        <!-- user declares dataframe here -->
+        <content id="myDataframe" select="urth-core-dataframe"></content>
+    </template>
+</dom-module>
+<script>
+(function(){
+    'use strict';
+
+    window.Urth = window.Urth || {};
+
+    window.Urth['urth-viz-query'] = Polymer({
+        is: 'urth-viz-query',
+
+        properties: {
+            // n-element array with shape to fit query form
+            filters: {
+                type: Array,
+                value: function() { return [{ col: null, op: null, val: null }]; }
+            },
+
+            groups: {
+                type: Array,
+                value: function() { return [{ col: null, aggregators: [] }]; }
+            }
+        },
+
+        filterExpression: function(col, op, val) {
+            if (Number.isNaN(+val)) {
+                val = "'" + val + "'";
+            }
+            return col + ' ' + op + ' ' + val;
+        },
+
+        filterOpSet: function(column) {
+            if (!column) { return []; }
+
+            var datatype = this.originalColumnTypes[this.columns.indexOf(column)];
+            var set = [{op: '==', desc: 'equals'}, {op: '!=', desc: 'not equals'}];
+  
+            //TODO: Need to settle on normalized set of data types, see #426
+            //TODO: contain? does not contain? possible with query?
+            if (/^[Dd]ate/.test(datatype)) {
+            } else if (/^(?:float|int)/.test(datatype)) {
+                set.push(
+                    {op: '<', desc: 'less than'},
+                    {op: '<=', desc: 'less than or equal'},
+                    {op: '>', desc: 'greater than'},
+                    {op: '>=', desc: 'greater than or equal'});
+            }
+
+            return set;
+        },
+
+        hasValue: function(filter) {
+            return filter.val !== null && filter.val !== '';
+        },
+
+        addFilter: function(event) {
+            this.push('filters', { col: null, op: null, val: null });
+        },
+
+        addGroup: function(event) {
+            this.push('groups', { col: null, aggregators: [] });
+        },
+
+        addAgg: function(event) {
+            this.push('groups.0.aggregators', { op: null, col: null });
+        },
+
+        deleteFilter: function(event) {
+            this.splice('filters', event.model.index, 1);
+        },
+
+        deleteGroup: function(event) {
+            this.splice('groups', event.model.index, 1);
+        },
+
+        deleteAgg: function(event) {
+            this.splice('groups.0.aggregators', event.model.index, 1);
+        },
+
+        ready: function() {
+            // move filters template to user-supplied urth-core-dataframe in light DOM
+            var dataframe = this.$.myDataframe.getDistributedNodes()[0];
+            dataframe.appendChild(this.$.filters.root);
+            dataframe.appendChild(this.$.groups.root);
+
+            this.columns = dataframe.columns;
+
+            // Keep track of dataframe columns prior to group operation
+            this.originalColumns = this.columns;
+
+            dataframe.addEventListener('columns-changed', function(event) {
+                this.columns = dataframe.columns;
+
+                if (!this.groups || !this.groups.length || !this.groups[0].col) {
+                    // Only update if this is not a group operation
+                    this.originalColumns = this.columns;
+                }
+            }.bind(this));
+
+            dataframe.addEventListener('column-types-changed', function(event) {
+                this.columnTypes = dataframe.columnTypes;
+
+                if (!this.groups || !this.groups.length || !this.groups[0].col) {
+                    // Only update if this is not a group operation
+                    this.originalColumnTypes = this.columnTypes;
+                }
+            }.bind(this));
+        }
+    });
+})();
+</script>
