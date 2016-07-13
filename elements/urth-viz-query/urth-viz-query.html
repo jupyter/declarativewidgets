@@ -20,7 +20,7 @@ Example:
 -->
 
 <dom-module id="urth-viz-query">
-    <style is="custom-style">
+    <style>
         .add-agg,
         .add-filter {
             text-align: right;
@@ -36,6 +36,7 @@ Example:
         .aggs-label,
         .filters-label {
             font-variant: small-caps;
+            margin-bottom: 0;
         }
         .query-filter-line-2 {
             display: flex;
@@ -61,6 +62,13 @@ Example:
             };
             --paper-button: {
                 min-width: 40px;
+                text-transform: none;
+            };
+            --paper-input-container: {
+                padding: 4px 0;
+            };
+            --paper-input-container-label: {
+                font-size: 14px;
             };
         }
     </style>
