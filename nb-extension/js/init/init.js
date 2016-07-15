@@ -201,7 +201,7 @@ define([
             // use a direct path based on this module's uri.
             var components_root = isAvailable
                 ? this._baseURL
-                : getModuleBasedComponentRoot(module);
+                : this._getModuleBasedComponentRoot(module);
 
             this.BASE_URL = components_root;
             components_root += COMPONENTS_DIR;
