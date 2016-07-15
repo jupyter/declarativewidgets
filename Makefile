@@ -31,9 +31,9 @@ help:
 	@echo '             all - run all necessary streps to produce and validate a build'
 
 # Docker images and repos
-ROOT_REPO:=jupyter/all-spark-notebook:2d878db5cbff
-REPO:=jupyter/all-spark-notebook-bower:2d878db5cbff
-REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:2d878db5cbff
+ROOT_REPO:=jupyter/all-spark-notebook:97a5071c5775
+REPO:=jupyter/all-spark-notebook-bower:97a5071c5775
+REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:97a5071c5775
 SCALA_BUILD_REPO:=1science/sbt
 
 # Global environment defaults
@@ -79,10 +79,9 @@ dev_image:
 	@docker $(DOCKER_OPTS) run -it --user root --name bower-build \
 		-v `pwd`/etc/r/install.r:/src-kernel-r/install.r \
 		$(ROOT_REPO) bash -c 'apt-get -qq update && \
-		apt-get -qq install --yes curl && \
+		apt-get -qq install --yes curl zlib1g-dev libssl-dev && \
 		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
-		apt-get -qq install --yes nodejs npm && \
-		ln -s /usr/bin/nodejs /usr/bin/node && \
+		apt-get -qq install --yes nodejs && \
 		npm install -g bower && \
 		Rscript /src-kernel-r/install.r && \
 		mkdir -p /home/jovyan/.local/share/jupyter/nbextensions && \
