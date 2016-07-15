@@ -194,6 +194,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 this.rowActive = coords.row;
                 this.colActive = coords.col;
                 coords.col = -1; //force row selection
+                if(coords.row == -1) { // if user clicked on header row, they're trying to sort the column, so stop propagation
+                    event.stopImmediatePropagation();
+                }
             },
 
             _selectionIndexChanged: function(newIndex, oldIndex) {
