@@ -17,9 +17,9 @@ object WidgetVisualizations {
   def explore(df: String) = {
     val explorerImport =
       """
-        <link rel='import' href='urth_components/declarativewidgets-explorer/urth-viz-vega-explorer.html'
+        <link rel='import' href='urth_components/declarativewidgets-explorer/urth-viz-explorer.html'
           is='urth-core-import' package='jupyter-incubator/declarativewidgets_explorer'>
       """
-    getKernel.display.html(s"$explorerImport <urth-viz-vega-explorer ref='$df'></urth-viz-vega-explorer>")
+    getKernel.display.html(s"$explorerImport <urth-viz-explorer ref='$df'></urth-viz-explorer>")
   }
 }
