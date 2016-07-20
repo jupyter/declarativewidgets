@@ -1,0 +1,191 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-menu/paper-menu.html">
+<link rel="import" href="../paper-item/paper-item.html">
+
+<!--
+Paper card with a collapse/expand button in the header.
+Collapsing will hide the content but keep the header
+-->
+<dom-module id="multi-select-menu">
+    <template>
+        <style>
+            :host {
+                --paper-item: {
+                    padding: 0 0.5em;
+                };
+            }
+            :host iron-icon {
+                color: var(--secondary-text-color);
+            }
+            :host paper-menu-button {
+                padding: 0;
+                width: 100%;
+            }
+            :host .list-item {
+                cursor: pointer;
+            }
+            :host .list-item iron-icon {
+                margin-right: 0.5em;
+            }
+            :host .list-item:not(.iron-selected) iron-icon {
+                visibility: hidden;
+            }
+            :host #trigger {
+                --paper-input-container-input: {
+                    cursor: pointer;
+                };
+            }
+            :host #filter {
+                --paper-input-container-label: {
+                    padding: 0 1em;
+                };
+                --paper-input-container-input: {
+                    padding: 0 1em;
+                };
+            }
+        </style>
+
+        <paper-menu-button
+            ignore-select
+            on-paper-dropdown-close="_clearFilter"
+            on-paper-dropdown-open="_focusFilter">
+            <div class="dropdown-trigger">
+                <!-- Mimic paper-dropdown-menu trigger -->
+                <paper-input
+                    id="trigger"
+                    type="text"
+                    readonly
+                    value="[[selectedText]]"
+                    label="[[label]]">
+                    <iron-icon icon="arrow-drop-down" suffix></iron-icon>
+                </paper-input>
+            </div>
+            <div class="dropdown-content">
+                <paper-input id="filter" label="Filter" value="{{filter}}" tabindex="0"></paper-input>
+                <paper-menu
+                    id="items"
+                    multi
+                    on-iron-select="_updateSelectedItems"
+                    on-iron-deselect="_updateSelectedItems">
+                    <template is="dom-repeat" items="{{filteredItems}}" as="item">
+                        <paper-item class="list-item">
+                            <iron-icon icon="check"></iron-icon>[[item]]</paper-item>
+                    </template>
+                </paper-menu>
+            </div>
+        </paper-menu-button>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+        Polymer({
+            is: 'multi-select-menu',
+            properties: {
+                // items to select
+                items: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                // type of items, used when selecting more than 1 item,
+                //      e.g. "3 items" or "3 carrots"
+                itemType: {
+                    type: String,
+                    value: 'items'
+                },
+                // list filter text
+                filter: {
+                    type: String,
+                    value: '',
+                    notify: true
+                },
+                // input label
+                label: {
+                    type: String,
+                    value: 'multi-select'
+                },
+                // selected items
+                selectedItems: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    },
+                    readOnly: true
+                },
+                // selected items text, is value if 1 item selected, else is count
+                selectedText: {
+                    type: String,
+                    value: '',
+                    readOnly: true
+                },
+                // selected text in CSV format
+                csv: {
+                    type: String,
+                    value: '',
+                    readOnly: true,
+                    notify: true
+                }
+            },
+            _clearFilter: function() {
+                // use timeout so it's cleared after menu hide animation
+                window.setTimeout(function() {
+                    this.filter = '';
+                }.bind(this), 250);
+            },
+            _deselect: function(event) {
+                console.log('deselect');
+            },
+            _focusFilter: function() {
+                // use timeout so menu is open and filter input can be focused
+                window.setTimeout(function() {
+                    this.$.filter.focus();
+                }.bind(this), 250);
+            },
+            _getFilterRegex: function() {
+                // returns non-consecutive regex
+                return new RegExp('.*' + this.filter.split('').join('.*') + '.*');
+            },
+            _updateSelectedItems: function() {
+                // get selected items based on menu item selections
+                var elements = this.$.items.querySelectorAll('paper-item');
+                var selectedItems = [];
+                for (var i = 0; i < elements.length; i++) {
+                    if (elements[i].classList.contains('iron-selected')) {
+                        selectedItems.push(this.items[i]);
+                    }
+                }
+                this._setSelectedItems(selectedItems);
+
+                // set selection label based on how many items are selected
+                if (this.selectedItems.length === 0) {
+                    this._setSelectedText('');
+                } else if (this.selectedItems.length === 1) {
+                    this._setSelectedText(this.selectedItems[0]);
+                } else {
+                    this._setSelectedText(this.selectedItems.length + ' ' + this.itemType);
+                }
+
+                // set CSV value
+                this._setCsv(this.selectedItems.join(','));
+            },
+            ready: function() {
+                this.filteredItems = this.items;
+                this.addEventListener('filter-changed', function(event) {
+                    if (this.filter) {
+                        var regex = this._getFilterRegex();
+                        this.filteredItems = this.items.filter(function(item) {
+                            return regex.test(item);
+                        });
+                    } else {
+                        this.filteredItems = this.items;
+                    }
+                });
+            }
+        });
+    })();
+    </script>
+</dom-module>

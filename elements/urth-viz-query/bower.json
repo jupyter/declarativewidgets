@@ -25,6 +25,8 @@
     "paper-listbox": "PolymerElements/paper-listbox",
     "paper-item": "PolymerElements/paper-item",
     "paper-button": "PolymerElements/paper-button",
+    "paper-menu": "PolymerElements/paper-menu",
+    "paper-menu-button": "PolymerElements/paper-menu-button",
     "paper-input": "PolymerElements/paper-input",
     "iron-icon": "PolymerElements/iron-icon",
     "polymer": "Polymer/polymer#^1.2.4"
