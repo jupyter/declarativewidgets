@@ -124,7 +124,9 @@
             _testLevel: function( level ){
                 var _logBooleanMap;
                 try{
-                    _logBooleanMap = this._logBooleanMap;
+                    //the next line may error out if this takes too early during element
+                    //creation. The fallback is to read the value from an attribute.
+                    _logBooleanMap = this._toLogBooleanMap(this.log);
                 }catch(e){
                     _logBooleanMap = this._toLogBooleanMap(this.getAttribute("log"));
                 }
