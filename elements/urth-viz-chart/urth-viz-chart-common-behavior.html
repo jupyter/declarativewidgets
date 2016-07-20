@@ -264,11 +264,10 @@
                             break;
 
                         case 'date':
-//                            Cannot use time scale for discrete values (e.g. bar)  Need to explicitly convert to Date
-//                              chart[dataIndex == this.primary ? 'xScale' : 'yScale'](d3.time.scale());
-                            axis.tickFormat(axisSettings.format ?
-                                function(d) { return d3.time.format(axisSettings.format)(new Date(d)); }
-                                : function(d) { return new Date(d).toLocaleDateString(); });
+                            if (this.type != 'bar' && this.type != 'pie') {
+                                this.chart[dataIndex == this.primary ? 'xScale' : 'yScale'](d3.time.scale.utc());
+                            }
+                            axis.tickFormat(d3.time.format.utc(axisSettings.format || '%c'));
                             break;
 
                         default:
