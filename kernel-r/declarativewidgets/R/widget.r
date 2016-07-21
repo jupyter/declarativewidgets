@@ -22,7 +22,7 @@ Widget <- R6Class("Widget",
                 #handle_custom for widget_X
                 self$handle_custom(msg$content)
             } else {
-                print(c('No content in custom message', msg))
+                log_info(paste('No content in custom message', msg))
             }
         },
         handle_backbone_content = function(msg) {
@@ -30,7 +30,7 @@ Widget <- R6Class("Widget",
                 #handle_backbone for widget_X
                 self$handle_backbone(msg)
             } else {
-                print(c('No content in backbone message', msg))
+                log_info(paste('No content in backbone message', msg))
             }
         },
         handle_request_state = function(msg) {
@@ -54,11 +54,11 @@ Widget <- R6Class("Widget",
                 backbone    = self$handle_backbone_content(msg),
                 custom      = self$handle_custom_content(msg),
                 request_state = self$handle_request_state_content(msg),
-                print(c('Got unhandled msg type:', msg$method))
+                log_info(paste('Got unhandled msg type:', msg$method))
             )
         },
         handle_close = function(msg) {
-            print("handle_close in Widget")
+            log_info("handle_close in Widget")
         },
         #Used by all widgets to send back a response indicating that
         #the result was successfully serialized and sent to the client
@@ -108,7 +108,7 @@ create_widget_instance <- function(class_name, comm, serializer, querier) {
         declarativewidgets.Function      = return (Widget_Function$new(comm = comm, serializer = serializer)),
         declarativewidgets.Channels      = return (Widget_Channels$new(comm = comm, serializer = serializer)),
         declarativewidgets.DataFrame    = return (Widget_Dataframe$new(comm = comm, serializer = serializer, querier = querier)),
-        print(c('Got unhandled class_name:', class_name))
+        log_info(paste('Got unhandled class_name:', class_name))
     )
 }
 
@@ -126,7 +126,11 @@ initWidgets <- function() {
     }
     library(IRdisplay)
     library(IRkernel)
-    comm_manager <- get("comm_manager", envir = as.environment("package:IRkernel"))()
+    #Set log to info level in IRkernel (1 -> log_error, 2 -> log_info, 3 -> log_debug)
+    options(jupyter.log_level = 2L)
+
+    log_info("Initing widgets")
+    comm_manager <- comm_manager() #get("comm_manager", envir = as.environment("package:IRkernel"))()
 
     # Support for ipywidgets 4.x client
     comm_manager$register_target("ipython.widget", target_handler)

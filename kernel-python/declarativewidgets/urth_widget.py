@@ -1,9 +1,10 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 import time
+import logging
 
 from ipywidgets import widgets  # Widget definitions
-
+import traceback
 
 class UrthWidget(widgets.Widget):
     """ A base class for Urth widgets. """
@@ -51,15 +52,15 @@ class UrthWidget(widgets.Widget):
             }
         })
 
-    def error(self, msg):
+    def error(self, error):
         """
         Inform the front-end that an error occurred, with the given error msg.
         Parameters
         ----------
-        msg : string
-            An error message.
+        error: string or exception
         """
-        self.send_status("error", msg)
+        self.send_status("error", str(error))
+        self.log.error(traceback.format_exc())
 
     def ok(self, msg=""):
         """

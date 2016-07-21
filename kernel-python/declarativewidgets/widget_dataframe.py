@@ -54,4 +54,4 @@ class DataFrame(UrthWidget):
             self._send_update("value", serialized_result)
             self.ok()
         except Exception as e:
-            self.error(str(e))
+            self.error(e)
