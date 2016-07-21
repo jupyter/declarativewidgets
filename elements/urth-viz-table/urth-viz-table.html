@@ -96,6 +96,31 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     type: Number,
                     value: 15,
                     reflectToAttribute: true
+                },
+
+                /**
+                 * Name of column that the table is sorted by
+                 */
+                sortColumn: {
+                    type: String,
+                    notify: true
+                },
+
+                /**
+                 * 'asc' or 'desc' for the sort order the sortColumn is sorted by
+                 */
+                sortOrder: {
+                    type: String,
+                    notify: true
+                },
+
+                /**
+                 * Boolean value
+                 * If true, when table is sorted, the datarows are sorted by sort query in urth-core-dataframe
+                 * and table is updated when urth-core-dataframe is done sorting
+                 */
+                disableLocalSort: {
+                    type: Boolean
                 }
             },
 
@@ -371,7 +396,15 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         beforeColumnSort: function() {
                             this.selectionIndex = -1;
                         }.bind(this),
-                        afterColumnSort: this._handleAfterSort.bind(this),
+                        afterColumnSort: function(colIndex, order) {
+                            // store sorted column and sorted order
+                            this.sortColumn = this.columns[colIndex];
+                            this.sortOrder = order ? 'asc' : 'desc';
+
+                            if (!this.disableLocalSort) {
+                                this._handleAfterSort();
+                            }
+                        }.bind(this),
                         afterRender: function(isForced) {
                             if (isForced && !this._rendered) {
                                 this._rendered = true;
