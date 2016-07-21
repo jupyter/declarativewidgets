@@ -105,7 +105,7 @@ Example:
              * The serialized representation of the DataFrame `ref`. The structure contains:
              * {
              *  columns: Array of column names
-             *  column_types: Array of column type names
+             *  columnTypes: Array of column type names
              *  data: 2D Array of rows with column values
              *  index: Array with index values
              * }
@@ -127,7 +127,6 @@ Example:
 
             /**
              * Column type metadata for the DataFrame
-             * For internal use ONLY
              */
              columnTypes: {
                 type: Array,
@@ -283,25 +282,42 @@ Example:
          */
         onModelValueChange: function(newVal){
             this._debug( "urth-core-dataframe onModelValueChange", newVal );
-            newVal = this._deserializeDateTypes(newVal || {data:[]});
+            newVal = this._deserializeDataTypes(newVal || {data:[]});
             this._setValue(newVal || {data:[]});
         },
 
         /*
-         * Returns the dataFrame with deserialized Date types of the dataFrame reconstructed via the column_types
+         * Returns the dataFrame with deserialized Data types of the dataFrame reconstructed via the columnTypes
          * @param df - the serialized DataFrame
-         * @return the reconstructed DataFrame
+         * @return the reconstructed/deserialized DataFrame data types
          */
-        _deserializeDateTypes: function(df) {
-            if (!df.column_types || !df.data) {
+        _deserializeDataTypes: function(df) {
+            if (!df.columnTypes || !df.data) {
                 return df;
             }
-            for (var i=0; i<df.column_types.length; i++) {
-                //If this column is of type date convert the string content to a date object
-                if(df.column_types[i] === "Date") {
-                    for (var j=0; j<df.data.length; j++) {
-                        df.data[j][i] = new Date(df.data[j][i]);
-                    }
+            
+            var deserializeDataColumn = function(aDf, columnIndex, objectType) {
+                aDf.data = aDf.data.map(function(row) {
+                    row[columnIndex] = new objectType(row[columnIndex]);
+                    return row;
+                });
+                return aDf;
+            };
+
+            for (var i=0; i<df.columnTypes.length; i++) {
+                switch(df.columnTypes[i]) {
+                    case "Date":
+                        df = deserializeDataColumn(df, i, Date);
+                        break;
+                    case "Number":
+                        df = deserializeDataColumn(df, i, Number);
+                        break;
+                    case "Boolean":
+                        df = deserializeDataColumn(df, i, Boolean);
+                        break;
+                    case "String":
+                        df = deserializeDataColumn(df, i, String);
+                        break;
                 }
             }
             return df;
@@ -377,7 +393,7 @@ Example:
          * @private
          */
         _columnTypes: function(df){
-            return df.column_types;
+            return df.columnTypes;
         },
 
         /**

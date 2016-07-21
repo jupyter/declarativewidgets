@@ -19,7 +19,7 @@ Once the element finds the DataFrame in the kernel, it get the data and makes it
 	```javascript
 {
    columns: [], //array of column names
-   column_types: [], //array of column type names (Note for internal use only)
+   columnTypes: [], //array of column type names
    data: [[]], //2 dimensional array with the data. The outer array holds each row.
    index: [] //index value for each row (partial support)  
 }
@@ -50,7 +50,18 @@ OR
 
 * The `columns` property has an Array of column names
 
-* The `columnTypes` property has an Array of column type names (Note for internal use only)
+* The `columnTypes` property has an Array of column type names
+
+Note: Column types from the native kernel language to the client are resolved/mapped according to the table below:
+
+JS objects| Pandas | pySpark |R data.frame| Spark R| Spark Scala|
+| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
+Number | int64 | bigint | integer | integer | Int |
+Number | float64 | double | numeric | numeric | Double |
+Boolean | bool | boolean | logical | logical | Boolean
+String | [object (object of ndarray of strings)](http://stackoverflow.com/questions/21018654/strings-in-a-dataframe-but-dtype-is-object) *See type of Unknown | string | character | character | String
+Date | datetime64[ns] | date | Date | Date | TimestampType, DateType|
+Unknown | object or ambiguous type | object or ambiguous type | object or ambiguous type | object or ambiguous type |object or ambiguous type|
 
 All property can be used in data bindings to render the data. The example above shows the data displayed as a set of cards, but the same data can be visualize using many of the `<urth-viz-*>` elements.
 

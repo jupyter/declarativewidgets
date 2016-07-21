@@ -29,6 +29,22 @@ if sys.version_info[0] == 2:
 else:
     from .base_serializer_py3 import BaseSerializer
 
+def normalize_type(data_type):
+    """Normalizes pandas/pyspark type names to the equivalent client side type names"""
+    # disregard/normalize precision of the data_type
+    data_type = re.sub("32|64(.*)", "", data_type)
+    return {
+        'int': 'Number',
+        'bigint': 'Number',
+        'float': 'Number',
+        'double': 'Number',
+        'bool': 'Boolean',
+        'boolean': 'Boolean',
+        'string': 'String',
+        'datetime': 'Date',
+        'date': 'Date'
+    }.get(data_type, "Unknown")
+
 class PandasSeriesSerializer(BaseSerializer):
     @staticmethod
     def klass():
@@ -65,10 +81,10 @@ class PandasDataFrameSerializer(BaseSerializer):
         # {index -> [index], columns -> [columns], data -> [values]}
         date_format = kwargs.get('date_format', 'iso')
         df_dict = json.loads(obj[:limit].to_json(orient='split', date_format=date_format))
-        df_dict['column_types'] = kwargs.get('column_types', [str(x) for x in obj.dtypes.tolist()])
-        df_dict['column_types'] = ["Date" if x == "datetime64[ns]" or x == "date" else x for x in df_dict['column_types']]
-        for i in range(0, len(df_dict['column_types'])):
-            if df_dict['column_types'][i] == "Date":
+        df_dict['columnTypes'] = kwargs.get('columnTypes', [str(x) for x in obj.dtypes.tolist()])
+        df_dict['columnTypes'] = [normalize_type(x) for x in df_dict['columnTypes']]
+        for i in range(0, len(df_dict['columnTypes'])):
+            if df_dict['columnTypes'][i] == "Date":
                 for j in range(0, len(df_dict['data'])):
                     #If this date element has no timezone drop the t/z from the serialized element
                     #Note on filter where rows are dropped we must associate the dict index with the original df index
@@ -132,9 +148,9 @@ class SparkDataFrameSerializer(BaseSerializer):
         df = pandas.DataFrame.from_records(
             obj.limit(kwargs.get('limit', 100)).collect(), columns=obj.columns)
 
-        #recover column_types from the original object before it is collected/converted
-        column_types = [str(x[1]) for x in obj.dtypes]
-        return PandasDataFrameSerializer.serialize(df, column_types=column_types, **kwargs)
+        #recover columnTypes from the original object before it is collected/converted
+        columnTypes = [str(x[1]) for x in obj.dtypes]
+        return PandasDataFrameSerializer.serialize(df, columnTypes=columnTypes, **kwargs)
 
     @staticmethod
     def check_packages():
