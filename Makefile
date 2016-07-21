@@ -411,7 +411,7 @@ system-test-python2: PYTHON=python2
 system-test-python2: SPECS:=$(PYTHON2_SPECS)
 system-test-python2: TEST_MSG="Starting system tests for Python 2"
 system-test-python2:
-	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
+	@PYTHON=$(PYTHON) TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
 
 system-test-alt-jupyter: JUPYTER:=_$(ALT_JUPYTER_VERSION)
 system-test-alt-jupyter: SPECS:=$(ALT_JUPYTER_SPECS)
