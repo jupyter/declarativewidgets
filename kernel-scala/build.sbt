@@ -2,6 +2,11 @@
  * Copyright (c) Jupyter Development Team.
  * Distributed under the terms of the Modified BSD License.
  */
+
+import scala.util.Properties
+
+organization := "org.jupyter"
+
 name := "declarativewidgets"
 
 version := "0.1-SNAPSHOT"
@@ -28,3 +33,50 @@ libraryDependencies ++= Seq(
 ivyLoggingLevel in ThisBuild := UpdateLogging.Quiet
 
 parallelExecution in Test := false
+
+publishMavenStyle := true
+
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+}
+
+publishArtifact in Test := false
+
+pomIncludeRepository := { _ => false }
+
+pomExtra := (
+  <url>https://github.com/jupyter-incubator/declarativewidgets</url>
+    <licenses>
+      <license>
+        <name>BSD-style</name>
+        <url>http://www.opensource.org/licenses/bsd-license.php</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+    <scm>
+      <url>git@github.com:jupyter-incubator/declarativewidgets.git</url>
+      <connection>scm:git:git@github.com:jupyter-incubator/declarativewidgets.git</connection>
+    </scm>
+    <developers>
+      <developer>
+        <id>dwidgets</id>
+        <name>declarative widgets</name>
+        <url>https://github.com/jupyter-incubator/declarativewidgets/graphs/contributors</url>
+      </developer>
+    </developers>)
+
+val repoUsername  = Properties.envOrElse("REPO_USERNAME", "")
+val repoPassword  = Properties.envOrElse("REPO_PASSWORD", "")
+
+pgpPassphrase := Some(Properties.envOrElse("PGP_PASSPHRASE", "").toCharArray)
+
+pgpSecretRing := file("/root/.gpg/secring.gpg")
+
+credentials += Credentials("Sonatype Nexus Repository Manager",
+  "oss.sonatype.org",
+  repoUsername,
+  repoPassword)
