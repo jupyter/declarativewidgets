@@ -3,7 +3,7 @@
 
 .PHONY: help init clean clean-dist clean-watch clean-watch-docs dist sdist docs
 .PHONY: dev dev_image dev_image_4.2 _dev _dev-python2 _dev-python3
-.PHONY: server server_4.2 remove-server install install-all all release
+.PHONY: server server_4.2 remove-server install install-all all release publish-scala-jar
 .PHONY: start-selenium stop-selenium _run _run-python3 _run-python2 run-test
 .PHONY: test testdev test-js test-js-remote test-py test-py-all _test-py
 .PHONY: _test-py-python2 _test-py-python3 test-scala test-r
@@ -199,6 +199,7 @@ else
 	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`:/src \
 		-v `pwd`/etc/ivy:/root/.ivy2 \
+		-v `pwd`/etc/sbt_plugin_config:/root/.sbt/0.13/plugins \
 		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/kernel-scala/* /app/. && \
 			sbt --warn package && \
 			cp target/scala-2.10/declarativewidgets*.jar /src/dist/declarativewidgets/static/declarativewidgets.jar && \
@@ -307,6 +308,7 @@ else
 	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`/kernel-scala:/src \
 		-v `pwd`/etc/ivy:/root/.ivy2 \
+		-v `pwd`/etc/sbt_plugin_config:/root/.sbt/0.13/plugins \
 		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/* /app/. && \
 			sbt --warn test'
 endif
@@ -481,7 +483,20 @@ docs: .watch-docs dist/docs
 
 all: init test-js-remote test-py-all test-scala test-r sdist install-all system-test
 
+publish-scala-jar:
+	@echo 'Publishing scala jar'
+	@docker $(DOCKER_OPTS) run -it --rm \
+		-v `pwd`/kernel-scala:/src \
+		-v `pwd`/etc/.gpg:/root/.gpg \
+		-v `pwd`/etc/ivy:/root/.ivy2 \
+		-v `pwd`/etc/sbt_plugin_config:/root/.sbt/0.13/plugins \
+		-e REPO_USERNAME=$(REPO_USERNAME) \
+		-e REPO_PASSWORD=$(REPO_PASSWORD) \
+		-e PGP_PASSPHRASE=$(PGP_PASSPHRASE) \
+		$(SCALA_BUILD_REPO) bash -c 'cp -r /src/* /app/. && \
+		    sbt publishSigned  && sbt sonatypeRelease'
+
 release: EXTRA_OPTIONS=-e PYPI_USER=$(PYPI_USER) -e PYPI_PASSWORD=$(PYPI_PASSWORD)
 release: PRE_SDIST=echo "[server-login]" > ~/.pypirc; echo "username:" ${PYPI_USER} >> ~/.pypirc; echo "password:" ${PYPI_PASSWORD} >> ~/.pypirc;
 release: POST_SDIST=register upload
-release: sdist
+release: sdist publish-scala-jar

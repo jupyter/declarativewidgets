@@ -26,8 +26,14 @@ declwidgets.init()
 ##### Scala Initialization
 
 ```
+//add the declarative widgets jar/dependency via one of the %addjar or %AddDeps magics
+
 // modify to IP and Port of this notebook server
 %addjar http://localhost:8888/nbextensions/declarativewidgets/declarativewidgets.jar
+
+// modify the GroupId, ArtifactId, Latest Version for the applicable release
+// release versions can be found on http://search.maven.org/#search|ga|1|g:"org.jupyter"
+%AddDeps org.jupyter declarativewidgets_2.10 0.6.1_dev --transitive --trace --verbose
 
 import declarativewidgets._
 
