@@ -305,6 +305,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
 
                     // highligh the selection by setting this.selectionIndex to physicalIndex
                     this.selectionIndex = physicalIndex > -1 ? physicalIndex : this.selectionIndex;
+
+                    // update rowActive so _handleSelection can update selectionInfo
+                    this.rowActive = this.selectionIndex;
                 }
             },
 
@@ -401,9 +404,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                             this.sortColumn = this.columns[colIndex];
                             this.sortOrder = order ? 'asc' : 'desc';
 
-                            if (!this.disableLocalSort) {
-                                this._handleAfterSort();
-                            }
+                            this._handleAfterSort();
                         }.bind(this),
                         afterRender: function(isForced) {
                             if (isForced && !this._rendered) {
