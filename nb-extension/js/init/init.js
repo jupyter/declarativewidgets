@@ -9,8 +9,7 @@
  */
 define([
     'module',
-    'jquery',
-    'jupyter-js-widgets'
+    'jquery'
 ], function(module, $) {
     'use strict';
 
