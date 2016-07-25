@@ -46,7 +46,7 @@ SPECS?=system-test/urth-core-bind-specs.js system-test/urth-system-test-specs.js
 PYTHON2_SPECS?=system-test/urth-system-test-specs.js
 ALT_JUPYTER_SPECS?=system-test/urth-system-test-specs.js
 ALT_JUPYTER_VERSION?=4.2
-PYTHON?=python3
+PYTHON?=ipython3
 TEST_MSG?="Starting system tests"
 
 # Logging levels
@@ -272,14 +272,14 @@ test-py: dist/urth dist/declarativewidgets
 	@echo 'Running python tests in $(PYTHON)...'
 	@$(MAKE) _test-py-$(PYTHON)
 
-_test-py-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages
-_test-py-python2: CMD=python --version; python -m unittest discover $(EXTENSION_DIR)/declarativewidgets "test*[!_py3].py"
-_test-py-python2: PYTHON_SETUP_CMD=source activate python2; pip install -U mock $(PIP_OPTS);
-_test-py-python2: _test-py
+_test-py-ipython2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages
+_test-py-ipython2: CMD=python --version; ipython -m unittest discover $(EXTENSION_DIR)/declarativewidgets "test*[!_py3].py"
+_test-py-ipython2: PYTHON_SETUP_CMD=source activate python2; pip install -U mock $(PIP_OPTS);
+_test-py-ipython2: _test-py
 
-_test-py-python3: EXTENSION_DIR=/usr/local/lib/python3.4/dist-packages
-_test-py-python3: CMD=python --version; python -m unittest discover $(EXTENSION_DIR)
-_test-py-python3: _test-py
+_test-py-ipython3: EXTENSION_DIR=/usr/local/lib/python3.4/dist-packages
+_test-py-ipython3: CMD=ipython --version; ipython -m unittest discover $(EXTENSION_DIR)
+_test-py-ipython3: _test-py
 
 _test-py:
 	@docker $(DOCKER_OPTS) run -it --rm \
@@ -288,7 +288,7 @@ _test-py:
 
 test-py-all:
 	@$(MAKE) test-py
-	@PYTHON="python2" $(MAKE) test-py
+	@PYTHON="ipython2" $(MAKE) test-py
 
 test-scala:
 ifeq ($(NOSCALA), true)
