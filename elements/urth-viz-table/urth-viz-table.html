@@ -112,15 +112,6 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 sortOrder: {
                     type: String,
                     notify: true
-                },
-
-                /**
-                 * Boolean value
-                 * If true, when table is sorted, the datarows are sorted by sort query in urth-core-dataframe
-                 * and table is updated when urth-core-dataframe is done sorting
-                 */
-                disableLocalSort: {
-                    type: Boolean
                 }
             },
 
@@ -181,6 +172,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         this.hot.loadData(newDataRows);
                     }
                 }
+
+                // this could have been a result of kernel sort, so need to handle selection after sort
+                this._handleAfterSort();
             },
 
             computeTableView: function(datarows, columns) {
@@ -202,6 +196,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         // reset selection to null if it was previously set
                         if (this.selection) {
                             this._setSelection(null);
+                            this._setSelectionInfo(null);
                             // deselect range that was previously highlighted
                             this.hot.deselectCell();
                         }
@@ -268,13 +263,11 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 } else {
                     this._setSelection(selection);
                 }
-                // store selectedRow, so after sorting, we can look for this row
-                this.selectedRow = selection;
             },
 
             _handleAfterSort: function() {
                 // if there is a previous selection, we need to handle re-highlighting it
-                if (this.selectedRow) {
+                if (this.selection) {
                     // since table has been sorted, the selectionIndex is not always the correct index
                     // of data anymore. Because even though the table view is sorted, this.datarows stays the same
 
@@ -303,11 +296,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         }
                     });
 
-                    // highligh the selection by setting this.selectionIndex to physicalIndex
-                    this.selectionIndex = physicalIndex > -1 ? physicalIndex : this.selectionIndex;
-
                     // update rowActive so _handleSelection can update selectionInfo
-                    this.rowActive = this.selectionIndex;
+                    this.rowActive = physicalIndex;
+                    this.hot.selectCell(physicalIndex, 0, physicalIndex, this.columns.length - 1, true);
                 }
             },
 
