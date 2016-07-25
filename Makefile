@@ -34,6 +34,7 @@ help:
 ROOT_REPO:=jupyter/all-spark-notebook:2d878db5cbff
 REPO:=jupyter/all-spark-notebook-bower:2d878db5cbff
 REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:2d878db5cbff
+REPO4.2.oldipyw:=jupyter/all-spark-notebook-bower-jup4.2-ipy4.1:2d878db5cbff
 SCALA_BUILD_REPO:=1science/sbt
 
 # Global environment defaults
@@ -46,6 +47,7 @@ SPECS?=system-test/urth-core-bind-specs.js system-test/urth-system-test-specs.js
 PYTHON2_SPECS?=system-test/urth-system-test-specs.js
 ALT_JUPYTER_SPECS?=system-test/urth-system-test-specs.js
 ALT_JUPYTER_VERSION?=4.2
+ALT_JUPYTER_OLD_IPYW_VERSION?=4.2.oldipyw
 PYTHON?=python3
 TEST_MSG?="Starting system tests"
 
@@ -64,7 +66,7 @@ $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 	@$(foreach dir, $(URTH_SRC_DIRS), cd $(abspath $(dir)) && $(NPM_BIN_DIR)/bower link $(BOWER_OPTS);)
 	@$(foreach name, $(URTH_DIRS), $(NPM_BIN_DIR)/bower link $(name) $(BOWER_OPTS);)
 
-init: node_modules dev_image dev_image_4.2
+init: node_modules dev_image dev_image_4.2 dev_image_4.2.oldipyw
 
 node_modules: package.json
 	@npm install --quiet
@@ -102,6 +104,13 @@ dev_image_4.2:
     jupyter toree install'
 	@docker $(DOCKER_OPTS) commit 4.2-build $(REPO4.2)
 	@-docker $(DOCKER_OPTS) rm -f 4.2-build
+
+dev_image_4.2.oldipyw:
+	@-docker $(DOCKER_OPTS) rm -f 4.2.oldipyw-build
+	@docker $(DOCKER_OPTS) run -it --user root --name 4.2.oldipyw-build \
+		$(REPO) bash -c 'pip install --upgrade notebook==4.2.0 $(PIP_OPTS)'
+	@docker $(DOCKER_OPTS) commit 4.2.oldipyw-build $(REPO4.2.oldipyw)
+	@-docker $(DOCKER_OPTS) rm -f 4.2.oldipyw-build
 
 clean: clean-dist
 	@-rm -rf *.egg-info
@@ -347,6 +356,14 @@ server_4.2: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server_4.2: REPO=$(REPO4.2)
 server_4.2: _run-$(PYTHON)
 
+server_4.2.oldipyw: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
+server_4.2.oldipyw: INSTALL_DECLWID_CMD?=pip install $(PIP_OPTS) --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
+server_4.2.oldipyw: SERVER_NAME?=urth_widgets_server
+server_4.2.oldipyw: OPTIONS?=-it --rm
+server_4.2.oldipyw: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
+server_4.2.oldipyw: REPO=$(REPO4.2.oldipyw)
+server_4.2.oldipyw: _run-$(PYTHON)
+
 remove-server:
 	-@docker $(DOCKER_OPTS) rm -f $(SERVER_NAME)
 
@@ -420,7 +437,13 @@ system-test-alt-jupyter: TEST_MSG="Starting system tests for Jupyter $(ALT_JUPYT
 system-test-alt-jupyter:
 	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
 
-system-test-all: system-test-python3 system-test-python2 system-test-alt-jupyter
+system-test-alt-jupyter.oldipyw: JUPYTER:=_$(ALT_JUPYTER_OLD_IPYW_VERSION)
+system-test-alt-jupyter.oldipyw: SPECS:=$(ALT_JUPYTER_SPECS)
+system-test-alt-jupyter.oldipyw: TEST_MSG="Starting system tests for Jupyter $(ALT_JUPYTER_OLD_IPYW_VERSION)"
+system-test-alt-jupyter.oldipyw:
+	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
+
+system-test-all: system-test-python3 system-test-python2 system-test-alt-jupyter system-test-alt-jupyter.oldipyw
 
 start-selenium: node_modules stop-selenium
 	@echo "Installing and starting Selenium Server..."
