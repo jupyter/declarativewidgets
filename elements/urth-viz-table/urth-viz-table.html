@@ -148,6 +148,15 @@ The table accepts data via attribute `datarows` and column headers via attribute
                   colHeaders: newColumns,
                   columns: columnSettings
                 });
+
+                // check if sortColumn is still in newColumns
+                var keepSortColumn = newColumns.some(function(col) {
+                    return col == this.sortColumn;
+                }.bind(this));
+                if (!keepSortColumn) {
+                    this.sortColumn = "";
+                    this.sortOrder = "";
+                }
             },
 
             _updateDatarows: function (newDataRows) {
