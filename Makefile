@@ -3,7 +3,7 @@
 
 .PHONY: help init clean clean-dist clean-watch clean-watch-docs dist sdist docs
 .PHONY: dev dev_image dev_image_4.2 _dev _dev-python2 _dev-python3
-.PHONY: server server_4.2 remove-server install install-all all release publish-scala-jar
+.PHONY: server server_4.2 remove-server install install-all all release export-release-version publish-scala-jar
 .PHONY: start-selenium stop-selenium _run _run-python3 _run-python2 run-test
 .PHONY: test testdev test-js test-js-remote test-py test-py-all _test-py
 .PHONY: _test-py-python2 _test-py-python3 test-scala test-r
@@ -482,13 +482,20 @@ docs: .watch-docs dist/docs
 
 all: init test-js-remote test-py-all test-scala test-r sdist install-all system-test
 
-publish-scala-jar:
+export-release-version:
+	docker $(DOCKER_OPTS) run -it --rm \
+		-v `pwd`/dist:/src \
+		-v `pwd`/etc/read_release_version.py:/src/read_release_version.py \
+		$(REPO) bash -c 'python /src/read_release_version.py' > `pwd`/dist/RELEASE_VERSION
+
+publish-scala-jar: export-release-version dist/declarativewidgets/static/declarativewidgets.jar
 	@echo 'Publishing scala jar'
 	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`/kernel-scala:/src \
 		-v `pwd`/etc/.gpg:/root/.gpg \
 		-v `pwd`/etc/ivy:/root/.ivy2 \
 		-v `pwd`/etc/sbt_plugin_config:/root/.sbt/0.13/plugins \
+		-v `pwd`/dist/RELEASE_VERSION:/src_version/RELEASE_VERSION \
 		-e REPO_USERNAME=$(REPO_USERNAME) \
 		-e REPO_PASSWORD=$(REPO_PASSWORD) \
 		-e PGP_PASSPHRASE=$(PGP_PASSPHRASE) \
