@@ -4,12 +4,24 @@
  */
 
 import scala.util.Properties
+import scala.io.Source
 
 organization := "org.jupyter"
 
 name := "declarativewidgets"
 
-version := "0.1-SNAPSHOT"
+version := {
+  val releaseVersionPath = "/src_version/RELEASE_VERSION"
+  if(new java.io.File(releaseVersionPath).exists) {
+    val src = Source.fromFile(releaseVersionPath)
+    val version = src.getLines().next()
+    src.close
+    val regex = "SNAPSHOT(.*)".r
+    regex.replaceFirstIn(version, "SNAPSHOT")
+  } else {
+    "0.1-SNAPSHOT"
+  }
+}
 
 scalaVersion := "2.10.4"
 
