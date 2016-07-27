@@ -1,4 +1,8 @@
 # Changelog
+## 0.6.2 (2016-07-27)
+* Misc fixes back ported from master
+* Publishing Toree support JAR to maven
+
 ## 0.6.1 (2016-07-01)
 * Fix to issue when Run All and using channel.set
 * Minor fixes to declarative queries
