@@ -23,14 +23,14 @@ addons:
     - declarativewidgets.org
 
 before_install:
-  openssl aes-256-cbc -K $encrypted_9067f25a9380_key -iv $encrypted_9067f25a9380_iv -in etc/.gpg/secring.gpg.enc -out etc/.gpg/secring.gpg -d
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then openssl aes-256-cbc -K "$encrypted_9067f25a9380_key" -iv "$encrypted_9067f25a9380_iv" -in etc/.gpg/secring.gpg.enc -out etc/.gpg/secring.gpg -d; fi'
 
 before_script:
   - curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
   - sh -e /etc/init.d/xvfb start
 
 script:
-  - make all
+  - make publish-scala-jar
 
 deploy:
   skip_cleanup: true
@@ -48,4 +48,5 @@ notifications:
 branches:
   only:
     - master
+    - add_jar_to_release
     - /^0\.6\.0\.dev[0-9]+$/
