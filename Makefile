@@ -489,7 +489,7 @@ export-release-version:
 		-v `pwd`/etc/read_release_version.py:/src/read_release_version.py \
 		$(REPO) bash -c 'python /src/read_release_version.py' > `pwd`/dist/RELEASE_VERSION
 
-publish-scala-jar: export-release-version dist/declarativewidgets/static/declarativewidgets.jar
+publish-scala-jar: sdist export-release-version dist/declarativewidgets/static/declarativewidgets.jar
 	@echo 'Publishing scala jar'
 	@docker $(DOCKER_OPTS) run -it --rm \
 		-v `pwd`/kernel-scala:/src \
