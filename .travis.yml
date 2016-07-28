@@ -22,7 +22,7 @@ addons:
   hosts:
     - declarativewidgets.org
 
-before_install:
+before_deploy:
   openssl aes-256-cbc -K $encrypted_9067f25a9380_key -iv $encrypted_9067f25a9380_iv -in etc/.gpg/secring.gpg.enc -out etc/.gpg/secring.gpg -d
 
 before_script:
