@@ -1,12 +1,17 @@
 #' @include serializer.r
 
 serialize_element <- function(elem) {
-    if(class(elem) == "Date") {
-        options(digits.secs=3)
-        return (format(elem, "%Y-%m-%dT%H:%M:%OSZ"))
-    } else {
+    switch(
+        class(elem),
+        Date    = {
+            options(digits.secs=3)
+            return (format(elem, "%Y-%m-%dT%H:%M:%OSZ"))
+        },
+        integer = return (elem),
+        numeric = return (elem),
+        logical = return (elem),
         return (as.character(elem))
-    }
+    )
 }
 
 get_df_column_types <- function(df) {
