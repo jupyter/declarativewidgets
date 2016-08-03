@@ -61,6 +61,11 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
   interpreter.interpret("def f(a: Int): Int = a")
   val TestMethodName = "f"
 
+  //define test method within class
+  interpreter.interpret("class Test() {def f(a: Int): Int = a}")
+  interpreter.interpret("val testClassWithMethod = new Test()")
+  val TestClassMethodName = "testClassWithMethod.f"
+
   // define test val function
   interpreter.interpret("val fv = (a: Int) => a")
   val TestValName = "fv"
@@ -91,6 +96,11 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
         support.invokeFunction(TestMethodName, Map("a" -> "1")) should be (Success(1))
       }
 
+      it("should invoke an object level method defined with def") {
+        doReturn(interpreter).when(support).kernelInterpreter
+        support.invokeFunction(TestClassMethodName, Map("a" -> "1")) should be (Success(1))
+      }
+
       it("should invoke a method defined with def using default arguments") {
         support.invokeFunction(TestDefaultMethodName, Map("a" -> "1")) should be (Success(1))
       }
@@ -118,6 +128,12 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
         // TODO defArgTypes requires equality checks with iMain.global Types
         val expected = Some(List(("a", support.iMain.global.typeOf[Int])))
         support.argTypes(TestMethodName) should be (expected)
+      }
+
+      it("should return argument names and types for a def method in an object") {
+        // TODO defArgTypes requires equality checks with iMain.global Types
+        val expected = Some(List(("a", support.iMain.global.typeOf[Int])))
+        support.argTypes(TestClassMethodName) should be (expected)
       }
 
       it("should return argument names and type for a val function") {
@@ -174,6 +190,12 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
           be (expected)
       }
 
+      it("should return argument names and types for a def method in an object") {
+        val expected = msg1.get.get("a").get("type")
+        support.signature(TestClassMethodName).get.get("a").get("type") should
+          be (expected)
+      }
+
       it("should return argument names and type for a val function") {
         val expected = msg1.get.get("a").get("type")
         support.signature(TestValName).get.get("a").get("type") should
@@ -183,6 +205,12 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
       it("should return required flags for a def method") {
         val expected = msg1.get.get("a").get("required")
         support.signature(TestMethodName).get.get("a").get("required") should
+          be (expected)
+      }
+
+      it("should return required flags for a def method in an object") {
+        val expected = msg1.get.get("a").get("required")
+        support.signature(TestClassMethodName).get.get("a").get("required") should
           be (expected)
       }
 
@@ -350,6 +378,12 @@ class FunctionSupportSpec extends FunSpec with Matchers with MockitoSugar {
         val supportSpy = spy(new TestFunctionSupport)
 
         supportSpy.invokeMethod(TestMethodName, Map("a" -> "1")) should be(Success(1))
+      }
+
+      it("integration: should return the result of method invocation from an object") {
+        val supportSpy = spy(new TestFunctionSupport)
+        doReturn(interpreter).when(supportSpy).kernelInterpreter
+        supportSpy.invokeMethod(TestClassMethodName, Map("a" -> "1")) should be(Success(1))
       }
 
       it("integration: should work with a default value") {
