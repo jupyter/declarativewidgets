@@ -282,7 +282,7 @@ Example:
          */
         onModelValueChange: function(newVal){
             this._debug( "urth-core-dataframe onModelValueChange", newVal );
-            newVal = this._deserializeDateTypes(newVal || {data:[], columns: []});
+            newVal = this._deserializeDataTypes(newVal || {data:[], columns: []});
             this._setValue(newVal);
         },
 
