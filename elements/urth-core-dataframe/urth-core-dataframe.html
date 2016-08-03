@@ -295,29 +295,14 @@ Example:
             if (!df.columnTypes || !df.data) {
                 return df;
             }
-            
-            var deserializeDataColumn = function(aDf, columnIndex, objectType) {
-                aDf.data = aDf.data.map(function(row) {
-                    row[columnIndex] = new objectType(row[columnIndex]);
-                    return row;
-                });
-                return aDf;
-            };
 
-            for (var i=0; i<df.columnTypes.length; i++) {
-                switch(df.columnTypes[i]) {
-                    case "Date":
-                        df = deserializeDataColumn(df, i, Date);
-                        break;
-                    case "Number":
-                        df = deserializeDataColumn(df, i, Number);
-                        break;
-                    case "Boolean":
-                        df = deserializeDataColumn(df, i, Boolean);
-                        break;
-                    case "String":
-                        df = deserializeDataColumn(df, i, String);
-                        break;
+            // JSON accounts for JS primitive types.  Only need to convert Dates.
+
+            for (var i = 0; i < df.columnTypes.length; i++) {
+                if (df.columnTypes[i] == "Date") {
+                    df.data.forEach(function(row) {
+                        row[i] = new Date(row[i]);
+                    });
                 }
             }
             return df;
