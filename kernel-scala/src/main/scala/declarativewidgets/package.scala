@@ -3,8 +3,8 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-import org.apache.toree.kernel.api.Kernel
 import org.apache.spark.repl.SparkIMain
+import org.apache.toree.kernel.api.Kernel
 
 package object declarativewidgets {
 
@@ -136,4 +136,8 @@ package object declarativewidgets {
 
   def channel(chan: String = Default.Channel): Channel =
     WidgetChannels.channel(chan)
+
+  def explore(df: Any, channel: String = "default", selectionVar: String = null): Unit = {
+    util.Explore.explore(df, channel, selectionVar)
+  }
 }

@@ -3,7 +3,10 @@
   * Distributed under the terms of the Modified BSD License.
   */
 
-package declarativewidgets
+package declarativewidgets.util
+
+import declarativewidgets.getKernel
+import declarativewidgets.sparkIMain
 
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.repl.SparkIMain
@@ -12,8 +15,8 @@ import scala.reflect.runtime.universe.ValDef
 /**
   * Object that contains Widget Visualization one line displays
   */
-object WidgetVisualizations {
 
+object Explore {
   /**
     * Gets the currently executing request in SparkIMain used to inspect the explore request
     *
@@ -68,7 +71,7 @@ object WidgetVisualizations {
     * @param channel The channel to bind to defaulted to default
     * @param selectionVar The selection variable by default not used/applied
     */
-  def explore(df: Any, channel: String = "default", selectionVar: String = null) = {
+  def explore(df: Any, channel: String, selectionVar: String) = {
     val selection = if(selectionVar == null) "" else s"selection={{$selectionVar}}"
     df match {
       case d : DataFrame => {
