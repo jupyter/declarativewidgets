@@ -33,6 +33,16 @@
 
         // STEP 5: Define suite(s) and tests.
         describe('_toStringOrArray', function() {
+            it('should return empty array if commaStr is empty string', function () {
+
+                var commaStr = "";
+                expect(Urth.QueryBehavior._toStringOrArray(commaStr)).to.eql([]);
+            });
+            it('should return empty array if commaStr is spaces', function () {
+                
+                var commaStr = "     ";
+                expect(Urth.QueryBehavior._toStringOrArray(commaStr)).to.eql([]);
+            });
             it('should return array of values trimmed', function () {
 
                 var commaStr = "a, b  , c  ";
@@ -45,10 +55,10 @@
                 expect(Urth.QueryBehavior._toStringOrArray(commaStr)).to.eql("a");
             });
 
-            it('should return undefined if only commas and spaces in string', function () {
+            it('should return emptry array if only commas and spaces in string', function () {
 
                 var commaStr = ",,  , ";
-                expect(Urth.QueryBehavior._toStringOrArray(commaStr)).to.be.undefined;
+                expect(Urth.QueryBehavior._toStringOrArray(commaStr)).to.eql([]);
             });
 
             it('should return only non-empty string between the commas', function () {

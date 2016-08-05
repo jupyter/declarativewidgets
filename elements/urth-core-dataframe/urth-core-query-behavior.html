@@ -32,7 +32,7 @@ query elements.
                         .filter(function(part){
                             return !!part;
                         });
-                return arrayVal.length > 1 ? arrayVal : arrayVal[0];
+                return arrayVal.length == 1 ? arrayVal[0] : arrayVal;
             }
 
         };

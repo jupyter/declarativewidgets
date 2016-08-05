@@ -38,11 +38,19 @@
 
         // STEP 5: Define suite(s) and tests.
         describe('isValid', function() {
+            it('should return false if __by and __direction are empty arrays', function () {
+                var elmt = fixture('basic');
+
+                var __by = [];
+                var __direction = [];
+                expect(elmt.isValid(__by,__direction)).to.be.false;
+            });
+
             it('should return false if __by and __direction are same length arrays', function () {
                 var elmt = fixture('basic');
 
                 var __by = ["a", "b", "c"];
-                var __direction = ["asc", "desc", "asc"]
+                var __direction = ["asc", "desc", "asc"];
                 expect(elmt.isValid(__by,__direction)).to.be.true;
             });
 
@@ -50,7 +58,7 @@
                 var elmt = fixture('basic');
 
                 var __by = ["a", "b", "c"];
-                var __direction = ["asc", "desc"]
+                var __direction = ["asc", "desc"];
                 expect(elmt.isValid(__by,__direction)).to.be.false;
             });
 
@@ -58,7 +66,7 @@
                 var elmt = fixture('basic');
 
                 var __by = "a"
-                var __direction = ["asc", "desc"]
+                var __direction = ["asc", "desc"];
                 expect(elmt.isValid(__by,__direction)).to.be.false;
             });
 
@@ -74,19 +82,19 @@
                 var elmt = fixture('basic');
 
                 var __by = "a";
-                var __direction = "asc"
+                var __direction = "asc";
                 expect(elmt.isValid(__by,__direction)).to.be.true;
             });
         });
 
         describe('_buildQuery', function() {
-            it('should return undefined if not valid', function () {
+            it('should return null if not valid', function () {
                 var elmt = fixture('basic');
 
                 var valid = false;
                 var __by = ["a", "b", "c"];
                 var __direction = ["asc", "desc", "asc"]
-                expect(elmt._buildQuery(__by, __direction,valid)).to.be.undefined;
+                expect(elmt._buildQuery(__by, __direction,valid)).to.be.null;
             });
 
             it('should return query structure with arrays', function () {

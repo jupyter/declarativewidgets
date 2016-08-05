@@ -94,7 +94,7 @@ Example:
              */
             isValid: function(__by, __direction){
                 if( Array.isArray(__by) ){
-                    return Array.isArray(__direction) && __by.length === __direction.length;
+                    return __by.length > 0 && Array.isArray(__direction) && __by.length === __direction.length;
                 }
                 else{
                     return !Array.isArray(__direction);
@@ -107,7 +107,7 @@ Example:
              */
             _buildQuery: function(__by,__direction, valid){
                 if( !valid ){
-                    return undefined;
+                    return null;
                 }
 
                 return {
