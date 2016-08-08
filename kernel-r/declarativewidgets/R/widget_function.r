@@ -63,7 +63,7 @@ Widget_Function <- R6Class(
         },
         get_global_function = function(func_name) {
             func_name_parts <- unlist(strsplit(func_name, "$", fixed = TRUE))
-            if(length(func_name_parts > 1)) {
+            if(length(func_name_parts) > 1) {
                 klass <- get(func_name_parts[1], envir = .GlobalEnv)
                 return (klass[[(func_name_parts[2])]])
             } else {
