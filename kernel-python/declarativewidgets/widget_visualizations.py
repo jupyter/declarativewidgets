@@ -4,6 +4,8 @@
 from IPython.core.display import display, HTML
 import pandas
 
+unique_explore_id = 0
+
 def explore(df, channel='default', selection_var=None):
     """
     Renders the urth-viz-explorer widget to the user output
@@ -16,7 +18,9 @@ def explore(df, channel='default', selection_var=None):
     selection_var   The selection variable by default not used/applied
     """
 
-    explore_df = "unique_explore_df_name"
+    global unique_explore_id
+    unique_explore_id += 1
+    explore_df = "unique_explore_df_name_" + str(unique_explore_id)
     if isinstance(df, pandas.DataFrame):
         get_ipython().user_ns[explore_df] = df
     else:
