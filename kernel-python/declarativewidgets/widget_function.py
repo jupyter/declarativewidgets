@@ -9,6 +9,9 @@ from .util.functions import apply_with_conversion, signature_spec
 from .urth_widget import UrthWidget
 from .urth_exception import UrthException
 
+from functools import reduce
+
+
 class Function(UrthWidget):
     """
     A Widget for invoking a function on the kernel.
@@ -40,9 +43,10 @@ class Function(UrthWidget):
             self._sync_state()
 
     def _the_function(self):
-        if self.function_name in self.shell.user_ns:
-            return self.shell.user_ns[self.function_name]
-        else:
+        try:
+            name = self.function_name.split('.')
+            return reduce(lambda x, y: getattr(x, y), [self.shell.user_ns[name.pop(0)]] + name)
+        except (KeyError, AttributeError):
             raise UrthException("Invalid function name {}".format(
                 self.function_name))
 
