@@ -50,9 +50,10 @@ object Explore {
     *
     * @param df DataFrame reference as a String
     * @param channel channel reference as a String
-    * @param selection selection reference as a String
+    * @param properties properties as a String
+    * @param bindings bindings as a String
     */
-  def display(df: String, channel: String, selection: String) = {
+  def display(df: String, channel: String, properties: String, bindings: String) = {
     val explorerImport =
       """
         <link rel='import' href='urth_components/declarativewidgets-explorer/urth-viz-explorer.html'
@@ -60,8 +61,27 @@ object Explore {
       """
     getKernel.display.html(s"$explorerImport " +
                             s"<template is='urth-core-bind' channel='$channel'>" +
-                              s"<urth-viz-explorer ref='$df' $selection></urth-viz-explorer>" +
+                              s"<urth-viz-explorer ref='$df' $properties $bindings></urth-viz-explorer>" +
                             "</template>")
+  }
+
+  def stringifyProperties(properties: Map[String, Any]) = {
+    properties.map {
+      case (k, v) => {
+        v match {
+          case isProp: Boolean => if(isProp) k else ""
+          case _ => k + "=" + v
+        }
+      }
+    }.mkString(" ")
+  }
+
+  def stringifyBindings(bindings: Map[String, String]) = {
+    bindings.map {
+      case (k, v) => {
+        s"$k={{$v}}"
+      }
+    }.mkString(" ")
   }
 
   /**
@@ -69,17 +89,17 @@ object Explore {
     *
     * @param df The (Spark DataFrame or String of the variable)
     * @param channel The channel to bind to defaulted to default
-    * @param selectionVar The selection variable by default not used/applied
+    * @param properties Map of properties e.g. {'selection-as-object': False, 'foo': 5}
+    * @param bindings Map of bindings e.g. {'selection': 'sel'}
     */
-  def explore(df: Any, channel: String, selectionVar: String) = {
-    val selection = if(selectionVar == null) "" else s"selection={{$selectionVar}}"
+  def explore(df: Any, channel: String, properties: Map[String, Any], bindings: Map[String, String]) = {
     df match {
       case d : DataFrame => {
         val dfString = getDfNameFromLastExploreRequest()
-        display(dfString, channel, selection)
+        display(dfString, channel, stringifyProperties(properties), stringifyBindings(bindings))
       }
       case s: String => {
-        display(s, channel, selection)
+        display(s, channel, stringifyProperties(properties), stringifyBindings(bindings))
       }
     }
   }
