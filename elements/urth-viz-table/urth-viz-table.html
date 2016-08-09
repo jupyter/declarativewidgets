@@ -112,6 +112,14 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 sortOrder: {
                     type: String,
                     notify: true
+                },
+
+                disableLocalSort: {
+                    type: Boolean,
+                    value: function() {
+                        return false;
+                    },
+                    notify: true
                 }
             },
 
@@ -307,7 +315,12 @@ The table accepts data via attribute `datarows` and column headers via attribute
 
                     // update rowActive so _handleSelection can update selectionInfo
                     this.rowActive = physicalIndex;
-                    this.hot.selectCell(physicalIndex, 0, physicalIndex, this.columns.length - 1, true);
+                    if (physicalIndex != -1) {
+                        this.hot.selectCell(physicalIndex, 0, physicalIndex, this.columns.length - 1, true);
+                    } else {
+                        this.selectionIndex = -1;
+                        this.hot.deselectCell();
+                    }
                 }
             },
 
@@ -398,6 +411,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         }.bind(this),
                         beforeColumnSort: function() {
                             this.selectionIndex = -1;
+                            if (this.disableLocalSort) {
+                                return false; // if sort column is set, return false to disable Handson sort
+                            }
                         }.bind(this),
                         afterColumnSort: function(colIndex, order) {
                             // store sorted column and sorted order
