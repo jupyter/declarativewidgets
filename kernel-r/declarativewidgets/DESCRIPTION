@@ -26,7 +26,7 @@ Collate:
     'widget_function.r'
     'widget_channels.r'
     'widget_dataframe.r'
-    'widget_visualizations.r'
+    'explore.r'
     'serializer.r'
     'serializers.r'
     'querier.r'
