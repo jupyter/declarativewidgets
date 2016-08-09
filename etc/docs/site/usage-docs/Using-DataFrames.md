@@ -2,9 +2,17 @@ DataFrame is a very popular API for data analysis. Python has Pandas DataFrames,
 
 The `urth-core-dataframe` element brings a representation of an actual DataFrame into the HTML template. It allows other elements in the template to visualize the data held by the DataFrame.
 
-The following code shows an example of using `urth-core-dataframe` to visualize a Spark DataFrame.
+#### Exploring the DataFrame
 
-> TODO: Code or Image of example here
+```python
+from declarativewidgets import explore
+explore(df, channel='default', selection_var=None)
+```
+* Enables visual exploration of different types of DataFrames across all kernels (Python, Scala, and R)
+* `explore`'s df parameter supports using the actual DataFrame or the String representation of the DataFrame variable
+* For more information see [declarativewidgets_explorer](https://github.com/jupyter-incubator/declarativewidgets_explorer)
+
+![](https://raw.githubusercontent.com/jupyter-incubator/declarativewidgets_explorer/master/media/explorer_screencast.gif)
 
 #### Connecting the element to the DataFrame
 
