@@ -14,12 +14,22 @@ describe('Widgets System Test', function() {
             .text().should.eventually.include('Luke')
             .nodeify(done);
     });
+
     it('should print the correct variable that is used for urth-core-function', function(done) {
         boilerplate.browser
             .waitForElementById('invokeButton', wd.asserters.isDisplayed, 10000)
             .click()
             .click() // Safari requires extra click for some reason
             .waitForElementById('test1', wd.asserters.textInclude('world'), 10000)
+            .nodeify(done);
+    });
+
+    it('should print the correct variable that is used for urth-core-function that is within an object', function(done) {
+        boilerplate.browser
+            .waitForElementById('invokeButtonWithinObj', wd.asserters.isDisplayed, 10000)
+            .click()
+            .click() // Safari requires extra click for some reason
+            .waitForElementById('testWithinObj', wd.asserters.textInclude('world'), 10000)
             .nodeify(done);
     });
 

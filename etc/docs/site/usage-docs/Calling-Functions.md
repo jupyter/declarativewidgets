@@ -19,7 +19,20 @@ def someFunction(a,b,c):
 
 ```html
 %%HTML
-<urth-core-function arg-a="..." arg-b="..." arg-c="..." result="..."></urth-core-function>
+<urth-core-function ref='t' arg-a="..." arg-b="..." arg-c="..." result="..."></urth-core-function>
+```
+
+Note function references are not limited to notebook level variable declarations, but can also be in reference to functions within objects.
+For example, given the following `Test` class:
+```Python
+class Test:
+    def math(self, x, y):
+        return x*y
+t = Test()
+```
+We can then reference it as
+```html
+<urth-core-function ref='t.math' ...></urth-core-function>
 ```
 
 #### Connecting the element to the function

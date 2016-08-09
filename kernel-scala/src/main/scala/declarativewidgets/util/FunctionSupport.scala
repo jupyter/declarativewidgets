@@ -42,7 +42,8 @@ trait FunctionSupport {
    * Invoke the given watch handler with the given arguments. Arguments are
    * converted from JSON values into their corresponding Scala types prior
    * to invocation.
-   * @param arg1Json JSON representation of the first handler argument.
+    *
+    * @param arg1Json JSON representation of the first handler argument.
    * @param arg2Json JSON representation of the second handler argument.
    * @param handler Handler function to invoke.
    * @return Some(()) if successful, None if an error occurs during invocation.
@@ -58,7 +59,8 @@ trait FunctionSupport {
    * must be present prior to function invocation.
    *
    * Returns None when the function cannot be found in the interpreter.
-   * @param funcName The name of the function.
+    *
+    * @param funcName The name of the function.
    * @return Signature or None.
    */
   def signature(funcName: String): Option[Signature]
@@ -105,7 +107,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
    * value is included when the parameter has a default value.
    *
    * Returns None when the function cannot be found in the interpreter.
-   * @param funcName The name of the function.
+    *
+    * @param funcName The name of the function.
    * @return Signature or None.
    */
   override def signature(funcName: String): Option[Signature] =
@@ -128,7 +131,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
    * each parameter of the function with the given name.
    *
    * Returns None when the function cannot be found in the interpreter.
-   * @param funcName The name of the function.
+    *
+    * @param funcName The name of the function.
    * @return List of (parameter_name, parameter_type) or None.
    */
   private[util] def argTypes(funcName: String): Option[List[(String, Type)]] =
@@ -151,7 +155,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
   /**
    * Returns a map of parameter_name -> parameter_default_value for
    * each default parameter of the function with the given name.
-   * @param funcName The name of the function.
+    *
+    * @param funcName The name of the function.
    * @return Map of parameter_name -> parameter_default_value or None.
    */
   private[util] def argDefaults(funcName: String): Option[Map[String, Any]] =
@@ -257,7 +262,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
 
   /**
    * Convert an array String, e.g. [1, 2, 3] to a JsArray.
-   * @param value array String
+    *
+    * @param value array String
    * @return JsArray representing the array found in the String
    */
   private[util] def convertStringArray(value: String): JsArray =
@@ -265,7 +271,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
 
   /**
    * Convert an object String, e.g. {"a": 1} to a JsObject.
-   * @param value object String
+    *
+    * @param value object String
    * @return JsObject representing the object found in the String
    */
   private[util] def convertStringObject(value: String): JsObject =
@@ -273,7 +280,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
 
   /**
    * Converts the given value to an AnyRef when possible.
-   * @param value
+    *
+    * @param value
    * @return AnyRef representation of the given value
    */
   private[util] def toAnyRef(value: Any): AnyRef = value match {
@@ -294,7 +302,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
 
   /**
    * Find the name of the JavaScript type corresponding to the given Scala Type.
-   * @param tpe Scala Type
+    *
+    * @param tpe Scala Type
    * @return name of JavaScript type for tpe
    */
   private[util] def jsType(tpe: Type): String =
@@ -316,7 +325,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
 
   /**
    * Convert the given JSON value to its corresponding Scala runtime type.
-   * @param x The JSON value to convert.
+    *
+    * @param x The JSON value to convert.
    * @return Value with converted Scala runtime type.
    */
   def convertJsValue(x: JsValue): Any = x match {
@@ -333,7 +343,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
   /**
    * Retrieve the class instance for the interpreter code request that
    * contained the declaration of the method with the given name.
-   * @param methodName
+    *
+    * @param methodName
    * @return Request instance or None if no request is found
    */
   private[util] def requestReadClassInstance(
@@ -357,17 +368,41 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
   }
 
   /**
-   * Invokes the method by recursively calling iw() on the Request instance
-   * until the real method is reached.
-   *
-   * @param obj instance of request read class for the given method name
-   * @param methodName name of the method to invoke
-   * @param args
-   * @return result of invocation
-   */
-  private[util] def evalMethod(
-    obj: AnyRef, methodName: String, args: AnyRef*
-  ): AnyRef = {
+    * Invokes the class level method by getting a handle of the class from the kernel and invoking the declared method
+    *
+    * @param obj instance of request read class for the given method name
+    * @param className name of the class to invoke
+    * @param methodName name of the method to invoke
+    * @param args
+    * @return result of invocation
+    */
+  private[util] def evalClassLevelMethod(
+                                       obj: AnyRef, className: String, methodName: String, args: AnyRef*
+                                     ): AnyRef = {
+    kernelInterpreter.read(className) match {
+      case Some(klass) => {
+        val theMethod = klass.getClass.getDeclaredMethods.filter(_.getName.equals(methodName)).last
+        theMethod.invoke(klass, args: _*)
+      }
+      case None => {
+        logger.trace(s"Interpreter could not find the class $className used to look for the method $methodName")
+        None
+      }
+    }
+  }
+
+  /**
+    * Invokes the method by recursively calling iw() on the Request instance
+    * until the real method is reached.
+    *
+    * @param obj instance of request read class for the given method name
+    * @param methodName name of the method to invoke
+    * @param args
+    * @return result of invocation
+    */
+  private[util] def evalDefinedMethod(
+                                       obj: AnyRef, methodName: String, args: AnyRef*
+                                     ): AnyRef = {
     val iwMethod = obj.getClass.getDeclaredMethods.find(
       _.getName.endsWith("$iw")
     )
@@ -384,8 +419,30 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
   }
 
   /**
+    * Invokes the method by recursively calling iw() on the Request instance
+    * until the real method is reached.
+    *
+    * @param obj instance of request read class for the given method name
+    * @param methodName name of the method to invoke
+    * @param args
+    * @return result of invocation
+    */
+  private[util] def evalMethod(
+                                obj: AnyRef, methodName: String, args: AnyRef*
+                              ): AnyRef = {
+    val methodNameParts = methodName.split('.')
+    if (methodNameParts.length > 1) {
+      evalClassLevelMethod(obj, methodNameParts(0), methodNameParts(1), args: _*)
+    }
+    else {
+      evalDefinedMethod(obj, methodNameParts(0), args: _*)
+    }
+  }
+
+  /**
    * Invoke the method with the given name using the given arguments.
-   * @param methodName
+    *
+    * @param methodName
    * @param args
    * @return result of method invocation or None if the method was not found.
    */
@@ -444,7 +501,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
   /**
    * Execute the given function that returns an Option type, catching execution
    * errors.
-   * @param f The function to execute.
+    *
+    * @param f The function to execute.
    * @param funcName The name of the function to execute.
    * @tparam T Type of underlying data that the function `f` returns.
    * @return Success(function result data) or Failure if execution fails.
@@ -458,7 +516,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
    * Invoke the given watch handler with the given arguments. Arguments are
    * converted from JSON values into their corresponding Scala types prior
    * to invocation.
-   * @param arg1Json JSON representation of the first handler argument.
+    *
+    * @param arg1Json JSON representation of the first handler argument.
    * @param arg2Json JSON representation of the second handler argument.
    * @param handler Handler function to invoke.
    * @return Some(()) if successful, None if an error occurs during invocation.
@@ -485,23 +544,95 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
   }
 
   /**
-   * Retrieves the Symbol representing the item (e.g. variable, method) with
-   * the given name. If multiple symbols exist for the given name, chooses
-   * the most recently declared symbol.
-   * @param name retrieve the Symbol corresponding to this name
-   * @return Some(symbol for name) or None if no symbol was found
-   */
-  private[util] def getSymbol(name: String): Option[iMain.global.Symbol] = {
+    * Retrieves the class name (String) of the defined names value definition
+    * e.g. t = new Test() -> Test, given t as the name
+    *
+    * @param name defined name to get the class value definition name from
+    * @return Some(class value definition name) or None if request was not found
+    */
+  private[util] def classNameOfRequest(name: String) = {
+    getRequest(name) match {
+      case Some(req) => {
+        val valDef = req.trees.head.asInstanceOf[reflect.runtime.universe.Tree] collect{case c: ValDef => c.rhs}
+        val regex = "new ".r
+        valDef.lastOption.map(x => {
+          val className = regex.replaceFirstIn(x.toString(), "")
+          className.substring(0, className.indexOf("("))
+        })
+      }
+      case None => None
+    }
+  }
+
+  /**
+    * Retrieves the Method Symbol if found under the members of the given class name
+    *
+    * @param className class name to look for the method symbol under
+    * @param methodName retrieve the method symbol under this name given the class
+    * @return Some(method symbol) or None if the method symbol was not found
+    */
+  private[util] def getMethodSymbol(className: String, methodName: String): Option[iMain.global.Symbol] = {
+    iMain.classSymbols.filter(klass => {
+      val klassName = klass.nameString
+      klassName.substring(klassName.lastIndexOf('$')+1).equals(className)
+    }).lastOption match {
+      case Some(classSym) => {
+        classSym.toType.members.filter(_.nameString.equals(methodName)).lastOption
+      }
+      case None => {
+        logger.trace(s"No symbol found for $className.$methodName")
+        None
+      }
+    }
+  }
+
+  /**
+    * Retrieves the Symbol representing the item (e.g. variable, method) with
+    * the given name. If multiple symbols exist for the given name, chooses
+    * the most recently declared symbol.
+    *
+    * @param symbolName retrieve the Symbol corresponding to this name
+    * @return Some(symbol for name) or None if no symbol was found
+    */
+  private[util] def getDefinedSymbol(symbolName: String): Option[iMain.global.Symbol] = {
     val symbolList = iMain.definedSymbolList
-    logger.trace(s"Getting symbol for $name. Symbols: ${symbolList}")
-    symbolList.filter(_.nameString == name).toList match {
+    logger.trace(s"Getting symbol for $symbolName. Symbols: ${symbolList}")
+    symbolList.filter(_.nameString == symbolName).toList match {
       case Nil =>
-        logger.trace(s"No symbol found for $name")
+        logger.trace(s"No symbol found for $symbolName")
         None
       case lst =>
         val sym = lst.last
-        logger.trace(s"Symbol $sym found for $name")
+        logger.trace(s"Symbol $sym found for $symbolName")
         Some(sym)
+    }
+  }
+
+  /**
+    * Retrieves the symbol representing the item (e.g. variable, method, method within object)
+    * with the given name.  If multiple symbols exist for the given name, chooses the most
+    * recently declared symbol.  This method will delegate if the symbol is in the top level
+    * user defined symbol list or if it is nested under a class symbol.
+    *
+    * @param name retrieve teh Symbol corresponding to this name
+    * @return Some (symbol for name) or None if no symbol was found
+    */
+  private[util] def getSymbol(name: String): Option[iMain.global.Symbol] = {
+    val symbolParts = name.split('.')
+    if (symbolParts.length > 1) {
+      val className = classNameOfRequest(symbolParts(0))
+      className match {
+        case Some(cName) => {
+          getMethodSymbol(cName, symbolParts(1))
+        }
+        case None => {
+          logger.trace(s"No symbol found for $name")
+          None
+        }
+      }
+    }
+    else {
+      getDefinedSymbol(symbolParts(0))
     }
   }
 
@@ -511,6 +642,62 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
       case None => throw new RuntimeException(s"Symbol $name not found!")
     }
 
+  /**
+    * Get the tree corresponding to the defined request
+    *
+    * @param definedName name of method or val from the defined names
+    * @return The AST of the request
+    */
+  private[util] def getTreeFromDefinedRequest(definedName: String): Option[reflect.runtime.universe.Tree] = {
+    getRequest(definedName).map(_.asInstanceOf[org.apache.spark.repl.SparkIMain#Request])
+      .map(_.trees.head.asInstanceOf[reflect.runtime.universe.Tree])
+  }
+
+  /**
+    * Get the tree corresponding to the method request
+    *
+    * @param className name of the class for which the method resides in
+    * @param methodName name of the method
+    * @return The AST of the request
+    */
+  private[util] def getTreeFromMethodRequest(className: String, methodName: String): Option[reflect.runtime.universe.Tree] = {
+    val requests = iMain.getClass.getDeclaredMethods.filter(_.getName.contains("prevRequestList")).head.
+      invoke(iMain).asInstanceOf[List[_]].map(_.asInstanceOf[org.apache.spark.repl.SparkIMain#Request])
+    val requestTrees = requests.map(_.trees.head.asInstanceOf[reflect.runtime.universe.Tree])
+    val classRequestTree = requestTrees.filter(i => {
+      val classDefs = i collect {case c: ClassDef => c}
+      classDefs.length > 0 && classDefs.last.name.toString.equals(className)
+    })
+    val methodsTree = classRequestTree.map(i => {
+      i collect { case v: DefDef => v }
+    }).head
+    methodsTree.filter(_.name.toString.equals(methodName)).lastOption
+  }
+
+  /**
+    * Get the tree corresponding to the request
+    *
+    * @param name name of method, val, or nested method
+    * @return Tree for the given defined name
+    */
+  private[util] def getTreeFromRequest(name: String): Option[reflect.runtime.universe.Tree] = {
+    val nameParts = name.split('.')
+    if (nameParts.length > 1) {
+      val className = classNameOfRequest(nameParts(0))
+      className match {
+        case Some(cName) => {
+          getTreeFromMethodRequest(cName, nameParts(1))
+        }
+        case None => {
+          logger.trace(s"No symbol found for $name")
+          None
+        }
+      }
+    } else {
+      getTreeFromDefinedRequest(nameParts(0))
+    }
+  }
+
   /** Get the interpreter Request object for the line of code that
     * contained the given name.
     *
@@ -518,10 +705,11 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
     * @return Request for the given name or None if it cannot be found
     */
   private def getRequest(name: String) = {
-    iMain.requestForName(iMain.global.newTermName(name)) match {
+    val requestName = name.split('.').head
+    iMain.requestForName(iMain.global.newTermName(requestName)) match {
       case Some(req) => Some(req)
       case None =>
-        logger.error(s"Interpreter request for $name not found!")
+        logger.error(s"Interpreter request for $requestName not found!")
         None
     }
   }
@@ -550,7 +738,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
   /**
    * Returns the argument names and types for the method represented by
    * the given Symbol in the interpreter.
-   * @param s symbol for the method
+    *
+    * @param s symbol for the method
    * @return list of (argument_name, argument_type) or None
    */
   private[util] def defArgTypes(s: iMain.global.Symbol): Option[List[(String, Type)]] =
@@ -561,16 +750,16 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
   /**
    * Returns a mapping of argument name to argument default value for
    * default arguments in the method represented by the given Symbol.
-   * @param s symbol for the method
+    *
+    * @param s symbol for the method
    * @param name name of the method
    * @return map of argument_name -> argument_default_value or None
    */
   private[util] def defArgDefaults(
     s: iMain.global.Symbol, name: String
   ): Option[Map[String, Any]] = {
-    getRequest(name) match {
-      case Some(req) =>
-        val tree = req.trees.head.asInstanceOf[reflect.runtime.universe.Tree]
+    getTreeFromRequest(name) match {
+      case Some(tree) =>
         val valDefs = tree collect { case v: ValDef => v }
         val defaults = s.typeSignature.params.zipWithIndex.
           filter(_._1.isParamWithDefault).map { case (p, i) => {
@@ -584,7 +773,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
 
   /**
    * Retrieves the right-hand-side of the given value definition.
-   * @param v object representing the value definition.
+    *
+    * @param v object representing the value definition.
    * @return Value assigned in the value definition, or None.
    */
   private[util] def extractValueFromValDef(v: ValDef): Option[Any] = {
@@ -608,7 +798,8 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
 
   /**
    * Finds the argument names and types for a function val with the given name.
-   * @param funcName name of the variable containing the function
+    *
+    * @param funcName name of the variable containing the function
    * @return list of (argument_name, argument_type) or None
    */
   private[util] def valArgTypes(funcName: String): Option[List[(String, Type)]] = for {
@@ -624,8 +815,7 @@ trait StandardFunctionSupport extends FunctionSupport with LogLike {
    * @return list of argument names, or None if the names cannot be retrieved
    */
   private[util] def valArgNames(funcName: String, numArgs: Int): Option[List[String]] = {
-    getRequest(funcName) map { case req => {
-      val tree = req.trees.head.asInstanceOf[reflect.runtime.universe.Tree]
+    getTreeFromRequest(funcName) map { case tree => {
       val funcTree = (tree collect { case x: Function  => x} ).head
       val argVals  = (funcTree collect { case v: ValDef => v } ).take(numArgs)
       val argNames = argVals.map(v => v.name.decoded)

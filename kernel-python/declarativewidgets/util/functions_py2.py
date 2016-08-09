@@ -5,8 +5,14 @@
 
 import inspect
 
-def parameter_types(func):
+def get_arg_spec(func):
     sig = inspect.getargspec(func)
+    if "self" in sig.args:
+        sig.args.remove("self")
+    return sig
+
+def parameter_types(func):
+    sig = get_arg_spec(func)
     required = required_parameter(func)
     default = default_parameters(func)
 
@@ -21,7 +27,7 @@ def parameter_types(func):
 
 
 def default_parameters(func):
-    sig = inspect.getargspec(func)
+    sig = get_arg_spec(func)
 
     if sig.defaults:
         return dict(zip(sig.args[-len(sig.defaults):], sig.defaults))
@@ -30,7 +36,7 @@ def default_parameters(func):
 
 
 def required_parameter(func):
-    sig = inspect.getargspec(func)
+    sig = get_arg_spec(func)
 
     if sig.defaults:
         return list(set(sig.args) - set(sig.args[-len(sig.defaults):]))

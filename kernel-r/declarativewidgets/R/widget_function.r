@@ -61,9 +61,18 @@ Widget_Function <- R6Class(
             response <- self$send_signature(func_name, self$limit)
             self$handle_function_response(response)
         },
+        get_global_function = function(func_name) {
+            func_name_parts <- unlist(strsplit(func_name, "$", fixed = TRUE))
+            if(length(func_name_parts) > 1) {
+                klass <- get(func_name_parts[1], envir = .GlobalEnv)
+                return (klass[[(func_name_parts[2])]])
+            } else {
+                return (get(func_name_parts[1], envir = .GlobalEnv))
+            }
+        },
         invoke_function = function(func_name, args, limit=self$limit) {
             #get function from user/global env
-            func <- get(func_name, envir = .GlobalEnv)
+            func <- self$get_global_function(func_name)
             #resolve args from defined env with args from client
             converted_args <- self$convert_args(func, args)
             #call the function with the list of args (convert_args is a list of values in order)
@@ -122,7 +131,7 @@ Widget_Function <- R6Class(
         get_signature = function(func_name) {
             names <- list()
             tryCatch({
-                func <- get(func_name, envir = .GlobalEnv)
+                func <- self$get_global_function(func_name)
                 func_param_list <- formals(func)
                 for(param in names(func_param_list)) {
                     names[[param]] <- list()
