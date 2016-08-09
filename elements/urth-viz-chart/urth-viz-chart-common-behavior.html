@@ -467,6 +467,21 @@
                         config(chart);
                     }
 
+                    // Convert xbounds to dates, if needed
+                    if (this.columnSettings && this.columnSettings[this.primary] && this.columnSettings[this.primary].type == 'date') {
+                        this.xbounds = this.xbounds && this.xbounds.map(function(d) { return new Date(d); });
+                        if (this.datarows.length === 1 && !this.xbounds) {
+                            // Create a domain to work around issue novus/nvd3#1703
+                            var point = +new Date(this.datarows[0][0]), delta = 24*60*60*1000;
+                            this.xbounds = [new Date(point - delta), new Date(point + delta)];
+                        }
+                    }
+
+                    // Convert ybounds to dates, if needed
+                    if (this.columnSettings && this.columnSettings[this.secondary || 1] && this.columnSettings[this.secondary || 1].type == 'date') {
+                        this.ybounds = this.ybounds && this.ybounds.map(function(d) { return new Date(d); });
+                    }
+
                     this._formatAxes();
 
                     if (this.height) {
