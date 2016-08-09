@@ -3,6 +3,7 @@
 
 from IPython.core.display import display, HTML
 import pandas
+import pyspark
 
 unique_explore_id = 0
 
@@ -21,7 +22,7 @@ def explore(df, channel='default', selection_var=None):
     global unique_explore_id
     unique_explore_id += 1
     explore_df = "unique_explore_df_name_" + str(unique_explore_id)
-    if isinstance(df, pandas.DataFrame):
+    if isinstance(df, pandas.DataFrame) or isinstance(df, pyspark.sql.DataFrame):
         get_ipython().user_ns[explore_df] = df
     else:
         explore_df = df

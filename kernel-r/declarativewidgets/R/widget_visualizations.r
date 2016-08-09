@@ -38,7 +38,7 @@ explore <- function(df, channel='default', selection_var=NULL) {
         return (unique_df_name)
     }
 
-    exlore_df_name <- ifelse(class(df) == "data.frame", register_explore_df(df), df)
+    exlore_df_name <- ifelse(class(df) == "data.frame" || class(df) == "DataFrame", register_explore_df(df), df)
     selection <- ifelse(is.null(selection_var), "", paste("selection={{", selection_var, "}}", sep=""))
 
     IRdisplay::display_html(paste("<link rel='import' href='urth_components/declarativewidgets-explorer/urth-viz-explorer.html'
