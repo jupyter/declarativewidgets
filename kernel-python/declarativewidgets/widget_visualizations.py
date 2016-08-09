@@ -2,13 +2,37 @@
 # Distributed under the terms of the Modified BSD License.
 
 from IPython.core.display import display, HTML
+import pandas
+import pyspark
+
+unique_explore_id = 0
 
 def explore(df, channel='default', selection_var=None):
-    """Renders the urth-viz-explorer widget to the user output"""
+    """
+    Renders the urth-viz-explorer widget to the user output
+    If pandas.DataFrame assign with unique name to user namespace else use what was passed in the string
+
+    Parameters
+    ----------
+    df              The dataframe itself or the string representation of the variable
+    channel         The channel to bind to defaulted to default
+    selection_var   The selection variable by default not used/applied
+    """
+
+    global unique_explore_id
+    unique_explore_id += 1
+    explore_df = "unique_explore_df_name_" + str(unique_explore_id)
+    if isinstance(df, pandas.DataFrame) or isinstance(df, pyspark.sql.DataFrame):
+        get_ipython().user_ns[explore_df] = df
+    else:
+        explore_df = df
+
+    selection = 'selection="{{{{{}}}}}"'.format(selection_var) if selection_var else ''
+
     display(HTML(
         """<link rel='import' href='urth_components/declarativewidgets-explorer/urth-viz-explorer.html'
                is='urth-core-import' package='jupyter-incubator/declarativewidgets_explorer'>
            <template is="urth-core-bind" channel="{channel}">
                <urth-viz-explorer ref='{ref}' {selection}></urth-viz-explorer>
-           </template>""".format(ref=df, channel=channel, selection = 'selection="{{{{{}}}}}"'.format(selection_var) if selection_var else '')
+           </template>""".format(ref=explore_df, channel=channel, selection=selection)
     ))
