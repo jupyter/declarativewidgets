@@ -96,6 +96,28 @@ The table accepts data via attribute `datarows` and column headers via attribute
                     type: Number,
                     value: 15,
                     reflectToAttribute: true
+                },
+
+                /**
+                 * Name of column that the table is sorted by
+                 */
+                sortColumn: {
+                    type: String,
+                    notify: true
+                },
+
+                /**
+                 * 'asc' or 'desc' for the sort order the sortColumn is sorted by
+                 */
+                sortOrder: {
+                    type: String,
+                    notify: true
+                },
+
+                disableLocalSort: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
                 }
             },
 
@@ -132,6 +154,15 @@ The table accepts data via attribute `datarows` and column headers via attribute
                   colHeaders: newColumns,
                   columns: columnSettings
                 });
+
+                // check if sortColumn is still in newColumns
+                var keepSortColumn = newColumns.some(function(col) {
+                    return col == this.sortColumn;
+                }.bind(this));
+                if (!keepSortColumn) {
+                    this.sortColumn = "";
+                    this.sortOrder = "";
+                }
             },
 
             _updateDatarows: function (newDataRows) {
@@ -156,6 +187,9 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         this.hot.loadData(newDataRows);
                     }
                 }
+
+                // this could have been a result of kernel sort, so need to handle selection after sort
+                this._handleAfterSort();
             },
 
             computeTableView: function(datarows, columns) {
@@ -177,6 +211,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         // reset selection to null if it was previously set
                         if (this.selection) {
                             this._setSelection(null);
+                            this._setSelectionInfo(null);
                             // deselect range that was previously highlighted
                             this.hot.deselectCell();
                         }
@@ -243,13 +278,11 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 } else {
                     this._setSelection(selection);
                 }
-                // store selectedRow, so after sorting, we can look for this row
-                this.selectedRow = selection;
             },
 
             _handleAfterSort: function() {
                 // if there is a previous selection, we need to handle re-highlighting it
-                if (this.selectedRow) {
+                if (this.selection) {
                     // since table has been sorted, the selectionIndex is not always the correct index
                     // of data anymore. Because even though the table view is sorted, this.datarows stays the same
 
@@ -278,8 +311,14 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         }
                     });
 
-                    // highligh the selection by setting this.selectionIndex to physicalIndex
-                    this.selectionIndex = physicalIndex > -1 ? physicalIndex : this.selectionIndex;
+                    // update rowActive so _handleSelection can update selectionInfo
+                    this.rowActive = physicalIndex;
+                    if (physicalIndex != -1) {
+                        this.hot.selectCell(physicalIndex, 0, physicalIndex, this.columns.length - 1, true);
+                    } else {
+                        this.selectionIndex = -1;
+                        this.hot.deselectCell();
+                    }
                 }
             },
 
@@ -370,8 +409,17 @@ The table accepts data via attribute `datarows` and column headers via attribute
                         }.bind(this),
                         beforeColumnSort: function() {
                             this.selectionIndex = -1;
+                            if (this.disableLocalSort) {
+                                return false; // if sort column is set, return false to disable Handson sort
+                            }
                         }.bind(this),
-                        afterColumnSort: this._handleAfterSort.bind(this),
+                        afterColumnSort: function(colIndex, order) {
+                            // store sorted column and sorted order
+                            this.sortColumn = this.columns[colIndex];
+                            this.sortOrder = order ? 'asc' : 'desc';
+
+                            this._handleAfterSort();
+                        }.bind(this),
                         afterRender: function(isForced) {
                             if (isForced && !this._rendered) {
                                 this._rendered = true;

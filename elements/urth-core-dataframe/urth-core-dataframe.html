@@ -282,8 +282,8 @@ Example:
          */
         onModelValueChange: function(newVal){
             this._debug( "urth-core-dataframe onModelValueChange", newVal );
-            newVal = this._deserializeDataTypes(newVal || {data:[]});
-            this._setValue(newVal || {data:[]});
+            newVal = this._deserializeDataTypes(newVal || {data:[], columns: []});
+            this._setValue(newVal);
         },
 
         /*
@@ -317,6 +317,7 @@ Example:
               this._clearErrorMessages();
             } else {
               this.displayErrorMessage(newStatus.msg);
+              this.onModelValueChange(); // need to set value to empty data on error
             }
         },
 
