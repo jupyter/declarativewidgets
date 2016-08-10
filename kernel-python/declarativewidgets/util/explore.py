@@ -7,16 +7,33 @@ import pyspark
 
 unique_explore_id = 0
 
-def explore(df, channel='default', selection_var=None):
+def stringify_properties(properties):
+    properties_str = ""
+    for k in properties:
+        if type(properties[k]) == bool:
+            if properties[k]:
+                properties_str += k + " "
+        else:
+            properties_str += '{}="{}" '.format(k, str(properties[k]))
+    return properties_str
+
+def stringify_bindings(bindings):
+    bindings_str = ""
+    for k in bindings:
+        bindings_str += '{}="{{{{{}}}}}"'.format(k, bindings[k])
+    return bindings_str
+
+def explore(df, channel='default', properties={}, bindings={}):
     """
     Renders the urth-viz-explorer widget to the user output
     If pandas.DataFrame assign with unique name to user namespace else use what was passed in the string
 
     Parameters
     ----------
-    df              The dataframe itself or the string representation of the variable
-    channel         The channel to bind to defaulted to default
-    selection_var   The selection variable by default not used/applied
+    df                  The dataframe itself or the string representation of the variable
+    channel             The channel to bind to defaulted to default
+    properties          The properties e.g. {'selection-as-object': False, 'foo': 5}
+    bindings            The bindings e.g. {'selection': 'sel'}
     """
 
     global unique_explore_id
@@ -27,12 +44,12 @@ def explore(df, channel='default', selection_var=None):
     else:
         explore_df = df
 
-    selection = 'selection="{{{{{}}}}}"'.format(selection_var) if selection_var else ''
-
     display(HTML(
         """<link rel='import' href='urth_components/declarativewidgets-explorer/urth-viz-explorer.html'
                is='urth-core-import' package='jupyter-incubator/declarativewidgets_explorer'>
            <template is="urth-core-bind" channel="{channel}">
-               <urth-viz-explorer ref='{ref}' {selection}></urth-viz-explorer>
-           </template>""".format(ref=explore_df, channel=channel, selection=selection)
+               <urth-viz-explorer ref='{ref}' {props} {binds}></urth-viz-explorer>
+           </template>"""
+            .format(ref=explore_df, channel=channel,
+                    props=stringify_properties(properties), binds=stringify_bindings(bindings))
     ))

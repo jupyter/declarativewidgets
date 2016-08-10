@@ -137,7 +137,7 @@ package object declarativewidgets {
   def channel(chan: String = Default.Channel): Channel =
     WidgetChannels.channel(chan)
 
-  def explore(df: Any, channel: String = "default", selectionVar: String = null): Unit = {
-    util.Explore.explore(df, channel, selectionVar)
+  def explore(df: Any, channel: String = "default", properties: Map[String, Any] = Map(), bindings: Map[String, String] = Map()): Unit = {
+    util.Explore.explore(df, channel, properties, bindings)
   }
 }
