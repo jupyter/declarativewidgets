@@ -20,6 +20,7 @@
 
     <!-- STEP 2: Import the element to test. -->
     <link rel='import' href='../urth-core-channel.html'>
+    <link rel='import' href='../urth-core-channel-item.html'>
 </head>
 
 <body>
@@ -39,6 +40,16 @@
     <test-fixture id="channelConsumer">
         <template>
             <test-channel-consumer></test-channel-consumer>
+        </template>
+    </test-fixture>
+
+    <test-fixture id="filterItems">
+        <template>
+            <urth-core-channel id="channelWithItems">
+                <urth-core-channel-item key="foo" value="bar"></urth-core-channel-item>
+                <urth-core-channel-item key="bar" value="awesome"></urth-core-channel-item>
+                <urth-core-channel-item key="baz" value=true></urth-core-channel-item>
+            </urth-core-channel>
         </template>
     </test-fixture>
 
@@ -618,6 +629,33 @@
                 expect(propSpyArgs[0]).to.equal('foo.value');
                 expect(propSpyArgs[1]).to.equal('none');
                 expect(propSpyArgs[2]).to.equal('all');
+            });
+        });
+
+        describe('filter channel items', function() {
+            it('should filter channel items.', function() {
+                var test = fixture('filterItems');
+
+                channel.register(test);
+    
+                var data = {
+                    'foo' : 'bar',
+                    'bar' : 'awesome',
+                    'baz' : true
+                };
+
+                var filterFunc = function(item) {
+                    if (item.value && item.value) {
+                        return item.value === 'awesome';
+                    }
+                    return false;
+                };
+
+                var filteredData = test.filterChannelItems(data, filterFunc);
+
+                expect(filteredData.foo).to.be.undefined;
+                expect(filteredData.baz).to.be.undefined;
+                expect(filteredData.bar).to.equal('awesome');
             });
         });
     </script>

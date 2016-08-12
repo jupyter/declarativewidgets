@@ -37,6 +37,13 @@ Example: Initialize channel data.
                 /** The value of the data property. */
                 value: {
                     type: Object
+                },
+                /** Should we store this data property in localStorage
+                * Default value is false meaning we store this data property
+                */
+                noStore: {
+                    type: Boolean,
+                    value: false
                 }
             },
 

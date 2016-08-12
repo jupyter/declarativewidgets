@@ -21,6 +21,7 @@
     <!-- STEP 2: Import the element to test. -->
     <link rel='import' href='../urth-core-channel-broker.html'>
     <link rel='import' href='../urth-core-channel.html'>
+    <link rel='import' href='../urth-core-channel-item.html'>
 </head>
 
 <body>
@@ -30,6 +31,10 @@
     <urth-core-channel id="channelDefault"></urth-core-channel>
     <urth-core-channel id="channel1" name="channel1"></urth-core-channel>
     <urth-core-channel id="channel2" name="channel2"></urth-core-channel>
+    <urth-core-channel id="channel3" name="channel3">
+        <urth-core-channel-item key='x' value='foobar'></urth-core-channel-item>
+        <urth-core-channel-item key='y' value='dontstoreme' no-store></urth-core-channel-item>
+    </urth-core-channel>
 
     <script>
         // STEP 4: Define any globals needed by the test suite.
@@ -303,6 +308,15 @@
 
                 expect(broker.get(channel1.name, 'foo')).to.equal('bar');
                 expect(broker.get(channel1.name, 'bar')).to.equal('none');
+            });
+
+            it('should not save values of no-store items', function() {
+                broker.save(channel3.name);
+
+                broker.reload(channel3.name);
+
+                expect(broker.get(channel3.name, 'x')).to.equal('foobar');
+                expect(broker.get(channel3.name, 'y')).to.be.undefined;
             });
         });
 
