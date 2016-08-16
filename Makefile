@@ -275,7 +275,7 @@ ifdef SAUCE_USER_NAME
 	@echo 'Running web component tests remotely on Sauce Labs...'
 	@npm run test-sauce --silent -- --sauce-tunnel-id \"$(TRAVIS_JOB_NUMBER)\" --sauce-username $(SAUCE_USER_NAME) --sauce-access-key $(SAUCE_ACCESS_KEY)
 else
-	@npm run test -- --local firefox
+	@npm run test -- --local chrome
 endif
 
 test-py: dist/urth dist/declarativewidgets
@@ -468,7 +468,7 @@ ifdef SAUCE_USER_NAME
 	@BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-remote
 else ifdef TRAVIS
 	@echo 'Starting system integration tests locally on Travis...'
-	@BROWSER_LIST="firefox" ALT_BROWSER_LIST="firefox" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-local
+	@BROWSER_LIST="chrome" ALT_BROWSER_LIST="chrome" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-local
 else
 	@echo 'Starting system integration tests locally...'
 	@BROWSER_LIST="$(BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) system-test-all-local
