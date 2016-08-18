@@ -76,7 +76,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                     }.bind(this),
                     function(error){
                         this._error(error);
-                    }
+                    }.bind(this)
                 );
             },
 
