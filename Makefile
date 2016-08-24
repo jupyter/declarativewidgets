@@ -87,6 +87,8 @@ dev_image:
 		ln -s /usr/bin/nodejs /usr/bin/node && \
 		npm install -g bower && \
 		pip install pandas==0.18.1 && \
+		unlink /opt/conda/lib/libstdc++.so.6 && \
+		ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20 /opt/conda/lib/libstdc++.so.6 && \
 		Rscript /src-kernel-r/install.r && \
 		mkdir -p /home/jovyan/.local/share/jupyter/nbextensions && \
 		chown -R jovyan:users /home/jovyan/.local/share/jupyter/nbextensions'
