@@ -7,21 +7,18 @@ import pyspark
 
 unique_explore_id = 0
 
+def stringify_property(property_key, property_value):
+    if type(property_value) == bool:
+        if property_value:
+            return property_key
+    else:
+        return '{}="{}"'.format(property_key, str(property_value))
+
 def stringify_properties(properties):
-    properties_str = ""
-    for k in properties:
-        if type(properties[k]) == bool:
-            if properties[k]:
-                properties_str += k + " "
-        else:
-            properties_str += '{}="{}" '.format(k, str(properties[k]))
-    return properties_str
+    return ' '.join(filter(None, map(lambda x: stringify_property(x, properties[x]), properties)))
 
 def stringify_bindings(bindings):
-    bindings_str = ""
-    for k in bindings:
-        bindings_str += '{}="{{{{{}}}}}"'.format(k, bindings[k])
-    return bindings_str
+    return ' '.join(map(lambda x: '{}="{{{{{}}}}}"'.format(x, bindings[x]), bindings))
 
 def explore(df, channel='default', properties={}, bindings={}):
     """
