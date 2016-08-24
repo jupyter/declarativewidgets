@@ -229,6 +229,12 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
                 var globalChannel = this._getGlobalChannel(channelName);
                 if (globalChannel) {
                     var data = Polymer.Base.get(globalChannel.name, this);
+                    var filterVariablesToStore = function(channelItem) {
+                        return !channelItem.noStore;
+                    }
+                    globalChannel.elements.forEach(function(channel) {
+                        data = channel.filterChannelItems(data, filterVariablesToStore);
+                    });
                     if (data) {
                         this.$.storage.set(globalChannel.name, data);
                     } else {

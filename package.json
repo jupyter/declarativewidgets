@@ -19,7 +19,7 @@
     "selenium-standalone": "latest",
     "web-component-tester": "^4",
     "vulcanize": "1.14.8",
-    "wct-local": "2.0.3"
+    "wct-local": "2.0.11"
   },
   "config": {},
   "scripts": {

@@ -428,6 +428,29 @@ dataChannel.set('user', 'Luke');
                 this.debounce(jName, function(){
                     this.$$('urth-core-channel-viewer').updateData(this._broker.get(this.name));
                 }.bind(this), 250);
+            },
+
+            /** Given a data object, which has key-value pairs representing the channel variables,
+             * and a filter function.
+             * Returns a new object with key-value pairs that satifies the filterFunc
+             */
+            filterChannelItems: function(data, filterFunc) {
+                var channelItems = Polymer.dom(this.$.contentItems).getDistributedNodes();
+                for (var key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        var item;
+                        channelItems.some(function(channelItem) {
+                            if (channelItem.key === key) {
+                                item = channelItem;
+                                return true;
+                            }
+                        });
+                        if(item && !filterFunc(item)) {
+                            data[key] = undefined;
+                        }
+                    }
+                };
+                return data;
             }
         });
     })();
