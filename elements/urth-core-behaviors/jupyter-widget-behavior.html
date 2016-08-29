@@ -188,7 +188,7 @@ This behavior is used to encapsulate some of the services needed for ipywidgets.
                     }
                     else{
                         this._warn('Urth.JupyterWidgetBehavior send - model not ready, cannot send message');
-                        reject(new Error('Model not ready, cannot send message'));
+                        resolve(new Error('Model not ready, cannot send message'));
                     }
                 }.bind(this));
             },

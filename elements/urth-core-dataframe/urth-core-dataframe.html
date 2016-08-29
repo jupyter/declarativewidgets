@@ -358,7 +358,7 @@ Example:
 
                 }.bind(this);
 
-                this.send({ "event": "sync" }, this.refreshTimeout).then(promiseHandler,promiseHandler);
+                this.send({ "event": "sync" }, this.refreshTimeout).then(promiseHandler);
             }.bind(this), 200);
         },
 
