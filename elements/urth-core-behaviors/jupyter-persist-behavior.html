@@ -1,0 +1,78 @@
+<!--
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+-->
+<script>
+    'use strict';
+    (function() {
+        window.Urth = window.Urth || {};
+
+//ISSUES:
+// 1. How do we remove or garbage collect unused metadata?
+// 2. Is there a better way to specify a unique id for widgets? Rely on the caller to declare 'id'?
+// 3. Right now, calling `saveState()` is the responsibility of the main class. The main class may use `observers`
+//    but that requires duplication of the list of persisted properties. Providing a facility to register
+//    based on property change events would require setting `notify:true` on all persisted properties.
+
+        var getMetadata = function(elem) {
+            var cellNode = $(elem).parents('.cell').first();
+
+            if (cellNode.length) {
+                var metadata = cellNode.length && cellNode.data('cell').metadata,
+                    uid = elem.is + [].indexOf.call(cellNode.find(elem.is), elem);
+
+                return metadata[uid] = metadata[uid] || {};
+            } 
+       }
+
+        /**
+         * Behavior for widgets to persist state in a Jupyter notebook
+         * All properties marked `persist:true` are saved in metadata that persists with the notebook cell.
+         * Only works for widgets which are children of a Jupyter notebook cell.  Will not work in the shadow DOM.
+         *
+         * @polymerBehavior Urth.JupyterPersistBehavior
+         */
+        Urth.JupyterPersistBehavior = {
+            /**
+             * Iterate through properties, collect state of those marked `persist` and put result in cell metadata.
+             * If not attached to document DOM as a child of a Jupyter notebook cell, or restoreState has not yet
+             * been called on this instance, function call will have no effect.
+             */
+            saveState: function() {
+                if (!this._persisted) { return; }
+
+                var state = {},
+                    metadata = getMetadata(this);
+
+                if (metadata) {
+                    for (var prop in this.properties) {
+                        if (this.properties[prop].persist) {
+                            state[prop] = this.get(prop);
+                        }
+                    }
+
+                    metadata.state = state;
+                    IPython.notebook.set_dirty(true);
+                }
+            },
+
+            /**
+             * Iterate through properties and for those marked `persist` pull state values out of cell metadata
+             * Must be attached to document DOM as a child of a Jupyter notebook cell or will fail silently.
+             * Typically called from `attached`
+             */
+            restoreState: function() {
+                var metadata = getMetadata(this) || {},
+                    state = metadata.state || {};
+
+                for (var prop in this.properties) {
+                    if (this.properties[prop].persist && prop in state) {
+                        this.set(prop, state[prop]);
+                    }
+                }
+
+                this._persisted = true;
+            }
+        };
+    })();
+</script>
