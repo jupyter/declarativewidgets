@@ -140,6 +140,16 @@ Widget_Channels <- R6Class(
             ## Clear cache as we have inited and established state
             put_from_widget_channel_env_cache("channel_set_data", list())
             put_from_widget_channel_env_cache("channel_watch_data", list())
+            if(length(channel_set_cache_data) < 1 && length(channel_watch_cache_data) < 1) {
+                self$reply_with_empty_state()
+            }
+        },
+        reply_with_empty_state = function() {
+            msg <- list()
+            msg[["method"]] <- "update"
+            state_list <- list()
+            msg[["state"]] <- state_list
+            self$send(msg)
         },
         initialize = function(comm, serializer) {
             assign("the_channels", self, envir = widget_channels_env)
