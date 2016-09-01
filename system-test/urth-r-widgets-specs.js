@@ -16,7 +16,9 @@ process.env.PYTHON != "python2" && describe('Widgets R System Test', function() 
 
     it('should bind and update a channel variable', function(done) {
         boilerplate.browser
-            .waitForElementById('invokeButton').click()
+            .waitForElementById('invokeButton', wd.asserters.isDisplayed, 60000)
+            .click()
+            .click() // Safari requires extra click for some reason
             .waitForElementByClassName('test2', wd.asserters.textInclude('mike'), 60000)
             .nodeify(done);
     });
