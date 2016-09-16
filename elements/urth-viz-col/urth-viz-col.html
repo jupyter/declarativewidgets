@@ -39,6 +39,14 @@
                     type: Number,
                     reflectToAttribute: true
                 }
+            },
+
+            observers: [
+                '_contentChanged(format, type, index)'
+            ],
+
+            _contentChanged: function() {
+                this.fire('col-content-changed');
             }
         });
     })();
