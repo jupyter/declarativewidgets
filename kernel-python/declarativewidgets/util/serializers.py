@@ -91,7 +91,7 @@ class PandasDataFrameSerializer(BaseSerializer):
                     row_index_in_obj = obj[df_dict['columns'][i]].index[j]
                     date_element = obj[df_dict['columns'][i]][row_index_in_obj]
                     if not hasattr(date_element, 'tzinfo') or date_element.tzinfo is None:
-                        df_dict['data'][j][i] = re.sub("T|Z", " ", df_dict['data'][j][i])
+                        df_dict['data'][j][i] = re.sub("T|Z", " ", df_dict['data'][j][i]).strip()
         return df_dict
 
     @staticmethod
