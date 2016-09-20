@@ -167,7 +167,8 @@
             },
 
         listeners: {
-            'iron-resize': '_resizer'
+            'iron-resize': '_resizer',
+            'col-content-changed': '_parseColumns'
         },
 
         _svgSelection: function(d3) {
@@ -233,9 +234,12 @@
         },
 
         _parseColumns: function() {
-            var columnSettings = this.columnSettings = [];
-            this.queryAllEffectiveChildren('urth-viz-col').forEach(function (col) {
-                if (col.hasAttribute('index')) {
+            var columnSettings = this.columnSettings = [],
+                columnElements = Array.prototype.slice.call(
+                    Polymer.dom(this.$.content).getDistributedNodes());
+
+            columnElements.forEach(function (col) {
+                if (col.hasAttribute && col.hasAttribute('index')) {
                     var index = col.getAttribute('index');
                     var set = columnSettings[index] = {};
                     ["type", "format"].forEach(function(prop) {
@@ -641,6 +645,21 @@
             };
 
             this.async(func);
+        },
+
+        /**
+         * Adds a mutation observer to react to changes to count of `urth-viz-col` child
+         * elements.
+         */
+        attached: function(){
+            this._contentObserver = Polymer.dom(this.$.content).observeNodes(this._parseColumns.bind(this));
+        },
+
+        /**
+         * Remove mutation observer
+         */
+        detached: function(){
+            Polymer.dom(this.$.content).unobserveNodes(this._contentObserver);
         },
 
         _resizer: function() {
