@@ -305,7 +305,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
 
                     // find physical index of sorted table view
                     var physicalIndex = logicalIndex;
-                    this.hot.sortIndex.some(function(sortedRow, sortedIndex){
+                    this.hot.sortIndex.some(function(sortedRow, sortedIndex) {
                         if(sortedRow[0] == logicalIndex) {
                             physicalIndex = sortedIndex;
                             return true;
@@ -469,15 +469,8 @@ The table accepts data via attribute `datarows` and column headers via attribute
                 }
             },
 
-            detached: function() {
-                if (this.hot) {
-                    this.hot.destroy();
-                    this.hot = null;
-                }
-            },
-
             ready: function() {
-                this.async(function(){
+                this.async(function() {
                     var display = window.getComputedStyle(this).display;
                     if (display === 'none' || document.readyState !== 'complete') {
                         this.async(this.ready, 200);
@@ -494,15 +487,20 @@ The table accepts data via attribute `datarows` and column headers via attribute
              * Adds a mutation observer to react to changes to count of `urth-viz-col` child
              * elements.
              */
-            attached: function(){
+            attached: function() {
                 this._contentObserver = Polymer.dom(this.$.content).observeNodes(this._updateColumns.bind(this));
             },
 
             /**
              * Remove mutation observer
              */
-            detached: function(){
+            detached: function() {
                 Polymer.dom(this.$.content).unobserveNodes(this._contentObserver);
+
+                if (this.hot) {
+                    this.hot.destroy();
+                    this.hot = null;
+                }
             }
         });
     })();
