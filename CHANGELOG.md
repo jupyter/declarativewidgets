@@ -1,5 +1,19 @@
 # Changelog
-## 0.6.0 (ONLY PRE RELEASED)
+## 0.7.0 (2016-09-22)
+* New explore function that renders explorer UI for DataFrames
+* Allow access to functions within instances
+* Allow control to local store of binding variables
+* Remove requirement to have PySpark installed
+
+## 0.6.2 (2016-07-27)
+* Misc fixes back ported from master
+* Publishing Toree support JAR to maven
+
+## 0.6.1 (2016-07-01)
+* Fix to issue when Run All and using channel.set
+* Minor fixes to declarative queries
+
+## 0.6.0 (2016-06-17)
 * User must manually activate declarativewidgets using a code cell
 * Declarative query support for dataframes
 * Usage documentation
