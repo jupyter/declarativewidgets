@@ -21,15 +21,13 @@ addons:
   hosts:
     - declarativewidgets.org
 
-before_deploy:
-  openssl aes-256-cbc -K $encrypted_9067f25a9380_key -iv $encrypted_9067f25a9380_iv -in etc/.gpg/secring.gpg.enc -out etc/.gpg/secring.gpg -d
-
 before_script:
   - curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
   - sh -e /etc/init.d/xvfb start
+  - openssl aes-256-cbc -K $encrypted_9067f25a9380_key -iv $encrypted_9067f25a9380_iv -in etc/.gpg/secring.gpg.enc -out etc/.gpg/secring.gpg -d
 
 script:
-  - make all
+  - make init sdist publish-scala-jar
 
 deploy:
   skip_cleanup: true
@@ -46,5 +44,4 @@ notifications:
 
 branches:
   only:
-    - master
-    - /^0\.7\.0\.dev[0-9]+$/
+    - test_scala_jar_7_release
