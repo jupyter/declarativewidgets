@@ -111,6 +111,10 @@ var broker = window.Urth['urth-core-channel-broker'].getChannelBroker();
                 }
             },
 
+            clearItemFromChannel: function(channelName, key) {
+                this.set(channelName, key, undefined);
+            },
+
             /**
              * Retrieves the value of the specified key on the specified
              * channel or undefined if the key has not been set.

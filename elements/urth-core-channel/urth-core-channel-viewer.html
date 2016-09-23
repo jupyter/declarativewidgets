@@ -49,25 +49,42 @@ Internal element used to render the data within an `urth-core-channel`.
                 text-overflow: ellipsis;
                 overflow: hidden;
             }
+
+            #viewer pre.viewer-item {
+                overflow: auto;
+                max-height: 300px;
+            }
         </style>
         <div id='viewer'>
-            <div class='viewer-title'>Channel: <span>[[name]]</span>
-                <template is='dom-if' if='{{!empty}}'>
-                    <button on-click="clear">clear</button>
+            <div class='viewer-title'>
+                <template is='dom-if' if='{{!showItem}}'>
+                    Channel <span>[[name]]</span>
+                    <template is='dom-if' if='{{!empty}}'>
+                        <button on-click="clear">clear channel</button>
+                    </template>
+                </template>
+                <template is='dom-if' if='{{showItem}}'>
+                    <a href="#" on-click="showChannel">Channel <span>[[name]] </span></a><span>[[breadcrumbs]]</span>
+                    <button on-click="clearItem">clear variable</button>
                 </template>
             </div>
-            <template is='dom-if' if='{{!empty}}'>
-                <table>
-                    <template id='viewer-repeat' is='dom-repeat' items='{{_computeDataAsArray(data.*, _updates)}}'>
-                        <tr>
-                            <td class="viewer-cell-name"><div title='{{item.name}}'>{{item.name}}</div></td>
-                            <td class="viewer-cell-value"><div title='{{item.value}}'>{{item.value}}</div></td>
-                        </tr>
-                    </template>
-                </table>
+            <template is='dom-if' if='{{!showItem}}'>
+                <template is='dom-if' if='{{!empty}}'>
+                    <table>
+                        <template id='viewer-repeat' is='dom-repeat' items='{{_computeDataAsArray(data.*, _updates)}}'>
+                            <tr>
+                                <td class="viewer-cell-name"><a href="#" on-click="showChannelItem" title='{{item.name}}'>{{item.name}}</a></td>
+                                <td class="viewer-cell-value"><div title='{{item.value}}'>{{item.value}}</div></td>
+                            </tr>
+                        </template>
+                    </table>
+                </template>
+                <template is='dom-if' if='{{empty}}'>
+                    <div class='viewer-empty-msg'><span>Empty</span></div>
+                </template>
             </template>
-            <template is='dom-if' if='{{empty}}'>
-                <div class='viewer-empty-msg'><span>Empty</span></div>
+            <template is='dom-if' if='{{showItem}}'>
+                <pre class='viewer-item'>{{itemValue}}</pre>
             </template>
         </div>
     </template>
@@ -95,14 +112,47 @@ Internal element used to render the data within an `urth-core-channel`.
                     type: String
                 },
 
+                showItem: {
+                    type: Boolean,
+                    value: false
+                },
+
+                _itemName: {
+                    type: String,
+                    observer: '__itemNameChanged'
+                },
+
                 _updates: {
                     type: Number,
                     value: 0
                 }
             },
 
+            __itemNameChanged: function(_itemName) {
+                if (this.showItem) {
+                    this.breadcrumbs = ' -> Variable ' + _itemName;
+                }
+            },
+
+            showChannel: function() {
+                this.showItem = false;
+                this._itemName = "";
+                this.itemValue = null;
+            },
+
+            showChannelItem: function(e) {
+                this.showItem = true;
+                this._itemName = e.target.text;
+                this.itemValue = JSON.stringify(this.data[this._itemName], null, 2);
+            },
+
             clear: function() {
                 this.fire("clear");
+            },
+
+            clearItem: function(e, detail) {
+                this.fire("clearitem", {itemKey: this._itemName});
+                this.showChannel();
             },
 
             refresh: function(){
@@ -116,10 +166,12 @@ Internal element used to render the data within an `urth-core-channel`.
 
             _computeDataAsArray: function(){
                 return Object.keys(this.data).map(function(key){
-                    return {
-                        name: key,
-                        value: JSON.stringify(this.data[key])
-                    };
+                    if (this.data[key]) {
+                        return {
+                            name: key,
+                            value: JSON.stringify(this.data[key])
+                        };
+                    }
                 }.bind(this))
             },
 

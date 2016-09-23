@@ -58,7 +58,7 @@ dataChannel.set('user', 'Luke');
     <template>
         <content id='contentItems' select='urth-core-channel-item'></content>
         <template is='dom-if' if='{{debug}}'>
-            <urth-core-channel-viewer on-clear='clear' name='{{name}}'></urth-core-channel-viewer>
+            <urth-core-channel-viewer on-clear='clear' on-clearitem='clearItem' name='{{name}}'></urth-core-channel-viewer>
         </template>
     </template>
 
@@ -121,6 +121,10 @@ dataChannel.set('user', 'Luke');
              */
             clear: function() {
                 this._broker.clear(this.name);
+            },
+
+            clearItem: function(e) {
+                this._broker.clearItemFromChannel(this.name, e.detail.itemKey);
             },
 
             created: function() {
