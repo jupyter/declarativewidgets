@@ -37,7 +37,7 @@ object Explore {
   def getDfNameFromLastExploreRequest(): String = {
     val executingRequest = getExecutingRequest()
     val requestTrees = executingRequest.map(_.trees.head.asInstanceOf[reflect.runtime.universe.Tree])
-    val valDefTrees = requestTrees collect {case c: ValDef => c}
+    val valDefTrees = requestTrees.map(_.asInstanceOf[ValDef])
     val exploreTrees = valDefTrees.filter({ eTree =>
       val children = eTree.rhs.children
       children.length > 0 && children.head.toString.equals("explore")
