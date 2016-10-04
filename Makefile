@@ -79,7 +79,6 @@ bower_components: node_modules/bower bower.json
 dev_image:
 	@-docker $(DOCKER_OPTS) rm -f bower-build
 	@docker $(DOCKER_OPTS) run -it --user root --name bower-build \
-		-v `pwd`/etc/r/install.r:/src-kernel-r/install.r \
 		$(ROOT_REPO) bash -c 'apt-get -qq update && \
 		apt-get -qq install --yes curl && \
 		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
@@ -89,7 +88,9 @@ dev_image:
 		pip install pandas==0.18.1 && \
 		unlink /opt/conda/lib/libstdc++.so.6 && \
 		ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20 /opt/conda/lib/libstdc++.so.6 && \
-		Rscript /src-kernel-r/install.r && \
+		conda install -y -q -c R r-irkernel=0.7* && \
+		ln -s /lib/x86_64-linux-gnu/libpcre.so.3 /lib/x86_64-linux-gnu/libpcre.so.1 && \
+		chown -R jovyan:users /opt/conda/lib/R/library && \
 		mkdir -p /home/jovyan/.local/share/jupyter/nbextensions && \
 		chown -R jovyan:users /home/jovyan/.local/share/jupyter/nbextensions'
 	@docker $(DOCKER_OPTS) commit bower-build $(REPO)
