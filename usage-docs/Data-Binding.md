@@ -122,3 +122,11 @@ example specifies the inputs, function invocation and result in a single cell,
 each piece could be performed in separate cells as described in [Inter-cell Binding](#data-binding+inter-cell-binding).
 
 ![Function Invocation](images/Data-Binding-function.gif)
+
+#### Naming binding variables: 
+
+Be cautious when naming binding variable names:
+
+* Name that is a Polymer lifecycle callback: `created`, `ready`, `attached`, `detached`, `attributeChanged`. This may cause a crash browser.
+* Name that is a Polymer.Base API method. See [Polymer.Base methods](https://www.polymer-project.org/1.0/docs/api/Polymer.Base#methods). This may cause a crash in browser.
+* Name that is a Polymer.Base Property. See [Polymer.Base properties](https://www.polymer-project.org/1.0/docs/api/Polymer.Base#properties). This may not cause a crash, but the binding will not work properly as intended.
