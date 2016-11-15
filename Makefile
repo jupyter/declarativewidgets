@@ -50,6 +50,7 @@ ALT_JUPYTER_VERSION?=4.2
 ALT_JUPYTER_OLD_IPYW_VERSION?=4.2.oldipyw
 PYTHON?=python3
 TEST_MSG?="Starting system tests"
+APACHE_TOREE_PACKAGE=https://dist.apache.org/repos/dist/dev/incubator/toree/0.1.0/snapshots/toree-0.1.0.dev8.tar.gz
 
 # Logging levels
 DOCKER_OPTS?=--log-level warn
@@ -103,7 +104,7 @@ dev_image_4.2:
     pip install --ignore-installed --upgrade notebook==4.2.* $(PIP_OPTS) && \
     pip install --upgrade ipywidgets==5.2.* $(PIP_OPTS) && \
     jupyter nbextension enable --system --py widgetsnbextension && \
-    pip install --pre --upgrade toree $(PIP_OPTS) && \
+    pip install $(APACHE_TOREE_PACKAGE) $(PIP_OPTS) && \
     jupyter toree install'
 	@docker $(DOCKER_OPTS) commit 4.2-build $(REPO4.2)
 	@-docker $(DOCKER_OPTS) rm -f 4.2-build
