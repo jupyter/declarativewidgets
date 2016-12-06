@@ -37,10 +37,11 @@ class DataFrame(UrthWidget):
         self.log.info("Changed value of query to {}...".format(new))
 
     def _the_dataframe(self):
-        if self.variable_name in self.shell.user_ns:
-            return self.shell.user_ns[self.variable_name]
-        else:
-            raise UrthException("Invalid DataFrame variable name {}".format(
+        try:
+            name = self.variable_name.split('.')
+            return reduce(lambda x, y: getattr(x, y), [self.shell.user_ns[name.pop(0)]] + name)
+        except (KeyError, AttributeError):
+            raise UrthException("Invalid DataFrame name {}".format(
                 self.variable_name))
 
     def _handle_state_msg(self, wid, content, buffers):
