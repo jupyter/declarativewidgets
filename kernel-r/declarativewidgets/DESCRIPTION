@@ -19,8 +19,7 @@ Imports:
     IRdisplay,
     uuid,
     jsonlite,
-    R6,
-    SparkR
+    R6
 Collate:
     'widget.r'
     'widget_function.r'

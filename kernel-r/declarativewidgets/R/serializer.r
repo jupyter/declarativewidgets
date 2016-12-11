@@ -21,8 +21,10 @@ Serializer <- R6Class(
         },
         load_serializers = function() {
             self$register_serializer(DataFrame_Serializer$new())
-            self$register_serializer(Spark_DataFrame_Serializer$new())
             self$register_serializer(Time_Series_Serializer$new())
+            if ("SparkR" %in% rownames(installed.packages())) {
+              self$register_serializer(Spark_DataFrame_Serializer$new())
+            }
         },
         initialize = function() {
             self$load_serializers()
