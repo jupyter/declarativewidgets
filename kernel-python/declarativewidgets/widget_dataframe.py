@@ -10,6 +10,8 @@ from .urth_widget import UrthWidget
 from .urth_exception import UrthException
 import json
 
+from functools import reduce
+
 
 class DataFrame(UrthWidget):
     """
