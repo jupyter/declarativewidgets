@@ -64,6 +64,9 @@ bower_components
 *.log
 node_modules/
 npm-debug.*
+*.Rproj
+.Rproj.user
+.Rhistory
 .watch
 .watch-docs
 project/
