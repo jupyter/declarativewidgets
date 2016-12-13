@@ -51,10 +51,24 @@ Widget_Dataframe <- R6Class(
             })
             return (TRUE)
         },
+        get_df_in_interpreter = function(name) {
+            df_name_vector <- unlist(strsplit(name, "$", fixed=TRUE))
+            if(length(df_name_vector) == 2) {
+                var_type <- class(get(df_name_vector[[1]], envir = .GlobalEnv))[[2]]
+                if(var_type == "R6") {
+                    return (get(df_name_vector[[1]], envir = .GlobalEnv)[[df_name_vector[[2]]]])
+                } else {
+                    log_info(paste("The df class type", var_type, "is not supported"))
+                    return (NULL)
+                }
+            } else {
+                return (get(name, envir = .GlobalEnv))
+            }
+        },
         serialize_and_send = function(name, limit, query = list()) {
             if(self$df_in_interpreter(name)) {
                 #apply query before sending over
-                df_after_query <- self$querier$apply_query(get(name, envir = .GlobalEnv), query)
+                df_after_query <- self$querier$apply_query(self$get_df_in_interpreter(name), query)
                 serialized_df <- self$serializer$serialize(df_after_query, limit)
                 self$send_update("value", serialized_df)
                 return (TRUE)
