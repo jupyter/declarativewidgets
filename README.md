@@ -109,7 +109,7 @@ pip uninstall jupyter_declarativewidgets
 
 ## Documentation
 
-The latest documentation can be found [here](http://jupyter-incubator.github.io/declarativewidgets/docs.html).
+The latest documentation can be found [here](http://jupyter.org/declarativewidgets/docs.html).
 
 Documentation is also available from within the notebook. To see the documentation add a cell with
 
