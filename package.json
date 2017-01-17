@@ -16,7 +16,7 @@
     "chai-as-promised": "latest",
     "colors": "latest",
     "minimist": "latest",
-    "selenium-standalone": "latest",
+    "selenium-standalone": "5.6.0",
     "web-component-tester": "^4",
     "vulcanize": "1.14.8",
     "wct-local": "2.0.11"
