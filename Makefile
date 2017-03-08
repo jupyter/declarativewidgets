@@ -448,7 +448,7 @@ system-test-alt-jupyter.oldipyw: TEST_MSG="Starting system tests for Jupyter $(A
 system-test-alt-jupyter.oldipyw:
 	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
 
-system-test-all: system-test-python3 system-test-python2 system-test-alt-jupyter system-test-alt-jupyter.oldipyw
+system-test-all: system-test-python3 system-test-python2 system-test-alt-jupyter.oldipyw
 
 start-selenium: node_modules stop-selenium
 	@echo "Installing and starting Selenium Server..."
