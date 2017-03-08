@@ -171,6 +171,15 @@
                     errorCB.call(this, msg);
                 }.bind(this));
             }
+			
+			var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+			r = r ? r[1] : undefined;
+			if(r){
+				if (!this.$.ajaxPost.headers) {
+					this.$.ajaxPost.headers = {};
+				}
+				this.$.ajaxPost.headers['X-XSRFToken'] = r;
+			}
 
             this.$.ajaxPost.generateRequest();
         },
