@@ -19,7 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "nvd3": "1.8.4",
+    "nvd3": "1.8.1",
     "polymer": "Polymer/polymer#^1.2.4",
     "paper-item": "PolymerElements/paper-item#^1.0.0",
     "paper-menu": "PolymerElements/paper-menu#^1.0.0",

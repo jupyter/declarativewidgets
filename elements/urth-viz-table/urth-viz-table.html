@@ -148,7 +148,7 @@ The table accepts data via attribute `datarows` and column headers via attribute
             },
 
             _updateColumns: function (newColumns) {
-                if (!newColumns || !this.datarows) { return; }
+                if (!newColumns || !this.datarows || !this.hot) { return; }
 
                 var columnSettings = this._parseColumns();
                 this.hot.updateSettings({
