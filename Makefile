@@ -79,7 +79,6 @@ dev_image:
 		curl --silent --location https://deb.nodesource.com/setup_6.x | sudo bash - && \
 		apt-get -qq install --yes nodejs && \
 		npm install -g bower && \
-		pip install pandas==0.18.1 && \
 		mkdir -p /home/jovyan/.local/share/jupyter/nbextensions && \
 		chown -R jovyan:users /home/jovyan/.local/share/jupyter/nbextensions'
 	@docker $(DOCKER_OPTS) commit bower-build $(REPO)
