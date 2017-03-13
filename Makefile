@@ -80,11 +80,6 @@ dev_image:
 		apt-get -qq install --yes nodejs && \
 		npm install -g bower && \
 		pip install pandas==0.18.1 && \
-		unlink /opt/conda/lib/libstdc++.so.6 && \
-		ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20 /opt/conda/lib/libstdc++.so.6 && \
-		conda install -y -q -c R r-irkernel=0.7* && \
-		ln -s /lib/x86_64-linux-gnu/libpcre.so.3 /lib/x86_64-linux-gnu/libpcre.so.1 && \
-		chown -R jovyan:users /opt/conda/lib/R/library && \
 		mkdir -p /home/jovyan/.local/share/jupyter/nbextensions && \
 		chown -R jovyan:users /home/jovyan/.local/share/jupyter/nbextensions'
 	@docker $(DOCKER_OPTS) commit bower-build $(REPO)
