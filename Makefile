@@ -484,7 +484,7 @@ docs: .watch-docs dist/docs
 	@echo "Serving docs at $(DOCURL):$(DOC_PORT)"
 	@bash -c "trap 'make clean-watch-docs' INT TERM ; npm run http-server -- dist/docs/site -p $(DOC_PORT)"
 
-all: init test-py-all test-scala test-r sdist install-all system-test
+all: init test-js-remote test-py-all test-scala test-r sdist install-all system-test
 
 export-release-version:
 	docker $(DOCKER_OPTS) run -it --rm \
