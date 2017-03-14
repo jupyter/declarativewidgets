@@ -50,7 +50,7 @@
         });
 
         // STEP 5: Define suite(s) and tests.
-        describe('render scatter chart', function() {
+        describe.skip('render scatter chart', function() {
             it('should contain a top-level <g> element for the scatter chart', function() {
                 expect(chart/*.shadowRoot*/.querySelector('g.nv-scatterChart')).to.exist;
             });
@@ -60,7 +60,7 @@
             });
         });
 
-        describe('select two points', function() {
+        describe.skip('select two points', function() {
             beforeEach(function(done) {
                 chart.async(function() {
                     var evObj1 = document.createEvent('MouseEvents'),
