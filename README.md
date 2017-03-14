@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jupyter-incubator/declarativewidgets.svg?branch=master)](https://travis-ci.org/jupyter-incubator/declarativewidgets)
+[![Build Status](https://travis-ci.org/jupyter/declarativewidgets.svg?branch=master)](https://travis-ci.org/jupyter/declarativewidgets)
 
 # Jupyter Declarative Widget Extension
 
@@ -20,7 +20,7 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 
 ## Runtime Requirements
 
-* Jupyter Notebook 4.0.x, 4.1.x, or 4.2.x running on Python 3.x or Python 2.7.x (see the [0.1.x branch](https://github.com/jupyter-incubator/declarativewidgets/tree/0.1.x) for IPython Notebook 3.2.x compatibility)
+* Jupyter Notebook 4.0.x, 4.1.x, or 4.2.x running on Python 3.x or Python 2.7.x (see the [0.1.x branch](https://github.com/jupyter/declarativewidgets/tree/0.1.x) for IPython Notebook 3.2.x compatibility)
 * [IPywidgets](https://github.com/ipython/ipywidgets) 4.1.x and 5.1.1+ (R and Scala support not available for 5.0.0 nor 5.1.0)
 * Bower, git - Necessary for installing 3rd party elements straight out of notebook
 
@@ -36,7 +36,7 @@ Watch from minute 21 to 41 of the [September 1st Jupyter meeting video recording
 
 ## Try It
 
-We're running a tmpnb instance at [http://jupyter.cloudet.xyz](http://jupyter.cloudet.xyz) with a snapshot of this project (and other related incubator projects) pre-installed.
+We're running a tmpnb instance at [http://jupyter.cloudet.xyz](http://jupyter.cloudet.xyz) with a snapshot of this project (and other related projects) pre-installed.
 
 ## Install It
 
@@ -142,7 +142,7 @@ mkdir -p ~/projects
 cd !$
 
 # clone this repo
-git clone https://github.com/jupyter-incubator/declarativewidgets.git
+git clone https://github.com/jupyter/declarativewidgets.git
 ```
 
 Run the notebook server in a docker container:
