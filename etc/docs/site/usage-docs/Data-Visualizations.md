@@ -30,7 +30,7 @@ aDataFrame1 = pd.DataFrame([
 )
 ```
 
-Then, bind `aDataFrame1` to an `urth-core-dataframe` element, see [Using DataFrames](https://github.com/jupyter-incubator/declarativewidgets/wiki/Using-DataFrames) for more on how to use DataFrames. Now we can make use of this `urth-core-dataframe` to supply datarows and columns for a table visualization.
+Then, bind `aDataFrame1` to an `urth-core-dataframe` element, see [Using DataFrames](https://github.com/jupyter-incubator/declarativewidgets/wiki/Using-DataFrames) for more on how to use DataFrames. Now we can make use of this `urth-core-dataframe` to supply datarows and columns for a table visualization.  Note dataframes can also be referenced from within an object e.g. `klass.df`.
 
 ```
 %%html
