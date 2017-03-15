@@ -2,13 +2,13 @@
 # Distributed under the terms of the Modified BSD License.
 
 .PHONY: help init clean clean-dist clean-watch clean-watch-docs dist sdist docs
-.PHONY: dev dev_image dev_image_4.2 _dev _dev-python2 _dev-python3
-.PHONY: server server_4.2 remove-server install install-all all release export-release-version publish-scala-jar
+.PHONY: dev dev_image _dev _dev-python2 _dev-python3
+.PHONY: server remove-server install install-all all release export-release-version publish-scala-jar
 .PHONY: start-selenium stop-selenium _run _run-python3 _run-python2 run-test
 .PHONY: test testdev test-js test-js-remote test-py test-py-all _test-py
 .PHONY: _test-py-python2 _test-py-python3 test-scala test-r
 .PHONY: system-test system-test-all system-test-all-local system-test-all-remote
-.PHONY: system-test-python3 system-test-python2 system-test-alt-jupyter
+.PHONY: system-test-python3 system-test-python2
 .SUFFIXES:
 MAKEFLAGS=-r
 
@@ -31,23 +31,18 @@ help:
 	@echo '             all - run all necessary steps to produce and validate a build'
 
 # Docker images and repos
-ROOT_REPO:=jupyter/all-spark-notebook:2d878db5cbff
-REPO:=jupyter/all-spark-notebook-bower:2d878db5cbff
-REPO4.2:=jupyter/all-spark-notebook-bower-jup4.2:2d878db5cbff
-REPO4.2.oldipyw:=jupyter/all-spark-notebook-bower-jup4.2-ipy4.1:2d878db5cbff
+ROOT_REPO:=jupyter/all-spark-notebook:bde52ed89463
+REPO:=jupyter/all-spark-notebook-bower:bde52ed89463
 SCALA_BUILD_REPO:=1science/sbt
 
 # Global environment defaults
 PORT_MAP?=-p 9500:8888
 BROWSER_LIST?=chrome
 ALT_BROWSER_LIST?=chrome
-BASEURL?=http://192.168.99.100:9500
+BASEURL?=http://localhost:9500
 TEST_TYPE?=local
 SPECS?=system-test/urth-core-bind-specs.js system-test/urth-system-test-specs.js system-test/urth-viz-table-specs.js system-test/urth-r-widgets-specs.js
 PYTHON2_SPECS?=system-test/urth-system-test-specs.js
-ALT_JUPYTER_SPECS?=system-test/urth-system-test-specs.js
-ALT_JUPYTER_VERSION?=4.2
-ALT_JUPYTER_OLD_IPYW_VERSION?=4.2.oldipyw
 PYTHON?=python3
 TEST_MSG?="Starting system tests"
 
@@ -66,7 +61,7 @@ $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 	@$(foreach dir, $(URTH_SRC_DIRS), cd $(abspath $(dir)) && $(NPM_BIN_DIR)/bower link $(BOWER_OPTS);)
 	@$(foreach name, $(URTH_DIRS), $(NPM_BIN_DIR)/bower link $(name) $(BOWER_OPTS);)
 
-init: node_modules dev_image dev_image_4.2 dev_image_4.2.oldipyw
+init: node_modules dev_image
 
 node_modules: package.json
 	@npm install --quiet
@@ -81,39 +76,13 @@ dev_image:
 	@docker $(DOCKER_OPTS) run -it --user root --name bower-build \
 		$(ROOT_REPO) bash -c 'apt-get -qq update && \
 		apt-get -qq install --yes curl && \
-		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
-		apt-get -qq install --yes nodejs npm && \
-		ln -s /usr/bin/nodejs /usr/bin/node && \
+		curl --silent --location https://deb.nodesource.com/setup_6.x | sudo bash - && \
+		apt-get -qq install --yes nodejs && \
 		npm install -g bower && \
-		pip install pandas==0.18.1 && \
-		unlink /opt/conda/lib/libstdc++.so.6 && \
-		ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20 /opt/conda/lib/libstdc++.so.6 && \
-		conda install -y -q -c R r-irkernel=0.7* && \
-		ln -s /lib/x86_64-linux-gnu/libpcre.so.3 /lib/x86_64-linux-gnu/libpcre.so.1 && \
-		chown -R jovyan:users /opt/conda/lib/R/library && \
 		mkdir -p /home/jovyan/.local/share/jupyter/nbextensions && \
 		chown -R jovyan:users /home/jovyan/.local/share/jupyter/nbextensions'
 	@docker $(DOCKER_OPTS) commit bower-build $(REPO)
 	@-docker $(DOCKER_OPTS) rm -f bower-build
-
-dev_image_4.2:
-	@-docker $(DOCKER_OPTS) rm -f 4.2-build
-	@docker $(DOCKER_OPTS) run -it --user root --name 4.2-build \
-		$(REPO) bash -c 'pip uninstall --yes ipywidgets &&\
-    pip install --ignore-installed --upgrade notebook==4.2.* $(PIP_OPTS) && \
-    pip install --upgrade ipywidgets==5.2.* $(PIP_OPTS) && \
-    jupyter nbextension enable --system --py widgetsnbextension && \
-    pip install --pre --upgrade toree $(PIP_OPTS) && \
-    jupyter toree install'
-	@docker $(DOCKER_OPTS) commit 4.2-build $(REPO4.2)
-	@-docker $(DOCKER_OPTS) rm -f 4.2-build
-
-dev_image_4.2.oldipyw:
-	@-docker $(DOCKER_OPTS) rm -f 4.2.oldipyw-build
-	@docker $(DOCKER_OPTS) run -it --user root --name 4.2.oldipyw-build \
-		$(REPO) bash -c 'pip install --ignore-installed --upgrade notebook==4.2.* $(PIP_OPTS)'
-	@docker $(DOCKER_OPTS) commit 4.2.oldipyw-build $(REPO4.2.oldipyw)
-	@-docker $(DOCKER_OPTS) rm -f 4.2.oldipyw-build
 
 clean: clean-dist
 	@-rm -rf *.egg-info
@@ -347,27 +316,11 @@ install-all:
 	@PYTHON="python2" $(MAKE) install
 
 server: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
-server: INSTALL_DECLWID_CMD?=pip install $(PIP_OPTS) --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets install --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library && jupyter declarativewidgets activate;
+server: INSTALL_DECLWID_CMD?=pip install $(PIP_OPTS) --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
 server: SERVER_NAME?=urth_widgets_server
 server: OPTIONS?=-it --rm
 server: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
 server: _run-$(PYTHON)
-
-server_4.2: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
-server_4.2: INSTALL_DECLWID_CMD?=pip install $(PIP_OPTS) --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
-server_4.2: SERVER_NAME?=urth_widgets_server
-server_4.2: OPTIONS?=-it --rm
-server_4.2: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
-server_4.2: REPO=$(REPO4.2)
-server_4.2: _run-$(PYTHON)
-
-server_4.2.oldipyw: CMD?=jupyter notebook --no-browser --port 8888 --ip="*"
-server_4.2.oldipyw: INSTALL_DECLWID_CMD?=pip install $(PIP_OPTS) --no-binary ::all: $$(ls -1 /src/dist/*.tar.gz | tail -n 1) && jupyter declarativewidgets quick-setup --user && jupyter declarativewidgets installr --library=/opt/conda/lib/R/library;
-server_4.2.oldipyw: SERVER_NAME?=urth_widgets_server
-server_4.2.oldipyw: OPTIONS?=-it --rm
-server_4.2.oldipyw: VOL_MAP?=-v `pwd`/etc/notebooks:/home/jovyan/work
-server_4.2.oldipyw: REPO=$(REPO4.2.oldipyw)
-server_4.2.oldipyw: _run-$(PYTHON)
 
 remove-server:
 	-@docker $(DOCKER_OPTS) rm -f $(SERVER_NAME)
@@ -436,19 +389,7 @@ system-test-python2: TEST_MSG="Starting system tests for Python 2"
 system-test-python2:
 	@PYTHON=$(PYTHON) TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
 
-system-test-alt-jupyter: JUPYTER:=_$(ALT_JUPYTER_VERSION)
-system-test-alt-jupyter: SPECS:=$(ALT_JUPYTER_SPECS)
-system-test-alt-jupyter: TEST_MSG="Starting system tests for Jupyter $(ALT_JUPYTER_VERSION)"
-system-test-alt-jupyter:
-	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
-
-system-test-alt-jupyter.oldipyw: JUPYTER:=_$(ALT_JUPYTER_OLD_IPYW_VERSION)
-system-test-alt-jupyter.oldipyw: SPECS:=$(ALT_JUPYTER_SPECS)
-system-test-alt-jupyter.oldipyw: TEST_MSG="Starting system tests for Jupyter $(ALT_JUPYTER_OLD_IPYW_VERSION)"
-system-test-alt-jupyter.oldipyw:
-	@TEST_MSG=$(TEST_MSG) TEST_TYPE=$(TEST_TYPE) BROWSER_LIST="$(ALT_BROWSER_LIST)" JUPYTER=$(JUPYTER) SPECS="$(SPECS)" BASEURL=$(BASEURL) $(MAKE) run-test
-
-system-test-all: system-test-python3 system-test-python2 system-test-alt-jupyter system-test-alt-jupyter.oldipyw
+system-test-all: system-test-python3 system-test-python2
 
 start-selenium: node_modules stop-selenium
 	@echo "Installing and starting Selenium Server..."
