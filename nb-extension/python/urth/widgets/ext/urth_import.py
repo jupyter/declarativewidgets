@@ -15,6 +15,8 @@ from concurrent.futures import ThreadPoolExecutor
 widgets_dir = ''
 logger = None
 
+# In Windows`bower` is not an `.exe` (see #373)
+cmd_bower = ['cmd', '/C', 'bower'] if os.name == 'nt' else ['bower']
 
 class UrthImportHandler(RequestHandler):
 
@@ -26,7 +28,7 @@ class UrthImportHandler(RequestHandler):
     def get(self):
         os.chdir(widgets_dir)
         try:
-            proc = subprocess.check_output(['bower', 'list', '--allow-root', '--config.interactive=false', '-o', '-p', '-j'])
+            proc = subprocess.check_output(cmd_bower + ['list', '--allow-root', '--config.interactive=false', '-o', '-p', '-j'])
             d = json.loads(proc.decode('utf-8'))
             for k in d.keys():
                 v = d[k]
@@ -64,11 +66,8 @@ class UrthImportHandler(RequestHandler):
 # and non-zero for an error.
 def do_install(package_name):
     logger.info('Installing %r', package_name)
-    args = ['bower', 'install', package_name, '--allow-root',
+    args = cmd_bower + ['install', package_name, '--allow-root',
             '--config.interactive=false', '--production', '--quiet']
-    # In Windows`bower` is not an `.exe` (see #373)
-    if os.name == 'nt':
-        args = ['cmd', '/C'] + args
     try:
         subprocess.check_call(args, cwd=widgets_dir)
     except subprocess.CalledProcessError as e:
