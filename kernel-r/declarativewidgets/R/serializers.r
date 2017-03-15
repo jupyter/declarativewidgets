@@ -67,10 +67,10 @@ DataFrame_Serializer <- R6Class(
         check_packages = function() {
             tryCatch({
                 library(base)
+                return (TRUE)
             }, error = function(e) {
-                return (False)
             })
-            return (True)
+            return (FALSE)
         },
         initialize = function() {
             #initialize must exists on this class
@@ -109,10 +109,10 @@ Spark_DataFrame_Serializer <- R6Class(
         check_packages = function() {
             tryCatch({
                 library(SparkR)
+                return (TRUE)
             }, error = function(e) {
-                return (False)
             })
-            return (True)
+            return (FALSE)
         },
         initialize = function() {
             #initialize must exists on this class
@@ -146,10 +146,10 @@ Time_Series_Serializer <- R6Class(
         check_packages = function() {
             tryCatch({
                 library(base)
+                return (TRUE)
             }, error = function(e) {
-                return (False)
             })
-            return (True)
+            return (FALSE)
         },
         initialize = function() {
             #initialize must exists on this class

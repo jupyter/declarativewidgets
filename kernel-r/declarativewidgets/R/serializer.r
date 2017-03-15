@@ -17,12 +17,16 @@ Serializer <- R6Class(
             return (obj)
         },
         register_serializer = function(a_serializer) {
-            self$serializer_list[[a_serializer$klass()]] <- a_serializer$serialize
+            if (a_serializer$check_packages()) {
+                self$serializer_list[[a_serializer$klass()]] <- a_serializer$serialize
+            } else {
+                log_info(paste("Unable to load", class(a_serializer)[1], ": dependent package not found."))
+            }
         },
         load_serializers = function() {
             self$register_serializer(DataFrame_Serializer$new())
-            self$register_serializer(Spark_DataFrame_Serializer$new())
             self$register_serializer(Time_Series_Serializer$new())
+            self$register_serializer(Spark_DataFrame_Serializer$new())
         },
         initialize = function() {
             self$load_serializers()
