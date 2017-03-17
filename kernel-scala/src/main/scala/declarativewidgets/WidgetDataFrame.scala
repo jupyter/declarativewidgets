@@ -34,7 +34,8 @@ class WidgetDataFrame(comm: CommWriter)
 
   /**
    * Handles a Comm Message whose method is backbone.
-   * @param msg The Comm Message.
+    *
+    * @param msg The Comm Message.
    */
   override def handleBackbone(msg: MsgData, msgSupport:MessageSupport): Unit = {
     logger.debug(s"Handling backbone message ${msg}...")
@@ -47,7 +48,8 @@ class WidgetDataFrame(comm: CommWriter)
 
   /**
    * Handles a Comm Message whose method is custom.
-   * @param msgContent The content field of the Comm Message.
+    *
+    * @param msgContent The content field of the Comm Message.
    */
   override def handleCustom(msgContent: MsgData, msgSupport:MessageSupport): Unit = {
     logger.debug(s"Handling custom message ${msgContent}...")
@@ -78,7 +80,25 @@ class WidgetDataFrame(comm: CommWriter)
   }
 
   private[declarativewidgets] def theDataframe = {
-    kernelInterpreter.read(variableName)
+    val splitVariableName = variableName.split('.')
+    if(splitVariableName.length == 2) {
+      val klassName = splitVariableName(0)
+      val fieldName = splitVariableName(1)
+      kernelInterpreter.read(klassName) match {
+        case Some(klass) => {
+          val field = klass.getClass.getDeclaredField(fieldName)
+          field.setAccessible(true)
+          Some(field.get(klass).asInstanceOf[org.apache.spark.sql.DataFrame])
+        }
+        case _ => {
+          logger.error(s"class name $klassName not found in the kernel interpreter")
+          None
+        }
+      }
+
+    } else{
+      kernelInterpreter.read(variableName)
+    }
   }
 
   private[declarativewidgets] def syncData(msgSupport:MessageSupport) = {
