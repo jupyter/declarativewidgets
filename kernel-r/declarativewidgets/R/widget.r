@@ -124,8 +124,6 @@ initWidgets <- function() {
         #create the widget instance
         widget <- create_widget_instance(widget_class, comm, serializer, querier)
     }
-    library(IRdisplay)
-    library(IRkernel)
     #Set log to info level in IRkernel (1 -> log_error, 2 -> log_info, 3 -> log_debug)
     options(jupyter.log_level = 2L)
 
