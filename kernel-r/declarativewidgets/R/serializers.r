@@ -64,14 +64,7 @@ DataFrame_Serializer <- R6Class(
             json[['index']] <- as.numeric(rownames(obj))
             return (json)
         },
-        check_packages = function() {
-            tryCatch({
-                library(base)
-                return (TRUE)
-            }, error = function(e) {
-            })
-            return (FALSE)
-        },
+        check_packages = function() requireNamespace('base', quietly = TRUE),
         initialize = function() {
             #initialize must exists on this class
         }
@@ -106,14 +99,7 @@ Spark_DataFrame_Serializer <- R6Class(
             json[['index']] <- list(1:nrow(df))
             return (json)
         },
-        check_packages = function() {
-            tryCatch({
-                library(SparkR)
-                return (TRUE)
-            }, error = function(e) {
-            })
-            return (FALSE)
-        },
+        check_packages = function() requireNamespace('SparkR', quietly = TRUE),
         initialize = function() {
             #initialize must exists on this class
         }
@@ -143,14 +129,7 @@ Time_Series_Serializer <- R6Class(
             json[['index']] <- self$index_to_list(obj)
             return (json)
         },
-        check_packages = function() {
-            tryCatch({
-                library(base)
-                return (TRUE)
-            }, error = function(e) {
-            })
-            return (FALSE)
-        },
+        check_packages = function() requireNamespace('base', quietly = TRUE),
         initialize = function() {
             #initialize must exists on this class
         }
