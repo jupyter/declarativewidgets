@@ -20,13 +20,14 @@ Imports:
     uuid,
     jsonlite,
     R6
-Collate:
-    'widget.r'
+Collate: 
+    'explore.r'
+    'queriers.r'
+    'querier.r'
+    'serializers.r'
+    'serializer.r'
+    'widget_dataframe.r'
     'widget_function.r'
     'widget_channels.r'
-    'widget_dataframe.r'
-    'explore.r'
-    'serializer.r'
-    'serializers.r'
-    'querier.r'
-    'queriers.r'
+    'widget.r'
+RoxygenNote: 6.0.1.9000

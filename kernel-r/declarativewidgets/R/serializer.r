@@ -1,6 +1,7 @@
 #' @include serializers.r
 NULL
 
+#' @export
 Serializer <- R6Class(
     'Serializer',
     public = list(
