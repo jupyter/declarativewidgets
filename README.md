@@ -74,6 +74,8 @@ jupyter declarativewidgets activate
 ```bash
 # installing R support
 jupyter declarativewidgets installr --library path/to/r/libs
+# alternatively directly from GitHub
+devtools::install_github('jupyter/declarativewidgets', subdir = 'kernel-r/declarativewidgets')
 ```
 
 ##### Note
