@@ -39,7 +39,7 @@ Spark_DataFrame_Querier <- R6Class(
         inherit = Querier,
         public = list(
         handle_sort = function(df, sort_expr) {
-            return (arrange(df, sort_expr$by, decreasing=(sort_expr$ascending == "FALSE")))
+            return (SparkR::arrange(df, sort_expr$by, decreasing=(sort_expr$ascending == "FALSE")))
         },
         handle_filter = function(df, filter_expr) {
             return (filter(df, filter_expr))
@@ -47,15 +47,15 @@ Spark_DataFrame_Querier <- R6Class(
         handle_group = function(df, grp_expr) {
             agg_args <- list()
             col_names <- list()
-            by_arg <- groupBy(df, as.character(grp_expr$by))
+            by_arg <- SparkR::groupBy(df, as.character(grp_expr$by))
             agg_args <- append(agg_args, by_arg)
             for (i in 1:length(grp_expr$agg$op)) {
                 temp_expr <- paste(grp_expr$agg[1][,1][i], "(", grp_expr$agg[2][,1][i], ")", sep="")
-                agg_args <- append(agg_args, expr(temp_expr))
+                agg_args <- append(agg_args, SparkR::expr(temp_expr))
                 temp_name <- paste(grp_expr$agg[1][,1][i], "_", grp_expr$agg[2][,1][i], sep="")
                 col_names <- append(col_names, temp_name)
             }
-            new_df <- do.call(agg, agg_args)
+            new_df <- do.call(SparkR::agg, agg_args)
             col_names <- append(names(new_df)[1], col_names)
             names(new_df) <- col_names
             return (new_df)

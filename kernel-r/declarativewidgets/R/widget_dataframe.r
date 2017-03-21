@@ -3,6 +3,7 @@ NULL
 #' Widget_Dataframe
 #'
 #' Description
+#' @importFrom jsonlite fromJSON
 Widget_Dataframe <- R6Class(
     'Widget_Dataframe',
     inherit = Widget,
@@ -87,7 +88,7 @@ Widget_Dataframe <- R6Class(
         },
         register_query = function(query) {
             self$query <- fromJSON(query)
-            response <- self$serialize_and_send(name, self$limit, self$query)
+            response <- self$serialize_and_send(self$variable_name, self$limit, self$query)
             self$handle_function_response(response)
         },
         initialize = function(comm, serializer, querier) {

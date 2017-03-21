@@ -58,6 +58,7 @@ stringify_bindings <- function(bindings) {
 #' @param channel  The channel to bind to defaulted to default
 #' @param properties  The properties e.g. properties <- list("selection-as-object"=FALSE, foo=5)
 #' @param bindings  The bindings e.g. bindings <- list(selection='sel')
+#' @export
 explore <- function(df, channel='default', properties=list(), bindings=list()) {
     unique_df_name <- paste("the_literal_template_df_name_", get_unique_explore_id(), sep = "")
     register_explore_df <- function(df) {

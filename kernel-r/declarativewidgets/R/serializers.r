@@ -15,7 +15,7 @@ serialize_element <- function(elem) {
 }
 
 get_df_column_types <- function(df) {
-    class_info <- lapply(aDataFrame, class)
+    class_info <- lapply(df, class)
     type_info <- list()
     for (klass in class_info) {
         switch(
@@ -36,7 +36,6 @@ DataFrame_Serializer <- R6Class(
     inherit = Serializer,
     public = list(
         klass = function() {
-            library(base)
             data_frame_class_name <- "data.frame"
             #package_contents <- ls("package:base")
             #index_found <- match(data_frame_class_name, package_contents)
@@ -64,14 +63,7 @@ DataFrame_Serializer <- R6Class(
             json[['index']] <- as.numeric(rownames(obj))
             return (json)
         },
-        check_packages = function() {
-            tryCatch({
-                library(base)
-                return (TRUE)
-            }, error = function(e) {
-            })
-            return (FALSE)
-        },
+        check_packages = function() TRUE,
         initialize = function() {
             #initialize must exists on this class
         }
@@ -83,7 +75,6 @@ Spark_DataFrame_Serializer <- R6Class(
     inherit = Serializer,
     public = list(
         klass = function() {
-            library(SparkR)
             return ("DataFrame")
         },
         df_to_lists = function(df) {
@@ -98,7 +89,7 @@ Spark_DataFrame_Serializer <- R6Class(
             return (rows)
         },
         serialize = function(obj, row_limit=100) {
-            df <- collect(limit(obj, row_limit))
+            df <- SparkR::collect(self$limit(obj, row_limit))
             json <- list()
             json[['columns']] <- colnames(df)
             json[['columnTypes']] <- get_df_column_types(df)
@@ -106,14 +97,7 @@ Spark_DataFrame_Serializer <- R6Class(
             json[['index']] <- list(1:nrow(df))
             return (json)
         },
-        check_packages = function() {
-            tryCatch({
-                library(SparkR)
-                return (TRUE)
-            }, error = function(e) {
-            })
-            return (FALSE)
-        },
+        check_packages = function() requireNamespace('SparkR', quietly = TRUE),
         initialize = function() {
             #initialize must exists on this class
         }
@@ -125,7 +109,6 @@ Time_Series_Serializer <- R6Class(
     inherit = Serializer,
     public = list(
         klass = function() {
-            library(base)
             return("ts")
         },
         index_to_list = function(a_ts) {
@@ -143,14 +126,7 @@ Time_Series_Serializer <- R6Class(
             json[['index']] <- self$index_to_list(obj)
             return (json)
         },
-        check_packages = function() {
-            tryCatch({
-                library(base)
-                return (TRUE)
-            }, error = function(e) {
-            })
-            return (FALSE)
-        },
+        check_packages = function() TRUE,
         initialize = function() {
             #initialize must exists on this class
         }

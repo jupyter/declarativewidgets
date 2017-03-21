@@ -155,7 +155,7 @@ Widget_Function <- R6Class(
                     )
                 }
             }, error = function(e) {
-                log_error(err_msg)
+                log_error(toString(e))
                 log_error(paste("Error getting signature of function:", func_name))
             })
             return (names)

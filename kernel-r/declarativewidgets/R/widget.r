@@ -1,12 +1,15 @@
 #' @include widget_channels.r widget_function.r widget_dataframe.r serializer.r querier.r
 NULL
 
+#' @importClassesFrom IRkernel Comm
 setClassUnion('CommOrNULL', members = c('Comm', 'NULL'))
 
 #' Widget
 #'
 #' Base Widget class
 #'
+#' @importFrom R6 R6Class
+#' @importFrom IRkernel log_info log_error
 #' @export
 Widget <- R6Class("Widget",
     public = list(
@@ -114,6 +117,8 @@ create_widget_instance <- function(class_name, comm, serializer, querier) {
 
 #' Initialise and run the widget
 #'
+#' @importFrom IRkernel comm_manager
+#' @importFrom IRdisplay display_javascript
 #' @export
 initWidgets <- function() {
     serializer <- Serializer$new()
@@ -124,8 +129,6 @@ initWidgets <- function() {
         #create the widget instance
         widget <- create_widget_instance(widget_class, comm, serializer, querier)
     }
-    library(IRdisplay)
-    library(IRkernel)
     #Set log to info level in IRkernel (1 -> log_error, 2 -> log_info, 3 -> log_debug)
     options(jupyter.log_level = 2L)
 
