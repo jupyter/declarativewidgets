@@ -42,7 +42,7 @@ trait QuerySupport extends LogLike {
     val by = toColExpr(
       expr \ "by" match {
         case JsString(col) => List(col)
-        case JsArray(colList:Seq[JsString]) => colList.map(_.as[String]).toList
+        case JsArray(colList:Seq[_]) => colList.map(_.as[String]).toList
         case _ => Nil
       }
     )
@@ -50,9 +50,8 @@ trait QuerySupport extends LogLike {
     val agg =  toArrayOfFuncExpr(
       expr \ "agg"  match {
         case anAgg:JsObject => List(anAgg)
-        case JsArray(aggList:Seq[JsObject]) => aggList.map(_.as[JsObject]).toList
+        case JsArray(aggList:Seq[_]) => aggList.map(_.as[JsObject]).toList
         case _ => List()
-
       }
     )
     //rename resultant column names to dataframe format i.e. sum(columnName) -> sum_columnName
@@ -71,14 +70,14 @@ trait QuerySupport extends LogLike {
     val by = toColExpr(
       expr \ "by" match {
         case JsString(col) => List(col)
-        case JsArray(colList:Seq[JsString]) => colList.map(_.as[String]).toList
+        case JsArray(colList:Seq[_]) => colList.map(_.as[String]).toList
         case _ => Nil
       })
 
     val ascending =
       expr \ "ascending"  match {
         case JsBoolean(asc) => List(asc)
-        case JsArray(ascList:Seq[JsBoolean]) => ascList.map(_.as[Boolean]).toList
+        case JsArray(ascList:Seq[_]) => ascList.map(_.as[Boolean]).toList
         case _ => Nil
       }
 
