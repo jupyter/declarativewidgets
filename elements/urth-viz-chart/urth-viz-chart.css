@@ -1,2 +1,6 @@
 #chart1 .selected { fill: yellow !important; }
 #settings-section { display: none; }
+
+.nvd3 rect[height="1"] {
+  display: none !important;
+}
