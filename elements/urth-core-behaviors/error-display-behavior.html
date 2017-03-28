@@ -42,7 +42,7 @@ This behavior is used to encapsulate some of the services needed for urth elemen
                     var errorNode = document.createElement("pre")
                     errorNode.innerHTML = msg;
                     errorNode.classList.add("urth-widget-error");
-                    Polymer.dom(this.root).appendChild(errorNode);
+                    Polymer.dom(this.root).parentNode.appendChild(errorNode);
                 }
                 var widgetName = this.nodeName.toLowerCase();
                 console.error(widgetName + ": " + msg);
