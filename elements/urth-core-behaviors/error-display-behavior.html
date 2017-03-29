@@ -40,12 +40,12 @@ This behavior is used to encapsulate some of the services needed for urth elemen
             displayErrorMessage: function(msg){
                 var widgetName = this.nodeName.toLowerCase();
 				if (!window.Urth.suppressErrors) {
-                    var errorNode = document.createElement("pre")
+                    var errorNode = document.createElement("pre");
                     errorNode.innerHTML = msg;
                     errorNode.classList.add("urth-widget-error");
 					var appendNode = Polymer.dom(this.root);
 					// if widgetName in a given set, append error message in parent node.
-					if({'urth-core-function': true}[widgetName])
+                    if({'urth-core-function': true}[widgetName])
 						appendNode = appendNode.parentNode;
                     appendNode.appendChild(errorNode);
                 }
