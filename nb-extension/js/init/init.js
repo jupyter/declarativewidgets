@@ -37,7 +37,7 @@ define([
     // to delay javascript execution until dependencies have loaded. If
     // extension initialization has not completed a wrapper implementation
     // is setup which will invoke the real implementation when it is available.
-	window.Urth = window.Urth || {};
+    window.Urth = window.Urth || {};
     Urth._initialized = Urth._initialized || $.Deferred();
     Urth.whenReady = Urth.whenReady || function(cb) {
         Urth._initialized.then(function() {
