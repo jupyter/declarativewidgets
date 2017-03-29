@@ -26,6 +26,25 @@ define([
     ['debug', 'error', 'trace', 'warn'].forEach(function (method) {
         window.console[method] = window.console[method] || window.console.log;
     });
+	
+
+    // Urth._initialized is a deferred that is resolved by the extension		
+    // initialization after the global Urth instance has been setup.
+    // If extension initialization has not completed a new deferred is
+    // initialized which extension initialization will resolve.
+    //		
+    // Urth.whenReady is a public API defined by extension initialization
+    // to delay javascript execution until dependencies have loaded. If
+    // extension initialization has not completed a wrapper implementation
+    // is setup which will invoke the real implementation when it is available.
+    window.Urth = window.Urth || {};
+    Urth._initialized = Urth._initialized || $.Deferred();
+    Urth.whenReady = Urth.whenReady || function(cb) {
+        Urth._initialized.then(function() {
+            Urth.whenReady(cb);
+        });
+    };
+    Urth.whenReady(function() { console.log("Declarative widgets connected.") });
 
     var COMPONENTS_DIR = 'urth_components';
 
