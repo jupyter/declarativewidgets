@@ -26,6 +26,15 @@ define([
     ['debug', 'error', 'trace', 'warn'].forEach(function (method) {
         window.console[method] = window.console[method] || window.console.log;
     });
+	
+    window.Urth = window.Urth || {};
+    Urth._initialized = Urth._initialized || $.Deferred();
+    Urth.whenReady = Urth.whenReady || function(cb) {
+        Urth._initialized.then(function() {
+            Urth.whenReady(cb);
+        });
+    };
+    Urth.whenReady(function() { console.log("Declarative widgets connected.") });
 
     var COMPONENTS_DIR = 'urth_components';
 
