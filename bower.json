@@ -19,8 +19,7 @@
   ],
   "private": true,
   "dependencies": {
-    "polymer": "Polymer/polymer#1",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^1"
+    "polymer": "Polymer/polymer#^1"
   },
   "devDependencies": {
     "web-component-tester": "*",
