@@ -49,7 +49,7 @@ TEST_MSG?="Starting system tests"
 # Logging levels
 DOCKER_OPTS?=--log-level warn
 PIP_OPTS?=--quiet
-BOWER_OPTS?=--quiet
+BOWER_OPTS?=--quiet --force
 
 URTH_BOWER_FILES:=$(shell find elements -name bower.json)
 URTH_SRC_DIRS:=$(foreach dir, $(URTH_BOWER_FILES), $(shell dirname $(dir)))
