@@ -64,7 +64,7 @@ $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 init: node_modules dev_image
 
 node_modules: package.json
-	@npm install --quiet
+	@npm install
 
 node_modules/bower: node_modules
 
@@ -395,7 +395,6 @@ start-selenium: node_modules stop-selenium
 	@echo "Installing and starting Selenium Server..."
 	@node_modules/selenium-standalone/bin/selenium-standalone install >/dev/null
 	@node_modules/selenium-standalone/bin/selenium-standalone start 2>/dev/null & echo $$! > SELENIUM_PID
-	@echo "selenium-standalone server pid=`cat SELENIUM_PID`"
 
 stop-selenium:
 	-@kill `cat SELENIUM_PID`
