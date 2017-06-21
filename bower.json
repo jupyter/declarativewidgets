@@ -19,11 +19,10 @@
   ],
   "private": true,
   "dependencies": {
-    "polymer": "Polymer/polymer#>=1.2.4 <=1.5.0",
-    "webcomponentsjs": "^0.7.2"
+    "polymer": "Polymer/polymer#^1"
   },
   "devDependencies": {
     "web-component-tester": "*",
-    "test-fixture": "PolymerElements/test-fixture#^1.0.0"
+    "test-fixture": "PolymerElements/test-fixture"
   }
 }

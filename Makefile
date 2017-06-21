@@ -49,7 +49,7 @@ TEST_MSG?="Starting system tests"
 # Logging levels
 DOCKER_OPTS?=--log-level warn
 PIP_OPTS?=--quiet
-BOWER_OPTS?=--quiet
+BOWER_OPTS?=--quiet --force
 
 URTH_BOWER_FILES:=$(shell find elements -name bower.json)
 URTH_SRC_DIRS:=$(foreach dir, $(URTH_BOWER_FILES), $(shell dirname $(dir)))
@@ -64,7 +64,7 @@ $(URTH_COMP_LINKS): | node_modules/bower $(URTH_SRC_DIRS)
 init: node_modules dev_image
 
 node_modules: package.json
-	@npm install --quiet
+	@npm install
 
 node_modules/bower: node_modules
 

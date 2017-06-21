@@ -20,7 +20,7 @@
   ],
   "dependencies": {
     "handsontable": "handsontable/handsontable#^0.25",
-    "polymer": "Polymer/polymer#^1.2.4",
+    "polymer": "Polymer/polymer#^1",
     "requirejs": "^2.1.0"
   },
   "private": true
