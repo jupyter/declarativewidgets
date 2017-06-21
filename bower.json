@@ -24,6 +24,6 @@
   },
   "devDependencies": {
     "web-component-tester": "*",
-    "test-fixture": "PolymerElements/test-fixture#^1.1.2"
+    "test-fixture": "PolymerElements/test-fixture"
   }
 }
